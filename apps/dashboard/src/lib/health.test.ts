@@ -1,10 +1,18 @@
 import { describe, expect, it } from 'vitest';
 
-import { serverWarnings, upStretches } from './health';
+import { gigabytesLabel, serverWarnings, upStretches } from './health';
 import { snapshotWith } from './test-common';
 
 /** 12:00Z on the test day. */
 const NOON_MS = Date.parse('2026-10-29T12:00:00.000Z');
+
+describe('gigabytesLabel', () => {
+  it('rounds free bytes to whole gigabytes', () => {
+    // GIVEN the free space from a real disk check
+    // WHEN / THEN it reads in whole gigabytes
+    expect(gigabytesLabel(278647042048)).toBe('279 GB');
+  });
+});
 
 describe('serverWarnings', () => {
   it('lists crashes, Steam drops and low disk, newest first', () => {
@@ -16,7 +24,7 @@ describe('serverWarnings', () => {
     });
 
     // WHEN warnings are listed
-    const texts = serverWarnings(snapshot).map((w) => w.text);
+    const texts = serverWarnings(snapshot).map((warning) => warning.text);
 
     // THEN each problem reads plainly, newest first
     expect(texts).toEqual([

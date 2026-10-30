@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { clip } from '#lib/day.ts';
-  import { DAY_MS, type Player, type Snapshot } from '#lib/models.ts';
+  import { clip, dayPercent } from '#lib/day.ts';
+  import { DAY_MS, HOURS_PER_DAY, LANE_AXIS_STEP_HOURS, MS_PER_HOUR, type Player, type Snapshot } from '#lib/models.ts';
   import { sessionEndMs } from '#lib/players.ts';
   import { clockTime } from '#lib/status.ts';
 
@@ -12,9 +12,6 @@
     offsetMinutes: number;
   } = $props();
 
-  /** Hours between axis labels. */
-  const AXIS_STEP_HOURS = 4;
-
   /** Start of the last 24 hours. */
   const startMs = $derived(nowMs - DAY_MS);
 
@@ -23,7 +20,9 @@
 
   /** Axis labels from 24 hours ago to now. */
   const axis = $derived(
-    Array.from({ length: 24 / AXIS_STEP_HOURS + 1 }, (_, i) => clockAt(startMs + (i * DAY_MS * AXIS_STEP_HOURS) / 24)),
+    Array.from({ length: HOURS_PER_DAY / LANE_AXIS_STEP_HOURS + 1 }, (_, step) =>
+      clockAt(startMs + step * LANE_AXIS_STEP_HOURS * MS_PER_HOUR),
+    ),
   );
 
   /** One lane per player, with a bar for each part of a session in the last 24 hours. */
@@ -36,8 +35,8 @@
           ? []
           : [
               {
-                left: `${((part.startMs - startMs) / DAY_MS) * 100}%`,
-                width: `max(3px, ${((part.endMs - part.startMs) / DAY_MS) * 100}%)`,
+                left: dayPercent(part.startMs, startMs),
+                width: `max(3px, ${dayPercent(part.endMs, part.startMs)})`,
                 label: `${player.character}: ${clockAt(part.startMs)} to ${clockAt(part.endMs)}`,
               },
             ];
@@ -51,7 +50,7 @@
     <div class="row">
       <span></span>
       <div class="axis mono">
-        {#each axis as label, i (i)}<span>{label}</span>{/each}
+        {#each axis as label, step (step)}<span>{label}</span>{/each}
       </div>
     </div>
     {#each lanes as lane (lane.player.key)}

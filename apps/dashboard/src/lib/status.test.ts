@@ -1,6 +1,15 @@
 import { describe, expect, it } from 'vitest';
 
-import { clockTime, durationLabel, isServerOnline, offsetLabel, onlinePlayers, statusLine, whenLabel } from './status';
+import {
+  clockTime,
+  durationLabel,
+  isServerOnline,
+  offsetLabel,
+  onlinePlayers,
+  statusLine,
+  steamLabel,
+  whenLabel,
+} from './status';
 import { sessionWith, snapshotWith } from './test-common';
 
 /** A run that started at 09:42Z with its last line at 12:00Z and one player inside. */
@@ -91,5 +100,13 @@ describe('whenLabel', () => {
     // THEN only the older one has a date
     expect(whenLabel('2026-10-29T09:15:00.000Z', 0, nowMs)).toBe('09:15');
     expect(whenLabel('2026-10-28T23:05:00.000Z', 0, nowMs)).toBe('Oct 28 23:05');
+  });
+});
+
+describe('steamLabel', () => {
+  it('names the Steam link in a word, or a dash before the log says', () => {
+    // GIVEN each state of the Steam link
+    // WHEN / THEN each reads as one word
+    expect([steamLabel(true), steamLabel(false), steamLabel(null)]).toEqual(['Connected', 'Disconnected', '–']);
   });
 });

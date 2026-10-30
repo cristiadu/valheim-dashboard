@@ -1,9 +1,9 @@
 import { clip } from './day';
-import { DAY_MS, type ServerWarning, type Snapshot } from './models';
+import { BYTES_PER_GB, DAY_MS, type ServerWarning, type Snapshot } from './models';
 import { isServerOnline } from './status';
 
-/** Bytes in a gigabyte, as disks count them. */
-export const BYTES_PER_GB = 1e9;
+/** Free disk space in whole gigabytes, for example `278 GB`. */
+export const gigabytesLabel = (bytes: number): string => `${Math.round(bytes / BYTES_PER_GB)} GB`;
 
 /** Problems worth a look, newest first: crashes, lost Steam connections and low disk space. */
 export const serverWarnings = (snapshot: Snapshot): ServerWarning[] => {

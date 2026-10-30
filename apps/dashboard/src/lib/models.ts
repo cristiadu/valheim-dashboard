@@ -1,10 +1,89 @@
 import type { LogEvent, PlayerSession } from 'valheim-log';
 
-/** How long after the last log line the server still counts as online. Saves log a line every 10 minutes. */
-export const ONLINE_WINDOW_MS = 15 * 60_000;
+/** One dashboard tab and the page it opens. */
+export type Tab = {
+  /** Page path, for example `/saga`. */
+  path: string;
+  /** Name shown in the menu and as the page heading. */
+  label: string;
+  /** Short line under the label in the menu. */
+  hint: string;
+  /** Rune shown as the tab icon. */
+  rune: string;
+};
+
+/** The dashboard tabs, in menu order. Hall is the first screen and stays short. */
+export const TABS: readonly Tab[] = [
+  { path: '/', label: 'Hall', hint: 'Today at a glance', rune: 'ᛟ' },
+  { path: '/vikings', label: 'Vikings', hint: 'Who was online', rune: 'ᛗ' },
+  { path: '/saga', label: 'Saga', hint: 'Every game event', rune: 'ᚱ' },
+  { path: '/world', label: 'World', hint: 'Saves and backups', rune: 'ᛃ' },
+  { path: '/recipes', label: 'Recipes', hint: 'Plan what to make', rune: 'ᚲ' },
+  { path: '/server', label: 'Server', hint: 'Status and warnings', rune: 'ᚾ' },
+];
 
 /** Milliseconds in one minute. */
 export const MS_PER_MINUTE = 60_000;
+
+/** Minutes in one hour. */
+export const MINUTES_PER_HOUR = 60;
+
+/** Hours in one day. */
+export const HOURS_PER_DAY = 24;
+
+/** Milliseconds in one hour. */
+export const MS_PER_HOUR = MINUTES_PER_HOUR * MS_PER_MINUTE;
+
+/** Milliseconds in one day. */
+export const DAY_MS = HOURS_PER_DAY * MS_PER_HOUR;
+
+/** How long after the last log line the server still counts as online. Saves log a line every 10 minutes. */
+export const ONLINE_WINDOW_MS = 15 * MS_PER_MINUTE;
+
+/** Bytes in a gigabyte, as disks count them. */
+export const BYTES_PER_GB = 1e9;
+
+/** Month names for dates. */
+export const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] as const;
+
+/** How often the page clock moves, so ages like "up 3h 12m" stay current. */
+export const CLOCK_TICK_MS = 30_000;
+
+/** Context key for the snapshot getter that the layout shares with the pages. */
+export const SNAPSHOT_KEY = Symbol('snapshot');
+
+/** Width and height of the day wheel drawing. */
+export const WHEEL_SIZE = 300;
+
+/** Center of the day wheel in its drawing. */
+export const WHEEL_CENTER = WHEEL_SIZE / 2;
+
+/** Radius of the day wheel's outer circle. Hour ticks start here. */
+export const WHEEL_RIM_RADIUS = 134;
+
+/** Radius where the long hour ticks, every 6 hours, end. */
+export const WHEEL_LONG_TICK_RADIUS = 124;
+
+/** Radius where the short hour ticks end. */
+export const WHEEL_SHORT_TICK_RADIUS = 129;
+
+/** Length of the clock hand that points at now. */
+export const WHEEL_HAND_RADIUS = 128;
+
+/** Radius of the first player's ring. */
+export const WHEEL_OUTER_RING_RADIUS = 118;
+
+/** Space between two players' rings. */
+export const WHEEL_RING_STEP = 14;
+
+/** Longest arc on the wheel, in hours. A full 24-hour circle cannot be drawn as one SVG arc. */
+export const WHEEL_MAX_ARC_HOURS = 23.99;
+
+/** Shortest arc on the wheel, in hours, so a short session still shows. */
+export const WHEEL_MIN_ARC_HOURS = 0.05;
+
+/** Hours between the time labels above the Vikings lanes. */
+export const LANE_AXIS_STEP_HOURS = 4;
 
 /** Event types friends see in the story of the server. Joins and leaves come from the sessions. */
 export const STORY_EVENT_TYPES = ['playerDied', 'raidStarted', 'nightSkipped', 'worldLoaded', 'serverStopped'] as const;
@@ -102,9 +181,6 @@ export type BuildRecord = {
 
 /** Most kinds of pieces a story line names. */
 export const LISTED_PIECE_KINDS = 3;
-
-/** Milliseconds in one day. */
-export const DAY_MS = 24 * 60 * MS_PER_MINUTE;
 
 /** How many events the Hall shows. */
 export const LATEST_EVENT_COUNT = 5;
@@ -275,4 +351,12 @@ export const ICON_FILES: Record<string, string> = {
   'Blackmetal sword': 'Black Metal Sword.png',
   'Blackmetal axe': 'Black Metal Axe.png',
   'Blackmetal shield': 'Black Metal Shield.png',
+};
+
+/** The browser's live stream and page clock, while the page is open. */
+export type LiveConnection = {
+  /** Server-sent events from `/api/stream`. */
+  source: EventSource;
+  /** Timer that moves the page clock. */
+  clock: ReturnType<typeof setInterval>;
 };

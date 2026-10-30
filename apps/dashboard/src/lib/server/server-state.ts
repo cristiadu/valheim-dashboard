@@ -24,7 +24,7 @@ const pushCapped = <T>(list: T[], item: T, max: number): void => {
  */
 const addPiece = (builds: BuildRecord[], event: PieceEvent): void => {
   const isDestroyed = event.type === 'pieceDestroyed';
-  const stretch = builds.findLast((b) => b.builder === event.builder && b.isDestroyed === isDestroyed);
+  const stretch = builds.findLast((build) => build.builder === event.builder && build.isDestroyed === isDestroyed);
   if (stretch && Date.parse(event.timeUtc) - Date.parse(stretch.endUtc) <= BUILD_GAP_MS) {
     stretch.endUtc = event.timeUtc;
     stretch.pieces[event.piece] = (stretch.pieces[event.piece] ?? 0) + 1;
