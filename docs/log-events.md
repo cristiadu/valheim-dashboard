@@ -21,6 +21,16 @@ Timestamp regex: `^(?<month>\d{2})/(?<day>\d{2})/(?<year>\d{4}) (?<time>\d{2}:\d
 
 ## Player IDs
 
+The log names one player in several ways. Group them under the Steam ID: one Steam ID is one person.
+
+```mermaid
+flowchart LR
+    SteamID[Steam ID] --- SteamName[Steam name: Tony Example]
+    SteamID --- PlayFab[PlayFab ID, one per connection]
+    PlayFab --- Peer[ZDOID peer ID, one per connection]
+    Peer --- Character[Character name: Ragnar]
+```
+
 | ID | Example | Lasts |
 | --- | --- | --- |
 | Steam ID | `Steam_76561198000000001` | Always |
@@ -28,6 +38,12 @@ Timestamp regex: `^(?<month>\d{2})/(?<day>\d{2})/(?<year>\d{4}) (?<time>\d{2}:\d
 | PlayFab ID (crossplay connection) | `A1B2C3D4E5F60718` | One connection |
 | Character name | `Ragnar` | Always (one Steam account can have many) |
 | ZDOID | `549297305:1` (peer ID `:` object ID) | One connection |
+
+In the sample log, Steam name `Tony Example` and character `Ragnar` are the same person. Show the
+player as one entry, for example `Ragnar (Tony Example)`.
+
+The server's own Steam ID (`Caching Steam ID: 76561197960265728`) and `Server ID` at startup belong
+to the server, not to a player.
 
 ## Join and leave
 
