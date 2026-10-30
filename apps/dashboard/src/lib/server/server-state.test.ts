@@ -74,6 +74,8 @@ describe('server state', () => {
 
     // THEN the stop time is known and the session ended with it
     expect(state.snapshot.stoppedUtc).toBe('2026-10-29T23:19:51.000Z');
+    expect(state.snapshot.runs).toMatchObject([{ startUtc: '2026-10-29T09:42:15.000Z', endReason: 'stopped' }]);
+    expect(state.snapshot.steamDropsUtc).toEqual(['2026-10-29T23:19:51.000Z']);
     expect(state.snapshot.sessions[0]).toMatchObject({ endReason: 'serverStopped' });
   });
 
@@ -90,6 +92,7 @@ describe('server state', () => {
       { character: 'Ragnar', endUtc: '2026-10-29T09:43:13.000Z', endReason: 'serverCrashed' },
     ]);
     expect(state.snapshot).toMatchObject({ world: null, startedUtc: '2026-10-29T12:00:00.000Z' });
+    expect(state.snapshot.runs.map((run) => run.endReason)).toEqual(['crashed', null]);
     expect(state.snapshot.events.map((event) => event.type)).toEqual(['worldLoaded']);
   });
 });
