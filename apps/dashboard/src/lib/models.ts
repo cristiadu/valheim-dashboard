@@ -188,3 +188,91 @@ export type ServerWarning = {
   /** Plain sentence, for example `Server went down without a clean stop`. */
   text: string;
 };
+
+/** Where a recipe is made in the game. `Hand` means the crafting menu, with no station. */
+export type CraftingStation = 'Hand' | 'Workbench' | 'Forge' | 'Cauldron' | 'Mead ketill';
+
+/** Biome a recipe belongs to, in the order players usually reach them. Groups the recipe list. */
+export const RECIPE_BIOMES = ['Meadows', 'Black Forest', 'Swamp', 'Mountain', 'Plains'] as const;
+
+/** One biome from [RECIPE_BIOMES]. */
+export type RecipeBiome = (typeof RECIPE_BIOMES)[number];
+
+/** An item and how many of it. */
+export type ItemAmount = {
+  /** Item name as the game shows it, for example `Deer hide`. */
+  item: string;
+  /** How many. */
+  amount: number;
+};
+
+/** A Valheim recipe at quality level 1. */
+export type Recipe = {
+  /** Stable key saved in plans, for example `bronze-axe`. */
+  id: string;
+  /** Name as the game shows it. */
+  name: string;
+  /** Biome where its materials come from. */
+  biome: RecipeBiome;
+  /** Where it is made. */
+  station: CraftingStation;
+  /** How many items one craft gives, for example 20 arrows. */
+  yields: number;
+  /** Items used by one craft. */
+  ingredients: ItemAmount[];
+};
+
+/** A recipe the viewer is working toward, saved in their browser. */
+export type Plan = {
+  /** Unique number for this plan. */
+  id: number;
+  /** Recipe being planned. */
+  recipeId: string;
+  /** How many times to craft it. */
+  crafts: number;
+  /** How many of each ingredient the viewer has set aside, by item name. Missing items count as 0. */
+  have: Record<string, number>;
+};
+
+/** One ingredient line of a plan. */
+export type PlanItem = {
+  /** Item name. */
+  item: string;
+  /** How many the plan needs in total. */
+  need: number;
+  /** How many the viewer has, capped at [need]. */
+  have: number;
+  /** How many are still missing. */
+  missing: number;
+};
+
+/** Browser storage key for the viewer's plans. */
+export const PLANS_STORAGE_KEY = 'valheim-dashboard.plans';
+
+/** Most crafts one plan can hold, so a typo like 5000 does not flood the list. */
+export const MAX_CRAFTS = 999;
+
+/** Valheim wiki address that sends back an uploaded file by its name. Item icons load from here in the viewer's browser. */
+export const WIKI_FILE_URL = 'https://valheim.fandom.com/wiki/Special:FilePath/';
+
+/** Size of an item icon next to its name, in pixels. */
+export const ITEM_ICON_PX = 28;
+
+/** Size of a recipe's icon beside its name or preview, in pixels. */
+export const RECIPE_ICON_PX = 40;
+
+/** Wiki icon files whose name is not the item name, by item name. */
+export const ICON_FILES: Record<string, string> = {
+  'Flint arrow': 'Flinthead Arrow.png',
+  'Fine wood': 'Finewood.png',
+  'Core wood': 'Corewood.png',
+  'Wolf armor chest': 'Wolf Hide Chestpiece.png',
+  'Wolf armor legs': 'Wolf Hide Trousers.png',
+  'Minor healing mead base': 'Mead Base - Minor Healing.png',
+  'Minor stamina mead base': 'Mead Base - Minor Stamina.png',
+  'Poison resistance mead base': 'Mead Base - Poison Resistance.png',
+  'Frost resistance mead base': 'Mead Base - Frost Resistance.png',
+  'Blackmetal sword': 'Black Metal Sword.png',
+  'Blackmetal axe': 'Black Metal Axe.png',
+  'Blackmetal shield': 'Black Metal Shield.png',
+};
