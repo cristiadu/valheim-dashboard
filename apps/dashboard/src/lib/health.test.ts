@@ -1,10 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { gigabytesLabel, serverWarnings, upStretches } from './health';
-import { snapshotWith } from './test-common';
-
-/** 12:00Z on the test day. */
-const NOON_MS = Date.parse('2026-10-29T12:00:00.000Z');
+import { snapshotWith, TEST_NOON_MS } from './test-common';
 
 describe('gigabytesLabel', () => {
   it('rounds free bytes to whole gigabytes', () => {
@@ -47,12 +44,12 @@ describe('upStretches', () => {
     });
 
     // WHEN the stretches are found at noon
-    const stretches = upStretches(snapshot, NOON_MS);
+    const stretches = upStretches(snapshot, TEST_NOON_MS);
 
     // THEN the old run starts at the window edge and the live run ends now
     expect(stretches).toEqual([
       { startMs: Date.parse('2026-10-28T12:00:00.000Z'), endMs: Date.parse('2026-10-28T14:00:00.000Z') },
-      { startMs: Date.parse('2026-10-29T08:00:00.000Z'), endMs: NOON_MS },
+      { startMs: Date.parse('2026-10-29T08:00:00.000Z'), endMs: TEST_NOON_MS },
     ]);
   });
 });

@@ -1,10 +1,14 @@
 import type { PlayerSession } from 'valheim-log';
 
 import type { Plan, Snapshot } from './models';
-import { createServerState } from './server/server-state';
+import type { ServerState } from './server/models';
+import { createServerState, readLogLine } from './server/server-state';
 
 /** Offset of the test server's clock from UTC, in minutes (UTC−7). */
 export const TEST_OFFSET_MINUTES = -420;
+
+/** 12:00Z on the test day, Oct 29 2026. */
+export const TEST_NOON_MS = Date.parse('2026-10-29T12:00:00.000Z');
 
 /** Returns a `logs.txt` line written at [time] (server clock, `HH:MM:SS`) on 10/29/2026. */
 export const logLine = (time: string, message: string): string => `10/29/2026 ${time}: ${message}`;
@@ -48,3 +52,10 @@ export const planWith = (changes: Partial<Plan>): Plan => ({
   have: {},
   ...changes,
 });
+
+/** Reads [lines] into [state], in order. */
+export const readLines = (state: ServerState, lines: readonly string[]): void => {
+  for (const line of lines) {
+    readLogLine(state, line);
+  }
+};
