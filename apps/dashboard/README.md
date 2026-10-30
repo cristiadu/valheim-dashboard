@@ -59,3 +59,17 @@ flowchart TD
 
 - Log times are the server PC's clock. They are stored in UTC and shown in each viewer's time zone.
 - History stays in memory while the dashboard runs. It survives server restarts, not dashboard restarts.
+
+## Recipes tab
+
+Each viewer plans what they want to craft. A plan is a recipe and how many times to make it. For each item you tick it off or type how many you have. "Still needed" adds up what every plan is missing.
+
+```mermaid
+flowchart LR
+  pick[Pick recipe and times] --> plan[Plan]
+  plan -->|tick or type what you have| left[Missing per item]
+  left --> total[Still needed, all plans]
+```
+
+- Plans are saved in the viewer's browser, so each friend has their own and the server stores nothing.
+- Recipes are a fixed list of common Valheim recipes at quality level 1, in `src/lib/recipes.ts`.

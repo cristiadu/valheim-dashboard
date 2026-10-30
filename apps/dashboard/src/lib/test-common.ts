@@ -1,6 +1,6 @@
 import type { PlayerSession } from 'valheim-log';
 
-import type { Snapshot } from './models';
+import type { Plan, Snapshot } from './models';
 import { createServerState } from './server/server-state';
 
 /** Offset of the test server's clock from UTC, in minutes (UTC−7). */
@@ -37,5 +37,14 @@ export const sessionWith = (changes: Partial<PlayerSession>): PlayerSession => (
   endUtc: null,
   endReason: null,
   deaths: 0,
+  ...changes,
+});
+
+/** Returns a plan to craft one Bronze axe (4 Wood, 8 Bronze) changed by [changes]. */
+export const planWith = (changes: Partial<Plan>): Plan => ({
+  id: 1,
+  recipeId: 'bronze-axe',
+  crafts: 1,
+  have: {},
   ...changes,
 });
