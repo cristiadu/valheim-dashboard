@@ -1,10 +1,17 @@
 import type { LogEvent, LogReader, SessionState } from 'valheim-log';
 
 import type { Snapshot } from '#/src/lib/models.ts';
+import type { LogHistory } from '#/src/lib/server/log-history.ts';
 import type { LogTail } from '#/src/lib/server/log-tail.ts';
 
 /** Where the server writes its log when no `LOG_FILE` is set. */
 export const DEFAULT_LOG_FILE = 'C:\\Valheim Server\\logs.txt';
+
+/**
+ * Folder next to the server's log that keeps a copy of every run's log, named by the run's first line, for
+ * example `20261030-154344.txt`. The server writes a new `logs.txt` on every start, so this is the history.
+ */
+export const HISTORY_FOLDER_NAME = 'log-history';
 
 /** How often the log file is checked for new lines. */
 export const POLL_INTERVAL_MS = 2_000;
@@ -67,6 +74,8 @@ export type Follower = {
   logFile: string;
   /** Reads the new lines. */
   tail: LogTail;
+  /** Keeps a copy of the run in the history folder. */
+  history: LogHistory;
   /** What the lines built so far. */
   state: ServerState;
   /** True when lines arrived since the listeners were last told. */
