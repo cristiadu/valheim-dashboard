@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { TABS, type Tab } from '#lib/models.ts';
+  import { TABS, type Tab } from '#/lib/models';
 
   /** Tab shown now. */
   let { current }: { current: Tab } = $props();

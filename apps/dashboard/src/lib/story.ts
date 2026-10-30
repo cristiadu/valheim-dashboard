@@ -7,7 +7,7 @@ import {
   type Snapshot,
   type StoryEvent,
   type StoryItem,
-} from './models';
+} from '#/lib/models';
 
 /** Returns `1 death` or `2 deaths` style text. */
 const count = (amount: number, one: string, many: string): string => `${amount} ${amount === 1 ? one : many}`;

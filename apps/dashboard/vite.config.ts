@@ -4,6 +4,6 @@ import { defineConfig } from 'vitest/config';
 
 /** Vite setup: one Node server serves the pages, and unit tests run with Vitest. */
 export default defineConfig({
-  plugins: [sveltekit({ adapter: adapter() })],
+  plugins: [sveltekit({ adapter: adapter(), alias: { '#/lib': 'src/lib', '#/app.css': 'src/app.css' } })],
   test: { include: ['src/**/*.test.ts'] },
 });

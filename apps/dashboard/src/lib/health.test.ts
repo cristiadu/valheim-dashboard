@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { gigabytesLabel, serverWarnings, upStretches } from './health';
-import { snapshotWith, TEST_NOON_MS } from './test-common';
+import { gigabytesLabel, serverWarnings, upStretches } from '#/lib/health';
+import { snapshotWith, TEST_NOON_MS } from '#/lib/test-common';
 
 describe('gigabytesLabel', () => {
   it('rounds free bytes to whole gigabytes', () => {

@@ -1,8 +1,8 @@
 import type { PlayerSession } from 'valheim-log';
 
-import type { Plan, Snapshot } from './models';
-import type { ServerState } from './server/models';
-import { createServerState, readLogLine } from './server/server-state';
+import type { Plan, Snapshot } from '#/lib/models';
+import type { ServerState } from '#/lib/server/models';
+import { createServerState, readLogLine } from '#/lib/server/server-state';
 
 /** Offset of the test server's clock from UTC, in minutes (UTC−7). */
 export const TEST_OFFSET_MINUTES = -420;

@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
-import { readConfig } from './config';
+import { readConfig } from '#/lib/server/config';
 
 describe('readConfig', () => {
   beforeAll(() => {

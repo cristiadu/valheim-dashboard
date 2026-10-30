@@ -1,6 +1,6 @@
 import { getContext, setContext } from 'svelte';
 
-import { CLOCK_TICK_MS, type LiveConnection, SNAPSHOT_KEY, type Snapshot } from './models';
+import { CLOCK_TICK_MS, type LiveConnection, SNAPSHOT_KEY, type Snapshot } from '#/lib/models';
 
 /** Live data in the browser. Both stay null while the page renders on the server. */
 export const live = $state<{ snapshot: Snapshot | null; nowMs: number | null }>({ snapshot: null, nowMs: null });

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { clampCrafts, newPlan, planItems, readPlans, stillNeeded, withHave } from './planner';
-import { planWith } from './test-common';
+import { clampCrafts, newPlan, planItems, readPlans, stillNeeded, withHave } from '#/lib/planner';
+import { planWith } from '#/lib/test-common';
 
 describe('clampCrafts', () => {
   it('keeps a whole number in range', () => {

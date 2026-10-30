@@ -1,4 +1,4 @@
-import { DEFAULT_LOG_FILE, type Config } from './models';
+import { DEFAULT_LOG_FILE, type Config } from '#/lib/server/models';
 
 /**
  * Reads the dashboard settings from [env]. Without `SERVER_UTC_OFFSET_MINUTES`, the offset is this

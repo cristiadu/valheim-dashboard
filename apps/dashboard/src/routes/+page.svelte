@@ -1,12 +1,12 @@
 <script lang="ts">
-  import DayWheel from '#lib/components/DayWheel.svelte';
-  import NoData from '#lib/components/NoData.svelte';
-  import { live, useSnapshot, viewerOffsetMinutes } from '#lib/live.svelte.ts';
-  import { LATEST_EVENT_COUNT, STORY_STYLES } from '#lib/models.ts';
-  import { playersOf } from '#lib/players.ts';
-  import { clockTime, durationLabel, isServerOnline, whenLabel } from '#lib/status.ts';
-  import { gigabytesLabel } from '#lib/health.ts';
-  import { daySummary, storyOf } from '#lib/story.ts';
+  import DayWheel from '#/lib/components/DayWheel.svelte';
+  import NoData from '#/lib/components/NoData.svelte';
+  import { live, useSnapshot, viewerOffsetMinutes } from '#/lib/live.svelte';
+  import { LATEST_EVENT_COUNT, STORY_STYLES } from '#/lib/models';
+  import { playersOf } from '#/lib/players';
+  import { clockTime, durationLabel, isServerOnline, whenLabel } from '#/lib/status';
+  import { gigabytesLabel } from '#/lib/health';
+  import { daySummary, storyOf } from '#/lib/story';
 
   /** Getter for the snapshot the layout shares. */
   const getSnapshot = useSnapshot();
