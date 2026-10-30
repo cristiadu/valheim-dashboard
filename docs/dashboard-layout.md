@@ -31,18 +31,23 @@ Errors and warnings only appear on the Server tab. Hall links to it with one lin
 ## Who is online
 
 Online players come from join and leave events, not from the clock. A player is online from their
-join until their leave, or until the server stops.
+join until they leave, time out, or the server stops.
 
 ```mermaid
 stateDiagram-v2
     [*] --> Offline
     Offline --> Online: Got character ZDOID from name
     Online --> Offline: Player connection lost
-    Online --> Offline: Server stopped
+    Online --> Offline: ZRpc timeout detected
+    Online --> Offline: OnApplicationQuit
+    Online --> Offline: Log ends without OnApplicationQuit
 ```
 
-If the log ends while a player is still online, the dashboard says "online at last log line" with
-that time. It does not say "online now" unless the log was written in the last few minutes.
+A server stop or crash ends every open player session. A log that ends without `OnApplicationQuit`
+means the server crashed, so open sessions end at the last log line.
+
+The dashboard only says "online now" when the log was written in the last few minutes. Otherwise it
+shows the time of the last log line.
 
 ## Players
 
