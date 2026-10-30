@@ -20,11 +20,11 @@ $ErrorActionPreference = 'Stop'
 # Seconds to wait before starting again after the dashboard stops.
 $RestartDelaySeconds = 5
 
-# pnpm version the repo uses, run through npx so it needs no global install.
-$Pnpm = 'pnpm@12.16.1'
-
 # Repo folder, one level above this script.
 $RepoRoot = Split-Path -Parent $PSScriptRoot
+
+# pnpm version the repo uses, from package.json, run through npx so it needs no global install.
+$Pnpm = (Get-Content (Join-Path $RepoRoot 'package.json') -Raw | ConvertFrom-Json).packageManager
 
 # Built server entry point.
 $BuildEntry = Join-Path $RepoRoot 'apps\dashboard\build\index.js'
