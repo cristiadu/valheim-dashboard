@@ -119,3 +119,6 @@ app.*.symbols
 !/dev/ci/**/Gemfile.lock
 # Node
 node_modules/
+
+# SvelteKit generated files
+.svelte-kit/
