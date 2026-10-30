@@ -143,6 +143,21 @@ that holds the keys as plain text.
 The sample world `Cotil` has `defeated_eikthyr` and `killedtroll`. A new key between two saves
 means that boss was killed between those save times.
 
+## Other events
+
+Also not in the sample log.
+
+| Event | Example | Regex |
+| --- | --- | --- |
+| Player timed out | `ZRpc timeout detected` | `^ZRpc timeout detected` (a leave, like `RPC_Disconnect`) |
+| Night skipped (players slept) | `Time 3600.5, day:2    nextm:3780  skipspeed:5` | `day:(?<day>\d+)` (day counts from 0) |
+| Server stopped | `OnApplicationQuit` | `OnApplicationQuit` |
+| Network trouble | `Resume TX on playfab/A1B2C3D4E5F60718` | `^Resume TX on playfab/(?<playFabId>[0-9A-F]+)` |
+| World loaded (before 1.0.7) | `Load world: Cotil (Cotil)` | `^Load world: (?<world>.+?) \(` |
+
+`OnApplicationQuit` may have no timestamp. If the log ends without it, the server crashed or was
+killed.
+
 ## Steam-only servers
 
 Without crossplay, the server writes Steam IDs instead of PlayFab IDs:
@@ -218,4 +233,5 @@ Not game events. Keep them out of the timeline.
 - [valheim-server-docker discussion #519](https://github.com/lloesche/valheim-server-docker/discussions/519) (`Closing socket`, handshake)
 - [Join and leave script](https://gist.github.com/KevinPayravi/fe33a9b7d1b17e2747908950aa7a12f7) (Steam-only join and leave lines)
 - [Example server log](https://gist.github.com/kgadberry/8703f734e53b76862c7d62aca828d664) (`Got connection SteamID`, wrong password)
+- [vh-notify-ts](https://github.com/Viapatis/vh-notify-ts) (closest full list: timeout, night skip, server stop, network trouble)
 - [valheim-discord-monitor PR #50](https://github.com/alainator/valheim-discord-monitor/pull/50) (boss keys in the `.db2` save)
