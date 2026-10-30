@@ -1,6 +1,6 @@
 <script lang="ts">
-  import NoData from '#/lib/components/NoData.svelte';
-  import StatGrid from '#/lib/components/StatGrid.svelte';
+  import NoData from '#/lib/components/NoData';
+  import StatGrid from '#/lib/components/StatGrid';
   import { live, useSnapshot, viewerOffsetMinutes } from '#/lib/live.svelte';
   import { LATEST_SAVE_COUNT } from '#/lib/models';
   import { whenLabel } from '#/lib/status';

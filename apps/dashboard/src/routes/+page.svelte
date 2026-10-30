@@ -1,6 +1,6 @@
 <script lang="ts">
-  import DayWheel from '#/lib/components/DayWheel.svelte';
-  import NoData from '#/lib/components/NoData.svelte';
+  import DayWheel from '#/lib/components/DayWheel';
+  import NoData from '#/lib/components/NoData';
   import { live, useSnapshot, viewerOffsetMinutes } from '#/lib/live.svelte';
   import { LATEST_EVENT_COUNT, STORY_STYLES } from '#/lib/models';
   import { playersOf } from '#/lib/players';

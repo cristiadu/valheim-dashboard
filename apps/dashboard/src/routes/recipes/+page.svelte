@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
-  import ItemIcon from '#/lib/components/ItemIcon.svelte';
+  import ItemIcon from '#/lib/components/ItemIcon';
   import { MAX_CRAFTS, RECIPE_BIOMES, RECIPE_ICON_PX, type Plan } from '#/lib/models';
   import { clampCrafts, newPlan, planItems, stillNeeded, withHave } from '#/lib/planner';
   import { loadPlans, planner, savePlans } from '#/lib/plans.svelte';

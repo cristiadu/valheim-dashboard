@@ -1,5 +1,5 @@
 <script lang="ts">
-  import NoData from '#/lib/components/NoData.svelte';
+  import NoData from '#/lib/components/NoData';
   import { live, useSnapshot, viewerOffsetMinutes } from '#/lib/live.svelte';
   import { SAGA_FILTERS, STORY_STYLES } from '#/lib/models';
   import { whenLabel } from '#/lib/status';

@@ -4,8 +4,8 @@
   import { onMount, type Snippet } from 'svelte';
 
   import { page } from '$app/state';
-  import Header from '#/lib/components/Header.svelte';
-  import SideMenu from '#/lib/components/SideMenu.svelte';
+  import Header from '#/lib/components/Header';
+  import SideMenu from '#/lib/components/SideMenu';
   import { connectLive, live, provideSnapshot, viewerOffsetMinutes } from '#/lib/live.svelte';
   import type { Snapshot } from '#/lib/models';
   import { isServerOnline, statusLine } from '#/lib/status';

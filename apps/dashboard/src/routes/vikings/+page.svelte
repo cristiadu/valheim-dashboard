@@ -1,6 +1,6 @@
 <script lang="ts">
-  import NoData from '#/lib/components/NoData.svelte';
-  import TimeLanes from '#/lib/components/TimeLanes.svelte';
+  import NoData from '#/lib/components/NoData';
+  import TimeLanes from '#/lib/components/TimeLanes';
   import { live, useSnapshot, viewerOffsetMinutes } from '#/lib/live.svelte';
   import { playersOf } from '#/lib/players';
   import { clockTime, durationLabel } from '#/lib/status';
