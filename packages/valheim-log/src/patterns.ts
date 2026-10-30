@@ -1,4 +1,4 @@
-import type { JoinRefusedReason } from '#/src/models.ts';
+import type { JoinRefusedReason } from '#/models';
 
 /** Start of a timestamped line: `10/29/2026 02:43:13: message`. Month comes first. */
 export const TIMESTAMP_PATTERN =

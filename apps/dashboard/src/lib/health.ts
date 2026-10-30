@@ -1,6 +1,6 @@
-import { clip } from '#/src/lib/day.ts';
-import { BYTES_PER_GB, DAY_MS, type ServerWarning, type Snapshot } from '#/src/lib/models.ts';
-import { isServerOnline } from '#/src/lib/status.ts';
+import { clip } from '#/lib/day';
+import { BYTES_PER_GB, DAY_MS, type ServerWarning, type Snapshot } from '#/lib/models';
+import { isServerOnline } from '#/lib/status';
 
 /** Free disk space in whole gigabytes, for example `278 GB`. */
 export const gigabytesLabel = (bytes: number): string => `${Math.round(bytes / BYTES_PER_GB)} GB`;

@@ -1,9 +1,9 @@
 <script lang="ts">
-  import NoData from '#/src/lib/components/NoData.svelte';
-  import { live, useSnapshot, viewerOffsetMinutes } from '#/src/lib/live.svelte.ts';
-  import { SAGA_FILTERS, STORY_STYLES } from '#/src/lib/models.ts';
-  import { whenLabel } from '#/src/lib/status.ts';
-  import { storyOf } from '#/src/lib/story.ts';
+  import NoData from '#/lib/components/NoData.svelte';
+  import { live, useSnapshot, viewerOffsetMinutes } from '#/lib/live.svelte';
+  import { SAGA_FILTERS, STORY_STYLES } from '#/lib/models';
+  import { whenLabel } from '#/lib/status';
+  import { storyOf } from '#/lib/story';
 
   /** Getter for the snapshot the layout shares. */
   const getSnapshot = useSnapshot();

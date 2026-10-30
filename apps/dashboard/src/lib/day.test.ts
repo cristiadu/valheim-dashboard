@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { arcPath, clip, dayPercent, hourOfDay, wheelPoint } from '#/src/lib/day.ts';
+import { arcPath, clip, dayPercent, hourOfDay, wheelPoint } from '#/lib/day';
 
 describe('day helpers', () => {
   it('keeps only the part of a range inside the window', () => {

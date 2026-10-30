@@ -1,5 +1,5 @@
-import { PLANS_STORAGE_KEY, type Plan } from '#/src/lib/models.ts';
-import { readPlans } from '#/src/lib/planner.ts';
+import { PLANS_STORAGE_KEY, type Plan } from '#/lib/models';
+import { readPlans } from '#/lib/planner';
 
 /** The viewer's recipe plans. Empty until [loadPlans] runs in the browser. */
 export const planner = $state<{ plans: Plan[]; isLoaded: boolean }>({ plans: [], isLoaded: false });

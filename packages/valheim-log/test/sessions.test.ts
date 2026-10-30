@@ -1,8 +1,8 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 
-import type { PlayerSession } from '#/src/models.ts';
-import { applyEvent, buildSessions, createSessionState, endAllSessions, onlineSessions } from '#/src/sessions.ts';
-import { CROSSPLAY_LOG, parseSample, STEAM_ONLY_LOG } from '#/test/common.ts';
+import type { PlayerSession } from '#/models';
+import { applyEvent, buildSessions, createSessionState, endAllSessions, onlineSessions } from '#/sessions';
+import { CROSSPLAY_LOG, parseSample, STEAM_ONLY_LOG } from '#test/common';
 
 describe('buildSessions', () => {
   let crossplaySessions: PlayerSession[];

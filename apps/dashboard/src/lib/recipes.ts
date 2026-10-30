@@ -1,4 +1,4 @@
-import { ICON_FILES, WIKI_FILE_URL, type CraftingStation, type Recipe, type RecipeBiome } from '#/src/lib/models.ts';
+import { ICON_FILES, WIKI_FILE_URL, type CraftingStation, type Recipe, type RecipeBiome } from '#/lib/models';
 
 /** Returns a recipe from its parts. [ingredients] maps each item name to the amount one craft uses. */
 const recipe = (

@@ -1,6 +1,6 @@
 import type { PlayerSession } from 'valheim-log';
 
-import { MINUTES_PER_HOUR, MONTHS, MS_PER_MINUTE, ONLINE_WINDOW_MS, type Snapshot } from '#/src/lib/models.ts';
+import { MINUTES_PER_HOUR, MONTHS, MS_PER_MINUTE, ONLINE_WINDOW_MS, type Snapshot } from '#/lib/models';
 
 /** True when the run did not stop and its last log line is recent. The clock alone never makes it online. */
 export const isServerOnline = (snapshot: Snapshot, nowMs: number): boolean =>

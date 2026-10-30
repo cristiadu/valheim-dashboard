@@ -1,5 +1,5 @@
-import { parseLog } from '#/src/logReader.ts';
-import type { LogEvent } from '#/src/models.ts';
+import { parseLog } from '#/logReader';
+import type { LogEvent } from '#/models';
 
 /** Offset of the sample server's clock from UTC, in minutes (UTC-7). */
 export const SAMPLE_SERVER_UTC_OFFSET_MINUTES = -420;

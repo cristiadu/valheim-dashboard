@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
-import { readConfig } from '#/src/lib/server/config.ts';
+import { readConfig } from '#/lib/server/config';
 
 describe('readConfig', () => {
   beforeAll(() => {

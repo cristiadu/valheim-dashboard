@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { arcPath, clip, hourOfDay, wheelPoint } from '#/src/lib/day.ts';
+  import { arcPath, clip, hourOfDay, wheelPoint } from '#/lib/day';
   import {
     DAY_MS,
     HOURS_PER_DAY,
@@ -14,9 +14,9 @@
     WHEEL_RING_STEP,
     WHEEL_SHORT_TICK_RADIUS,
     WHEEL_SIZE,
-  } from '#/src/lib/models.ts';
-  import { sessionEndMs } from '#/src/lib/players.ts';
-  import { clockTime } from '#/src/lib/status.ts';
+  } from '#/lib/models';
+  import { sessionEndMs } from '#/lib/players';
+  import { clockTime } from '#/lib/status';
 
   /** Players to draw, the snapshot, the clock and the viewer's offset from UTC in minutes. */
   let { players, snapshot, nowMs, offsetMinutes }: {

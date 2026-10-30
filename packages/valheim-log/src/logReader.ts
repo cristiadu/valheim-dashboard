@@ -1,4 +1,4 @@
-import type { LogEvent, LogReader } from '#/src/models.ts';
+import type { LogEvent, LogReader } from '#/models';
 import {
   BACKUP_PATTERN,
   CHARACTER_PATTERN,
@@ -29,7 +29,7 @@ import {
   VERSION_PATTERN,
   WORLD_LOADED_PATTERN,
   WORLD_SAVE_STEP_PATTERN,
-} from '#/src/patterns.ts';
+} from '#/patterns';
 
 /** Named groups of a pattern match. Optional groups that did not match are `undefined` at runtime. */
 type Groups = Record<string, string | undefined>;

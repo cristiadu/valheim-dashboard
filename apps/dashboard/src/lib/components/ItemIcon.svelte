@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { ITEM_ICON_PX } from '#/src/lib/models.ts';
-  import { iconUrl } from '#/src/lib/recipes.ts';
+  import { ITEM_ICON_PX } from '#/lib/models';
+  import { iconUrl } from '#/lib/recipes';
 
   /** Item to show the icon of, and the icon size in pixels. */
   let { item, size = ITEM_ICON_PX }: { item: string; size?: number } = $props();

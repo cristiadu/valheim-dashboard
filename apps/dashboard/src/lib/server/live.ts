@@ -1,12 +1,12 @@
 import { dirname, join } from 'node:path';
 
-import type { Snapshot } from '#/src/lib/models.ts';
-import { readConfig } from '#/src/lib/server/config.ts';
-import { firstRunKey, LogHistory, readHistory } from '#/src/lib/server/log-history.ts';
-import { LogTail } from '#/src/lib/server/log-tail.ts';
-import { logger } from '#/src/lib/server/logger.ts';
-import { HISTORY_FOLDER_NAME, POLL_INTERVAL_MS, type Follower, type ServerState } from '#/src/lib/server/models.ts';
-import { createServerState, readLogLine, startNewLog } from '#/src/lib/server/server-state.ts';
+import type { Snapshot } from '#/lib/models';
+import { readConfig } from '#/lib/server/config';
+import { firstRunKey, LogHistory, readHistory } from '#/lib/server/log-history';
+import { LogTail } from '#/lib/server/log-tail';
+import { logger } from '#/lib/server/logger';
+import { HISTORY_FOLDER_NAME, POLL_INTERVAL_MS, type Follower, type ServerState } from '#/lib/server/models';
+import { createServerState, readLogLine, startNewLog } from '#/lib/server/server-state';
 
 /** Functions to call with the snapshot after new log lines. */
 const listeners = new Set<(snapshot: Snapshot) => void>();

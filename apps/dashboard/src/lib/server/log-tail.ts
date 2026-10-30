@@ -1,6 +1,6 @@
 import { open, stat } from 'node:fs/promises';
 
-import type { TailListener } from '#/src/lib/server/models.ts';
+import type { TailListener } from '#/lib/server/models';
 
 /**
  * Follows a growing text file, like `tail -f`.

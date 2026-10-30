@@ -6,6 +6,6 @@ export type {
   PlayerSession,
   SessionEndReason,
   SessionState,
-} from '#/src/models.ts';
-export { createLogReader, parseLog, parseMessage, readLine, runKeyOf } from '#/src/logReader.ts';
-export { applyEvent, buildSessions, createSessionState, endAllSessions, onlineSessions } from '#/src/sessions.ts';
+} from '#/models';
+export { createLogReader, parseLog, parseMessage, readLine, runKeyOf } from '#/logReader';
+export { applyEvent, buildSessions, createSessionState, endAllSessions, onlineSessions } from '#/sessions';

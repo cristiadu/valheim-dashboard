@@ -1,5 +1,5 @@
-import { currentSnapshot, subscribe } from '#/src/lib/server/live.ts';
-import { KEEP_ALIVE_MS } from '#/src/lib/server/models.ts';
+import { currentSnapshot, subscribe } from '#/lib/server/live';
+import { KEEP_ALIVE_MS } from '#/lib/server/models';
 
 /** Streams the snapshot to the page with server-sent events: once now, then after each batch of new log lines. */
 export const GET = async (): Promise<Response> => {

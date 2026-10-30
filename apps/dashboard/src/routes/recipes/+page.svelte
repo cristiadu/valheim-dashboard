@@ -1,11 +1,11 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
-  import ItemIcon from '#/src/lib/components/ItemIcon.svelte';
-  import { MAX_CRAFTS, RECIPE_BIOMES, RECIPE_ICON_PX, type Plan } from '#/src/lib/models.ts';
-  import { clampCrafts, newPlan, planItems, stillNeeded, withHave } from '#/src/lib/planner.ts';
-  import { loadPlans, planner, savePlans } from '#/src/lib/plans.svelte.ts';
-  import { RECIPES, madeAt, recipeById } from '#/src/lib/recipes.ts';
+  import ItemIcon from '#/lib/components/ItemIcon.svelte';
+  import { MAX_CRAFTS, RECIPE_BIOMES, RECIPE_ICON_PX, type Plan } from '#/lib/models';
+  import { clampCrafts, newPlan, planItems, stillNeeded, withHave } from '#/lib/planner';
+  import { loadPlans, planner, savePlans } from '#/lib/plans.svelte';
+  import { RECIPES, madeAt, recipeById } from '#/lib/recipes';
 
   onMount(loadPlans);
 

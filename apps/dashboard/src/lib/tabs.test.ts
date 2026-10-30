@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { TABS } from '#/src/lib/models.ts';
-import { tabFor } from '#/src/lib/tabs.ts';
+import { TABS } from '#/lib/models';
+import { tabFor } from '#/lib/tabs';
 
 describe('tabFor', () => {
   it('finds the tab for its path', () => {

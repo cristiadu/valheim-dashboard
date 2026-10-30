@@ -3,7 +3,7 @@ import { join } from 'node:path';
 
 import { runKeyOf } from 'valheim-log';
 
-import type { TailListener } from '#/src/lib/server/models.ts';
+import type { TailListener } from '#/lib/server/models';
 
 /** File extension of a run's copy in the history folder. */
 const RUN_FILE_EXTENSION = '.txt';
