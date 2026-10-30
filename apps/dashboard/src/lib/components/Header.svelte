@@ -1,9 +1,19 @@
+<script lang="ts">
+  /** Server status line and whether it is online. Null until the page runs in the browser. */
+  let { status }: { status: { text: string; isOnline: boolean } | null } = $props();
+</script>
+
 <header>
   <div class="mark" aria-hidden="true"><span>ᛟ</span></div>
   <div>
     <div class="name">VALHEIM DASHBOARD</div>
     <div class="muted">Server status and who was online</div>
   </div>
+  {#if status}
+    <p class="status" class:online={status.isOnline} role="status">
+      <span class="dot" aria-hidden="true"></span>{status.text}
+    </p>
+  {/if}
 </header>
 
 <style>
@@ -11,6 +21,7 @@
   header {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: 14px;
     padding: 18px 28px;
     border-bottom: 1px solid var(--line);
@@ -40,5 +51,27 @@
     font-weight: 700;
     font-size: 22px;
     letter-spacing: 0.14em;
+  }
+
+  /* Status line on the right; drops under the name on narrow screens */
+  .status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 0 auto;
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  /* Square status light: red when offline */
+  .dot {
+    width: 8px;
+    height: 8px;
+    background: var(--blood);
+  }
+
+  /* Green light while the server is online */
+  .online .dot {
+    background: var(--good);
   }
 </style>

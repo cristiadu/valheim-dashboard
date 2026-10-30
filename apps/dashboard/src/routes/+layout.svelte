@@ -1,15 +1,34 @@
 <script lang="ts">
   import '../app.css';
 
-  import type { Snippet } from 'svelte';
+  import { onMount, type Snippet } from 'svelte';
 
   import { page } from '$app/state';
   import Header from '#lib/components/Header.svelte';
   import SideMenu from '#lib/components/SideMenu.svelte';
+  import { connectLive, live, provideSnapshot, viewerOffsetMinutes } from '#lib/live.svelte.ts';
+  import type { Snapshot } from '#lib/models.ts';
+  import { isServerOnline, statusLine } from '#lib/status.ts';
   import { tabFor } from '#lib/tabs.ts';
 
-  /** The page for the current tab. */
-  let { children }: { children: Snippet } = $props();
+  /** Snapshot from the server render, and the page for the current tab. */
+  let { data, children }: { data: { snapshot: Snapshot }; children: Snippet } = $props();
+
+  /** Latest snapshot: live once the stream connects, the server render's until then. */
+  const snapshot = $derived(live.snapshot ?? data.snapshot);
+
+  /** Header line, made in the browser only, because it depends on the viewer's clock and time zone. */
+  const status = $derived(
+    live.nowMs === null
+      ? null
+      : {
+          text: statusLine(snapshot, live.nowMs, viewerOffsetMinutes(live.nowMs)),
+          isOnline: isServerOnline(snapshot, live.nowMs),
+        },
+  );
+
+  provideSnapshot(() => snapshot);
+  onMount(connectLive);
 
   /** Tab that matches the current address. */
   const current = $derived(tabFor(page.url.pathname));
@@ -19,7 +38,7 @@
   <title>{current.label} · Valheim Dashboard</title>
 </svelte:head>
 
-<Header />
+<Header {status} />
 <div class="frame">
   <aside><SideMenu {current} /></aside>
   <main>
@@ -52,6 +71,14 @@
     min-height: calc(100vh - 90px);
     padding: 22px 28px 40px;
     border-left: 1px solid var(--line);
+  }
+
+  /* On phones the menu sits on top, so the page gets a top rule instead */
+  @media (max-width: 720px) {
+    main {
+      border-left: 0;
+      border-top: 1px solid var(--line);
+    }
   }
 
   /* Page heading in the heading font */
