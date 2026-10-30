@@ -1,4 +1,4 @@
-import type { LogEvent, PlayerSession, SessionEndReason, SessionState } from './models';
+import type { LogEvent, PlayerSession, SessionEndReason, SessionState } from '#/src/models.ts';
 
 /** Creates empty session state. */
 export const createSessionState = (): SessionState => ({

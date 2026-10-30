@@ -1,7 +1,7 @@
 import type { PlayerSession } from 'valheim-log';
 
-import { OTHER_PLAYER_COLOR, PLAYER_COLORS, type Player, type Snapshot } from './models';
-import { isServerOnline } from './status';
+import { OTHER_PLAYER_COLOR, PLAYER_COLORS, type Player, type Snapshot } from '#/src/lib/models.ts';
+import { isServerOnline } from '#/src/lib/status.ts';
 
 /**
  * End of [session] in milliseconds. An open session ends now while the server is online, or at the last

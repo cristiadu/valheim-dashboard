@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { logLine, readLines, RUN_START, TEST_OFFSET_MINUTES } from '../test-common';
-import type { ServerState } from './models';
-import { createServerState, startNewLog } from './server-state';
+import { logLine, readLines, RUN_START, TEST_OFFSET_MINUTES } from '#/src/lib/test-common.ts';
+import type { ServerState } from '#/src/lib/server/models.ts';
+import { createServerState, startNewLog } from '#/src/lib/server/server-state.ts';
 
 describe('server state', () => {
   let state: ServerState;

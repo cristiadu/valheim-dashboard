@@ -1,7 +1,7 @@
 import type { LogEvent, LogReader, SessionState } from 'valheim-log';
 
-import type { Snapshot } from '../models';
-import type { LogTail } from './log-tail';
+import type { Snapshot } from '#/src/lib/models.ts';
+import type { LogTail } from '#/src/lib/server/log-tail.ts';
 
 /** Where the server writes its log when no `LOG_FILE` is set. */
 export const DEFAULT_LOG_FILE = 'C:\\Valheim Server\\logs.txt';

@@ -1,5 +1,5 @@
-import { MAX_CRAFTS, type ItemAmount, type Plan, type PlanItem } from './models';
-import { recipeById } from './recipes';
+import { MAX_CRAFTS, type ItemAmount, type Plan, type PlanItem } from '#/src/lib/models.ts';
+import { recipeById } from '#/src/lib/recipes.ts';
 
 /** Returns [crafts] as a whole number from 1 to [MAX_CRAFTS]. Anything that is not a number becomes 1. */
 export const clampCrafts = (crafts: number): number => {

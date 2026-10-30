@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { MS_PER_HOUR } from './models';
-import { playersOf, sessionEndMs } from './players';
-import { sessionWith, snapshotWith, TEST_NOON_MS } from './test-common';
+import { MS_PER_HOUR } from '#/src/lib/models.ts';
+import { playersOf, sessionEndMs } from '#/src/lib/players.ts';
+import { sessionWith, snapshotWith, TEST_NOON_MS } from '#/src/lib/test-common.ts';
 
 describe('playersOf', () => {
   it('joins sessions with the same Steam ID into one player', () => {

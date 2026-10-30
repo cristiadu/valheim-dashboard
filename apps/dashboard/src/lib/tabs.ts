@@ -1,4 +1,4 @@
-import { TABS, type Tab } from './models';
+import { TABS, type Tab } from '#/src/lib/models.ts';
 
 /** Returns the tab for [pathname], ignoring a trailing slash. Unknown paths fall back to Hall. */
 export const tabFor = (pathname: string): Tab => {

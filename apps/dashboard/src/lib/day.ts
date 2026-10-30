@@ -6,7 +6,7 @@ import {
   WHEEL_CENTER,
   WHEEL_MAX_ARC_HOURS,
   WHEEL_MIN_ARC_HOURS,
-} from './models';
+} from '#/src/lib/models.ts';
 
 /** Part of a time range inside a window, or null when they do not overlap. */
 export const clip = (

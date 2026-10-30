@@ -9,9 +9,9 @@ import {
   statusLine,
   steamLabel,
   whenLabel,
-} from './status';
-import { MS_PER_MINUTE } from './models';
-import { sessionWith, snapshotWith, TEST_NOON_MS } from './test-common';
+} from '#/src/lib/status.ts';
+import { MS_PER_MINUTE } from '#/src/lib/models.ts';
+import { sessionWith, snapshotWith, TEST_NOON_MS } from '#/src/lib/test-common.ts';
 
 /** A run that started at 09:42Z with its last line at 12:00Z and one player inside. */
 const RUNNING = snapshotWith({

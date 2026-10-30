@@ -1,8 +1,8 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 
-import { createLogReader, parseMessage, readLine } from '../src/logReader';
-import type { LogEvent } from '../src/models';
-import { CROSSPLAY_LOG, ofType, parseSample, STEAM_ONLY_LOG } from './common';
+import { createLogReader, parseMessage, readLine } from '#/src/logReader.ts';
+import type { LogEvent } from '#/src/models.ts';
+import { CROSSPLAY_LOG, ofType, parseSample, STEAM_ONLY_LOG } from '#/test/common.ts';
 
 describe('parseLog', () => {
   let crossplay: LogEvent[];

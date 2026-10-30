@@ -1,9 +1,9 @@
 <script lang="ts">
-  import NoData from '#lib/components/NoData.svelte';
-  import StatGrid from '#lib/components/StatGrid.svelte';
-  import { live, useSnapshot, viewerOffsetMinutes } from '#lib/live.svelte.ts';
-  import { LATEST_SAVE_COUNT } from '#lib/models.ts';
-  import { whenLabel } from '#lib/status.ts';
+  import NoData from '#/src/lib/components/NoData.svelte';
+  import StatGrid from '#/src/lib/components/StatGrid.svelte';
+  import { live, useSnapshot, viewerOffsetMinutes } from '#/src/lib/live.svelte.ts';
+  import { LATEST_SAVE_COUNT } from '#/src/lib/models.ts';
+  import { whenLabel } from '#/src/lib/status.ts';
 
   /** Getter for the snapshot the layout shares. */
   const getSnapshot = useSnapshot();

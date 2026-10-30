@@ -1,15 +1,15 @@
 <script lang="ts">
-  import '../app.css';
+  import '#/src/app.css';
 
   import { onMount, type Snippet } from 'svelte';
 
   import { page } from '$app/state';
-  import Header from '#lib/components/Header.svelte';
-  import SideMenu from '#lib/components/SideMenu.svelte';
-  import { connectLive, live, provideSnapshot, viewerOffsetMinutes } from '#lib/live.svelte.ts';
-  import type { Snapshot } from '#lib/models.ts';
-  import { isServerOnline, statusLine } from '#lib/status.ts';
-  import { tabFor } from '#lib/tabs.ts';
+  import Header from '#/src/lib/components/Header.svelte';
+  import SideMenu from '#/src/lib/components/SideMenu.svelte';
+  import { connectLive, live, provideSnapshot, viewerOffsetMinutes } from '#/src/lib/live.svelte.ts';
+  import type { Snapshot } from '#/src/lib/models.ts';
+  import { isServerOnline, statusLine } from '#/src/lib/status.ts';
+  import { tabFor } from '#/src/lib/tabs.ts';
 
   /** Snapshot from the server render, and the page for the current tab. */
   let { data, children }: { data: { snapshot: Snapshot }; children: Snippet } = $props();
