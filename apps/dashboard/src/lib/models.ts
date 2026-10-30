@@ -42,6 +42,16 @@ export type DiskSpace = {
   blockedBelowBytes: number;
 };
 
+/** One server run: from the first line of a `logs.txt` to its last. */
+export type RunRecord = {
+  /** First line of the log, as a UTC ISO string. */
+  startUtc: string;
+  /** Last line of the log so far, as a UTC ISO string. */
+  lastLineUtc: string;
+  /** How it ended: a clean stop, a new log without a stop (a crash), or null while it is the latest run. */
+  endReason: 'stopped' | 'crashed' | null;
+};
+
 /** Everything the page knows about the server, read from `logs.txt`. Times are UTC ISO strings. */
 export type Snapshot = {
   /** Offset of the server's clock from UTC, in minutes. */
@@ -68,6 +78,10 @@ export type Snapshot = {
   backups: BackupRecord[];
   /** Free disk space at the last save. */
   diskSpace: DiskSpace | null;
+  /** Server runs seen since the dashboard started, oldest first. */
+  runs: RunRecord[];
+  /** Times the server lost its Steam connection, oldest first. */
+  steamDropsUtc: string[];
 };
 
 /** Milliseconds in one day. */
@@ -131,4 +145,24 @@ export const STORY_STYLES: Record<StoryKind, { rune: string; color: string }> = 
   night: { rune: 'ᛜ', color: 'var(--frost)' },
   world: { rune: 'ᛃ', color: 'var(--gold)' },
   stopped: { rune: 'ᚾ', color: 'var(--muted)' },
+};
+
+/** Filters on the Saga tab and the story kinds each one shows. */
+export const SAGA_FILTERS: readonly { label: string; kinds: readonly StoryKind[] }[] = [
+  { label: 'All', kinds: ['joined', 'left', 'died', 'raid', 'night', 'world', 'stopped'] },
+  { label: 'Joins and leaves', kinds: ['joined', 'left'] },
+  { label: 'Deaths', kinds: ['died'] },
+  { label: 'Raids', kinds: ['raid'] },
+  { label: 'Nights and server', kinds: ['night', 'world', 'stopped'] },
+];
+
+/** How many saves the World tab lists. */
+export const LATEST_SAVE_COUNT = 10;
+
+/** One problem on the Server tab. */
+export type ServerWarning = {
+  /** When it happened, as a UTC ISO string. */
+  timeUtc: string;
+  /** Plain sentence, for example `Server went down without a clean stop`. */
+  text: string;
 };

@@ -4,11 +4,9 @@
   import { live, useSnapshot, viewerOffsetMinutes } from '#lib/live.svelte.ts';
   import { LATEST_EVENT_COUNT, STORY_STYLES } from '#lib/models.ts';
   import { playersOf } from '#lib/players.ts';
-  import { clockTime, durationLabel, isServerOnline } from '#lib/status.ts';
+  import { clockTime, durationLabel, isServerOnline, whenLabel } from '#lib/status.ts';
   import { daySummary, storyOf } from '#lib/story.ts';
-
-  /** Bytes in a gigabyte, as disks count them. */
-  const BYTES_PER_GB = 1e9;
+  import { BYTES_PER_GB } from '#lib/health.ts';
 
   /** Current snapshot from the layout. */
   const getSnapshot = useSnapshot();
@@ -66,7 +64,7 @@
           </div>
           {#each latest as item, i (i)}
             <div class="line event">
-              <span class="mono muted">{at(item.timeUtc)}</span>
+              <span class="mono muted">{whenLabel(item.timeUtc, offset, nowMs)}</span>
               <span class="rune" aria-hidden="true" style:color={STORY_STYLES[item.kind].color}>{STORY_STYLES[item.kind].rune}</span>
               <span>{item.text}</span>
             </div>
@@ -141,7 +139,7 @@
   /* Event row: time, rune, sentence */
   .event {
     display: grid;
-    grid-template-columns: 48px 22px minmax(0, 1fr);
+    grid-template-columns: auto 22px minmax(0, 1fr);
     align-items: baseline;
   }
 

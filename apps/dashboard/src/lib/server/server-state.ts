@@ -1,7 +1,7 @@
 import { applyEvent, createLogReader, createSessionState, endAllSessions, onlineSessions, readLine } from 'valheim-log';
 
 import { STORY_EVENT_TYPES, type StoryEvent } from '../models';
-import { MAX_BACKUPS, MAX_EVENTS, MAX_SAVES, type ServerState } from './models';
+import { MAX_BACKUPS, MAX_EVENTS, MAX_RUNS, MAX_SAVES, type ServerState } from './models';
 
 /** Adds [item] to the end of [list] and drops the oldest items past [max]. */
 const pushCapped = <T>(list: T[], item: T, max: number): void => {
@@ -29,6 +29,8 @@ export const createServerState = (serverUtcOffsetMinutes: number): ServerState =
       saves: [],
       backups: [],
       diskSpace: null,
+      runs: [],
+      steamDropsUtc: [],
     },
   };
 };
@@ -39,6 +41,10 @@ export const createServerState = (serverUtcOffsetMinutes: number): ServerState =
  */
 export const startNewLog = (state: ServerState): void => {
   const { snapshot } = state;
+  const run = snapshot.runs.at(-1);
+  if (run && run.endReason === null) {
+    run.endReason = 'crashed';
+  }
   if (snapshot.lastLineUtc !== null && onlineSessions(state.sessionState).length > 0) {
     endAllSessions(state.sessionState, snapshot.lastLineUtc, 'serverCrashed');
   }
@@ -61,8 +67,12 @@ export const readLogLine = (state: ServerState, line: string): void => {
     return;
   }
   const { snapshot } = state;
-  snapshot.startedUtc ??= event.timeUtc;
+  if (snapshot.startedUtc === null) {
+    snapshot.startedUtc = event.timeUtc;
+    pushCapped(snapshot.runs, { startUtc: event.timeUtc, lastLineUtc: event.timeUtc, endReason: null }, MAX_RUNS);
+  }
   snapshot.lastLineUtc = event.timeUtc;
+  snapshot.runs.at(-1)!.lastLineUtc = event.timeUtc;
   applyEvent(state.sessionState, event);
   if ((STORY_EVENT_TYPES as readonly string[]).includes(event.type)) {
     pushCapped(snapshot.events, event as StoryEvent, MAX_EVENTS);
@@ -76,9 +86,13 @@ export const readLogLine = (state: ServerState, line: string): void => {
       break;
     case 'gameServer':
       snapshot.isGameServerConnected = event.isConnected;
+      if (!event.isConnected) {
+        pushCapped(snapshot.steamDropsUtc, event.timeUtc, MAX_RUNS);
+      }
       break;
     case 'serverStopped':
       snapshot.stoppedUtc = event.timeUtc;
+      snapshot.runs.at(-1)!.endReason = 'stopped';
       break;
     case 'worldSaveStep':
       if (event.step === 1) {

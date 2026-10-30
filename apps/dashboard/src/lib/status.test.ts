@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { clockTime, durationLabel, isServerOnline, offsetLabel, onlinePlayers, statusLine } from './status';
+import { clockTime, durationLabel, isServerOnline, offsetLabel, onlinePlayers, statusLine, whenLabel } from './status';
 import { sessionWith, snapshotWith } from './test-common';
 
 /** A run that started at 09:42Z with its last line at 12:00Z and one player inside. */
@@ -79,5 +79,17 @@ describe('formatting', () => {
     // GIVEN 12 minutes and 3h 5m
     // WHEN / THEN they read short
     expect([durationLabel(12 * 60_000), durationLabel(185 * 60_000)]).toEqual(['12m', '3h 5m']);
+  });
+});
+
+describe('whenLabel', () => {
+  it('shows only the time today and adds the date for other days', () => {
+    // GIVEN noon on Oct 29 in UTC
+    const nowMs = Date.parse('2026-10-29T12:00:00.000Z');
+
+    // WHEN a time today and one the day before are labeled
+    // THEN only the older one has a date
+    expect(whenLabel('2026-10-29T09:15:00.000Z', 0, nowMs)).toBe('09:15');
+    expect(whenLabel('2026-10-28T23:05:00.000Z', 0, nowMs)).toBe('Oct 28 23:05');
   });
 });

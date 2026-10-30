@@ -20,6 +20,9 @@ export const MAX_SAVES = 300;
 /** Most backups kept. */
 export const MAX_BACKUPS = 50;
 
+/** Most server runs and Steam drops kept. */
+export const MAX_RUNS = 50;
+
 /** Dashboard settings, read from environment variables. */
 export type Config = {
   /** Path of the server's `logs.txt`. From `LOG_FILE`. */
