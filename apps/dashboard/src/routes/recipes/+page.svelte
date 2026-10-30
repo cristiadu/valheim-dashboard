@@ -1,10 +1,11 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
+  import ItemIcon from '#lib/components/ItemIcon.svelte';
   import { MAX_CRAFTS, RECIPE_BIOMES, type Plan } from '#lib/models.ts';
   import { clampCrafts, newPlan, planItems, stillNeeded, withHave } from '#lib/planner.ts';
   import { loadPlans, planner, savePlans } from '#lib/plans.svelte.ts';
-  import { RECIPES, recipeById } from '#lib/recipes.ts';
+  import { RECIPES, madeAt, recipeById } from '#lib/recipes.ts';
 
   onMount(loadPlans);
 
@@ -37,10 +38,10 @@
 
 <div class="recipes">
   <section class="panel" aria-labelledby="new-title">
-    <h2 id="new-title" class="panel-title">NEW PLAN</h2>
+    <h2 id="new-title" class="panel-title">START A PLAN</h2>
     <form onsubmit={addPlan}>
       <label>
-        <span class="muted">Recipe</span>
+        <span class="muted">What do you want to make?</span>
         <select bind:value={pickedId}>
           {#each RECIPE_BIOMES as biome (biome)}
             <optgroup label={biome}>
@@ -52,28 +53,37 @@
         </select>
       </label>
       <label>
-        <span class="muted">Times to craft</span>
+        <span class="muted">{picked.yields > 1 ? 'How many batches?' : 'How many?'}</span>
         <input type="number" min="1" max={MAX_CRAFTS} bind:value={pickedCrafts} />
       </label>
-      <button type="submit">Add plan</button>
+      <button type="submit">Start tracking</button>
     </form>
-    <p class="muted">
-      {picked.station}{picked.yields > 1 ? `, makes ${picked.yields} each time` : ''}:
-      {picked.ingredients.map((line) => `${line.amount} ${line.item}`).join(', ')}
-    </p>
+    <div class="preview">
+      <ItemIcon item={picked.name} size={48} />
+      <div>
+        <p class="muted">
+          {madeAt(picked.station)} {picked.yields > 1 ? `Each batch makes ${picked.yields} and takes:` : 'Takes:'}
+        </p>
+        <ul class="items">
+          {#each picked.ingredients as line (line.item)}
+            <li><ItemIcon item={line.item} /><span class="amount">{line.amount}</span>{line.item}</li>
+          {/each}
+        </ul>
+      </div>
+    </div>
   </section>
 
   {#if planner.isLoaded}
     <section class="panel" aria-labelledby="needed-title">
-      <h2 id="needed-title" class="panel-title">STILL NEEDED</h2>
+      <h2 id="needed-title" class="panel-title">STILL TO GATHER</h2>
       {#if planner.plans.length === 0}
-        <p class="muted">No plans yet. Plans are saved in this browser only.</p>
+        <p class="muted">Nothing planned yet. Your plans stay in this browser, so only you see them.</p>
       {:else if needed.length === 0}
-        <p class="ready">Every plan has what it needs.</p>
+        <p class="ready">You have everything. Time to craft!</p>
       {:else}
-        <ul class="needed">
+        <ul class="items">
           {#each needed as line (line.item)}
-            <li><span class="amount">{line.amount}</span> {line.item}</li>
+            <li><ItemIcon item={line.item} /><span class="amount">{line.amount}</span>{line.item}</li>
           {/each}
         </ul>
       {/if}
@@ -85,10 +95,11 @@
       {@const isReady = items.every((line) => line.missing === 0)}
       <section class="panel" aria-label={recipe.name}>
         <div class="plan-head">
+          <ItemIcon item={recipe.name} size={40} />
           <h2 class="plan-title">{recipe.name}</h2>
-          {#if isReady}<span class="ready mono">READY</span>{/if}
+          {#if isReady}<span class="ready mono">READY TO CRAFT</span>{/if}
           <label class="crafts">
-            <span class="muted">Times</span>
+            <span class="muted">{recipe.yields > 1 ? 'Batches' : 'How many'}</span>
             <input
               type="number"
               min="1"
@@ -99,10 +110,10 @@
           </label>
           <button type="button" onclick={() => removePlan(plan)}>Remove</button>
         </div>
-        <p class="muted">{recipe.station} · makes {recipe.yields * plan.crafts}</p>
+        <p class="muted">{madeAt(recipe.station)}{recipe.yields > 1 ? ` You'll get ${recipe.yields * plan.crafts}.` : ''}</p>
         <table>
           <thead>
-            <tr><th>Got it</th><th>Item</th><th>Have</th><th>Missing</th></tr>
+            <tr><th>Got it</th><th>Item</th><th>You have</th><th>Still need</th></tr>
           </thead>
           <tbody>
             {#each items as line (line.item)}
@@ -110,18 +121,18 @@
                 <td>
                   <input
                     type="checkbox"
-                    aria-label="Have all {line.item}"
+                    aria-label="I have all the {line.item}"
                     checked={line.missing === 0}
                     onchange={(event) => updatePlan(plan, withHave(plan, line.item, event.currentTarget.checked ? line.need : 0))}
                   />
                 </td>
-                <td>{line.item}</td>
+                <td><span class="item"><ItemIcon item={line.item} />{line.item}</span></td>
                 <td class="have">
                   <input
                     type="number"
                     min="0"
                     max={line.need}
-                    aria-label="How many {line.item} you have"
+                    aria-label="How much {line.item} you have"
                     value={line.have}
                     onchange={(event) => updatePlan(plan, withHave(plan, line.item, event.currentTarget.valueAsNumber))}
                   />
@@ -203,20 +214,40 @@
     color: var(--ember);
   }
 
-  /* Missing items flow in columns */
-  .needed {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 6px 16px;
+  /* Picked recipe's icon beside what it takes */
+  .preview {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    margin-top: 14px;
+  }
+
+  /* Text beside the picked recipe's icon starts level with it */
+  .preview p {
     margin: 0;
+  }
+
+  /* Icon lists of items flow in columns */
+  .items {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 8px 16px;
+    margin: 10px 0 0;
     padding: 0;
     list-style: none;
   }
 
-  /* Count before each missing item */
+  /* One item: icon, count and name in a row */
+  .items li,
+  .item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Count before each item name */
   .amount {
-    display: inline-block;
-    min-width: 36px;
+    min-width: 28px;
     font-family: var(--font-heading);
     color: var(--ember);
   }
@@ -226,7 +257,7 @@
     color: var(--good);
   }
 
-  /* Plan name, ready mark, times and remove in one row */
+  /* Plan name, ready mark, how many and remove in one row */
   .plan-head {
     display: flex;
     flex-wrap: wrap;
@@ -243,7 +274,7 @@
     font-weight: 500;
   }
 
-  /* Times field sits beside its label in the plan row */
+  /* How many field sits beside its label in the plan row */
   .crafts {
     flex-direction: row;
     align-items: center;

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { RECIPES, recipeById } from './recipes';
+import { RECIPES, iconUrl, madeAt, recipeById } from './recipes';
 
 describe('RECIPES', () => {
   it('gives every recipe its own id', () => {
@@ -50,5 +50,41 @@ describe('recipeById', () => {
 
     // THEN nothing is found
     expect(recipe).toBeUndefined();
+  });
+});
+
+describe('iconUrl', () => {
+  it('turns the item name into a wiki file address', () => {
+    // GIVEN an item with a space in its name
+    // WHEN its icon address is made
+    const url = iconUrl('Deer hide');
+
+    // THEN it points at the wiki file with an underscore
+    expect(url).toBe('https://valheim.fandom.com/wiki/Special:FilePath/Deer_hide.png');
+  });
+
+  it('uses the wiki file name when it differs from the item name', () => {
+    // GIVEN Fine wood, whose wiki file is Finewood.png
+    // WHEN its icon address is made
+    const url = iconUrl('Fine wood');
+
+    // THEN it points at Finewood.png
+    expect(url).toBe('https://valheim.fandom.com/wiki/Special:FilePath/Finewood.png');
+  });
+});
+
+describe('madeAt', () => {
+  it('names the station', () => {
+    // GIVEN the Forge
+    // WHEN the sentence is made
+    // THEN it names the Forge
+    expect(madeAt('Forge')).toBe('Made at the Forge.');
+  });
+
+  it('says by hand when there is no station', () => {
+    // GIVEN no station
+    // WHEN the sentence is made
+    // THEN it says by hand
+    expect(madeAt('Hand')).toBe('Made by hand.');
   });
 });

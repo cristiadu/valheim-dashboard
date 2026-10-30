@@ -40,7 +40,7 @@ export const sessionWith = (changes: Partial<PlayerSession>): PlayerSession => (
   ...changes,
 });
 
-/** Returns a plan to craft one Bronze axe (4 Wood, 8 Bronze) changed by [changes]. */
+/** Returns a plan to craft one Bronze axe (4 Wood, 8 Bronze, 2 Leather scraps) changed by [changes]. */
 export const planWith = (changes: Partial<Plan>): Plan => ({
   id: 1,
   recipeId: 'bronze-axe',

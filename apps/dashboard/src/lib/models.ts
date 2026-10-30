@@ -167,8 +167,8 @@ export type ServerWarning = {
   text: string;
 };
 
-/** Where a recipe is made in the game. */
-export type CraftingStation = 'Workbench' | 'Forge' | 'Cauldron';
+/** Where a recipe is made in the game. `Hand` means the crafting menu, with no station. */
+export type CraftingStation = 'Hand' | 'Workbench' | 'Forge' | 'Cauldron' | 'Mead ketill';
 
 /** Biome a recipe belongs to, in the order players usually reach them. Groups the recipe list. */
 export const RECIPE_BIOMES = ['Meadows', 'Black Forest', 'Swamp', 'Mountain', 'Plains'] as const;
@@ -229,3 +229,6 @@ export const PLANS_STORAGE_KEY = 'valheim-dashboard.plans';
 
 /** Most crafts one plan can hold, so a typo like 5000 does not flood the list. */
 export const MAX_CRAFTS = 999;
+
+/** Valheim wiki address that sends back an uploaded file by its name. Item icons load from here in the viewer's browser. */
+export const WIKI_FILE_URL = 'https://valheim.fandom.com/wiki/Special:FilePath/';

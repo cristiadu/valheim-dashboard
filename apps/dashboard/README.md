@@ -72,4 +72,5 @@ flowchart LR
 ```
 
 - Plans are saved in the viewer's browser, so each friend has their own and the server stores nothing.
+- Item icons load from the Valheim wiki in the viewer's browser. If one fails, the name shows alone.
 - Recipes are a fixed list of common Valheim recipes at quality level 1, in `src/lib/recipes.ts`.

@@ -80,10 +80,11 @@ describe('planItems', () => {
     // WHEN its items are listed
     const items = planItems(plan);
 
-    // THEN Wood is covered (capped at what is needed) and 11 Bronze are missing
+    // THEN Wood is covered (capped at what is needed), 11 Bronze and 4 Leather scraps are missing
     expect(items).toEqual([
       { item: 'Wood', need: 8, have: 8, missing: 0 },
       { item: 'Bronze', need: 16, have: 5, missing: 11 },
+      { item: 'Leather scraps', need: 4, have: 0, missing: 4 },
     ]);
   });
 
@@ -107,14 +108,14 @@ describe('stillNeeded', () => {
     expect(needed).toEqual([
       { item: 'Iron', amount: 40 },
       { item: 'Bronze', amount: 8 },
-      { item: 'Leather scraps', amount: 6 },
+      { item: 'Leather scraps', amount: 8 },
       { item: 'Wood', amount: 6 },
     ]);
   });
 
   it('leaves out items that are covered', () => {
     // GIVEN a Bronze axe with everything set aside
-    const plans = [planWith({ have: { Wood: 4, Bronze: 8 } })];
+    const plans = [planWith({ have: { Wood: 4, Bronze: 8, 'Leather scraps': 2 } })];
 
     // WHEN what is still needed is listed
     // THEN nothing is
