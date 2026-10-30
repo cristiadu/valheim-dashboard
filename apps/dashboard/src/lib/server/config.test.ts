@@ -1,9 +1,17 @@
-import { describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { readConfig } from './config';
-import { DEFAULT_LOG_FILE } from './models';
 
 describe('readConfig', () => {
+  beforeAll(() => {
+    // GIVEN a machine in Arizona, which is UTC−7 all year
+    vi.stubEnv('TZ', 'America/Phoenix');
+  });
+
+  afterAll(() => {
+    vi.unstubAllEnvs();
+  });
+
   it('uses the default log path and this machine offset when nothing is set', () => {
     // GIVEN no settings
     const nowMs = Date.parse('2026-10-29T12:00:00Z');
@@ -12,10 +20,7 @@ describe('readConfig', () => {
     const config = readConfig({}, nowMs);
 
     // THEN the defaults are used
-    expect(config).toEqual({
-      logFile: DEFAULT_LOG_FILE,
-      serverUtcOffsetMinutes: -new Date(nowMs).getTimezoneOffset(),
-    });
+    expect(config).toEqual({ logFile: 'C:\\Valheim Server\\logs.txt', serverUtcOffsetMinutes: -420 });
   });
 
   it('reads the log path and offset from the settings', () => {
