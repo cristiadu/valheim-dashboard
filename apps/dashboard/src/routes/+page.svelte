@@ -52,7 +52,7 @@
             </div>
           {:else}
             <p class="muted">
-              Nobody is online.{#if lastOut} Last to leave: {lastOut.character} at {at(lastOut.lastSeenUtc!)}.{/if}
+              Nobody is online.{#if lastOut}{` Last to leave: ${lastOut.character} at ${at(lastOut.lastSeenUtc!)}.`}{/if}
             </p>
           {/each}
         </section>

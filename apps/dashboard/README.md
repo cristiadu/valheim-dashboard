@@ -24,6 +24,24 @@ node apps/dashboard/build
 
 Then open `http://localhost:3000`. Set `PORT` to use another port.
 
+### Keep it running
+
+`scripts/start-dashboard.ps1` builds the dashboard if there is no build yet, starts it, and starts it again 5 seconds after it stops. Its output goes to `apps/dashboard/dashboard.log`.
+
+```powershell
+.\scripts\start-dashboard.ps1
+.\scripts\start-dashboard.ps1 -Rebuild   # after a git pull
+```
+
+To start it each time you log on to Windows, run this once:
+
+```powershell
+.\scripts\install-startup.ps1
+.\scripts\install-startup.ps1 -Remove   # to stop that
+```
+
+Both scripts take `-LogFile` and `-Port`. If Windows blocks scripts, run `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` once.
+
 | Setting | Default | What it is |
 | --- | --- | --- |
 | `LOG_FILE` | `C:\Valheim Server\logs.txt` | The server's log file |
