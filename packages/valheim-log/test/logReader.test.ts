@@ -168,6 +168,25 @@ describe('parseMessage', () => {
     expect(events.map((e) => (e.type === 'joinRefused' ? e.reason : e.type))).toEqual(messages.map(([, r]) => r));
   });
 
+  it('reads build log plugin lines, with null for an unknown builder', () => {
+    // GIVEN a built piece and two destroyed pieces, one by an unknown builder
+    const messages = [
+      'Piece built: wood_floor_1x1 by Ragnar',
+      'Piece destroyed: piece_groundtorch_wood built by Ragnar',
+      'Piece destroyed: stake_wall built by an unknown player',
+    ];
+
+    // WHEN each message is read
+    const events = messages.map((message) => parseMessage(message, '2026-01-01T00:00:00.000Z'));
+
+    // THEN the piece and the builder come out of each line
+    expect(events).toEqual([
+      { type: 'pieceBuilt', timeUtc: '2026-01-01T00:00:00.000Z', piece: 'wood_floor_1x1', builder: 'Ragnar' },
+      { type: 'pieceDestroyed', timeUtc: '2026-01-01T00:00:00.000Z', piece: 'piece_groundtorch_wood', builder: 'Ragnar' },
+      { type: 'pieceDestroyed', timeUtc: '2026-01-01T00:00:00.000Z', piece: 'stake_wall', builder: null },
+    ]);
+  });
+
   it('keeps an unknown message as another line', () => {
     // WHEN an upkeep message is read
     const event = parseMessage('Update PlayFab entity token', '2026-01-01T00:00:00.000Z');

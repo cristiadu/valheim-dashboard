@@ -82,7 +82,26 @@ export type Snapshot = {
   runs: RunRecord[];
   /** Times the server lost its Steam connection, oldest first. */
   steamDropsUtc: string[];
+  /** Latest stretches of building and of destroyed pieces, from the build log plugin, oldest first. */
+  builds: BuildRecord[];
 };
+
+/** Pieces one character built, or pieces of theirs that were destroyed, with pauses under a few minutes. */
+export type BuildRecord = {
+  /** Character who built the pieces, or null when the build log did not know. */
+  builder: string | null;
+  /** True for destroyed pieces, false for built ones. */
+  isDestroyed: boolean;
+  /** First piece of the stretch, as a UTC ISO string. */
+  startUtc: string;
+  /** Last piece of the stretch, as a UTC ISO string. */
+  endUtc: string;
+  /** How many of each piece, by prefab name, for example `{ wood_floor_1x1: 14 }`. */
+  pieces: Record<string, number>;
+};
+
+/** Most kinds of pieces a story line names. */
+export const LISTED_PIECE_KINDS = 3;
 
 /** Milliseconds in one day. */
 export const DAY_MS = 24 * 60 * MS_PER_MINUTE;
@@ -124,7 +143,7 @@ export type Player = {
 };
 
 /** What kind of thing happened, which picks its rune and color. */
-export type StoryKind = 'joined' | 'left' | 'died' | 'raid' | 'night' | 'world' | 'stopped';
+export type StoryKind = 'joined' | 'left' | 'died' | 'raid' | 'night' | 'world' | 'stopped' | 'built' | 'wrecked';
 
 /** One line in the story of the server. */
 export type StoryItem = {
@@ -145,14 +164,17 @@ export const STORY_STYLES: Record<StoryKind, { rune: string; color: string }> = 
   night: { rune: 'ᛜ', color: 'var(--frost)' },
   world: { rune: 'ᛃ', color: 'var(--gold)' },
   stopped: { rune: 'ᚾ', color: 'var(--muted)' },
+  built: { rune: 'ᛒ', color: 'var(--good)' },
+  wrecked: { rune: 'ᚺ', color: 'var(--ember)' },
 };
 
 /** Filters on the Saga tab and the story kinds each one shows. */
 export const SAGA_FILTERS: readonly { label: string; kinds: readonly StoryKind[] }[] = [
-  { label: 'All', kinds: ['joined', 'left', 'died', 'raid', 'night', 'world', 'stopped'] },
+  { label: 'All', kinds: ['joined', 'left', 'died', 'raid', 'night', 'world', 'stopped', 'built', 'wrecked'] },
   { label: 'Joins and leaves', kinds: ['joined', 'left'] },
   { label: 'Deaths', kinds: ['died'] },
   { label: 'Raids', kinds: ['raid'] },
+  { label: 'Building', kinds: ['built', 'wrecked'] },
   { label: 'Nights and server', kinds: ['night', 'world', 'stopped'] },
 ];
 

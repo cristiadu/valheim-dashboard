@@ -7,6 +7,10 @@
 .buildlog/
 .history
 
+# Build log plugin output
+/plugins/build-log/bin/
+/plugins/build-log/obj/
+
 
 
 # Flutter repo-specific

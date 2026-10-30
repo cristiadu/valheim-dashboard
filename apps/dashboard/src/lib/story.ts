@@ -1,6 +1,44 @@
 import type { PlayerSession } from 'valheim-log';
 
-import { DAY_MS, type Snapshot, type StoryEvent, type StoryItem } from './models';
+import {
+  type BuildRecord,
+  DAY_MS,
+  LISTED_PIECE_KINDS,
+  type Snapshot,
+  type StoryEvent,
+  type StoryItem,
+} from './models';
+
+/** Returns `1 death` or `2 deaths` style text. */
+const count = (n: number, one: string, many: string): string => `${n} ${n === 1 ? one : many}`;
+
+/** Total pieces in a stretch of building. */
+const pieceTotal = (build: BuildRecord): number => Object.values(build.pieces).reduce((sum, n) => sum + n, 0);
+
+/** Most common pieces of a stretch, for example `14 wood floor 1x1, 8 wood fence and more`. */
+const pieceList = (build: BuildRecord): string => {
+  const kinds = Object.entries(build.pieces).sort(([, a], [, b]) => b - a);
+  const listed = kinds
+    .slice(0, LISTED_PIECE_KINDS)
+    .map(([piece, n]) => `${n} ${piece.replace(/^piece_/, '').replaceAll('_', ' ')}`)
+    .join(', ');
+  return kinds.length > LISTED_PIECE_KINDS ? `${listed} and more` : listed;
+};
+
+/** Story line for one stretch of building or of destroyed pieces. */
+const buildItem = (build: BuildRecord): StoryItem => {
+  const total = pieceTotal(build);
+  const pieces = count(total, 'piece', 'pieces');
+  if (!build.isDestroyed) {
+    return { timeUtc: build.endUtc, kind: 'built', text: `${build.builder ?? 'Someone'} built ${pieces}: ${pieceList(build)}` };
+  }
+  const whose = build.builder === null ? pieces : `${pieces} ${build.builder} built`;
+  return {
+    timeUtc: build.endUtc,
+    kind: 'wrecked',
+    text: `${whose} ${total === 1 ? 'was' : 'were'} destroyed: ${pieceList(build)}`,
+  };
+};
 
 /** Sentence for how a session ended. */
 const leaveText = (session: PlayerSession): string => {
@@ -33,19 +71,16 @@ const eventItem = (event: StoryEvent): StoryItem => {
   }
 };
 
-/** Everything that happened, newest first: joins and leaves from the sessions, plus the game events. */
+/** Everything that happened, newest first: joins and leaves from the sessions, game events and building. */
 export const storyOf = (snapshot: Snapshot): StoryItem[] => {
   const sessionItems = snapshot.sessions.flatMap((session): StoryItem[] => [
     { timeUtc: session.startUtc, kind: 'joined', text: `${session.character} joined` },
     ...(session.endUtc === null ? [] : [{ timeUtc: session.endUtc, kind: 'left' as const, text: leaveText(session) }]),
   ]);
-  return [...sessionItems, ...snapshot.events.map(eventItem)].sort(
+  return [...sessionItems, ...snapshot.events.map(eventItem), ...snapshot.builds.map(buildItem)].sort(
     (a, b) => Date.parse(b.timeUtc) - Date.parse(a.timeUtc),
   );
 };
-
-/** Returns `1 death` or `2 deaths` style text. */
-const count = (n: number, one: string, many: string): string => `${n} ${n === 1 ? one : many}`;
 
 /** One plain line about the last 24 hours, for example `2 players in the last 24 hours · 1 death · 1 raid`. */
 export const daySummary = (snapshot: Snapshot, nowMs: number): string => {
@@ -59,9 +94,13 @@ export const daySummary = (snapshot: Snapshot, nowMs: number): string => {
     return 'Nobody played in the last 24 hours';
   }
   const recent = snapshot.events.filter((e) => Date.parse(e.timeUtc) > sinceMs);
+  const piecesBuilt = snapshot.builds
+    .filter((b) => !b.isDestroyed && Date.parse(b.endUtc) > sinceMs)
+    .reduce((sum, b) => sum + pieceTotal(b), 0);
   return [
     `${count(players.size, 'player', 'players')} in the last 24 hours`,
     count(recent.filter((e) => e.type === 'playerDied').length, 'death', 'deaths'),
     count(recent.filter((e) => e.type === 'raidStarted').length, 'raid', 'raids'),
+    ...(piecesBuilt > 0 ? [count(piecesBuilt, 'piece built', 'pieces built')] : []),
   ].join(' · ');
 };
