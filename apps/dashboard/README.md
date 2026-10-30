@@ -62,13 +62,13 @@ flowchart TD
 
 ## Recipes tab
 
-Each viewer plans what they want to craft. A plan is a recipe and how many times to make it. For each item you tick it off or type how many you have. "Still needed" adds up what every plan is missing.
+Each viewer plans what they want to make. A plan is a recipe and how many to make. For each item you tick it off or type how much you have. "Still to gather" adds up what every plan is missing.
 
 ```mermaid
 flowchart LR
-  pick[Pick recipe and times] --> plan[Plan]
+  pick[Pick a recipe and how many] --> plan[Plan]
   plan -->|tick or type what you have| left[Missing per item]
-  left --> total[Still needed, all plans]
+  left --> total[Still to gather, all plans]
 ```
 
 - Plans are saved in the viewer's browser, so each friend has their own and the server stores nothing.

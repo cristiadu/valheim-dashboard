@@ -2,18 +2,20 @@
   import { onMount } from 'svelte';
 
   import ItemIcon from '#lib/components/ItemIcon.svelte';
-  import { MAX_CRAFTS, RECIPE_BIOMES, type Plan } from '#lib/models.ts';
+  import { MAX_CRAFTS, RECIPE_BIOMES, RECIPE_ICON_PX, type Plan } from '#lib/models.ts';
   import { clampCrafts, newPlan, planItems, stillNeeded, withHave } from '#lib/planner.ts';
   import { loadPlans, planner, savePlans } from '#lib/plans.svelte.ts';
   import { RECIPES, madeAt, recipeById } from '#lib/recipes.ts';
 
   onMount(loadPlans);
 
-  /** Recipe and crafts picked in the new plan form. */
+  /** Recipe picked in the new plan form. */
   let pickedId = $state(RECIPES[0]!.id);
+
+  /** How many crafts the new plan form asks for. */
   let pickedCrafts = $state(1);
 
-  /** Recipe picked in the form. */
+  /** Full recipe for [pickedId]. */
   const picked = $derived(recipeById(pickedId)!);
 
   /** Items still missing across every plan. */
@@ -59,7 +61,7 @@
       <button type="submit">Start tracking</button>
     </form>
     <div class="preview">
-      <ItemIcon item={picked.name} size={48} />
+      <ItemIcon item={picked.name} size={RECIPE_ICON_PX} />
       <div>
         <p class="muted">
           {madeAt(picked.station)} {picked.yields > 1 ? `Each batch makes ${picked.yields} and takes:` : 'Takes:'}
@@ -95,7 +97,7 @@
       {@const isReady = items.every((line) => line.missing === 0)}
       <section class="panel" aria-label={recipe.name}>
         <div class="plan-head">
-          <ItemIcon item={recipe.name} size={40} />
+          <ItemIcon item={recipe.name} size={RECIPE_ICON_PX} />
           <h2 class="plan-title">{recipe.name}</h2>
           {#if isReady}<span class="ready mono">READY TO CRAFT</span>{/if}
           <label class="crafts">

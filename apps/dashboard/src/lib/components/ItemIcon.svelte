@@ -1,8 +1,9 @@
 <script lang="ts">
+  import { ITEM_ICON_PX } from '#lib/models.ts';
   import { iconUrl } from '#lib/recipes.ts';
 
   /** Item to show the icon of, and the icon size in pixels. */
-  let { item, size = 28 }: { item: string; size?: number } = $props();
+  let { item, size = ITEM_ICON_PX }: { item: string; size?: number } = $props();
 
   /** Whether the icon failed to load, so the name shows alone. */
   let isBroken = $state(false);
