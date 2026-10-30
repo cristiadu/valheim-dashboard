@@ -89,14 +89,70 @@ The connection count line starts with a space and has two spaces before `sent`.
 
 ## Deaths, raids and bosses
 
-None of these happened in the sample log. The first two come from how Valheim behaves and need a
-check against a real log.
+None of these happened in the sample log. The lines below come from other server owners' logs
+(see Sources).
 
-| Event | Log line | Regex |
+| Event | Example | Regex |
 | --- | --- | --- |
-| Death | `Got character ZDOID from Ragnar : 0:0` | Character spawned regex, with peer ID and object ID both `0` |
-| Raid | `Random event set:army_eikthyr` | `^Random event set:(?<event>\w+)$` |
-| Boss killed | Not logged | The world file stores keys such as `defeated_eikthyr` |
+| Death | `Got character ZDOID from Ragnar : 0:0` | Character spawned regex with peer ID `0` and object ID `0` |
+| Respawn | `Got character ZDOID from Ragnar : 549297305:2` | Character spawned regex, the next one after a death |
+| Raid check | `Possible events:1` | `^Possible events:(?<count>\d+)$` |
+| Raid started | `Random event set:army_theelder` | `^Random event set:(?<event>\w+)$` |
+
+The server checks for a raid about every 46 minutes. `Possible events:0` means no raid can happen
+yet. The log has no line for when a raid ends.
+
+Raid names:
+
+| Name | Message in game | Unlocked by |
+| --- | --- | --- |
+| `army_eikthyr` | Eikthyr rallies the creatures of the forest. | Start of the world |
+| `army_theelder` | The forest is moving... | Eikthyr |
+| `army_bonemass` | A foul smell from the swamp... | The Elder |
+| `army_moder` | A cold wind blows from the mountains. | Bonemass |
+| `army_goblin` | The horde is attacking! | Moder |
+| `foresttrolls` | The ground is shaking. | A troll kill and The Elder |
+| `skeletons` | A skeleton surprise! | Bonemass |
+| `blobs` | A foul smell from the swamp... | Bonemass |
+| `ghosts` | You feel a chill down your spine... | Bonemass |
+| `wolves` | You are being hunted... | Bonemass |
+| `surtlings` | There's a smell of sulfur in the air... | A surtling kill and Bonemass |
+| `bats` | You stirred the cauldron. | A bat kill and Bonemass |
+| `army_gjall` | What's up, Gjall?! | Yagluth |
+| `army_seekers` | They sought you out. | Yagluth |
+| `army_charred` | The undead army marches. | The Queen |
+| `army_charredspawners` | The dead have been summoned. | The Queen |
+| `hildirboss1` to `hildirboss3` | (Hildir quest bosses) | Returning Hildir's chests |
+
+### Boss kills
+
+The server does not log boss kills. It stores them as keys in the world save
+(`worlds_local/<world>/_main.<N>.db2`, highest `N`). The file has a 16-byte header, then gzip data
+that holds the keys as plain text.
+
+| Key | Boss |
+| --- | --- |
+| `defeated_eikthyr` | Eikthyr |
+| `defeated_gdking` | The Elder |
+| `defeated_bonemass` | Bonemass |
+| `defeated_dragon` | Moder |
+| `defeated_goblinking` | Yagluth |
+| `defeated_queen` | The Queen |
+| `defeated_fader` | Fader |
+
+The sample world `Cotil` has `defeated_eikthyr` and `killedtroll`. A new key between two saves
+means that boss was killed between those save times.
+
+## Steam-only servers
+
+Without crossplay, the server writes Steam IDs instead of PlayFab IDs:
+
+| Event | Example | Regex |
+| --- | --- | --- |
+| Connected | `Got connection SteamID 76561198000000001` | `^Got connection SteamID (?<steamId>\d+)$` |
+| Handshake | `Got handshake from client 76561198000000001` | Handshake regex above |
+| Wrong password | `Peer 76561198000000001 has wrong password` | `^Peer (?<steamId>\d+) has wrong password$` |
+| Left | `Closing socket 76561198000000001` | `^Closing socket (?<steamId>\d+)$` (ignore `Closing socket 0`) |
 
 ## World saves and backups
 
@@ -151,3 +207,15 @@ Not game events. Keep them out of the timeline.
 | PlayFab upkeep | `Update PlayFab entity token` |
 | Save internals | `PrepareSave: ZDOExtraData.PrepareSave done [35ms]` |
 | Low disk | Disk space line where `available` is under `warnBelow`. Saving stops under `blockedBelow`. |
+
+## Sources
+
+- [Valheim Wiki: Events](https://valheim.fandom.com/wiki/Events) (raid names, messages, unlocks)
+- [Valheim Wiki: Global Keys](https://valheim.weirdgloop.org/w/Global_Keys) (boss keys)
+- [Valheim Modding Wiki: Event System](https://github-wiki-see.page/m/Valheim-Modding/Wiki/wiki/Event-System) (raid key rules)
+- [Steam discussion: raid timing](https://steamcommunity.com/app/892970/discussions/0/3826413850820704361) (`Possible events`, `Random event set` lines)
+- [valheim-server-docker discussion #397](https://github.com/lloesche/valheim-server-docker/discussions/397) (death `0:0`, raid and leave lines)
+- [valheim-server-docker discussion #519](https://github.com/lloesche/valheim-server-docker/discussions/519) (`Closing socket`, handshake)
+- [Join and leave script](https://gist.github.com/KevinPayravi/fe33a9b7d1b17e2747908950aa7a12f7) (Steam-only join and leave lines)
+- [Example server log](https://gist.github.com/kgadberry/8703f734e53b76862c7d62aca828d664) (`Got connection SteamID`, wrong password)
+- [valheim-discord-monitor PR #50](https://github.com/alainator/valheim-discord-monitor/pull/50) (boss keys in the `.db2` save)
