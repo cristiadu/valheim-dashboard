@@ -10,17 +10,17 @@ import {
 } from './models';
 
 /** Returns `1 death` or `2 deaths` style text. */
-const count = (n: number, one: string, many: string): string => `${n} ${n === 1 ? one : many}`;
+const count = (amount: number, one: string, many: string): string => `${amount} ${amount === 1 ? one : many}`;
 
 /** Total pieces in a stretch of building. */
-const pieceTotal = (build: BuildRecord): number => Object.values(build.pieces).reduce((sum, n) => sum + n, 0);
+const pieceTotal = (build: BuildRecord): number => Object.values(build.pieces).reduce((sum, amount) => sum + amount, 0);
 
 /** Most common pieces of a stretch, for example `14 wood floor 1x1, 8 wood fence and more`. */
 const pieceList = (build: BuildRecord): string => {
-  const kinds = Object.entries(build.pieces).sort(([, a], [, b]) => b - a);
+  const kinds = Object.entries(build.pieces).sort(([, firstAmount], [, secondAmount]) => secondAmount - firstAmount);
   const listed = kinds
     .slice(0, LISTED_PIECE_KINDS)
-    .map(([piece, n]) => `${n} ${piece.replace(/^piece_/, '').replaceAll('_', ' ')}`)
+    .map(([piece, amount]) => `${amount} ${piece.replace(/^piece_/, '').replaceAll('_', ' ')}`)
     .join(', ');
   return kinds.length > LISTED_PIECE_KINDS ? `${listed} and more` : listed;
 };
@@ -87,20 +87,20 @@ export const daySummary = (snapshot: Snapshot, nowMs: number): string => {
   const sinceMs = nowMs - DAY_MS;
   const players = new Set(
     snapshot.sessions
-      .filter((s) => s.endUtc === null || Date.parse(s.endUtc) > sinceMs)
-      .map((s) => s.steamId ?? s.character),
+      .filter((session) => session.endUtc === null || Date.parse(session.endUtc) > sinceMs)
+      .map((session) => session.steamId ?? session.character),
   );
   if (players.size === 0) {
     return 'Nobody played in the last 24 hours';
   }
-  const recent = snapshot.events.filter((e) => Date.parse(e.timeUtc) > sinceMs);
+  const recent = snapshot.events.filter((event) => Date.parse(event.timeUtc) > sinceMs);
   const piecesBuilt = snapshot.builds
-    .filter((b) => !b.isDestroyed && Date.parse(b.endUtc) > sinceMs)
-    .reduce((sum, b) => sum + pieceTotal(b), 0);
+    .filter((build) => !build.isDestroyed && Date.parse(build.endUtc) > sinceMs)
+    .reduce((sum, build) => sum + pieceTotal(build), 0);
   return [
     `${count(players.size, 'player', 'players')} in the last 24 hours`,
-    count(recent.filter((e) => e.type === 'playerDied').length, 'death', 'deaths'),
-    count(recent.filter((e) => e.type === 'raidStarted').length, 'raid', 'raids'),
+    count(recent.filter((event) => event.type === 'playerDied').length, 'death', 'deaths'),
+    count(recent.filter((event) => event.type === 'raidStarted').length, 'raid', 'raids'),
     ...(piecesBuilt > 0 ? [count(piecesBuilt, 'piece built', 'pieces built')] : []),
   ].join(' · ');
 };

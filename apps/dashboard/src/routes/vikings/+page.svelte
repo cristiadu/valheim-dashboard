@@ -5,8 +5,10 @@
   import { playersOf } from '#lib/players.ts';
   import { clockTime, durationLabel } from '#lib/status.ts';
 
-  /** Current snapshot from the layout. */
+  /** Getter for the snapshot the layout shares. */
   const getSnapshot = useSnapshot();
+
+  /** Current snapshot. */
   const snapshot = $derived(getSnapshot());
 
   /** Viewer's offset from UTC; only known in the browser. */

@@ -5,8 +5,10 @@
   import { whenLabel } from '#lib/status.ts';
   import { storyOf } from '#lib/story.ts';
 
-  /** Current snapshot from the layout. */
+  /** Getter for the snapshot the layout shares. */
   const getSnapshot = useSnapshot();
+
+  /** Current snapshot. */
   const snapshot = $derived(getSnapshot());
 
   /** Every story line, newest first. */

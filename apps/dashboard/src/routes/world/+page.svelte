@@ -5,17 +5,21 @@
   import { LATEST_SAVE_COUNT } from '#lib/models.ts';
   import { whenLabel } from '#lib/status.ts';
 
-  /** Current snapshot from the layout. */
+  /** Getter for the snapshot the layout shares. */
   const getSnapshot = useSnapshot();
+
+  /** Current snapshot. */
   const snapshot = $derived(getSnapshot());
 
-  /** Latest saves and backups, newest first. */
+  /** Latest saves, newest first. */
   const saves = $derived(snapshot.saves.slice(-LATEST_SAVE_COUNT).reverse());
+
+  /** Backups, newest first. */
   const backups = $derived(snapshot.backups.toReversed());
 
   /** Average save time in milliseconds, or null without saves. */
   const averageMs = $derived(
-    snapshot.saves.length === 0 ? null : snapshot.saves.reduce((sum, s) => sum + s.durationMs, 0) / snapshot.saves.length,
+    snapshot.saves.length === 0 ? null : snapshot.saves.reduce((sum, save) => sum + save.durationMs, 0) / snapshot.saves.length,
   );
 </script>
 
