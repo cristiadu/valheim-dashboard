@@ -19,10 +19,12 @@ namespace ValheimDashboard.BuildLog
         /// <summary>Plugin version.</summary>
         public const string PluginVersion = "1.0.0";
 
-        /// <summary>Applies the patches in <see cref="BuildTracker"/>.</summary>
+        /// <summary>Sends BepInEx messages to the server's log and applies the patches in <see cref="BuildTracker"/>.</summary>
         private void Awake()
         {
+            BepInEx.Logging.Logger.Listeners.Add(new ServerLogListener());
             new Harmony(PluginGuid).PatchAll(typeof(BuildTracker));
+            Logger.LogInfo($"{PluginName} {PluginVersion} loaded");
         }
     }
 }
