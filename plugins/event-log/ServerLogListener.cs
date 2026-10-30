@@ -1,6 +1,6 @@
 using BepInEx.Logging;
 
-namespace ValheimDashboard.BuildLog
+namespace ValheimDashboard.EventLog
 {
     /// <summary>
     /// Copies BepInEx messages, such as plugin errors, into the server's log. BepInEx's own log file is turned

@@ -17,7 +17,7 @@ describe('parseLog', () => {
 
   it('gives every crossplay line one event, in log order', () => {
     // THEN each line maps to its event and nothing is dropped
-    expect(crossplay.map((e) => e.type)).toEqual([
+    expect(crossplay.map((event) => event.type)).toEqual([
       'serverVersion',
       'worldLoaded',
       'knownPlayer',
@@ -48,7 +48,7 @@ describe('parseLog', () => {
 
   it('gives every Steam-only line one event, in log order', () => {
     // THEN older and Steam-only lines map to the same events
-    expect(steamOnly.map((e) => e.type)).toEqual([
+    expect(steamOnly.map((event) => event.type)).toEqual([
       'worldLoaded',
       'playerConnecting',
       'joinRefused',
@@ -108,7 +108,7 @@ describe('parseLog', () => {
 
   it('reads player counts, disconnects and timeouts', () => {
     // THEN the counts, the direction and the timeout flag match the lines
-    expect(ofType(crossplay, 'playerCount').map((e) => [e.players, e.isJoin])).toEqual([
+    expect(ofType(crossplay, 'playerCount').map((event) => [event.players, event.isJoin])).toEqual([
       [1, true],
       [0, false],
     ]);
@@ -125,7 +125,7 @@ describe('parseLog', () => {
 
   it('reads world save, backup and disk space values', () => {
     // THEN the save number, step times, backup name and byte counts are read
-    expect(ofType(crossplay, 'worldSaveStep').map((e) => [e.step, e.saveNumber, e.durationMs])).toEqual([
+    expect(ofType(crossplay, 'worldSaveStep').map((event) => [event.step, event.saveNumber, event.durationMs])).toEqual([
       [1, 1189, 0],
       [5, null, 40],
     ]);
@@ -143,7 +143,7 @@ describe('parseLog', () => {
     expect(ofType(crossplay, 'serverVersion')[0]).toMatchObject({ version: '1.0.21', networkVersion: 41 });
     expect(ofType(crossplay, 'worldLoaded')[0]).toMatchObject({ world: 'Cotil', saveNumber: 1183 });
     expect(ofType(steamOnly, 'worldLoaded')[0]).toMatchObject({ world: 'Midgard', saveNumber: null });
-    expect(ofType(crossplay, 'gameServer').map((e) => e.isConnected)).toEqual([true, false]);
+    expect(ofType(crossplay, 'gameServer').map((event) => event.isConnected)).toEqual([true, false]);
   });
 });
 
@@ -165,10 +165,10 @@ describe('parseMessage', () => {
     const events = messages.map(([message]) => parseMessage(message!, '2026-01-01T00:00:00.000Z'));
 
     // THEN each gets its reason
-    expect(events.map((e) => (e.type === 'joinRefused' ? e.reason : e.type))).toEqual(messages.map(([, r]) => r));
+    expect(events.map((event) => (event.type === 'joinRefused' ? event.reason : event.type))).toEqual(messages.map(([, r]) => r));
   });
 
-  it('reads build log plugin lines, with null for an unknown builder', () => {
+  it('reads piece lines, with null for an unknown builder', () => {
     // GIVEN a built piece and two destroyed pieces, one by an unknown builder
     const messages = [
       'Piece built: wood_floor_1x1 by Ragnar',
@@ -185,6 +185,51 @@ describe('parseMessage', () => {
       { type: 'pieceDestroyed', timeUtc: '2026-01-01T00:00:00.000Z', piece: 'piece_groundtorch_wood', builder: 'Ragnar' },
       { type: 'pieceDestroyed', timeUtc: '2026-01-01T00:00:00.000Z', piece: 'stake_wall', builder: null },
     ]);
+  });
+
+  it('reads event log plugin lines, with null for an unknown player', () => {
+    // GIVEN one line of each kind the event log plugin writes
+    const messages = [
+      'Chat: Ragnar shouted: Troll at the gate!',
+      'Chat: Ragnar said: hello',
+      'Chat: Ragnar whispered: psst',
+      'Ping: Ragnar at 120 -340',
+      'Global key set: defeated_eikthyr',
+      'Global key removed: nomap',
+      'Raid ended: army_eikthyr',
+      'Boss summoned: Eikthyr by Ragnar',
+      'Boss summoned: gd_king by an unknown player',
+      'Day started: 42',
+    ];
+
+    // WHEN each message is read
+    const events = messages.map((message) => parseMessage(message, '2026-01-01T00:00:00.000Z'));
+
+    // THEN each line gives its event and values
+    const timeUtc = '2026-01-01T00:00:00.000Z';
+    expect(events).toEqual([
+      { type: 'chatMessage', timeUtc, character: 'Ragnar', kind: 'shouted', text: 'Troll at the gate!' },
+      { type: 'chatMessage', timeUtc, character: 'Ragnar', kind: 'said', text: 'hello' },
+      { type: 'chatMessage', timeUtc, character: 'Ragnar', kind: 'whispered', text: 'psst' },
+      { type: 'ping', timeUtc, character: 'Ragnar', x: 120, z: -340 },
+      { type: 'globalKey', timeUtc, key: 'defeated_eikthyr', isSet: true },
+      { type: 'globalKey', timeUtc, key: 'nomap', isSet: false },
+      { type: 'raidEnded', timeUtc, raid: 'army_eikthyr' },
+      { type: 'bossSummoned', timeUtc, boss: 'Eikthyr', summoner: 'Ragnar' },
+      { type: 'bossSummoned', timeUtc, boss: 'gd_king', summoner: null },
+      { type: 'dayStarted', timeUtc, day: 42 },
+    ]);
+  });
+
+  it('reads chat as chat even when its text looks like another line', () => {
+    // GIVEN chat that holds text other patterns look for
+    const messages = ['Chat: Ragnar said: the server is full', 'Chat: Ragnar said: day:3 OnApplicationQuit'];
+
+    // WHEN each message is read
+    const events = messages.map((message) => parseMessage(message, '2026-01-01T00:00:00.000Z'));
+
+    // THEN both stay chat messages
+    expect(events.map((event) => event.type)).toEqual(['chatMessage', 'chatMessage']);
   });
 
   it('keeps an unknown message as another line', () => {

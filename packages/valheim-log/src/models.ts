@@ -15,6 +15,9 @@ export type JoinRefusedReason =
  */
 export type SessionEndReason = 'left' | 'timedOut' | 'serverStopped' | 'serverCrashed';
 
+/** How a chat message was sent: normal talk, a shout or a whisper. */
+export type ChatKind = 'said' | 'shouted' | 'whispered';
+
 /** One event read from `logs.txt`. `timeUtc` is the log time moved to UTC, as an ISO string. */
 export type LogEvent = { timeUtc: string } & (
   | { type: 'knownPlayer'; steamName: string; steamId: string }
@@ -33,6 +36,12 @@ export type LogEvent = { timeUtc: string } & (
   | { type: 'pieceBuilt'; piece: string; builder: string | null }
   | { type: 'pieceDestroyed'; piece: string; builder: string | null }
   | { type: 'nightSkipped'; day: number }
+  | { type: 'chatMessage'; character: string; kind: ChatKind; text: string }
+  | { type: 'ping'; character: string; x: number; z: number }
+  | { type: 'globalKey'; key: string; isSet: boolean }
+  | { type: 'raidEnded'; raid: string }
+  | { type: 'bossSummoned'; boss: string; summoner: string | null }
+  | { type: 'dayStarted'; day: number }
   | { type: 'worldSaveStep'; step: number; durationMs: number; saveNumber: number | null }
   | { type: 'backupCreated'; backup: string }
   | { type: 'diskSpace'; availableBytes: number; blockedBelowBytes: number; warnBelowBytes: number }
@@ -42,6 +51,15 @@ export type LogEvent = { timeUtc: string } & (
   | { type: 'serverStopped' }
   | { type: 'otherLine'; message: string; isEngineLine: boolean }
 );
+
+/** Named groups of a pattern match. Optional groups that did not match are `undefined` at runtime. */
+export type Groups = Record<string, string | undefined>;
+
+/** One pattern and how to turn its match into an event. Checked in order; the first match wins. */
+export type Matcher = {
+  pattern: RegExp;
+  toEvent: (groups: Groups, timeUtc: string, message: string) => LogEvent;
+};
 
 /** Name of an event type, for example `characterSpawned`. */
 export type LogEventType = LogEvent['type'];

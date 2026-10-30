@@ -58,14 +58,32 @@ export const POSSIBLE_RAIDS_PATTERN = /^Possible events:(?<count>\d+)$/;
 /** A raid started. */
 export const RAID_PATTERN = /^Random event set:(?<raid>\w+)$/;
 
-/** A player built a piece. Written by the build log plugin in `plugins/build-log`. */
+/** A player built a piece. Written by the event log plugin in `plugins/event-log`. */
 export const PIECE_BUILT_PATTERN = /^Piece built: (?<piece>\S+) by (?<builder>.+)$/;
 
-/** A built piece was destroyed or removed. Written by the build log plugin in `plugins/build-log`. */
+/** A built piece was destroyed or removed. Written by the event log plugin in `plugins/event-log`. */
 export const PIECE_DESTROYED_PATTERN = /^Piece destroyed: (?<piece>\S+) built by (?<builder>.+)$/;
 
-/** Builder the build log plugin writes when it never saw the builder's character online. */
-export const UNKNOWN_BUILDER = 'an unknown player';
+/** Player the event log plugin writes when it does not know who it was. */
+export const UNKNOWN_PLAYER = 'an unknown player';
+
+/** A chat message. Checked first, since the text can hold anything. Written by the event log plugin. */
+export const CHAT_PATTERN = /^Chat: (?<character>.+?) (?<kind>said|shouted|whispered): (?<text>.*)$/;
+
+/** A player pinged the map at a spot in world coordinates. Written by the event log plugin. */
+export const PING_PATTERN = /^Ping: (?<character>.+) at (?<x>-?\d+) (?<z>-?\d+)$/;
+
+/** A global key was set or removed, such as `defeated_eikthyr` when a boss dies. Written by the event log plugin. */
+export const GLOBAL_KEY_PATTERN = /^Global key (?<change>set|removed): (?<key>.+)$/;
+
+/** A raid ended. Written by the event log plugin. */
+export const RAID_ENDED_PATTERN = /^Raid ended: (?<raid>\w+)$/;
+
+/** A player summoned a boss. Written by the event log plugin. */
+export const BOSS_SUMMONED_PATTERN = /^Boss summoned: (?<boss>\S+) by (?<summoner>.+)$/;
+
+/** A new in-game day started, numbered as the game shows it. Written by the event log plugin. */
+export const DAY_STARTED_PATTERN = /^Day started: (?<day>\d+)$/;
 
 /** Players slept through the night. The day counts from 0. */
 export const NIGHT_SKIPPED_PATTERN = /day:(?<day>\d+)/;
