@@ -11,6 +11,8 @@ import {
   MS_PER_MINUTE,
   NIGHT_SKIPPED_PATTERN,
   OBJECTS_REMOVED_PATTERN,
+  PIECE_BUILT_PATTERN,
+  PIECE_DESTROYED_PATTERN,
   PLAYER_COUNT_PATTERN,
   PLAYFAB_CONNECTED_PATTERN,
   POSSIBLE_RAIDS_PATTERN,
@@ -23,6 +25,7 @@ import {
   STEAM_ID_PREFIX,
   STEAM_LINKED_PATTERN,
   TIMESTAMP_PATTERN,
+  UNKNOWN_BUILDER,
   VERSION_PATTERN,
   WORLD_LOADED_PATTERN,
   WORLD_SAVE_STEP_PATTERN,
@@ -39,6 +42,9 @@ type Matcher = {
 
 /** Reads an optional number group, or null when it did not match. */
 const optionalNumber = (value: string | undefined): number | null => (value === undefined ? null : Number(value));
+
+/** Reads a builder from the build log plugin, or null when the plugin did not know who built the piece. */
+const builderOf = (builder: string | undefined): string | null => (builder === UNKNOWN_BUILDER ? null : builder!);
 
 /** Every known message, in the order it is checked. */
 const MATCHERS: readonly Matcher[] = [
@@ -102,6 +108,14 @@ const MATCHERS: readonly Matcher[] = [
   {
     pattern: RAID_PATTERN,
     toEvent: (g, timeUtc) => ({ type: 'raidStarted', timeUtc, raid: g.raid! }),
+  },
+  {
+    pattern: PIECE_BUILT_PATTERN,
+    toEvent: (g, timeUtc) => ({ type: 'pieceBuilt', timeUtc, piece: g.piece!, builder: builderOf(g.builder) }),
+  },
+  {
+    pattern: PIECE_DESTROYED_PATTERN,
+    toEvent: (g, timeUtc) => ({ type: 'pieceDestroyed', timeUtc, piece: g.piece!, builder: builderOf(g.builder) }),
   },
   {
     pattern: WORLD_SAVE_STEP_PATTERN,

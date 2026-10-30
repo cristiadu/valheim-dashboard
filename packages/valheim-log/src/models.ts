@@ -30,6 +30,8 @@ export type LogEvent = { timeUtc: string } & (
   | { type: 'joinRefused'; reason: JoinRefusedReason; message: string }
   | { type: 'raidCheck'; possibleRaids: number }
   | { type: 'raidStarted'; raid: string }
+  | { type: 'pieceBuilt'; piece: string; builder: string | null }
+  | { type: 'pieceDestroyed'; piece: string; builder: string | null }
   | { type: 'nightSkipped'; day: number }
   | { type: 'worldSaveStep'; step: number; durationMs: number; saveNumber: number | null }
   | { type: 'backupCreated'; backup: string }
