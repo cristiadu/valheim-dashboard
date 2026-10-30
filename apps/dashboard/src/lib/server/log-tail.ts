@@ -26,11 +26,13 @@ export class LogTail {
 
   /** Reads what was added since the last poll. Does nothing while the file is missing. */
   async poll(): Promise<void> {
-    const size = await stat(this.path).then(
-      (stats) => stats.size,
-      () => null,
-    );
-    if (size === null || size === this.offset) {
+    let size: number;
+    try {
+      size = (await stat(this.path)).size;
+    } catch {
+      return;
+    }
+    if (size === this.offset) {
       return;
     }
     if (size < this.offset) {
