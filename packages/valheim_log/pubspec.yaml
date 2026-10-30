@@ -1,0 +1,11 @@
+name: valheim_log
+description: Reads a Valheim dedicated server's logs.txt into game events and player sessions.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: 3.13.7
+
+dev_dependencies:
+  lints: 6.1.0
+  test: 1.33.0
