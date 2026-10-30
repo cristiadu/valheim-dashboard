@@ -1,5 +1,10 @@
 {
   "name": "valheim-dashboard",
   "private": true,
-  "packageManager": "pnpm@12.16.1"
+  "packageManager": "pnpm@12.16.1",
+  "scripts": {
+    "check": "pnpm -r --if-present run check",
+    "test": "pnpm -r --if-present run test",
+    "build": "pnpm -r --if-present run build"
+  }
 }

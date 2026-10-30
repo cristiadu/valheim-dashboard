@@ -9,7 +9,7 @@
   },
   "scripts": {
     "test": "vitest run",
-    "typecheck": "tsc --noEmit"
+    "check": "tsc --noEmit"
   },
   "devDependencies": {
     "@types/node": "26.6.6",
