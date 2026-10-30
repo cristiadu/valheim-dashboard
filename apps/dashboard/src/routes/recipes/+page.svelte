@@ -227,6 +227,11 @@
     margin: 0;
   }
 
+  /* Text beside the icon takes the rest of the row */
+  .preview > div {
+    flex: 1;
+  }
+
   /* Icon lists of items flow in columns */
   .items {
     display: grid;
