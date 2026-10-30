@@ -1,11 +1,11 @@
 <script lang="ts">
   import NoData from '#/lib/components/NoData';
   import StatGrid from '#/lib/components/StatGrid';
-  import { live, useSnapshot, viewerOffsetMinutes } from '#/lib/live.svelte';
+  import { live, useSnapshot } from '#/lib/live.svelte';
   import { dayPercent } from '#/lib/day';
   import { gigabytesLabel, serverWarnings, upStretches } from '#/lib/health';
   import { DAY_MS } from '#/lib/models';
-  import { clockTime, durationLabel, isServerOnline, onlinePlayers, steamLabel, whenLabel } from '#/lib/status';
+  import { clockTime, durationLabel, isServerOnline, onlinePlayers, steamLabel, viewerOffsetMinutes, whenLabel } from '#/lib/status';
 
   /** Getter for the snapshot the layout shares. */
   const getSnapshot = useSnapshot();

@@ -1,4 +1,4 @@
-# Checks, tests and builds every workspace package on each pull request and push to main.
+# Checks, lints, tests and builds every workspace package on each pull request and push to main.
 name: CI
 
 on:
@@ -26,5 +26,6 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm check
+      - run: pnpm lint
       - run: pnpm test
       - run: pnpm build

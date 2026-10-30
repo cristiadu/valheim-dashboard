@@ -1,9 +1,9 @@
 <script lang="ts">
   import NoData from '#/lib/components/NoData';
   import TimeLanes from '#/lib/components/TimeLanes';
-  import { live, useSnapshot, viewerOffsetMinutes } from '#/lib/live.svelte';
+  import { live, useSnapshot } from '#/lib/live.svelte';
   import { playersOf } from '#/lib/players';
-  import { clockTime, durationLabel } from '#/lib/status';
+  import { clockTime, durationLabel, viewerOffsetMinutes } from '#/lib/status';
 
   /** Getter for the snapshot the layout shares. */
   const getSnapshot = useSnapshot();
