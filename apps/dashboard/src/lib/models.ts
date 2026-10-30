@@ -82,7 +82,26 @@ export type Snapshot = {
   runs: RunRecord[];
   /** Times the server lost its Steam connection, oldest first. */
   steamDropsUtc: string[];
+  /** Latest stretches of building and of destroyed pieces, from the build log plugin, oldest first. */
+  builds: BuildRecord[];
 };
+
+/** Pieces one character built, or pieces of theirs that were destroyed, with pauses under a few minutes. */
+export type BuildRecord = {
+  /** Character who built the pieces, or null when the build log did not know. */
+  builder: string | null;
+  /** True for destroyed pieces, false for built ones. */
+  isDestroyed: boolean;
+  /** First piece of the stretch, as a UTC ISO string. */
+  startUtc: string;
+  /** Last piece of the stretch, as a UTC ISO string. */
+  endUtc: string;
+  /** How many of each piece, by prefab name, for example `{ wood_floor_1x1: 14 }`. */
+  pieces: Record<string, number>;
+};
+
+/** Most kinds of pieces a story line names. */
+export const LISTED_PIECE_KINDS = 3;
 
 /** Milliseconds in one day. */
 export const DAY_MS = 24 * 60 * MS_PER_MINUTE;
@@ -124,7 +143,7 @@ export type Player = {
 };
 
 /** What kind of thing happened, which picks its rune and color. */
-export type StoryKind = 'joined' | 'left' | 'died' | 'raid' | 'night' | 'world' | 'stopped';
+export type StoryKind = 'joined' | 'left' | 'died' | 'raid' | 'night' | 'world' | 'stopped' | 'built' | 'wrecked';
 
 /** One line in the story of the server. */
 export type StoryItem = {
@@ -145,14 +164,17 @@ export const STORY_STYLES: Record<StoryKind, { rune: string; color: string }> = 
   night: { rune: 'ᛜ', color: 'var(--frost)' },
   world: { rune: 'ᛃ', color: 'var(--gold)' },
   stopped: { rune: 'ᚾ', color: 'var(--muted)' },
+  built: { rune: 'ᛒ', color: 'var(--good)' },
+  wrecked: { rune: 'ᚺ', color: 'var(--ember)' },
 };
 
 /** Filters on the Saga tab and the story kinds each one shows. */
 export const SAGA_FILTERS: readonly { label: string; kinds: readonly StoryKind[] }[] = [
-  { label: 'All', kinds: ['joined', 'left', 'died', 'raid', 'night', 'world', 'stopped'] },
+  { label: 'All', kinds: ['joined', 'left', 'died', 'raid', 'night', 'world', 'stopped', 'built', 'wrecked'] },
   { label: 'Joins and leaves', kinds: ['joined', 'left'] },
   { label: 'Deaths', kinds: ['died'] },
   { label: 'Raids', kinds: ['raid'] },
+  { label: 'Building', kinds: ['built', 'wrecked'] },
   { label: 'Nights and server', kinds: ['night', 'world', 'stopped'] },
 ];
 
@@ -165,4 +187,92 @@ export type ServerWarning = {
   timeUtc: string;
   /** Plain sentence, for example `Server went down without a clean stop`. */
   text: string;
+};
+
+/** Where a recipe is made in the game. `Hand` means the crafting menu, with no station. */
+export type CraftingStation = 'Hand' | 'Workbench' | 'Forge' | 'Cauldron' | 'Mead ketill';
+
+/** Biome a recipe belongs to, in the order players usually reach them. Groups the recipe list. */
+export const RECIPE_BIOMES = ['Meadows', 'Black Forest', 'Swamp', 'Mountain', 'Plains'] as const;
+
+/** One biome from [RECIPE_BIOMES]. */
+export type RecipeBiome = (typeof RECIPE_BIOMES)[number];
+
+/** An item and how many of it. */
+export type ItemAmount = {
+  /** Item name as the game shows it, for example `Deer hide`. */
+  item: string;
+  /** How many. */
+  amount: number;
+};
+
+/** A Valheim recipe at quality level 1. */
+export type Recipe = {
+  /** Stable key saved in plans, for example `bronze-axe`. */
+  id: string;
+  /** Name as the game shows it. */
+  name: string;
+  /** Biome where its materials come from. */
+  biome: RecipeBiome;
+  /** Where it is made. */
+  station: CraftingStation;
+  /** How many items one craft gives, for example 20 arrows. */
+  yields: number;
+  /** Items used by one craft. */
+  ingredients: ItemAmount[];
+};
+
+/** A recipe the viewer is working toward, saved in their browser. */
+export type Plan = {
+  /** Unique number for this plan. */
+  id: number;
+  /** Recipe being planned. */
+  recipeId: string;
+  /** How many times to craft it. */
+  crafts: number;
+  /** How many of each ingredient the viewer has set aside, by item name. Missing items count as 0. */
+  have: Record<string, number>;
+};
+
+/** One ingredient line of a plan. */
+export type PlanItem = {
+  /** Item name. */
+  item: string;
+  /** How many the plan needs in total. */
+  need: number;
+  /** How many the viewer has, capped at [need]. */
+  have: number;
+  /** How many are still missing. */
+  missing: number;
+};
+
+/** Browser storage key for the viewer's plans. */
+export const PLANS_STORAGE_KEY = 'valheim-dashboard.plans';
+
+/** Most crafts one plan can hold, so a typo like 5000 does not flood the list. */
+export const MAX_CRAFTS = 999;
+
+/** Valheim wiki address that sends back an uploaded file by its name. Item icons load from here in the viewer's browser. */
+export const WIKI_FILE_URL = 'https://valheim.fandom.com/wiki/Special:FilePath/';
+
+/** Size of an item icon next to its name, in pixels. */
+export const ITEM_ICON_PX = 28;
+
+/** Size of a recipe's icon beside its name or preview, in pixels. */
+export const RECIPE_ICON_PX = 40;
+
+/** Wiki icon files whose name is not the item name, by item name. */
+export const ICON_FILES: Record<string, string> = {
+  'Flint arrow': 'Flinthead Arrow.png',
+  'Fine wood': 'Finewood.png',
+  'Core wood': 'Corewood.png',
+  'Wolf armor chest': 'Wolf Hide Chestpiece.png',
+  'Wolf armor legs': 'Wolf Hide Trousers.png',
+  'Minor healing mead base': 'Mead Base - Minor Healing.png',
+  'Minor stamina mead base': 'Mead Base - Minor Stamina.png',
+  'Poison resistance mead base': 'Mead Base - Poison Resistance.png',
+  'Frost resistance mead base': 'Mead Base - Frost Resistance.png',
+  'Blackmetal sword': 'Black Metal Sword.png',
+  'Blackmetal axe': 'Black Metal Axe.png',
+  'Blackmetal shield': 'Black Metal Shield.png',
 };

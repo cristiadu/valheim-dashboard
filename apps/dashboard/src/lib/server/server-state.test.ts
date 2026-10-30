@@ -14,6 +14,46 @@ describe('server state', () => {
     state = createServerState(TEST_OFFSET_MINUTES);
   });
 
+  it('groups pieces into stretches per builder, split by long pauses and by destroyed pieces', () => {
+    // GIVEN Ragnar builds three pieces, a piece of his is destroyed, and he builds again 20 minutes later
+    readAll(state, [
+      ...RUN_START,
+      logLine('03:00:00', 'Piece built: wood_floor_1x1 by Ragnar'),
+      logLine('03:01:00', 'Piece built: wood_floor_1x1 by Ragnar'),
+      logLine('03:05:00', 'Piece built: wood_fence by Ragnar'),
+      logLine('03:06:00', 'Piece destroyed: wood_fence built by Ragnar'),
+      logLine('03:25:00', 'Piece built: piece_chest_wood by Ragnar'),
+    ]);
+
+    // WHEN the builds are listed
+    const { builds } = state.snapshot;
+
+    // THEN pieces within 10 minutes share a stretch and the late chest starts a new one
+    expect(builds).toEqual([
+      {
+        builder: 'Ragnar',
+        isDestroyed: false,
+        startUtc: '2026-10-29T10:00:00.000Z',
+        endUtc: '2026-10-29T10:05:00.000Z',
+        pieces: { wood_floor_1x1: 2, wood_fence: 1 },
+      },
+      {
+        builder: 'Ragnar',
+        isDestroyed: true,
+        startUtc: '2026-10-29T10:06:00.000Z',
+        endUtc: '2026-10-29T10:06:00.000Z',
+        pieces: { wood_fence: 1 },
+      },
+      {
+        builder: 'Ragnar',
+        isDestroyed: false,
+        startUtc: '2026-10-29T10:25:00.000Z',
+        endUtc: '2026-10-29T10:25:00.000Z',
+        pieces: { piece_chest_wood: 1 },
+      },
+    ]);
+  });
+
   it('reads the run details with times in UTC', () => {
     // GIVEN the start of a run
     // WHEN it is read
