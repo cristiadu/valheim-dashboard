@@ -167,6 +167,10 @@ importers:
   .: {}
 
   apps/dashboard:
+    dependencies:
+      valheim-log:
+        specifier: workspace:*
+        version: link:../../packages/valheim-log
     devDependencies:
       '@sveltejs/adapter-node':
         specifier: 6.0.1
