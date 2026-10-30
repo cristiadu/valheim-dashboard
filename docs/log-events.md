@@ -150,13 +150,32 @@ Also not in the sample log.
 | Event | Example | Regex |
 | --- | --- | --- |
 | Player timed out | `ZRpc timeout detected` | `^ZRpc timeout detected` (a leave, like `RPC_Disconnect`) |
-| Night skipped (players slept) | `Time 3600.5, day:2    nextm:3780  skipspeed:5` | `day:(?<day>\d+)` (day counts from 0) |
+| Night skipped (players slept) | a line containing `day:2` | `day:(?<day>\d+)` (day counts from 0, so this is day 3) |
 | Server stopped | `OnApplicationQuit` | `OnApplicationQuit` |
 | Network trouble | `Resume TX on playfab/A1B2C3D4E5F60718` | `^Resume TX on playfab/(?<playFabId>[0-9A-F]+)` |
 | World loaded (before 1.0.7) | `Load world: Cotil (Cotil)` | `^Load world: (?<world>.+?) \(` |
+| World saved (before 1.0) | `World saved ( 120ms )` | `^World saved \( (?<ms>.+)ms \)` |
 
 `OnApplicationQuit` may have no timestamp. If the log ends without it, the server crashed or was
-killed.
+killed. Tools only match `day:` as text; nobody publishes the full night-skip line.
+
+## Refused joins
+
+The player tried to connect and the server sent them away. Tools match these by the text in the
+line, since the start of the line differs by version.
+
+| Reason | Text in the line | Regex |
+| --- | --- | --- |
+| Wrong password | `Peer 76561198000000001 has wrong password` | `has wrong password` |
+| Wrong game version | `... has incompatible version` | `has incompatible version` |
+| Banned or not on the permitted list | `... is blacklisted or not in whitelist.` | `is blacklisted or not in whitelist` |
+| Steam could not verify the player | `... has invalid session ticket` | `has invalid session ticket` |
+| Server full (10 players) | `... disconnected due to server is full` | `server is full` |
+| Blocked by the host (crossplay) | `The player with the ID ... is blocked by the server owner` | `is blocked by the server owner` |
+| Not signed in to PlayFab (crossplay) | `... disconnected because they were not authenticated!` | `were not authenticated` |
+| Platform not allowed (crossplay) | `Peer diconnected due to server platform privileges disallowing crossplay` | `disallowing crossplay` |
+
+`diconnected` is spelled that way in the game.
 
 ## Steam-only servers
 
@@ -234,4 +253,7 @@ Not game events. Keep them out of the timeline.
 - [Join and leave script](https://gist.github.com/KevinPayravi/fe33a9b7d1b17e2747908950aa7a12f7) (Steam-only join and leave lines)
 - [Example server log](https://gist.github.com/kgadberry/8703f734e53b76862c7d62aca828d664) (`Got connection SteamID`, wrong password)
 - [vh-notify-ts](https://github.com/Viapatis/vh-notify-ts) (closest full list: timeout, night skip, server stop, network trouble)
+- [Valheim connection errors](https://valheimdb.com/multiplayer/connection-errors) (refused join lines)
+- [valheim-notify](https://github.com/Whiskey24/valheim-notify) (`day:`, `OnApplicationQuit`, `Load world`, death `: 0:`)
+- [vikings log parser](https://github.com/nickpelone/vikings) (`World saved ( Nms )`, Steam connect and leave)
 - [valheim-discord-monitor PR #50](https://github.com/alainator/valheim-discord-monitor/pull/50) (boss keys in the `.db2` save)
