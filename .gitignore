@@ -122,3 +122,6 @@ node_modules/
 
 # SvelteKit generated files
 .svelte-kit/
+
+# Dashboard output from the start script
+apps/dashboard/dashboard.log
