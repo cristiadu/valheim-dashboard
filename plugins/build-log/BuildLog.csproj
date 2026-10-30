@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>ValheimDashboard.BuildLog</AssemblyName>
+    <LangVersion>latest</LangVersion>
+    <!-- Dedicated server folder, which holds the game and BepInEx assemblies this plugin builds against. -->
+    <ValheimServerDir Condition="'$(ValheimServerDir)' == ''">C:\Program Files (x86)\Steam\steamapps\common\Valheim dedicated server</ValheimServerDir>
+    <ManagedDir>$(ValheimServerDir)\valheim_server_Data\Managed</ManagedDir>
+    <!-- BepInEx folder, installed in the server folder by BepInExPack_Valheim. -->
+    <BepInExDir Condition="'$(BepInExDir)' == ''">$(ValheimServerDir)\BepInEx</BepInExDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="assembly_valheim" HintPath="$(ManagedDir)\assembly_valheim.dll" Private="false" />
+    <Reference Include="assembly_utils" HintPath="$(ManagedDir)\assembly_utils.dll" Private="false" />
+    <Reference Include="UnityEngine" HintPath="$(ManagedDir)\UnityEngine.dll" Private="false" />
+    <Reference Include="UnityEngine.CoreModule" HintPath="$(ManagedDir)\UnityEngine.CoreModule.dll" Private="false" />
+    <Reference Include="BepInEx" HintPath="$(BepInExDir)\core\BepInEx.dll" Private="false" />
+    <Reference Include="0Harmony" HintPath="$(BepInExDir)\core\0Harmony.dll" Private="false" />
+  </ItemGroup>
+
+</Project>

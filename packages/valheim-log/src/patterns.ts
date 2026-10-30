@@ -58,6 +58,15 @@ export const POSSIBLE_RAIDS_PATTERN = /^Possible events:(?<count>\d+)$/;
 /** A raid started. */
 export const RAID_PATTERN = /^Random event set:(?<raid>\w+)$/;
 
+/** A player built a piece. Written by the build log plugin in `plugins/build-log`. */
+export const PIECE_BUILT_PATTERN = /^Piece built: (?<piece>\S+) by (?<builder>.+)$/;
+
+/** A built piece was destroyed or removed. Written by the build log plugin in `plugins/build-log`. */
+export const PIECE_DESTROYED_PATTERN = /^Piece destroyed: (?<piece>\S+) built by (?<builder>.+)$/;
+
+/** Builder the build log plugin writes when it never saw the builder's character online. */
+export const UNKNOWN_BUILDER = 'an unknown player';
+
 /** Players slept through the night. The day counts from 0. */
 export const NIGHT_SKIPPED_PATTERN = /day:(?<day>\d+)/;
 

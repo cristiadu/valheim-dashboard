@@ -1,12 +1,37 @@
 import { applyEvent, createLogReader, createSessionState, endAllSessions, onlineSessions, readLine } from 'valheim-log';
 
-import { STORY_EVENT_TYPES, type StoryEvent } from '../models';
-import { MAX_BACKUPS, MAX_EVENTS, MAX_RUNS, MAX_SAVES, type ServerState } from './models';
+import { type BuildRecord, STORY_EVENT_TYPES, type StoryEvent } from '../models';
+import {
+  BUILD_GAP_MS,
+  MAX_BACKUPS,
+  MAX_BUILDS,
+  MAX_EVENTS,
+  MAX_RUNS,
+  MAX_SAVES,
+  type PieceEvent,
+  type ServerState,
+} from './models';
 
 /** Adds [item] to the end of [list] and drops the oldest items past [max]. */
 const pushCapped = <T>(list: T[], item: T, max: number): void => {
   list.push(item);
   list.splice(0, Math.max(0, list.length - max));
+};
+
+/**
+ * Adds a built or destroyed piece to the builder's latest stretch of the same kind, or starts a new stretch
+ * when the builder paused longer than [BUILD_GAP_MS].
+ */
+const addPiece = (builds: BuildRecord[], event: PieceEvent): void => {
+  const isDestroyed = event.type === 'pieceDestroyed';
+  const stretch = builds.findLast((b) => b.builder === event.builder && b.isDestroyed === isDestroyed);
+  if (stretch && Date.parse(event.timeUtc) - Date.parse(stretch.endUtc) <= BUILD_GAP_MS) {
+    stretch.endUtc = event.timeUtc;
+    stretch.pieces[event.piece] = (stretch.pieces[event.piece] ?? 0) + 1;
+    return;
+  }
+  const { builder, timeUtc, piece } = event;
+  pushCapped(builds, { builder, isDestroyed, startUtc: timeUtc, endUtc: timeUtc, pieces: { [piece]: 1 } }, MAX_BUILDS);
 };
 
 /** Creates empty state for a server whose clock is [serverUtcOffsetMinutes] from UTC. */
@@ -31,6 +56,7 @@ export const createServerState = (serverUtcOffsetMinutes: number): ServerState =
       diskSpace: null,
       runs: [],
       steamDropsUtc: [],
+      builds: [],
     },
   };
 };
@@ -102,6 +128,10 @@ export const readLogLine = (state: ServerState, line: string): void => {
         pushCapped(snapshot.saves, save, MAX_SAVES);
         state.pendingSaveNumber = null;
       }
+      break;
+    case 'pieceBuilt':
+    case 'pieceDestroyed':
+      addPiece(snapshot.builds, event);
       break;
     case 'backupCreated':
       pushCapped(snapshot.backups, { timeUtc: event.timeUtc, backup: event.backup }, MAX_BACKUPS);

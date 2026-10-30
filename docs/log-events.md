@@ -159,6 +159,21 @@ Also not in the sample log.
 `OnApplicationQuit` may have no timestamp. If the log ends without it, the server crashed or was
 killed. Tools only match `day:` as text; nobody publishes the full night-skip line.
 
+## Building
+
+The game does not log building. The build log plugin in `plugins/build-log` runs on the server only
+and writes these lines. The builder is the character name, or `an unknown player` when the builder's
+character was not online since the server started.
+
+| Event | Example | Regex |
+| --- | --- | --- |
+| Piece built | `Piece built: wood_floor_1x1 by Ragnar` | `^Piece built: (?<piece>\S+) by (?<builder>.+)$` |
+| Piece destroyed or removed | `Piece destroyed: wood_fence built by Ragnar` | `^Piece destroyed: (?<piece>\S+) built by (?<builder>.+)$` |
+
+To build it, install the .NET SDK and BepInExPack_Valheim on the server, run `dotnet build -c Release`
+in `plugins/build-log`, and copy `bin\Release\netstandard2.1\ValheimDashboard.BuildLog.dll` to the
+server's `BepInEx\plugins` folder.
+
 ## Refused joins
 
 The player tried to connect and the server sent them away. Tools match these by the text in the
