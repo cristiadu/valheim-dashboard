@@ -29,8 +29,8 @@ $RepoRoot = Split-Path -Parent $PSScriptRoot
 # Built server entry point.
 $BuildEntry = Join-Path $RepoRoot 'apps\dashboard\build\index.js'
 
-# File that collects the dashboard's output.
-$OutputLog = Join-Path $RepoRoot 'apps\dashboard\dashboard.log'
+# File that collects the dashboard's output, next to the server's log so every log stays in one folder.
+$OutputLog = Join-Path (Split-Path -Parent $LogFile) 'dashboard.log'
 
 # Writes [Message] with the time to the screen and the output log.
 function Write-Status([string]$Message) {
@@ -46,6 +46,7 @@ function Invoke-Pnpm([string[]]$Arguments) {
 }
 
 Set-Location $RepoRoot
+New-Item -ItemType Directory -Force -Path (Split-Path -Parent $OutputLog) | Out-Null
 
 if ($Rebuild -or -not (Test-Path $BuildEntry)) {
   Write-Status 'Installing packages and building the dashboard'
