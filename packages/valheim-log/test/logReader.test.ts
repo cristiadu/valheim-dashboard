@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 
-import { createLogReader, parseMessage, readLine } from '../src/logReader';
+import { createLogReader, parseMessage, readLine, runKeyOf } from '../src/logReader';
 import type { LogEvent } from '../src/models';
 import { CROSSPLAY_LOG, ofType, parseSample, STEAM_ONLY_LOG } from './common';
 
@@ -198,6 +198,15 @@ describe('parseMessage', () => {
       message: 'Update PlayFab entity token',
       isEngineLine: false,
     });
+  });
+});
+
+describe('runKeyOf', () => {
+  it('names a timestamped line by its server-local time, and gives null without a timestamp', () => {
+    // GIVEN a timestamped line and an engine line
+    // WHEN / THEN only the timestamped line has a key, in sortable form
+    expect(runKeyOf('10/30/2026 15:43:44: Valheim version: 1.0.21 (network version 41)')).toBe('20261030-154344');
+    expect(runKeyOf('Mono path[0] = C:/Valheim')).toBeNull();
   });
 });
 
