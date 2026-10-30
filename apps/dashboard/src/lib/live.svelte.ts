@@ -33,3 +33,6 @@ export const provideSnapshot = (getSnapshot: () => Snapshot): void => {
 
 /** Returns the getter for the current snapshot, shared by the layout. */
 export const useSnapshot = (): (() => Snapshot) => getContext(SNAPSHOT_KEY);
+
+/** The viewer's offset from UTC in minutes at [nowMs], for example `-420` for UTC−7. */
+export const viewerOffsetMinutes = (nowMs: number): number => -new Date(nowMs).getTimezoneOffset();

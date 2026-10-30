@@ -1,3 +1,5 @@
+import type { PlayerSession } from 'valheim-log';
+
 import type { Snapshot } from './models';
 import { createServerState } from './server/server-state';
 
@@ -22,5 +24,18 @@ export const RUN_START = [
 /** Returns an empty snapshot changed by [changes]. */
 export const snapshotWith = (changes: Partial<Snapshot>): Snapshot => ({
   ...createServerState(TEST_OFFSET_MINUTES).snapshot,
+  ...changes,
+});
+
+/** Returns an open session for Ragnar changed by [changes]. */
+export const sessionWith = (changes: Partial<PlayerSession>): PlayerSession => ({
+  character: 'Ragnar',
+  peerId: '1',
+  steamId: null,
+  steamName: null,
+  startUtc: '2026-10-29T09:43:13.000Z',
+  endUtc: null,
+  endReason: null,
+  deaths: 0,
   ...changes,
 });

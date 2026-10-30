@@ -6,7 +6,7 @@
   import { page } from '$app/state';
   import Header from '#lib/components/Header.svelte';
   import SideMenu from '#lib/components/SideMenu.svelte';
-  import { connectLive, live, provideSnapshot } from '#lib/live.svelte.ts';
+  import { connectLive, live, provideSnapshot, viewerOffsetMinutes } from '#lib/live.svelte.ts';
   import type { Snapshot } from '#lib/models.ts';
   import { isServerOnline, statusLine } from '#lib/status.ts';
   import { tabFor } from '#lib/tabs.ts';
@@ -22,7 +22,7 @@
     live.nowMs === null
       ? null
       : {
-          text: statusLine(snapshot, live.nowMs, -new Date(live.nowMs).getTimezoneOffset()),
+          text: statusLine(snapshot, live.nowMs, viewerOffsetMinutes(live.nowMs)),
           isOnline: isServerOnline(snapshot, live.nowMs),
         },
   );
@@ -71,6 +71,14 @@
     min-height: calc(100vh - 90px);
     padding: 22px 28px 40px;
     border-left: 1px solid var(--line);
+  }
+
+  /* On phones the menu sits on top, so the page gets a top rule instead */
+  @media (max-width: 720px) {
+    main {
+      border-left: 0;
+      border-top: 1px solid var(--line);
+    }
   }
 
   /* Page heading in the heading font */

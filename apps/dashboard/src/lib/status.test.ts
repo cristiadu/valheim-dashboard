@@ -1,25 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
 import { clockTime, durationLabel, isServerOnline, offsetLabel, onlinePlayers, statusLine } from './status';
-import { snapshotWith } from './test-common';
-
-/** A session that is still open. */
-const OPEN_SESSION = {
-  character: 'Ragnar',
-  peerId: '1',
-  steamId: null,
-  steamName: null,
-  startUtc: '2026-10-29T09:43:13.000Z',
-  endUtc: null,
-  endReason: null,
-  deaths: 0,
-};
+import { sessionWith, snapshotWith } from './test-common';
 
 /** A run that started at 09:42Z with its last line at 12:00Z and one player inside. */
 const RUNNING = snapshotWith({
   startedUtc: '2026-10-29T09:42:15.000Z',
   lastLineUtc: '2026-10-29T12:00:00.000Z',
-  sessions: [OPEN_SESSION],
+  sessions: [sessionWith({})],
 });
 
 /** The last line time of [RUNNING] plus [minutes]. */
