@@ -235,6 +235,19 @@ export const readLine = (reader: LogReader, line: string): LogEvent | null => {
     : { type: 'otherLine', timeUtc: reader.lastTimeUtc, message: line, isEngineLine: true };
 };
 
+/**
+ * Returns the server-local time a timestamped [line] was written, as `20261030-154344`, or null for a line
+ * without a timestamp. The first one names a server run, and names sort in time order.
+ */
+export const runKeyOf = (line: string): string | null => {
+  const groups = TIMESTAMP_PATTERN.exec(line)?.groups;
+  if (groups === undefined) {
+    return null;
+  }
+  const { year, month, day, hour, minute, second } = groups;
+  return `${year}${month}${day}-${hour}${minute}${second}`;
+};
+
 /** Reads all of [log] and returns one event per line, in log order. */
 export const parseLog = (log: string, serverUtcOffsetMinutes: number): LogEvent[] => {
   const reader = createLogReader(serverUtcOffsetMinutes);
