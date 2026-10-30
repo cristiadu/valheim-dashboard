@@ -26,6 +26,7 @@ namespace ValheimDashboard.EventLog
             Harmony harmony = new Harmony(PluginGuid);
             harmony.PatchAll(typeof(WorldScanner));
             harmony.PatchAll(typeof(ChatTracker));
+            harmony.PatchAll(typeof(CombatTracker));
             harmony.PatchAll(typeof(WorldEventTracker));
             Logger.LogInfo($"{PluginName} {PluginVersion} loaded");
         }

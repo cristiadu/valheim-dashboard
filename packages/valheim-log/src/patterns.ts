@@ -82,6 +82,27 @@ export const RAID_ENDED_PATTERN = /^Raid ended: (?<raid>\w+)$/;
 /** A player summoned a boss. Written by the event log plugin. */
 export const BOSS_SUMMONED_PATTERN = /^Boss summoned: (?<boss>\S+) by (?<summoner>.+)$/;
 
+/** Where and fighting what a player died. Written by the event log plugin, next to the game's own death line. */
+export const DEATH_DETAILS_PATTERN = /^Player died: (?<character>.+?) in (?<area>\w+)(?: while fighting (?<fighting>.+))?$/;
+
+/** A player entered a biome, or `Dungeon` inside one. Written by the event log plugin. */
+export const AREA_ENTERED_PATTERN = /^Area entered: (?<character>.+) (?<area>\w+)$/;
+
+/** A player came out of a portal. Written by the event log plugin. */
+export const TELEPORTED_PATTERN = /^Teleported: (?<character>.+?) to (?<portal>.+)$/;
+
+/** A player turned PvP on or off. Written by the event log plugin. */
+export const PVP_PATTERN = /^PvP turned (?<state>on|off): (?<character>.+)$/;
+
+/** A player lay down in a bed. Written by the event log plugin. */
+export const BED_PATTERN = /^Went to bed: (?<character>.+)$/;
+
+/** A player wore or held a piece of gear for the first time since the server started. Written by the event log plugin. */
+export const GEAR_PATTERN = /^Gear: (?<character>\S+) (?<item>\S+)(?: quality (?<quality>\d+))?$/;
+
+/** Portal name the event log plugin writes when the portal has no name. */
+export const UNNAMED_PORTAL = 'an unnamed portal';
+
 /** A new in-game day started, numbered as the game shows it. Written by the event log plugin. */
 export const DAY_STARTED_PATTERN = /^Day started: (?<day>\d+)$/;
 

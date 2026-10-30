@@ -221,6 +221,38 @@ describe('parseMessage', () => {
     ]);
   });
 
+  it('reads player lines from the event log plugin', () => {
+    // GIVEN one line of each player event, with and without optional parts
+    const messages = [
+      'Player died: Ragnar in BlackForest while fighting Troll, Greydwarf',
+      'Player died: Ragnar in Ocean',
+      'Area entered: Ragnar Swamp',
+      'Teleported: Ragnar to Home base',
+      'Teleported: Ragnar to an unnamed portal',
+      'PvP turned on: Ragnar',
+      'Went to bed: Ragnar',
+      'Gear: Ragnar SwordIron quality 2',
+      'Gear: Ragnar ArmorBronzeChest',
+    ];
+
+    // WHEN each message is read
+    const events = messages.map((message) => parseMessage(message, '2026-01-01T00:00:00.000Z'));
+
+    // THEN each line gives its event and values
+    const timeUtc = '2026-01-01T00:00:00.000Z';
+    expect(events).toEqual([
+      { type: 'deathDetails', timeUtc, character: 'Ragnar', area: 'BlackForest', fighting: ['Troll', 'Greydwarf'] },
+      { type: 'deathDetails', timeUtc, character: 'Ragnar', area: 'Ocean', fighting: [] },
+      { type: 'areaEntered', timeUtc, character: 'Ragnar', area: 'Swamp' },
+      { type: 'teleported', timeUtc, character: 'Ragnar', portal: 'Home base' },
+      { type: 'teleported', timeUtc, character: 'Ragnar', portal: null },
+      { type: 'pvpChanged', timeUtc, character: 'Ragnar', isOn: true },
+      { type: 'wentToBed', timeUtc, character: 'Ragnar' },
+      { type: 'gearSeen', timeUtc, character: 'Ragnar', item: 'SwordIron', quality: 2 },
+      { type: 'gearSeen', timeUtc, character: 'Ragnar', item: 'ArmorBronzeChest', quality: 1 },
+    ]);
+  });
+
   it('reads chat as chat even when its text looks like another line', () => {
     // GIVEN chat that holds text other patterns look for
     const messages = ['Chat: Ragnar said: the server is full', 'Chat: Ragnar said: day:3 OnApplicationQuit'];
