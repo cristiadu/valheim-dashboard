@@ -15,7 +15,7 @@ export const TABS: readonly Tab[] = [
   { path: '/', label: 'Hall', hint: 'Today at a glance', rune: 'ᛟ' },
   { path: '/vikings', label: 'Vikings', hint: 'Who was online', rune: 'ᛗ' },
   { path: '/saga', label: 'Saga', hint: 'Every game event', rune: 'ᚱ' },
-  { path: '/world', label: 'World', hint: 'Saves and bosses', rune: 'ᛃ' },
+  { path: '/world', label: 'World', hint: 'Saves and backups', rune: 'ᛃ' },
   { path: '/server', label: 'Server', hint: 'Status and warnings', rune: 'ᚾ' },
 ];
 

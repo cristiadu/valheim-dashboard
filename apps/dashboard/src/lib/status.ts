@@ -48,3 +48,16 @@ export const statusLine = (snapshot: Snapshot, nowMs: number, viewerOffsetMinute
   const uptime = durationLabel(nowMs - Date.parse(snapshot.startedUtc ?? snapshot.lastLineUtc));
   return `Online · up ${uptime} · ${onlinePlayers(snapshot, nowMs).length} online · ${zone}`;
 };
+
+/** Month names for dates. */
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+/** Time of [timeUtc] in the zone at [offsetMinutes]: `HH:MM` on the same day as [nowMs], else `Oct 29 HH:MM`. */
+export const whenLabel = (timeUtc: string, offsetMinutes: number, nowMs: number): string => {
+  const local = new Date(Date.parse(timeUtc) + offsetMinutes * MS_PER_MINUTE);
+  const today = new Date(nowMs + offsetMinutes * MS_PER_MINUTE);
+  const time = local.toISOString().slice(11, 16);
+  return local.toISOString().slice(0, 10) === today.toISOString().slice(0, 10)
+    ? time
+    : `${MONTHS[local.getUTCMonth()]} ${local.getUTCDate()} ${time}`;
+};
