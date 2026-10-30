@@ -29,8 +29,8 @@ $RepoRoot = Split-Path -Parent $PSScriptRoot
 # Built server entry point.
 $BuildEntry = Join-Path $RepoRoot 'apps\dashboard\build\index.js'
 
-# File that collects the dashboard's output.
-$OutputLog = Join-Path $RepoRoot 'apps\dashboard\dashboard.log'
+# File that collects the dashboard's output, next to the server's log so every log stays in one folder.
+$OutputLog = Join-Path (Split-Path -Parent $LogFile) 'dashboard.log'
 
 # Writes [Message] with the time to the screen and the output log.
 function Write-Status([string]$Message) {
@@ -46,6 +46,7 @@ function Invoke-Pnpm([string[]]$Arguments) {
 }
 
 Set-Location $RepoRoot
+New-Item -ItemType Directory -Force -Path (Split-Path -Parent $OutputLog) | Out-Null
 
 if ($Rebuild -or -not (Test-Path $BuildEntry)) {
   Write-Status 'Installing packages and building the dashboard'
@@ -62,7 +63,8 @@ $env:PORT = "$Port"
 
 while ($true) {
   Write-Status "Starting the dashboard on http://localhost:$Port"
-  & node $BuildEntry *>> $OutputLog
+  # cmd redirects the output as-is: PowerShell 5.1 would write UTF-16 and stop on node's stderr.
+  & cmd.exe /c "node `"$BuildEntry`" >> `"$OutputLog`" 2>&1"
   Write-Status "The dashboard stopped with exit code $LASTEXITCODE. Starting again in $RestartDelaySeconds seconds."
   Start-Sleep -Seconds $RestartDelaySeconds
 }
