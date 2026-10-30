@@ -1,6 +1,7 @@
 import type { LogReader, SessionState } from 'valheim-log';
 
 import type { Snapshot } from '../models';
+import type { LogTail } from './log-tail';
 
 /** Where the server writes its log when no `LOG_FILE` is set. */
 export const DEFAULT_LOG_FILE = 'C:\\Valheim Server\\logs.txt';
@@ -49,4 +50,16 @@ export type ServerState = {
   pendingSaveNumber: number | null;
   /** What the page shows. Its `sessions` is the session state's list. */
   snapshot: Snapshot;
+};
+
+/** A log being followed and what was read from it. */
+export type Follower = {
+  /** Path of the log, for error messages. */
+  logFile: string;
+  /** Reads the new lines. */
+  tail: LogTail;
+  /** What the lines built so far. */
+  state: ServerState;
+  /** True when lines arrived since the listeners were last told. */
+  hasNewLines: boolean;
 };
