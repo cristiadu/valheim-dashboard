@@ -2,7 +2,7 @@
   import NoData from '#/lib/components/NoData';
   import { live, useSnapshot } from '#/lib/live.svelte';
   import { SAGA_FILTERS, STORY_STYLES } from '#/lib/models';
-  import { viewerOffsetMinutes, whenLabel } from '#/lib/status';
+  import { viewerTimeZone, whenLabel } from '#/lib/status';
   import { storyOf } from '#/lib/story';
 
   /** Getter for the snapshot the layout shares. */
@@ -25,7 +25,7 @@
   <NoData />
 {:else if live.nowMs !== null}
   {@const nowMs = live.nowMs}
-  {@const offset = viewerOffsetMinutes(nowMs)}
+  {@const timeZone = viewerTimeZone()}
   <div class="saga">
     <div class="filters" role="group" aria-label="Filter events">
       {#each SAGA_FILTERS as option (option.label)}
@@ -39,7 +39,7 @@
       {#each shown as item, i (i)}
         <li>
           <span class="rune" aria-hidden="true" style:color={STORY_STYLES[item.kind].color} style:border-color={STORY_STYLES[item.kind].color}>{STORY_STYLES[item.kind].rune}</span>
-          <span class="mono muted">{whenLabel(item.timeUtc, offset, nowMs)}</span>
+          <span class="mono muted">{whenLabel(item.timeUtc, timeZone, nowMs)}</span>
           <span>{item.text}</span>
         </li>
       {:else}

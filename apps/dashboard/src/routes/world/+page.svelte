@@ -5,7 +5,7 @@
   import { live, useSnapshot } from '#/lib/live.svelte';
   import { BOSS_ORDER, LATEST_SAVE_COUNT } from '#/lib/models';
   import { bossPill } from '#/lib/pills';
-  import { viewerOffsetMinutes, whenLabel } from '#/lib/status';
+  import { viewerTimeZone, whenLabel } from '#/lib/status';
 
   /** Getter for the snapshot the layout shares. */
   const getSnapshot = useSnapshot();
@@ -29,7 +29,7 @@
   <NoData />
 {:else if live.nowMs !== null}
   {@const nowMs = live.nowMs}
-  {@const offset = viewerOffsetMinutes(nowMs)}
+  {@const timeZone = viewerTimeZone()}
   <div class="world">
     <StatGrid
       stats={[
@@ -59,7 +59,7 @@
       <p class="muted">The server saves the world every 10 minutes.</p>
       {#each saves as save (save.timeUtc)}
         <div class="line">
-          <span>{whenLabel(save.timeUtc, offset, nowMs)}</span>
+          <span>{whenLabel(save.timeUtc, timeZone, nowMs)}</span>
           <span class="mono muted">{save.saveNumber === null ? '' : `save ${save.saveNumber} · `}{save.durationMs} ms</span>
         </div>
       {:else}
@@ -71,7 +71,7 @@
       <h2 id="backups-title" class="panel-title">AUTO BACKUPS</h2>
       {#each backups as backup (backup.timeUtc)}
         <div class="line">
-          <span>{whenLabel(backup.timeUtc, offset, nowMs)}</span>
+          <span>{whenLabel(backup.timeUtc, timeZone, nowMs)}</span>
           <code class="mono muted">{backup.backup}</code>
         </div>
       {:else}

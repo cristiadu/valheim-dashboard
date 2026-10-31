@@ -6,7 +6,7 @@
   import { LISTED_GEAR_COUNT } from '#/lib/models';
   import { playerPill } from '#/lib/pills';
   import { playersOf } from '#/lib/players';
-  import { clockTime, durationLabel, viewerOffsetMinutes } from '#/lib/status';
+  import { clockTime, durationLabel, viewerTimeZone } from '#/lib/status';
   import { areaLabel, gearLabel, thingName } from '#/lib/story';
 
   /** Getter for the snapshot the layout shares. */
@@ -15,8 +15,8 @@
   /** Current snapshot. */
   const snapshot = $derived(getSnapshot());
 
-  /** Viewer's offset from UTC; only known in the browser. */
-  const offset = $derived(live.nowMs === null ? 0 : viewerOffsetMinutes(live.nowMs));
+  /** Viewer's time zone from the browser. */
+  const timeZone = viewerTimeZone();
 
   /** Players at the page clock. */
   const players = $derived(live.nowMs === null ? [] : playersOf(snapshot, live.nowMs));
@@ -28,7 +28,7 @@
   <div class="vikings">
     <section class="panel" aria-labelledby="lanes-title">
       <h2 id="lanes-title" class="panel-title">ONLINE IN THE LAST 24 HOURS</h2>
-      <TimeLanes {players} {snapshot} nowMs={live.nowMs} offsetMinutes={offset} />
+      <TimeLanes {players} {snapshot} nowMs={live.nowMs} {timeZone} />
     </section>
 
     <div class="cards">
@@ -40,7 +40,7 @@
           </div>
           <p class="muted">
             {#if player.steamName}Steam: {player.steamName} ·{/if}
-            {player.isOnline ? `Since ${clockTime(player.sinceUtc!, offset)}` : `Last seen ${clockTime(player.lastSeenUtc!, offset)}`}
+            {player.isOnline ? `Since ${clockTime(player.sinceUtc!, timeZone)}` : `Last seen ${clockTime(player.lastSeenUtc!, timeZone)}`}
           </p>
           <dl>
             <div><dt>TIME</dt><dd class="mono">{durationLabel(player.totalMs)}</dd></div>

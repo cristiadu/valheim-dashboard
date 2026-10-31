@@ -26,8 +26,11 @@ export const TABS: readonly Tab[] = [
 /** Address of the page where friends type the password. */
 export const PASSWORD_PATH = '/password';
 
+/** Milliseconds in one second. */
+export const MS_PER_SECOND = 1000;
+
 /** Milliseconds in one minute. */
-export const MS_PER_MINUTE = 60_000;
+export const MS_PER_MINUTE = 60 * MS_PER_SECOND;
 
 /** Minutes in one hour. */
 export const MINUTES_PER_HOUR = 60;
@@ -46,6 +49,17 @@ export const ONLINE_WINDOW_MS = 15 * MS_PER_MINUTE;
 
 /** Bytes in a gigabyte, as disks count them. */
 export const BYTES_PER_GB = 1e9;
+
+/** Date and 24-hour clock parts read in a time zone, to find its offset from UTC. */
+export const ZONE_CLOCK_OPTIONS: Intl.DateTimeFormatOptions = {
+  hourCycle: 'h23',
+  year: 'numeric',
+  month: 'numeric',
+  day: 'numeric',
+  hour: 'numeric',
+  minute: 'numeric',
+  second: 'numeric',
+};
 
 /** Month names for dates. */
 export const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] as const;

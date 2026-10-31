@@ -39,6 +39,17 @@ flowchart LR
 
 Server times are local (UTC−7 on this PC) and are stored as UTC. One Steam ID is one player.
 
+## Showing times
+
+```mermaid
+flowchart LR
+  utc["Stored time: 2026-11-01T02:30Z"] --> zone[Viewer's browser time zone]
+  zone --> la["Los Angeles: Oct 31 19:30"]
+  zone --> sp["São Paulo: Oct 31 23:30"]
+```
+
+Every time on the dashboard is shown in the time zone of the browser looking at it. Each time uses the offset its zone had on that day, so times stay right after daylight saving changes.
+
 ## Following logs.txt
 
 ```mermaid
