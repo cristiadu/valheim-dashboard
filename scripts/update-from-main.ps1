@@ -115,7 +115,7 @@ try {
     $changedFiles = Invoke-Checked 'git' @('diff', '--name-only', $state.pluginCommit, $head)
     if (Test-PluginChanged $changedFiles) {
       Invoke-Checked 'dotnet' @('build', $PluginProject, '-c', 'Release', '--nologo', '-v', 'quiet') | Out-Null
-      $snapshot = Get-DashboardSnapshot "http://localhost:$Port/api/status" $DashboardStartSeconds
+      $snapshot = Get-DashboardSnapshot "http://127.0.0.1:$Port/api/status" $DashboardStartSeconds
       if (-not $snapshot) {
         Write-LogLine $UpdaterLog 'Plugin update waiting: the dashboard did not answer, so nobody can tell who is online.'
         return

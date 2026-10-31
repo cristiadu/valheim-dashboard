@@ -22,6 +22,9 @@ $FailureOutputLines = 20
 # Seconds between tries while waiting for the dashboard to answer.
 $DashboardRetrySeconds = 2
 
+# Seconds one request to the dashboard may take. Its first answer after a restart can take a few seconds.
+$DashboardRequestSeconds = 10
+
 # Script that sends Ctrl+C to the game server's console, next to this module.
 $CtrlCSender = Join-Path $PSScriptRoot 'Send-CtrlC.ps1'
 
@@ -147,7 +150,7 @@ function Get-DashboardSnapshot([string]$Url, [int]$TimeoutSeconds) {
   $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
   while ((Get-Date) -lt $deadline) {
     try {
-      return Invoke-RestMethod -Uri $Url -TimeoutSec $DashboardRetrySeconds
+      return Invoke-RestMethod -Uri $Url -TimeoutSec $DashboardRequestSeconds
     } catch {
       Start-Sleep -Seconds $DashboardRetrySeconds
     }
