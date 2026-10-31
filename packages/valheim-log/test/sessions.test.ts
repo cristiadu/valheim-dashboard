@@ -49,7 +49,7 @@ describe('buildSessions', () => {
 
   it('ends open sessions when the server stops', () => {
     // GIVEN the crossplay log without its leave lines
-    const events = parseSample(CROSSPLAY_LOG).filter((e) => e.type !== 'playerLeft');
+    const events = parseSample(CROSSPLAY_LOG).filter((event) => event.type !== 'playerLeft');
 
     // WHEN sessions are built from it
     const [session] = buildSessions(events);
@@ -64,7 +64,7 @@ describe('applyEvent', () => {
     // GIVEN the crossplay log up to the character spawn, fed one event at a time
     const state = createSessionState();
     const events = parseSample(CROSSPLAY_LOG);
-    for (const event of events.slice(0, events.findIndex((e) => e.type === 'playerDied'))) {
+    for (const event of events.slice(0, events.findIndex((event) => event.type === 'playerDied'))) {
       applyEvent(state, event);
     }
     const onlineBefore = onlineSessions(state).map((s) => [s.character, s.endUtc, s.endReason]);

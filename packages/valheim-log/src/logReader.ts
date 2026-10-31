@@ -1,10 +1,14 @@
-import type { LogEvent, LogReader } from '#/models';
+import type { ChatKind, LogEvent, LogReader, Matcher } from '#/models';
 import {
   BACKUP_PATTERN,
+  BOSS_SUMMONED_PATTERN,
+  CHAT_PATTERN,
+  DAY_STARTED_PATTERN,
   CHARACTER_PATTERN,
   DISCONNECT_PATTERN,
   DISK_SPACE_PATTERN,
   GAME_SERVER_PATTERN,
+  GLOBAL_KEY_PATTERN,
   HANDSHAKE_PATTERN,
   KNOWN_PLAYER_PATTERN,
   LEGACY_WORLD_SAVED_PATTERN,
@@ -13,9 +17,11 @@ import {
   OBJECTS_REMOVED_PATTERN,
   PIECE_BUILT_PATTERN,
   PIECE_DESTROYED_PATTERN,
+  PING_PATTERN,
   PLAYER_COUNT_PATTERN,
   PLAYFAB_CONNECTED_PATTERN,
   POSSIBLE_RAIDS_PATTERN,
+  RAID_ENDED_PATTERN,
   RAID_PATTERN,
   REFUSED_JOIN_PATTERN,
   REFUSED_JOIN_REASONS,
@@ -25,157 +31,189 @@ import {
   STEAM_ID_PREFIX,
   STEAM_LINKED_PATTERN,
   TIMESTAMP_PATTERN,
-  UNKNOWN_BUILDER,
+  UNKNOWN_PLAYER,
   VERSION_PATTERN,
   WORLD_LOADED_PATTERN,
   WORLD_SAVE_STEP_PATTERN,
 } from '#/patterns';
 
-/** Named groups of a pattern match. Optional groups that did not match are `undefined` at runtime. */
-type Groups = Record<string, string | undefined>;
-
-/** One pattern and how to turn its match into an event. Checked in order; the first match wins. */
-type Matcher = {
-  pattern: RegExp;
-  toEvent: (groups: Groups, timeUtc: string, message: string) => LogEvent;
-};
-
 /** Reads an optional number group, or null when it did not match. */
 const optionalNumber = (value: string | undefined): number | null => (value === undefined ? null : Number(value));
 
-/** Reads a builder from the build log plugin, or null when the plugin did not know who built the piece. */
-const builderOf = (builder: string | undefined): string | null => (builder === UNKNOWN_BUILDER ? null : builder!);
+/** Reads a player from the event log plugin, or null when the plugin did not know who it was. */
+const playerOf = (player: string | undefined): string | null => (player === UNKNOWN_PLAYER ? null : player!);
 
 /** Every known message, in the order it is checked. */
 const MATCHERS: readonly Matcher[] = [
   {
+    pattern: CHAT_PATTERN,
+    toEvent: (groups, timeUtc) => ({
+      type: 'chatMessage',
+      timeUtc,
+      character: groups.character!,
+      kind: groups.kind as ChatKind,
+      text: groups.text!,
+    }),
+  },
+  {
     pattern: KNOWN_PLAYER_PATTERN,
-    toEvent: (g, timeUtc) => ({ type: 'knownPlayer', timeUtc, steamName: g.steamName!, steamId: g.steamId! }),
+    toEvent: (groups, timeUtc) => ({ type: 'knownPlayer', timeUtc, steamName: groups.steamName!, steamId: groups.steamId! }),
   },
   {
     pattern: PLAYFAB_CONNECTED_PATTERN,
-    toEvent: (g, timeUtc) => ({ type: 'playerConnecting', timeUtc, connectionId: g.playFabId!, steamId: null }),
+    toEvent: (groups, timeUtc) => ({ type: 'playerConnecting', timeUtc, connectionId: groups.playFabId!, steamId: null }),
   },
   {
     pattern: STEAM_CONNECTED_PATTERN,
-    toEvent: (g, timeUtc) => ({
+    toEvent: (groups, timeUtc) => ({
       type: 'playerConnecting',
       timeUtc,
-      connectionId: g.steamId!,
-      steamId: `${STEAM_ID_PREFIX}${g.steamId}`,
+      connectionId: groups.steamId!,
+      steamId: `${STEAM_ID_PREFIX}${groups.steamId}`,
     }),
   },
   {
     pattern: STEAM_LINKED_PATTERN,
-    toEvent: (g, timeUtc) => ({ type: 'steamLinked', timeUtc, playFabId: g.playFabId!, steamId: g.steamId! }),
+    toEvent: (groups, timeUtc) => ({ type: 'steamLinked', timeUtc, playFabId: groups.playFabId!, steamId: groups.steamId! }),
   },
   {
     pattern: HANDSHAKE_PATTERN,
-    toEvent: (g, timeUtc) => ({ type: 'handshake', timeUtc, connectionId: g.connectionId! }),
+    toEvent: (groups, timeUtc) => ({ type: 'handshake', timeUtc, connectionId: groups.connectionId! }),
   },
   {
     pattern: CHARACTER_PATTERN,
-    toEvent: (g, timeUtc) =>
-      g.peerId === '0' && g.objectId === '0'
-        ? { type: 'playerDied', timeUtc, character: g.character! }
-        : { type: 'characterSpawned', timeUtc, character: g.character!, peerId: g.peerId! },
+    toEvent: (groups, timeUtc) =>
+      groups.peerId === '0' && groups.objectId === '0'
+        ? { type: 'playerDied', timeUtc, character: groups.character! }
+        : { type: 'characterSpawned', timeUtc, character: groups.character!, peerId: groups.peerId! },
   },
   {
     pattern: OBJECTS_REMOVED_PATTERN,
-    toEvent: (g, timeUtc) => ({ type: 'playerLeft', timeUtc, peerId: g.peerId! }),
+    toEvent: (groups, timeUtc) => ({ type: 'playerLeft', timeUtc, peerId: groups.peerId! }),
   },
   {
     pattern: PLAYER_COUNT_PATTERN,
-    toEvent: (g, timeUtc) => ({
+    toEvent: (groups, timeUtc) => ({
       type: 'playerCount',
       timeUtc,
-      players: Number(g.players),
-      isJoin: g.change === 'joined',
+      players: Number(groups.players),
+      isJoin: groups.change === 'joined',
     }),
   },
   {
     pattern: DISCONNECT_PATTERN,
-    toEvent: (g, timeUtc) => ({ type: 'playerDisconnecting', timeUtc, isTimeout: g.timeout !== undefined }),
+    toEvent: (groups, timeUtc) => ({ type: 'playerDisconnecting', timeUtc, isTimeout: groups.timeout !== undefined }),
   },
   {
     pattern: SOCKET_CLOSED_PATTERN,
-    toEvent: (g, timeUtc) => ({ type: 'socketClosed', timeUtc, steamId: `${STEAM_ID_PREFIX}${g.steamId}` }),
+    toEvent: (groups, timeUtc) => ({ type: 'socketClosed', timeUtc, steamId: `${STEAM_ID_PREFIX}${groups.steamId}` }),
   },
   {
     pattern: POSSIBLE_RAIDS_PATTERN,
-    toEvent: (g, timeUtc) => ({ type: 'raidCheck', timeUtc, possibleRaids: Number(g.count) }),
+    toEvent: (groups, timeUtc) => ({ type: 'raidCheck', timeUtc, possibleRaids: Number(groups.count) }),
   },
   {
     pattern: RAID_PATTERN,
-    toEvent: (g, timeUtc) => ({ type: 'raidStarted', timeUtc, raid: g.raid! }),
+    toEvent: (groups, timeUtc) => ({ type: 'raidStarted', timeUtc, raid: groups.raid! }),
   },
   {
     pattern: PIECE_BUILT_PATTERN,
-    toEvent: (g, timeUtc) => ({ type: 'pieceBuilt', timeUtc, piece: g.piece!, builder: builderOf(g.builder) }),
+    toEvent: (groups, timeUtc) => ({ type: 'pieceBuilt', timeUtc, piece: groups.piece!, builder: playerOf(groups.builder) }),
   },
   {
     pattern: PIECE_DESTROYED_PATTERN,
-    toEvent: (g, timeUtc) => ({ type: 'pieceDestroyed', timeUtc, piece: g.piece!, builder: builderOf(g.builder) }),
+    toEvent: (groups, timeUtc) => ({ type: 'pieceDestroyed', timeUtc, piece: groups.piece!, builder: playerOf(groups.builder) }),
   },
   {
     pattern: WORLD_SAVE_STEP_PATTERN,
-    toEvent: (g, timeUtc) => ({
+    toEvent: (groups, timeUtc) => ({
       type: 'worldSaveStep',
       timeUtc,
-      step: Number(g.step),
-      durationMs: Number(g.ms),
-      saveNumber: optionalNumber(g.saveNumber),
+      step: Number(groups.step),
+      durationMs: Number(groups.ms),
+      saveNumber: optionalNumber(groups.saveNumber),
     }),
   },
   {
     pattern: LEGACY_WORLD_SAVED_PATTERN,
-    toEvent: (g, timeUtc) => ({
+    toEvent: (groups, timeUtc) => ({
       type: 'worldSaveStep',
       timeUtc,
       step: 5,
-      durationMs: Math.round(Number(g.ms)),
+      durationMs: Math.round(Number(groups.ms)),
       saveNumber: null,
     }),
   },
   {
     pattern: BACKUP_PATTERN,
-    toEvent: (g, timeUtc) => ({ type: 'backupCreated', timeUtc, backup: g.backup! }),
+    toEvent: (groups, timeUtc) => ({ type: 'backupCreated', timeUtc, backup: groups.backup! }),
   },
   {
     pattern: DISK_SPACE_PATTERN,
-    toEvent: (g, timeUtc) => ({
+    toEvent: (groups, timeUtc) => ({
       type: 'diskSpace',
       timeUtc,
-      availableBytes: Number(g.available),
-      blockedBelowBytes: Number(g.blockedBelow),
-      warnBelowBytes: Number(g.warnBelow),
+      availableBytes: Number(groups.available),
+      blockedBelowBytes: Number(groups.blockedBelow),
+      warnBelowBytes: Number(groups.warnBelow),
     }),
   },
   {
     pattern: VERSION_PATTERN,
-    toEvent: (g, timeUtc) => ({
+    toEvent: (groups, timeUtc) => ({
       type: 'serverVersion',
       timeUtc,
-      version: g.version!,
-      networkVersion: Number(g.network),
+      version: groups.version!,
+      networkVersion: Number(groups.network),
     }),
   },
   {
     pattern: WORLD_LOADED_PATTERN,
-    toEvent: (g, timeUtc) => ({
+    toEvent: (groups, timeUtc) => ({
       type: 'worldLoaded',
       timeUtc,
-      world: g.world!,
-      saveNumber: optionalNumber(g.saveNumber),
+      world: groups.world!,
+      saveNumber: optionalNumber(groups.saveNumber),
     }),
   },
   {
     pattern: GAME_SERVER_PATTERN,
-    toEvent: (g, timeUtc) => ({ type: 'gameServer', timeUtc, isConnected: g.state === 'connected' }),
+    toEvent: (groups, timeUtc) => ({ type: 'gameServer', timeUtc, isConnected: groups.state === 'connected' }),
   },
   {
     pattern: SERVER_STOPPED_PATTERN,
     toEvent: (_, timeUtc) => ({ type: 'serverStopped', timeUtc }),
+  },
+  {
+    pattern: PING_PATTERN,
+    toEvent: (groups, timeUtc) => ({
+      type: 'ping',
+      timeUtc,
+      character: groups.character!,
+      x: Number(groups.x),
+      z: Number(groups.z),
+    }),
+  },
+  {
+    pattern: GLOBAL_KEY_PATTERN,
+    toEvent: (groups, timeUtc) => ({ type: 'globalKey', timeUtc, key: groups.key!, isSet: groups.change === 'set' }),
+  },
+  {
+    pattern: RAID_ENDED_PATTERN,
+    toEvent: (groups, timeUtc) => ({ type: 'raidEnded', timeUtc, raid: groups.raid! }),
+  },
+  {
+    pattern: BOSS_SUMMONED_PATTERN,
+    toEvent: (groups, timeUtc) => ({
+      type: 'bossSummoned',
+      timeUtc,
+      boss: groups.boss!,
+      summoner: playerOf(groups.summoner),
+    }),
+  },
+  {
+    pattern: DAY_STARTED_PATTERN,
+    toEvent: (groups, timeUtc) => ({ type: 'dayStarted', timeUtc, day: Number(groups.day) }),
   },
   {
     pattern: REFUSED_JOIN_PATTERN,
@@ -188,7 +226,7 @@ const MATCHERS: readonly Matcher[] = [
   },
   {
     pattern: NIGHT_SKIPPED_PATTERN,
-    toEvent: (g, timeUtc) => ({ type: 'nightSkipped', timeUtc, day: Number(g.day) + 1 }),
+    toEvent: (groups, timeUtc) => ({ type: 'nightSkipped', timeUtc, day: Number(groups.day) + 1 }),
   },
 ];
 

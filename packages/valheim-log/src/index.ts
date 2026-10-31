@@ -1,4 +1,5 @@
 export type {
+  ChatKind,
   JoinRefusedReason,
   LogEvent,
   LogEventType,

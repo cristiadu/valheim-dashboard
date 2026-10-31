@@ -7,8 +7,8 @@ build/
 .vite/
 
 # Plugin build output
-/plugins/build-log/bin/
-/plugins/build-log/obj/
+/plugins/event-log/bin/
+/plugins/event-log/obj/
 
 # Logs, such as dashboard.log
 *.log

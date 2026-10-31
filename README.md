@@ -38,4 +38,4 @@ pnpm build                    # what CI runs last
 ## Learn more
 
 - [How it works](docs/architecture.md)
-- [Log lines it reads](docs/log-events.md), including the optional build log plugin
+- [Log lines it reads](docs/log-events.md), including the optional event log plugin
