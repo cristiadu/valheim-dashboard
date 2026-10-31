@@ -1,8 +1,10 @@
 <script lang="ts">
   import NoData from '#/lib/components/NoData';
+  import Pill from '#/lib/components/Pill';
   import TimeLanes from '#/lib/components/TimeLanes';
   import { live, useSnapshot } from '#/lib/live.svelte';
   import { LISTED_GEAR_COUNT } from '#/lib/models';
+  import { playerPill } from '#/lib/pills';
   import { playersOf } from '#/lib/players';
   import { clockTime, durationLabel, viewerOffsetMinutes } from '#/lib/status';
   import { areaLabel, gearLabel, thingName } from '#/lib/story';
@@ -32,10 +34,13 @@
     <div class="cards">
       {#each players as player (player.key)}
         <article class="panel card">
-          <h3><span class="diamond" aria-hidden="true" style:background={player.color}></span>{player.character}</h3>
+          <div class="name">
+            <h3><span class="diamond" aria-hidden="true" style:background={player.color}></span>{player.character}</h3>
+            <Pill pill={playerPill(player.isOnline)} />
+          </div>
           <p class="muted">
             {#if player.steamName}Steam: {player.steamName} ·{/if}
-            {player.isOnline ? `Online since ${clockTime(player.sinceUtc!, offset)}` : `Last seen ${clockTime(player.lastSeenUtc!, offset)}`}
+            {player.isOnline ? `Since ${clockTime(player.sinceUtc!, offset)}` : `Last seen ${clockTime(player.lastSeenUtc!, offset)}`}
           </p>
           <dl>
             <div><dt>TIME</dt><dd class="mono">{durationLabel(player.totalMs)}</dd></div>
@@ -76,6 +81,15 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
+  }
+
+  /* Name on the left, online pill on the right */
+  .name {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px 10px;
   }
 
   /* Player name with their color */

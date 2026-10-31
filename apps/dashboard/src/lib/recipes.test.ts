@@ -54,22 +54,22 @@ describe('recipeById', () => {
 });
 
 describe('iconUrl', () => {
-  it('turns the item name into a wiki file address', () => {
+  it('turns the item name into a lowercase icon file name', () => {
     // GIVEN an item with a space in its name
     // WHEN its icon address is made
     const url = iconUrl('Deer hide');
 
-    // THEN it points at the wiki file with an underscore
-    expect(url).toBe('https://valheim.fandom.com/wiki/Special:FilePath/Deer_hide.png');
+    // THEN it points at the served icon with a dash
+    expect(url).toBe('/icons/deer-hide.png');
   });
 
-  it('uses the wiki file name when it differs from the item name', () => {
-    // GIVEN Fine wood, whose wiki file is Finewood.png
+  it('drops apostrophes from the icon file name', () => {
+    // GIVEN Queen's jam
     // WHEN its icon address is made
-    const url = iconUrl('Fine wood');
+    const url = iconUrl("Queen's jam");
 
-    // THEN it points at Finewood.png
-    expect(url).toBe('https://valheim.fandom.com/wiki/Special:FilePath/Finewood.png');
+    // THEN the apostrophe is gone
+    expect(url).toBe('/icons/queens-jam.png');
   });
 });
 

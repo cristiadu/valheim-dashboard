@@ -1,8 +1,10 @@
 <script lang="ts">
   import NoData from '#/lib/components/NoData';
+  import Pill from '#/lib/components/Pill';
   import StatGrid from '#/lib/components/StatGrid';
   import { live, useSnapshot } from '#/lib/live.svelte';
   import { BOSS_ORDER, LATEST_SAVE_COUNT } from '#/lib/models';
+  import { bossPill } from '#/lib/pills';
   import { viewerOffsetMinutes, whenLabel } from '#/lib/status';
 
   /** Getter for the snapshot the layout shares. */
@@ -46,7 +48,7 @@
           {@const isDefeated = snapshot.defeatedBosses.includes(boss)}
           <li class:defeated={isDefeated}>
             <span>{boss}</span>
-            <span class="mono muted">{isDefeated ? 'Defeated' : 'Not yet'}</span>
+            <span><Pill pill={bossPill(isDefeated)} /></span>
           </li>
         {/each}
       </ol>
@@ -107,7 +109,7 @@
   .bosses li {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 6px;
     padding: 10px 12px;
     border: 1px solid var(--line);
   }

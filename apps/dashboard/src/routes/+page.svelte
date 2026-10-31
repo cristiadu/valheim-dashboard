@@ -2,8 +2,10 @@
   import { resolve } from '$app/paths';
   import DayWheel from '#/lib/components/DayWheel';
   import NoData from '#/lib/components/NoData';
+  import Pill from '#/lib/components/Pill';
   import { live, useSnapshot } from '#/lib/live.svelte';
   import { LATEST_EVENT_COUNT, STORY_STYLES } from '#/lib/models';
+  import { serverPill } from '#/lib/pills';
   import { playersOf } from '#/lib/players';
   import { clockTime, durationLabel, isServerOnline, viewerOffsetMinutes, whenLabel } from '#/lib/status';
   import { gigabytesLabel } from '#/lib/health';
@@ -94,12 +96,12 @@
 
     <a class="strip" href={resolve('/server')}>
       <strong>SERVER</strong>
-      <span><span class="diamond small" aria-hidden="true" class:up={isUp}></span>{isUp ? 'Online' : 'Offline'}</span>
+      <Pill pill={serverPill(isUp)} />
       {#if isUp && snapshot.startedUtc}<span>Up {durationLabel(nowMs - Date.parse(snapshot.startedUtc))}</span>{/if}
       {#if lastSave}<span>Last save {at(lastSave.timeUtc)}</span>{/if}
       <span>{online.length === 1 ? '1 player online' : `${online.length} players online`}</span>
       {#if snapshot.diskSpace}<span>{gigabytesLabel(snapshot.diskSpace.availableBytes)} disk free</span>{/if}
-      {#if snapshot.isGameServerConnected === false}<span class="warn">Steam connection lost</span>{/if}
+      {#if snapshot.isGameServerConnected === false}<Pill pill={{ text: 'Steam connection lost', tone: 'bad' }} />{/if}
       <span class="link">Server details</span>
     </a>
   </div>
@@ -174,19 +176,6 @@
     transform: rotate(45deg);
   }
 
-  /* Smaller status square in the server strip, red when offline */
-  .small {
-    width: 7px;
-    height: 7px;
-    margin-right: 6px;
-    background: var(--blood);
-  }
-
-  /* Green status square while online */
-  .small.up {
-    background: var(--good);
-  }
-
   /* Event rune */
   .rune {
     font-family: var(--font-rune);
@@ -213,11 +202,6 @@
     font-weight: 500;
     letter-spacing: 0.1em;
     color: var(--text);
-  }
-
-  /* Steam warning in the strip */
-  .warn {
-    color: var(--blood);
   }
 
   /* Looks like a link at the end of the strip */

@@ -414,12 +414,31 @@ export const SAGA_FILTERS: readonly { label: string; kinds: readonly StoryKind[]
 /** How many saves the World tab lists. */
 export const LATEST_SAVE_COUNT = 10;
 
+/** Kind of problem on the Server tab: the server crashed, lost Steam, or is low on disk. */
+export type WarningKind = 'crash' | 'steam' | 'disk';
+
 /** One problem on the Server tab. */
 export type ServerWarning = {
+  /** What went wrong, shown as a pill. */
+  kind: WarningKind;
   /** When it happened, as a UTC ISO string. */
   timeUtc: string;
   /** Plain sentence, for example `Server went down without a clean stop`. */
   text: string;
+};
+
+/**
+ * Color of a pill. `good` is green (online, ready), `bad` is red (offline, crashed),
+ * `gold` marks a win or something to watch (boss defeated, low disk), `quiet` is grey (not yet, unknown).
+ */
+export type PillTone = 'good' | 'bad' | 'gold' | 'quiet';
+
+/** A status or state in a word or two, shown as a rounded pill, for example `Online` in green. */
+export type Pill = {
+  /** Word or two on the pill. */
+  text: string;
+  /** Color of the pill. */
+  tone: PillTone;
 };
 
 /** Where a recipe is made in the game. `Hand` means the crafting menu, with no station. */
@@ -485,30 +504,14 @@ export const PLANS_STORAGE_KEY = 'valheim-dashboard.plans';
 /** Most crafts one plan can hold, so a typo like 5000 does not flood the list. */
 export const MAX_CRAFTS = 999;
 
-/** Valheim wiki address that sends back an uploaded file by its name. Item icons load from here in the viewer's browser. */
-export const WIKI_FILE_URL = 'https://valheim.fandom.com/wiki/Special:FilePath/';
+/** Address the dashboard serves item icons from, for example `/icons/deer-hide.png`. */
+export const ICON_PATH = '/icons/';
 
 /** Size of an item icon next to its name, in pixels. */
 export const ITEM_ICON_PX = 28;
 
 /** Size of a recipe's icon beside its name or preview, in pixels. */
 export const RECIPE_ICON_PX = 40;
-
-/** Wiki icon files whose name is not the item name, by item name. */
-export const ICON_FILES: Record<string, string> = {
-  'Flint arrow': 'Flinthead Arrow.png',
-  'Fine wood': 'Finewood.png',
-  'Core wood': 'Corewood.png',
-  'Wolf armor chest': 'Wolf Hide Chestpiece.png',
-  'Wolf armor legs': 'Wolf Hide Trousers.png',
-  'Minor healing mead base': 'Mead Base - Minor Healing.png',
-  'Minor stamina mead base': 'Mead Base - Minor Stamina.png',
-  'Poison resistance mead base': 'Mead Base - Poison Resistance.png',
-  'Frost resistance mead base': 'Mead Base - Frost Resistance.png',
-  'Blackmetal sword': 'Black Metal Sword.png',
-  'Blackmetal axe': 'Black Metal Axe.png',
-  'Blackmetal shield': 'Black Metal Shield.png',
-};
 
 /** The browser's live stream and page clock, while the page is open. */
 export type LiveConnection = {
