@@ -31,6 +31,33 @@ describe('playersOf', () => {
     });
   });
 
+  it('adds what the plugin knows of all the player\'s characters', () => {
+    // GIVEN one Steam account with two characters, their kills, areas and gear
+    const snapshot = snapshotWith({
+      lastLineUtc: '2026-10-29T11:59:00.000Z',
+      sessions: [
+        sessionWith({ steamId: 'Steam_1', character: 'Tony', endUtc: '2026-10-29T10:43:13.000Z' }),
+        sessionWith({ steamId: 'Steam_1', character: 'wynnyarD', startUtc: '2026-10-29T11:00:00.000Z' }),
+      ],
+      kills: { Tony: { Greydwarf: 3 }, wynnyarD: { Greydwarf: 1, Troll: 2 } },
+      visitedAreas: { Tony: ['Meadows'], wynnyarD: ['Meadows', 'Swamp'] },
+      currentAreas: { Tony: 'Meadows', wynnyarD: 'Swamp' },
+      gear: { Tony: ['Club'], wynnyarD: ['AxeBronze', 'SwordIron quality 2'] },
+    });
+
+    // WHEN players are made at noon
+    const [player] = playersOf(snapshot, TEST_NOON_MS);
+
+    // THEN kills and areas cover both characters, and area and gear are the latest character's
+    expect(player).toMatchObject({
+      area: 'Swamp',
+      kills: 6,
+      topKill: 'Greydwarf',
+      areas: ['Meadows', 'Swamp'],
+      gear: ['SwordIron quality 2', 'AxeBronze'],
+    });
+  });
+
   it('shows nobody online once the log went quiet', () => {
     // GIVEN an open session but a last log line 20 minutes ago
     const snapshot = snapshotWith({ lastLineUtc: '2026-10-29T11:40:00.000Z', sessions: [sessionWith({})] });
