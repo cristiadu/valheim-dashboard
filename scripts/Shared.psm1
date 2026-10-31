@@ -142,15 +142,14 @@ function Stop-GameServer([System.Diagnostics.Process]$Server, [int]$TimeoutSecon
 
 <#
 .SYNOPSIS
-  Starts the game server from [ServerDir] with Valheim's batch file, in its own console window. The window
-  opens minimized on the taskbar and does not take focus from the game or app in use.
+  Starts the game server from [ServerDir] with Valheim's batch file, in its own console window in the
+  foreground.
 #>
 function Start-GameServer([string]$ServerDir) {
   # The batch file runs valheim_server from the current folder, which cmd skips when this variable is set.
   Remove-Item Env:NoDefaultCurrentDirectoryInExePath -ErrorAction SilentlyContinue
-  # start /min opens the window without activating it. conhost keeps it a classic console window, which
-  # Ctrl+C can reach, whatever the default terminal app is.
-  $arguments = @('/c', 'start', "`"$GameServerWindowTitle`"", '/min', 'conhost.exe', 'cmd.exe', '/c', $GameServerStartFile)
+  # conhost keeps it a classic console window, which Ctrl+C can reach, whatever the default terminal app is.
+  $arguments = @('/c', 'start', "`"$GameServerWindowTitle`"", 'conhost.exe', 'cmd.exe', '/c', $GameServerStartFile)
   Start-Process -FilePath 'cmd.exe' -ArgumentList $arguments -WorkingDirectory $ServerDir -WindowStyle Hidden
 }
 
