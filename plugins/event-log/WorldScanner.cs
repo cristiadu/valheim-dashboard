@@ -6,8 +6,8 @@ namespace ValheimDashboard.EventLog
 {
     /// <summary>
     /// Scans the world every few seconds for objects that reached the server, such as built pieces and summoned
-    /// bosses, and logs each one with the player behind it. Also logs pieces as the server destroys them, and
-    /// each new in-game day.
+    /// bosses, and logs each one with the player behind it. Also hands players to <see cref="PlayerTracker"/>,
+    /// logs pieces as the server destroys them, and logs each new in-game day.
     /// </summary>
     [HarmonyPatch]
     internal static class WorldScanner
@@ -54,6 +54,7 @@ namespace ValheimDashboard.EventLog
                 {
                     Names.CharacterNames[zdo.GetLong(ZDOVars.s_playerID, 0L)] = zdo.GetString(ZDOVars.s_playerName, string.Empty);
                 }
+                PlayerTracker.See(zdo);
                 if (SeenObjects.Add(entry.Key) && hasSeenWorld)
                 {
                     NewObjects.Add(zdo);
@@ -65,6 +66,8 @@ namespace ValheimDashboard.EventLog
             }
             NewObjects.Clear();
             hasSeenWorld = true;
+            PlayerTracker.AfterScan();
+            CombatTracker.ForgetOldMoves();
             LogNewDay();
         }
 
@@ -74,6 +77,7 @@ namespace ValheimDashboard.EventLog
         private static void BeforeDestroyed(ZDOMan __instance, ZDOID uid)
         {
             SeenObjects.Remove(uid);
+            PlayerTracker.Forget(uid);
             ZDO zdo = __instance.GetZDO(uid);
             if (zdo != null && zdo.GetLong(ZDOVars.s_creator, 0L) != 0L)
             {

@@ -12,6 +12,25 @@ namespace ValheimDashboard.EventLog
         /// <summary>Character name by player ID, learned from characters online since the server started.</summary>
         public static readonly Dictionary<long, string> CharacterNames = new Dictionary<long, string>();
 
+        /// <summary>Returns true when the prefab of [zdo] has a component of type <typeparamref name="T"/>.</summary>
+        public static bool Has<T>(ZDO zdo) where T : Component
+        {
+            int prefab = zdo.GetPrefab();
+            if (!PrefabsWith<T>.HasComponent.TryGetValue(prefab, out bool hasComponent))
+            {
+                hasComponent = Prefab(zdo)?.GetComponent<T>() != null;
+                PrefabsWith<T>.HasComponent[prefab] = hasComponent;
+            }
+            return hasComponent;
+        }
+
+        /// <summary>Returns the item name for item prefab [hash], for example <c>SwordIron</c>.</summary>
+        public static string Item(int hash)
+        {
+            GameObject prefab = ObjectDB.instance == null ? null : ObjectDB.instance.GetItemPrefab(hash);
+            return prefab == null ? hash.ToString() : prefab.name;
+        }
+
         /// <summary>Returns the prefab name of [zdo], for example <c>wood_floor_1x1</c> or <c>Eikthyr</c>.</summary>
         public static string PrefabName(ZDO zdo)
         {
