@@ -1,9 +1,11 @@
-import { MAX_CRAFTS, type ItemAmount, type Plan, type PlanItem } from './models';
-import { recipeById } from './recipes';
+import { MAX_CRAFTS, type ItemAmount, type Plan, type PlanItem } from '#/lib/models';
+import { recipeById } from '#/lib/recipes';
 
 /** Returns [crafts] as a whole number from 1 to [MAX_CRAFTS]. Anything that is not a number becomes 1. */
 export const clampCrafts = (crafts: number): number => {
-  if (!Number.isFinite(crafts)) return 1;
+  if (!Number.isFinite(crafts)) {
+    return 1;
+  }
   return Math.min(MAX_CRAFTS, Math.max(1, Math.floor(crafts)));
 };
 
@@ -24,7 +26,9 @@ export const withHave = (plan: Plan, item: string, amount: number): Plan => ({
 /** Returns what [plan] needs, item by item, in recipe order. Empty when its recipe is unknown. */
 export const planItems = (plan: Plan): PlanItem[] => {
   const recipe = recipeById(plan.recipeId);
-  if (recipe === undefined) return [];
+  if (recipe === undefined) {
+    return [];
+  }
   return recipe.ingredients.map(({ item, amount }) => {
     const need = amount * plan.crafts;
     const have = Math.min(need, plan.have[item] ?? 0);
@@ -37,7 +41,9 @@ export const stillNeeded = (plans: readonly Plan[]): ItemAmount[] => {
   const missing = new Map<string, number>();
   for (const plan of plans) {
     for (const line of planItems(plan)) {
-      if (line.missing > 0) missing.set(line.item, (missing.get(line.item) ?? 0) + line.missing);
+      if (line.missing > 0) {
+        missing.set(line.item, (missing.get(line.item) ?? 0) + line.missing);
+      }
     }
   }
   return [...missing.entries()]
@@ -47,14 +53,18 @@ export const stillNeeded = (plans: readonly Plan[]): ItemAmount[] => {
 
 /** Reads plans saved as JSON in [saved]. Returns no plans for empty or broken data, and drops plans for unknown recipes. */
 export const readPlans = (saved: string | null): Plan[] => {
-  if (saved === null) return [];
+  if (saved === null) {
+    return [];
+  }
   let plans: Plan[];
   try {
     plans = JSON.parse(saved);
   } catch {
     return [];
   }
-  if (!Array.isArray(plans)) return [];
+  if (!Array.isArray(plans)) {
+    return [];
+  }
   return plans
     .filter((plan) => Number.isInteger(plan?.id) && recipeById(plan.recipeId) !== undefined)
     .map((plan) => ({ ...plan, crafts: clampCrafts(plan.crafts), have: plan.have ?? {} }));

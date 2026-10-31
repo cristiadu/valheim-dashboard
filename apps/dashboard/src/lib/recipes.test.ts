@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { RECIPES, iconUrl, madeAt, recipeById } from './recipes';
+import { RECIPES, iconUrl, madeAt, recipeById } from '#/lib/recipes';
 
 describe('RECIPES', () => {
   it('gives every recipe its own id', () => {

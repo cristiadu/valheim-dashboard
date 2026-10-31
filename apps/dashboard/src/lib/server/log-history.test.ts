@@ -4,8 +4,8 @@ import { join } from 'node:path';
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import { logLine } from '../test-common';
-import { firstRunKey, LogHistory, readHistory } from './log-history';
+import { logLine } from '#/lib/test-common';
+import { firstRunKey, LogHistory, readHistory } from '#/lib/server/log-history';
 
 describe('log history', () => {
   let folder: string;

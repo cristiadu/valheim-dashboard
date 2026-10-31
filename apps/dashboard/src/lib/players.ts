@@ -1,7 +1,7 @@
 import type { PlayerSession } from 'valheim-log';
 
-import { OTHER_PLAYER_COLOR, PLAYER_COLORS, type Player, type Snapshot } from './models';
-import { isServerOnline } from './status';
+import { OTHER_PLAYER_COLOR, PLAYER_COLORS, type Player, type Snapshot } from '#/lib/models';
+import { isServerOnline } from '#/lib/status';
 
 /**
  * End of [session] in milliseconds. An open session ends now while the server is online, or at the last
@@ -21,21 +21,24 @@ export const playersOf = (snapshot: Snapshot, nowMs: number): Player[] => {
     const key = session.steamId ?? session.character;
     groups.set(key, [...(groups.get(key) ?? []), session]);
   }
-  const serverOnline = isServerOnline(snapshot, nowMs);
+  const isServerUp = isServerOnline(snapshot, nowMs);
   return [...groups].map(([key, sessions], index) => {
     const last = sessions.at(-1)!;
-    const isOnline = serverOnline && last.endUtc === null;
+    const isOnline = isServerUp && last.endUtc === null;
     return {
       key,
       character: last.character,
-      steamName: sessions.findLast((s) => s.steamName !== null)?.steamName ?? null,
+      steamName: sessions.findLast((session) => session.steamName !== null)?.steamName ?? null,
       color: PLAYER_COLORS[index] ?? OTHER_PLAYER_COLOR,
       sessions,
       isOnline,
       sinceUtc: isOnline ? last.startUtc : null,
       lastSeenUtc: isOnline ? null : new Date(sessionEndMs(last, snapshot, nowMs)).toISOString(),
-      totalMs: sessions.reduce((sum, s) => sum + sessionEndMs(s, snapshot, nowMs) - Date.parse(s.startUtc), 0),
-      deaths: sessions.reduce((sum, s) => sum + s.deaths, 0),
+      totalMs: sessions.reduce(
+        (sum, session) => sum + sessionEndMs(session, snapshot, nowMs) - Date.parse(session.startUtc),
+        0,
+      ),
+      deaths: sessions.reduce((sum, session) => sum + session.deaths, 0),
     };
   });
 };

@@ -22,11 +22,11 @@ $env:LOG_FILE = "C:\Valheim Server\logs.txt"
 node apps/dashboard/build
 ```
 
-Then open `http://localhost:3000`. Set `PORT` to use another port.
+Then open `http://localhost:3000`.
 
 ### Keep it running
 
-`scripts/start-dashboard.ps1` builds the dashboard if there is no build yet, starts it, and starts it again 5 seconds after it stops. Its output goes to `apps/dashboard/dashboard.log`.
+`scripts/start-dashboard.ps1` builds the dashboard if there is no build yet, starts it, and starts it again 5 seconds after it stops. Its output goes to `dashboard.log`, in the same folder as the server's `logs.txt`.
 
 ```powershell
 .\scripts\start-dashboard.ps1
@@ -46,6 +46,7 @@ Both scripts take `-LogFile` and `-Port`. If Windows blocks scripts, run `Set-Ex
 | --- | --- | --- |
 | `LOG_FILE` | `C:\Valheim Server\logs.txt` | The server's log file |
 | `SERVER_UTC_OFFSET_MINUTES` | This PC's offset | The server clock's offset from UTC, for example `-420` for UTC−7 |
+| `PORT` | `3000` | Port the dashboard listens on |
 
 ## How it decides what is true
 

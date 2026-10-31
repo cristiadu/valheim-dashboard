@@ -1,11 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { PLAYER_COLORS } from './models';
-import { playersOf, sessionEndMs } from './players';
-import { sessionWith, snapshotWith } from './test-common';
-
-/** 12:00Z on the test day. */
-const NOON_MS = Date.parse('2026-10-29T12:00:00.000Z');
+import { MS_PER_HOUR } from '#/lib/models';
+import { playersOf, sessionEndMs } from '#/lib/players';
+import { sessionWith, snapshotWith, TEST_NOON_MS } from '#/lib/test-common';
 
 describe('playersOf', () => {
   it('joins sessions with the same Steam ID into one player', () => {
@@ -20,16 +17,16 @@ describe('playersOf', () => {
     });
 
     // WHEN players are made at noon
-    const players = playersOf(snapshot, NOON_MS);
+    const players = playersOf(snapshot, TEST_NOON_MS);
 
     // THEN the Steam player has both sessions, the latest character and the summed numbers
-    expect(players.map((p) => p.character)).toEqual(['wynnyarD', 'Astrid']);
+    expect(players.map((player) => player.character)).toEqual(['wynnyarD', 'Astrid']);
     expect(players[0]).toMatchObject({
       steamName: 'Tony Example',
-      color: PLAYER_COLORS[0],
+      color: 'var(--gold)',
       isOnline: true,
       sinceUtc: '2026-10-29T11:00:00.000Z',
-      totalMs: 2 * 60 * 60_000,
+      totalMs: 2 * MS_PER_HOUR,
       deaths: 3,
     });
   });
@@ -39,10 +36,10 @@ describe('playersOf', () => {
     const snapshot = snapshotWith({ lastLineUtc: '2026-10-29T11:40:00.000Z', sessions: [sessionWith({})] });
 
     // WHEN players are made at noon
-    const [player] = playersOf(snapshot, NOON_MS);
+    const [player] = playersOf(snapshot, TEST_NOON_MS);
 
     // THEN the player is offline, last seen at the last log line, and the quiet time is not counted
     expect(player).toMatchObject({ isOnline: false, lastSeenUtc: '2026-10-29T11:40:00.000Z' });
-    expect(sessionEndMs(snapshot.sessions[0]!, snapshot, NOON_MS)).toBe(Date.parse('2026-10-29T11:40:00.000Z'));
+    expect(sessionEndMs(snapshot.sessions[0]!, snapshot, TEST_NOON_MS)).toBe(Date.parse('2026-10-29T11:40:00.000Z'));
   });
 });

@@ -1,13 +1,16 @@
 <script lang="ts">
-  import NoData from '#lib/components/NoData.svelte';
-  import StatGrid from '#lib/components/StatGrid.svelte';
-  import { live, useSnapshot, viewerOffsetMinutes } from '#lib/live.svelte.ts';
-  import { DAY_MS } from '#lib/models.ts';
-  import { clockTime, durationLabel, isServerOnline, onlinePlayers, whenLabel } from '#lib/status.ts';
-  import { BYTES_PER_GB, serverWarnings, upStretches } from '#lib/health.ts';
+  import NoData from '#/lib/components/NoData';
+  import StatGrid from '#/lib/components/StatGrid';
+  import { live, useSnapshot } from '#/lib/live.svelte';
+  import { dayPercent } from '#/lib/day';
+  import { gigabytesLabel, serverWarnings, upStretches } from '#/lib/health';
+  import { DAY_MS } from '#/lib/models';
+  import { clockTime, durationLabel, isServerOnline, onlinePlayers, steamLabel, viewerOffsetMinutes, whenLabel } from '#/lib/status';
 
-  /** Current snapshot from the layout. */
+  /** Getter for the snapshot the layout shares. */
   const getSnapshot = useSnapshot();
+
+  /** Current snapshot. */
   const snapshot = $derived(getSnapshot());
 
   /** Problems worth a look, newest first. */
@@ -31,17 +34,17 @@
         { label: 'Players online', value: String(onlinePlayers(snapshot, nowMs).length) },
         { label: 'Last log line', value: whenLabel(snapshot.lastLineUtc, offset, nowMs) },
         { label: 'Last save', value: lastSave ? `${whenLabel(lastSave.timeUtc, offset, nowMs)} · ${lastSave.durationMs} ms` : '–' },
-        { label: 'Disk free', value: snapshot.diskSpace ? `${Math.round(snapshot.diskSpace.availableBytes / BYTES_PER_GB)} GB` : '–' },
+        { label: 'Disk free', value: snapshot.diskSpace ? gigabytesLabel(snapshot.diskSpace.availableBytes) : '–' },
         { label: 'Game version', value: snapshot.version ?? '–' },
-        { label: 'Steam', value: snapshot.isGameServerConnected === null ? '–' : snapshot.isGameServerConnected ? 'Connected' : 'Disconnected' },
+        { label: 'Steam', value: steamLabel(snapshot.isGameServerConnected) },
       ]}
     />
 
     <section class="panel" aria-labelledby="uptime-title">
       <h2 id="uptime-title" class="panel-title">UPTIME, LAST 24 HOURS</h2>
-      <div class="bar" role="img" aria-label="Server up {upParts.map((p) => `${clockTime(new Date(p.startMs).toISOString(), offset)} to ${clockTime(new Date(p.endMs).toISOString(), offset)}`).join(', ') || 'never in the last 24 hours'}">
+      <div class="bar" role="img" aria-label="Server up {upParts.map((part) => `${clockTime(new Date(part.startMs).toISOString(), offset)} to ${clockTime(new Date(part.endMs).toISOString(), offset)}`).join(', ') || 'never in the last 24 hours'}">
         {#each upParts as part (part.startMs)}
-          <div class="up" style:left="{((part.startMs - startMs) / DAY_MS) * 100}%" style:width="max(2px, {((part.endMs - part.startMs) / DAY_MS) * 100}%)"></div>
+          <div class="up" style:left={dayPercent(part.startMs, startMs)} style:width="max(2px, {dayPercent(part.endMs, part.startMs)})"></div>
         {/each}
       </div>
       <div class="axis mono muted">

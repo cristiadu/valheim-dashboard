@@ -1,12 +1,14 @@
 <script lang="ts">
-  import NoData from '#lib/components/NoData.svelte';
-  import TimeLanes from '#lib/components/TimeLanes.svelte';
-  import { live, useSnapshot, viewerOffsetMinutes } from '#lib/live.svelte.ts';
-  import { playersOf } from '#lib/players.ts';
-  import { clockTime, durationLabel } from '#lib/status.ts';
+  import NoData from '#/lib/components/NoData';
+  import TimeLanes from '#/lib/components/TimeLanes';
+  import { live, useSnapshot } from '#/lib/live.svelte';
+  import { playersOf } from '#/lib/players';
+  import { clockTime, durationLabel, viewerOffsetMinutes } from '#/lib/status';
 
-  /** Current snapshot from the layout. */
+  /** Getter for the snapshot the layout shares. */
   const getSnapshot = useSnapshot();
+
+  /** Current snapshot. */
   const snapshot = $derived(getSnapshot());
 
   /** Viewer's offset from UTC; only known in the browser. */

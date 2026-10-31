@@ -1,6 +1,6 @@
 import type { PlayerSession } from 'valheim-log';
 
-import { MS_PER_MINUTE, ONLINE_WINDOW_MS, type Snapshot } from './models';
+import { MINUTES_PER_HOUR, MONTHS, MS_PER_MINUTE, ONLINE_WINDOW_MS, type Snapshot } from '#/lib/models';
 
 /** True when the run did not stop and its last log line is recent. The clock alone never makes it online. */
 export const isServerOnline = (snapshot: Snapshot, nowMs: number): boolean =>
@@ -17,8 +17,8 @@ export const offsetLabel = (offsetMinutes: number): string => {
   if (offsetMinutes === 0) {
     return 'UTC';
   }
-  const hours = Math.floor(Math.abs(offsetMinutes) / 60);
-  const minutes = Math.abs(offsetMinutes) % 60;
+  const hours = Math.floor(Math.abs(offsetMinutes) / MINUTES_PER_HOUR);
+  const minutes = Math.abs(offsetMinutes) % MINUTES_PER_HOUR;
   return `UTC${offsetMinutes < 0 ? '−' : '+'}${hours}${minutes === 0 ? '' : `:${String(minutes).padStart(2, '0')}`}`;
 };
 
@@ -29,8 +29,16 @@ export const clockTime = (timeUtc: string, offsetMinutes: number): string =>
 /** Length of time as `3h 12m`, or `12m` under an hour. */
 export const durationLabel = (ms: number): string => {
   const totalMinutes = Math.floor(ms / MS_PER_MINUTE);
-  const hours = Math.floor(totalMinutes / 60);
-  return hours > 0 ? `${hours}h ${totalMinutes % 60}m` : `${totalMinutes}m`;
+  const hours = Math.floor(totalMinutes / MINUTES_PER_HOUR);
+  return hours > 0 ? `${hours}h ${totalMinutes % MINUTES_PER_HOUR}m` : `${totalMinutes}m`;
+};
+
+/** Steam link of the server in a word: `Connected`, `Disconnected`, or `–` when the log has not said. */
+export const steamLabel = (isConnected: boolean | null): string => {
+  if (isConnected === null) {
+    return '–';
+  }
+  return isConnected ? 'Connected' : 'Disconnected';
 };
 
 /**
@@ -49,9 +57,6 @@ export const statusLine = (snapshot: Snapshot, nowMs: number, viewerOffsetMinute
   return `Online · up ${uptime} · ${onlinePlayers(snapshot, nowMs).length} online · ${zone}`;
 };
 
-/** Month names for dates. */
-const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
 /** Time of [timeUtc] in the zone at [offsetMinutes]: `HH:MM` on the same day as [nowMs], else `Oct 29 HH:MM`. */
 export const whenLabel = (timeUtc: string, offsetMinutes: number, nowMs: number): string => {
   const local = new Date(Date.parse(timeUtc) + offsetMinutes * MS_PER_MINUTE);
@@ -61,3 +66,6 @@ export const whenLabel = (timeUtc: string, offsetMinutes: number, nowMs: number)
     ? time
     : `${MONTHS[local.getUTCMonth()]} ${local.getUTCDate()} ${time}`;
 };
+
+/** The viewer's offset from UTC in minutes at [nowMs], for example `-420` for UTC−7. */
+export const viewerOffsetMinutes = (nowMs: number): number => -new Date(nowMs).getTimezoneOffset();

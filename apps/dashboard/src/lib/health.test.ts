@@ -1,10 +1,15 @@
 import { describe, expect, it } from 'vitest';
 
-import { serverWarnings, upStretches } from './health';
-import { snapshotWith } from './test-common';
+import { gigabytesLabel, serverWarnings, upStretches } from '#/lib/health';
+import { snapshotWith, TEST_NOON_MS } from '#/lib/test-common';
 
-/** 12:00Z on the test day. */
-const NOON_MS = Date.parse('2026-10-29T12:00:00.000Z');
+describe('gigabytesLabel', () => {
+  it('rounds free bytes to whole gigabytes', () => {
+    // GIVEN the free space from a real disk check
+    // WHEN / THEN it reads in whole gigabytes
+    expect(gigabytesLabel(278647042048)).toBe('279 GB');
+  });
+});
 
 describe('serverWarnings', () => {
   it('lists crashes, Steam drops and low disk, newest first', () => {
@@ -16,7 +21,7 @@ describe('serverWarnings', () => {
     });
 
     // WHEN warnings are listed
-    const texts = serverWarnings(snapshot).map((w) => w.text);
+    const texts = serverWarnings(snapshot).map((warning) => warning.text);
 
     // THEN each problem reads plainly, newest first
     expect(texts).toEqual([
@@ -39,12 +44,12 @@ describe('upStretches', () => {
     });
 
     // WHEN the stretches are found at noon
-    const stretches = upStretches(snapshot, NOON_MS);
+    const stretches = upStretches(snapshot, TEST_NOON_MS);
 
     // THEN the old run starts at the window edge and the live run ends now
     expect(stretches).toEqual([
       { startMs: Date.parse('2026-10-28T12:00:00.000Z'), endMs: Date.parse('2026-10-28T14:00:00.000Z') },
-      { startMs: Date.parse('2026-10-29T08:00:00.000Z'), endMs: NOON_MS },
+      { startMs: Date.parse('2026-10-29T08:00:00.000Z'), endMs: TEST_NOON_MS },
     ]);
   });
 });

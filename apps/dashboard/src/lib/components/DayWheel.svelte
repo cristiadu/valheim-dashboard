@@ -1,8 +1,22 @@
 <script lang="ts">
-  import { arcPath, clip, hourOfDay, WHEEL_CENTER, wheelPoint } from '#lib/day.ts';
-  import { DAY_MS, type Player, type Snapshot } from '#lib/models.ts';
-  import { sessionEndMs } from '#lib/players.ts';
-  import { clockTime } from '#lib/status.ts';
+  import { arcPath, clip, hourOfDay, wheelPoint } from '#/lib/day';
+  import {
+    DAY_MS,
+    HOURS_PER_DAY,
+    PLAYER_COLORS,
+    type Player,
+    type Snapshot,
+    WHEEL_CENTER,
+    WHEEL_HAND_RADIUS,
+    WHEEL_LONG_TICK_RADIUS,
+    WHEEL_OUTER_RING_RADIUS,
+    WHEEL_RIM_RADIUS,
+    WHEEL_RING_STEP,
+    WHEEL_SHORT_TICK_RADIUS,
+    WHEEL_SIZE,
+  } from '#/lib/models';
+  import { sessionEndMs } from '#/lib/players';
+  import { clockTime } from '#/lib/status';
 
   /** Players to draw, the snapshot, the clock and the viewer's offset from UTC in minutes. */
   let { players, snapshot, nowMs, offsetMinutes }: {
@@ -12,20 +26,16 @@
     offsetMinutes: number;
   } = $props();
 
-  /** Radius of the outer ring and the space between rings. */
-  const OUTER_RING = 118;
-  const RING_STEP = 14;
-
   /** Hour ticks around the edge, longer every 6 hours. */
-  const ticks = Array.from({ length: 24 }, (_, hour) => {
-    const [x1, y1] = wheelPoint(hour, 134);
-    const [x2, y2] = wheelPoint(hour, hour % 6 === 0 ? 124 : 129);
+  const ticks = Array.from({ length: HOURS_PER_DAY }, (_, hour) => {
+    const [x1, y1] = wheelPoint(hour, WHEEL_RIM_RADIUS);
+    const [x2, y2] = wheelPoint(hour, hour % 6 === 0 ? WHEEL_LONG_TICK_RADIUS : WHEEL_SHORT_TICK_RADIUS);
     return `M ${x1.toFixed(1)} ${y1.toFixed(1)} L ${x2.toFixed(1)} ${y2.toFixed(1)}`;
   }).join(' ');
 
   /** One ring per player, with an arc for each part of a session in the last 24 hours. */
   const rings = $derived(
-    players.slice(0, 4).map((player, index) => ({
+    players.slice(0, PLAYER_COLORS.length).map((player, index) => ({
       player,
       arcs: player.sessions.flatMap((session) => {
         const part = clip(Date.parse(session.startUtc), sessionEndMs(session, snapshot, nowMs), nowMs - DAY_MS, nowMs);
@@ -33,7 +43,7 @@
           return [];
         }
         const label = `${player.character} ${clockTime(new Date(part.startMs).toISOString(), offsetMinutes)} to ${clockTime(new Date(part.endMs).toISOString(), offsetMinutes)}`;
-        const path = arcPath(hourOfDay(part.startMs, offsetMinutes), hourOfDay(part.endMs, offsetMinutes), OUTER_RING - index * RING_STEP);
+        const path = arcPath(hourOfDay(part.startMs, offsetMinutes), hourOfDay(part.endMs, offsetMinutes), WHEEL_OUTER_RING_RADIUS - index * WHEEL_RING_STEP);
         return [{ path, label }];
       }),
     })),
@@ -41,18 +51,18 @@
 
   /** Clock hand pointing at now. */
   const hand = $derived.by(() => {
-    const [x, y] = wheelPoint(hourOfDay(nowMs, offsetMinutes), 128);
+    const [x, y] = wheelPoint(hourOfDay(nowMs, offsetMinutes), WHEEL_HAND_RADIUS);
     return `M ${WHEEL_CENTER} ${WHEEL_CENTER} L ${x.toFixed(1)} ${y.toFixed(1)}`;
   });
 
   /** Screen reader text listing every arc. */
   const description = $derived(
-    rings.flatMap((ring) => ring.arcs.map((a) => a.label)).join(', ') || 'Nobody played in the last 24 hours',
+    rings.flatMap((ring) => ring.arcs.map((arc) => arc.label)).join(', ') || 'Nobody played in the last 24 hours',
   );
 </script>
 
-<svg viewBox="0 0 300 300" role="img" aria-label="Who was online in the last 24 hours: {description}">
-  <circle cx="150" cy="150" r="134" class="rim" />
+<svg viewBox="0 0 {WHEEL_SIZE} {WHEEL_SIZE}" role="img" aria-label="Who was online in the last 24 hours: {description}">
+  <circle cx={WHEEL_CENTER} cy={WHEEL_CENTER} r={WHEEL_RIM_RADIUS} class="rim" />
   <path d={ticks} class="tick" />
   {#each rings as ring (ring.player.key)}
     {#each ring.arcs as arc (arc.path)}

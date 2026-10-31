@@ -1,26 +1,43 @@
 <script lang="ts">
-  import DayWheel from '#lib/components/DayWheel.svelte';
-  import NoData from '#lib/components/NoData.svelte';
-  import { live, useSnapshot, viewerOffsetMinutes } from '#lib/live.svelte.ts';
-  import { LATEST_EVENT_COUNT, STORY_STYLES } from '#lib/models.ts';
-  import { playersOf } from '#lib/players.ts';
-  import { clockTime, durationLabel, isServerOnline, whenLabel } from '#lib/status.ts';
-  import { daySummary, storyOf } from '#lib/story.ts';
-  import { BYTES_PER_GB } from '#lib/health.ts';
+  import { resolve } from '$app/paths';
+  import DayWheel from '#/lib/components/DayWheel';
+  import NoData from '#/lib/components/NoData';
+  import { live, useSnapshot } from '#/lib/live.svelte';
+  import { LATEST_EVENT_COUNT, STORY_STYLES } from '#/lib/models';
+  import { playersOf } from '#/lib/players';
+  import { clockTime, durationLabel, isServerOnline, viewerOffsetMinutes, whenLabel } from '#/lib/status';
+  import { gigabytesLabel } from '#/lib/health';
+  import { daySummary, storyOf } from '#/lib/story';
 
-  /** Current snapshot from the layout. */
+  /** Getter for the snapshot the layout shares. */
   const getSnapshot = useSnapshot();
+
+  /** Current snapshot. */
   const snapshot = $derived(getSnapshot());
 
   /** Viewer's offset from UTC; only known in the browser. */
   const offset = $derived(live.nowMs === null ? 0 : viewerOffsetMinutes(live.nowMs));
 
-  /** Players, newest story lines and whether the server is up, at the page clock. */
+  /** Players at the page clock. */
   const players = $derived(live.nowMs === null ? [] : playersOf(snapshot, live.nowMs));
-  const online = $derived(players.filter((p) => p.isOnline));
+
+  /** Players online now. */
+  const online = $derived(players.filter((player) => player.isOnline));
+
+  /** Newest story lines. */
   const latest = $derived(storyOf(snapshot).slice(0, LATEST_EVENT_COUNT));
+
+  /** Whether the server is up at the page clock. */
   const isUp = $derived(live.nowMs !== null && isServerOnline(snapshot, live.nowMs));
-  const lastOut = $derived(players.filter((p) => p.lastSeenUtc !== null).sort((a, b) => b.lastSeenUtc!.localeCompare(a.lastSeenUtc!))[0]);
+
+  /** Player who left most recently, if anyone left. */
+  const lastOut = $derived(
+    players
+      .filter((player) => player.lastSeenUtc !== null)
+      .sort((first, second) => second.lastSeenUtc!.localeCompare(first.lastSeenUtc!))[0],
+  );
+
+  /** Newest world save. */
   const lastSave = $derived(snapshot.saves.at(-1));
 
   /** Clock time of [timeUtc] in the viewer's zone. */
@@ -60,7 +77,7 @@
         <section class="panel" aria-labelledby="latest-title">
           <div class="heading">
             <h2 id="latest-title" class="panel-title">LATEST EVENTS</h2>
-            <a href="/saga">See all events</a>
+            <a href={resolve('/saga')}>See all events</a>
           </div>
           {#each latest as item, i (i)}
             <div class="line event">
@@ -75,13 +92,13 @@
       </div>
     </div>
 
-    <a class="strip" href="/server">
+    <a class="strip" href={resolve('/server')}>
       <strong>SERVER</strong>
       <span><span class="diamond small" aria-hidden="true" class:up={isUp}></span>{isUp ? 'Online' : 'Offline'}</span>
       {#if isUp && snapshot.startedUtc}<span>Up {durationLabel(nowMs - Date.parse(snapshot.startedUtc))}</span>{/if}
       {#if lastSave}<span>Last save {at(lastSave.timeUtc)}</span>{/if}
       <span>{online.length === 1 ? '1 player online' : `${online.length} players online`}</span>
-      {#if snapshot.diskSpace}<span>{Math.round(snapshot.diskSpace.availableBytes / BYTES_PER_GB)} GB disk free</span>{/if}
+      {#if snapshot.diskSpace}<span>{gigabytesLabel(snapshot.diskSpace.availableBytes)} disk free</span>{/if}
       {#if snapshot.isGameServerConnected === false}<span class="warn">Steam connection lost</span>{/if}
       <span class="link">Server details</span>
     </a>

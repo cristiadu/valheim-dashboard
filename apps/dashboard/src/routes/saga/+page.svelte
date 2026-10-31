@@ -1,12 +1,14 @@
 <script lang="ts">
-  import NoData from '#lib/components/NoData.svelte';
-  import { live, useSnapshot, viewerOffsetMinutes } from '#lib/live.svelte.ts';
-  import { SAGA_FILTERS, STORY_STYLES } from '#lib/models.ts';
-  import { whenLabel } from '#lib/status.ts';
-  import { storyOf } from '#lib/story.ts';
+  import NoData from '#/lib/components/NoData';
+  import { live, useSnapshot } from '#/lib/live.svelte';
+  import { SAGA_FILTERS, STORY_STYLES } from '#/lib/models';
+  import { viewerOffsetMinutes, whenLabel } from '#/lib/status';
+  import { storyOf } from '#/lib/story';
 
-  /** Current snapshot from the layout. */
+  /** Getter for the snapshot the layout shares. */
   const getSnapshot = useSnapshot();
+
+  /** Current snapshot. */
   const snapshot = $derived(getSnapshot());
 
   /** Every story line, newest first. */

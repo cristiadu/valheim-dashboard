@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { arcPath, clip, hourOfDay, wheelPoint } from './day';
+import { arcPath, clip, dayPercent, hourOfDay, wheelPoint } from '#/lib/day';
 
 describe('day helpers', () => {
   it('keeps only the part of a range inside the window', () => {
@@ -9,6 +9,16 @@ describe('day helpers', () => {
     // THEN the overlap is kept and a range outside is dropped
     expect(clip(5, 15, 10, 20)).toEqual({ startMs: 10, endMs: 15 });
     expect(clip(1, 5, 10, 20)).toBeNull();
+  });
+
+  it('places a time as a share of the day', () => {
+    // GIVEN a day that starts at 00:00Z
+    const dayStartMs = Date.parse('2026-10-29T00:00:00.000Z');
+
+    // WHEN noon and 06:00 are placed
+    // THEN they sit at half and a quarter of the day
+    expect(dayPercent(Date.parse('2026-10-29T12:00:00.000Z'), dayStartMs)).toBe('50%');
+    expect(dayPercent(Date.parse('2026-10-29T06:00:00.000Z'), dayStartMs)).toBe('25%');
   });
 
   it('finds the hour of the day in the viewer zone', () => {

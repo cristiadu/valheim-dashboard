@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { daySummary, storyOf } from './story';
-import { sessionWith, snapshotWith } from './test-common';
+import { daySummary, storyOf } from '#/lib/story';
+import { sessionWith, snapshotWith } from '#/lib/test-common';
 
 describe('storyOf', () => {
   it('mixes joins, leaves and game events, newest first', () => {

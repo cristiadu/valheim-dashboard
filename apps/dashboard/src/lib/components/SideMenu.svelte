@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { TABS, type Tab } from '#lib/tabs.ts';
+  import { resolve } from '$app/paths';
+  import { TABS, type Tab } from '#/lib/models';
 
   /** Tab shown now. */
   let { current }: { current: Tab } = $props();
@@ -7,7 +8,7 @@
 
 <nav aria-label="Dashboard sections">
   {#each TABS as tab (tab.path)}
-    <a href={tab.path} aria-current={tab.path === current.path ? 'page' : undefined}>
+    <a href={resolve(tab.path)} aria-current={tab.path === current.path ? 'page' : undefined}>
       <span class="rune" aria-hidden="true">{tab.rune}</span>
       <span class="text">
         <span class="label">{tab.label}</span>

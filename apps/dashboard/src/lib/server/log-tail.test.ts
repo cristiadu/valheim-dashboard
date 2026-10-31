@@ -4,7 +4,7 @@ import { join } from 'node:path';
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import { LogTail } from './log-tail';
+import { LogTail } from '#/lib/server/log-tail';
 
 describe('LogTail', () => {
   let folder: string;

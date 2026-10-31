@@ -1,7 +1,17 @@
 import { describe, expect, it } from 'vitest';
 
-import { clockTime, durationLabel, isServerOnline, offsetLabel, onlinePlayers, statusLine, whenLabel } from './status';
-import { sessionWith, snapshotWith } from './test-common';
+import {
+  clockTime,
+  durationLabel,
+  isServerOnline,
+  offsetLabel,
+  onlinePlayers,
+  statusLine,
+  steamLabel,
+  whenLabel,
+} from '#/lib/status';
+import { MS_PER_MINUTE } from '#/lib/models';
+import { sessionWith, snapshotWith, TEST_NOON_MS } from '#/lib/test-common';
 
 /** A run that started at 09:42Z with its last line at 12:00Z and one player inside. */
 const RUNNING = snapshotWith({
@@ -11,7 +21,7 @@ const RUNNING = snapshotWith({
 });
 
 /** The last line time of [RUNNING] plus [minutes]. */
-const minutesAfterLastLine = (minutes: number): number => Date.parse('2026-10-29T12:00:00.000Z') + minutes * 60_000;
+const minutesAfterLastLine = (minutes: number): number => TEST_NOON_MS + minutes * MS_PER_MINUTE;
 
 describe('isServerOnline', () => {
   it('is online while the last line is recent', () => {
@@ -78,7 +88,7 @@ describe('formatting', () => {
   it('shows hours only past an hour', () => {
     // GIVEN 12 minutes and 3h 5m
     // WHEN / THEN they read short
-    expect([durationLabel(12 * 60_000), durationLabel(185 * 60_000)]).toEqual(['12m', '3h 5m']);
+    expect([durationLabel(12 * MS_PER_MINUTE), durationLabel(185 * MS_PER_MINUTE)]).toEqual(['12m', '3h 5m']);
   });
 });
 
@@ -91,5 +101,13 @@ describe('whenLabel', () => {
     // THEN only the older one has a date
     expect(whenLabel('2026-10-29T09:15:00.000Z', 0, nowMs)).toBe('09:15');
     expect(whenLabel('2026-10-28T23:05:00.000Z', 0, nowMs)).toBe('Oct 28 23:05');
+  });
+});
+
+describe('steamLabel', () => {
+  it('names the Steam link in a word, or a dash before the log says', () => {
+    // GIVEN each state of the Steam link
+    // WHEN / THEN each reads as one word
+    expect([steamLabel(true), steamLabel(false), steamLabel(null)]).toEqual(['Connected', 'Disconnected', '–']);
   });
 });

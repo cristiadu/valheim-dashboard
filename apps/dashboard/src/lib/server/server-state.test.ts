@@ -1,11 +1,8 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { logLine, RUN_START, TEST_OFFSET_MINUTES } from '../test-common';
-import type { ServerState } from './models';
-import { createServerState, readLogLine, startNewLog } from './server-state';
-
-/** Reads [lines] into [state], in order. */
-const readAll = (state: ServerState, lines: readonly string[]): void => lines.forEach((line) => readLogLine(state, line));
+import { logLine, readLines, RUN_START, TEST_OFFSET_MINUTES } from '#/lib/test-common';
+import type { ServerState } from '#/lib/server/models';
+import { createServerState, startNewLog } from '#/lib/server/server-state';
 
 describe('server state', () => {
   let state: ServerState;
@@ -16,7 +13,7 @@ describe('server state', () => {
 
   it('groups pieces into stretches per builder, split by long pauses and by destroyed pieces', () => {
     // GIVEN Ragnar builds three pieces, a piece of his is destroyed, and he builds again 20 minutes later
-    readAll(state, [
+    readLines(state, [
       ...RUN_START,
       logLine('03:00:00', 'Piece built: wood_floor_1x1 by Ragnar'),
       logLine('03:01:00', 'Piece built: wood_floor_1x1 by Ragnar'),
@@ -57,7 +54,7 @@ describe('server state', () => {
   it('reads the run details with times in UTC', () => {
     // GIVEN the start of a run
     // WHEN it is read
-    readAll(state, RUN_START);
+    readLines(state, RUN_START);
 
     // THEN the world, version, start, last line and the open session are known
     expect(state.snapshot).toMatchObject({
@@ -73,7 +70,7 @@ describe('server state', () => {
 
   it('keeps game events and leaves out lines friends do not need', () => {
     // GIVEN a run with a death, a raid and an unknown line
-    readAll(state, [
+    readLines(state, [
       ...RUN_START,
       logLine('03:10:02', 'Got character ZDOID from Ragnar : 0:0'),
       logLine('03:20:40', 'Random event set:army_eikthyr'),
@@ -90,7 +87,7 @@ describe('server state', () => {
 
   it('records a finished save with its number, the backup and disk space', () => {
     // GIVEN a save, its backup and the disk check
-    readAll(state, [
+    readLines(state, [
       logLine('03:52:15', 'Available space to current user: 278647042048. Saving is blocked if below: 14961108 bytes. Warnings are given if below: 29922216'),
       logLine('03:52:15', 'World save (1/5) Cloud & Backup checks done [0ms] => Save number 1189'),
       logLine('03:52:15', 'World save (5/5) done. Total time [40ms]'),
@@ -107,10 +104,10 @@ describe('server state', () => {
 
   it('notes a clean stop and ends the sessions', () => {
     // GIVEN a run with a player inside
-    readAll(state, RUN_START);
+    readLines(state, RUN_START);
 
     // WHEN the server quits
-    readAll(state, [logLine('16:19:51', 'Game server disconnected'), 'OnApplicationQuit']);
+    readLines(state, [logLine('16:19:51', 'Game server disconnected'), 'OnApplicationQuit']);
 
     // THEN the stop time is known and the session ended with it
     expect(state.snapshot.stoppedUtc).toBe('2026-10-29T23:19:51.000Z');
@@ -121,11 +118,11 @@ describe('server state', () => {
 
   it('ends open sessions as a crash when a new log starts, and keeps history', () => {
     // GIVEN a run with a player inside and no clean stop
-    readAll(state, RUN_START);
+    readLines(state, RUN_START);
 
     // WHEN the server writes a new log
     startNewLog(state);
-    readAll(state, [logLine('05:00:00', 'Valheim version: 1.0.21 (network version 41)')]);
+    readLines(state, [logLine('05:00:00', 'Valheim version: 1.0.21 (network version 41)')]);
 
     // THEN the old session ended at the old log's last line, and the new run starts fresh
     expect(state.snapshot.sessions).toMatchObject([
