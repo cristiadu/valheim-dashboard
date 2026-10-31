@@ -1,14 +1,25 @@
 import { applyEvent, createLogReader, createSessionState, endAllSessions, onlineSessions, readLine } from 'valheim-log';
 
-import { type BuildRecord, STORY_EVENT_TYPES, type StoryEvent } from '#/lib/models';
+import type { LogEvent } from 'valheim-log';
+
 import {
-  BUILD_GAP_MS,
+  type ActivityKind,
+  type ActivityRecord,
+  BOSS_NAMES,
+  DEFEATED_KEY_PREFIX,
+  DUNGEON_AREA,
+  type Snapshot,
+  STORY_EVENT_TYPES,
+  type StoryEvent,
+} from '#/lib/models';
+import {
+  ACTIVITY_GAP_MS,
+  MAX_ACTIVITIES,
   MAX_BACKUPS,
-  MAX_BUILDS,
+  MAX_CHAT,
   MAX_EVENTS,
   MAX_RUNS,
   MAX_SAVES,
-  type PieceEvent,
   type ServerState,
 } from '#/lib/server/models';
 
@@ -19,19 +30,80 @@ const pushCapped = <T>(list: T[], item: T, max: number): void => {
 };
 
 /**
- * Adds a built or destroyed piece to the builder's latest stretch of the same kind, or starts a new stretch
- * when the builder paused longer than [BUILD_GAP_MS].
+ * Adds [count] of [thing] to the player's latest stretch of the same [kind], or starts a new stretch when the
+ * player paused longer than [ACTIVITY_GAP_MS].
  */
-const addPiece = (builds: BuildRecord[], event: PieceEvent): void => {
-  const isDestroyed = event.type === 'pieceDestroyed';
-  const stretch = builds.findLast((build) => build.builder === event.builder && build.isDestroyed === isDestroyed);
-  if (stretch && Date.parse(event.timeUtc) - Date.parse(stretch.endUtc) <= BUILD_GAP_MS) {
-    stretch.endUtc = event.timeUtc;
-    stretch.pieces[event.piece] = (stretch.pieces[event.piece] ?? 0) + 1;
+const addActivity = (
+  activities: ActivityRecord[],
+  timeUtc: string,
+  player: string | null,
+  kind: ActivityKind,
+  thing: string,
+  count: number,
+): void => {
+  const stretch = activities.findLast((activity) => activity.player === player && activity.kind === kind);
+  if (stretch && Date.parse(timeUtc) - Date.parse(stretch.endUtc) <= ACTIVITY_GAP_MS) {
+    stretch.endUtc = timeUtc;
+    stretch.things[thing] = (stretch.things[thing] ?? 0) + count;
     return;
   }
-  const { builder, timeUtc, piece } = event;
-  pushCapped(builds, { builder, isDestroyed, startUtc: timeUtc, endUtc: timeUtc, pieces: { [piece]: 1 } }, MAX_BUILDS);
+  pushCapped(activities, { player, kind, startUtc: timeUtc, endUtc: timeUtc, things: { [thing]: count } }, MAX_ACTIVITIES);
+};
+
+/** Adds [value] to the list of [key] in [lists] and returns true when it was not there yet. */
+const addNew = (lists: Record<string, string[]>, key: string, value: string): boolean => {
+  const list = lists[key] ?? [];
+  if (list.includes(value)) {
+    return false;
+  }
+  lists[key] = [...list, value];
+  return true;
+};
+
+/**
+ * Returns true when [event] belongs in the story. An area is news on a first visit or a trip into a dungeon,
+ * gear when it is new, and a global key when it is a boss defeat.
+ */
+const isStoryNews = (snapshot: Snapshot, event: LogEvent): boolean => {
+  switch (event.type) {
+    case 'areaEntered':
+      return addNew(snapshot.visitedAreas, event.character, event.area) || event.area === DUNGEON_AREA;
+    case 'gearSeen':
+      return addNew(snapshot.gear, event.character, event.quality > 1 ? `${event.item} quality ${event.quality}` : event.item);
+    case 'globalKey':
+      return event.isSet && event.key.startsWith(DEFEATED_KEY_PREFIX);
+    default:
+      return (STORY_EVENT_TYPES as readonly string[]).includes(event.type);
+  }
+};
+
+/** Adds the activity [event] stands for, such as a piece built or a creature killed, to [activities]. */
+const addActivityOf = (activities: ActivityRecord[], event: LogEvent): void => {
+  const { timeUtc } = event;
+  switch (event.type) {
+    case 'pieceBuilt':
+      addActivity(activities, timeUtc, event.builder, 'built', event.piece, 1);
+      break;
+    case 'pieceDestroyed':
+      addActivity(activities, timeUtc, event.builder, 'destroyed', event.piece, 1);
+      break;
+    case 'creatureKilled':
+      for (const attacker of event.attackers) {
+        addActivity(activities, timeUtc, attacker, 'killed', event.creature, 1);
+      }
+      break;
+    case 'itemPickedUp':
+      addActivity(activities, timeUtc, event.player, 'pickedUp', event.item, event.count);
+      break;
+    case 'harvested':
+      addActivity(activities, timeUtc, event.player, 'harvested', event.plant, 1);
+      break;
+    case 'chestChanged':
+      addActivity(activities, timeUtc, event.player, event.isStored ? 'stored' : 'taken', event.item, event.count);
+      break;
+    default:
+      break;
+  }
 };
 
 /** Creates empty state for a server whose clock is [serverUtcOffsetMinutes] from UTC. */
@@ -56,7 +128,14 @@ export const createServerState = (serverUtcOffsetMinutes: number): ServerState =
       diskSpace: null,
       runs: [],
       steamDropsUtc: [],
-      builds: [],
+      activities: [],
+      chat: [],
+      visitedAreas: {},
+      gear: {},
+      currentAreas: {},
+      kills: {},
+      day: null,
+      defeatedBosses: [],
     },
   };
 };
@@ -100,9 +179,10 @@ export const readLogLine = (state: ServerState, line: string): void => {
   snapshot.lastLineUtc = event.timeUtc;
   snapshot.runs.at(-1)!.lastLineUtc = event.timeUtc;
   applyEvent(state.sessionState, event);
-  if ((STORY_EVENT_TYPES as readonly string[]).includes(event.type)) {
+  if (isStoryNews(snapshot, event)) {
     pushCapped(snapshot.events, event as StoryEvent, MAX_EVENTS);
   }
+  addActivityOf(snapshot.activities, event);
   switch (event.type) {
     case 'worldLoaded':
       snapshot.world = event.world;
@@ -129,9 +209,32 @@ export const readLogLine = (state: ServerState, line: string): void => {
         state.pendingSaveNumber = null;
       }
       break;
-    case 'pieceBuilt':
-    case 'pieceDestroyed':
-      addPiece(snapshot.builds, event);
+    case 'chatMessage': {
+      const { timeUtc, character, kind, text } = event;
+      pushCapped(snapshot.chat, { timeUtc, character, kind, text }, MAX_CHAT);
+      break;
+    }
+    case 'areaEntered':
+      snapshot.currentAreas[event.character] = event.area;
+      break;
+    case 'creatureKilled':
+      for (const attacker of event.attackers) {
+        const kills = (snapshot.kills[attacker] ??= {});
+        kills[event.creature] = (kills[event.creature] ?? 0) + 1;
+      }
+      break;
+    case 'dayStarted':
+      snapshot.day = event.day;
+      break;
+    case 'globalKey': {
+      const boss = BOSS_NAMES[event.key];
+      if (event.isSet && boss !== undefined && !snapshot.defeatedBosses.includes(boss)) {
+        snapshot.defeatedBosses.push(boss);
+      }
+      break;
+    }
+    case 'ping':
+      pushCapped(snapshot.chat, { timeUtc: event.timeUtc, character: event.character, kind: 'ping', text: '' }, MAX_CHAT);
       break;
     case 'backupCreated':
       pushCapped(snapshot.backups, { timeUtc: event.timeUtc, backup: event.backup }, MAX_BACKUPS);

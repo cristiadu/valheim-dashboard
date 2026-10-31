@@ -22,32 +22,107 @@ describe('server state', () => {
       logLine('03:25:00', 'Piece built: piece_chest_wood by Ragnar'),
     ]);
 
-    // WHEN the builds are listed
-    const { builds } = state.snapshot;
+    // WHEN the activities are listed
+    const { activities } = state.snapshot;
 
     // THEN pieces within 10 minutes share a stretch and the late chest starts a new one
-    expect(builds).toEqual([
+    expect(activities).toEqual([
       {
-        builder: 'Ragnar',
-        isDestroyed: false,
+        player: 'Ragnar',
+        kind: 'built',
         startUtc: '2026-10-29T10:00:00.000Z',
         endUtc: '2026-10-29T10:05:00.000Z',
-        pieces: { wood_floor_1x1: 2, wood_fence: 1 },
+        things: { wood_floor_1x1: 2, wood_fence: 1 },
       },
       {
-        builder: 'Ragnar',
-        isDestroyed: true,
+        player: 'Ragnar',
+        kind: 'destroyed',
         startUtc: '2026-10-29T10:06:00.000Z',
         endUtc: '2026-10-29T10:06:00.000Z',
-        pieces: { wood_fence: 1 },
+        things: { wood_fence: 1 },
       },
       {
-        builder: 'Ragnar',
-        isDestroyed: false,
+        player: 'Ragnar',
+        kind: 'built',
         startUtc: '2026-10-29T10:25:00.000Z',
         endUtc: '2026-10-29T10:25:00.000Z',
-        pieces: { piece_chest_wood: 1 },
+        things: { piece_chest_wood: 1 },
       },
+    ]);
+  });
+
+  it('counts kills for every player who fought, and items per player', () => {
+    // GIVEN a troll Ragnar and Bjorn fought, then Ragnar picks up wood and stores it
+    readLines(state, [
+      ...RUN_START,
+      logLine('03:00:00', 'Creature killed: Troll level 1 by Ragnar, Bjorn'),
+      logLine('03:01:00', 'Picked up: Wood x20 by Ragnar'),
+      logLine('03:02:00', 'Stored: Wood x15 in piece_chest_wood by Ragnar'),
+    ]);
+
+    // WHEN the activities are listed
+    const kinds = state.snapshot.activities.map((activity) => [activity.player, activity.kind, activity.things]);
+
+    // THEN the kill counts for both players and each item kind has its own stretch
+    expect(kinds).toEqual([
+      ['Ragnar', 'killed', { Troll: 1 }],
+      ['Bjorn', 'killed', { Troll: 1 }],
+      ['Ragnar', 'pickedUp', { Wood: 20 }],
+      ['Ragnar', 'stored', { Wood: 15 }],
+    ]);
+  });
+
+  it('keeps areas, gear and global keys in the story only when they are news', () => {
+    // GIVEN two visits to the Swamp, two trips into a dungeon, the same gear twice, a boss defeat and another key
+    readLines(state, [
+      ...RUN_START,
+      logLine('03:00:00', 'Area entered: Ragnar Swamp'),
+      logLine('03:10:00', 'Area entered: Ragnar Dungeon'),
+      logLine('03:20:00', 'Area entered: Ragnar Swamp'),
+      logLine('03:30:00', 'Area entered: Ragnar Dungeon'),
+      logLine('03:40:00', 'Gear: Ragnar SwordIron'),
+      logLine('03:50:00', 'Gear: Ragnar SwordIron'),
+      logLine('04:00:00', 'Global key set: defeated_eikthyr'),
+      logLine('04:10:00', 'Global key set: nomap'),
+    ]);
+
+    // WHEN the story events are listed
+    const events = state.snapshot.events.map((event) => event.type);
+
+    // THEN only the first Swamp visit, both dungeon trips, the gear once and the boss defeat are kept
+    expect(events).toEqual(['worldLoaded', 'areaEntered', 'areaEntered', 'areaEntered', 'gearSeen', 'globalKey']);
+    expect(state.snapshot.visitedAreas).toEqual({ Ragnar: ['Swamp', 'Dungeon'] });
+    expect(state.snapshot.gear).toEqual({ Ragnar: ['SwordIron'] });
+  });
+
+  it('tracks where players are, their kills, the day and the bosses defeated', () => {
+    // GIVEN Ragnar moves to the Swamp, kills with Bjorn, a day starts and Eikthyr falls twice
+    readLines(state, [
+      ...RUN_START,
+      logLine('03:00:00', 'Area entered: Ragnar Meadows'),
+      logLine('03:10:00', 'Area entered: Ragnar Swamp'),
+      logLine('03:20:00', 'Creature killed: Draugr level 1 by Ragnar, Bjorn'),
+      logLine('03:21:00', 'Creature killed: Draugr level 2 by Ragnar'),
+      logLine('03:30:00', 'Day started: 42'),
+      logLine('03:40:00', 'Global key set: defeated_eikthyr'),
+      logLine('03:50:00', 'Global key set: defeated_eikthyr'),
+    ]);
+
+    // WHEN / THEN the snapshot knows each
+    expect(state.snapshot.currentAreas).toEqual({ Ragnar: 'Swamp' });
+    expect(state.snapshot.kills).toEqual({ Ragnar: { Draugr: 2 }, Bjorn: { Draugr: 1 } });
+    expect(state.snapshot.day).toBe(42);
+    expect(state.snapshot.defeatedBosses).toEqual(['Eikthyr']);
+  });
+
+  it('keeps chat and pings apart from the game events', () => {
+    // GIVEN a shout and a ping
+    readLines(state, [...RUN_START, logLine('03:00:00', 'Chat: Ragnar shouted: Troll!'), logLine('03:00:05', 'Ping: Ragnar at 1 2')]);
+
+    // WHEN / THEN both are in the chat list
+    expect(state.snapshot.chat).toEqual([
+      { timeUtc: '2026-10-29T10:00:00.000Z', character: 'Ragnar', kind: 'shouted', text: 'Troll!' },
+      { timeUtc: '2026-10-29T10:00:05.000Z', character: 'Ragnar', kind: 'ping', text: '' },
     ]);
   });
 

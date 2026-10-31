@@ -2,7 +2,7 @@
   import NoData from '#/lib/components/NoData';
   import StatGrid from '#/lib/components/StatGrid';
   import { live, useSnapshot } from '#/lib/live.svelte';
-  import { LATEST_SAVE_COUNT } from '#/lib/models';
+  import { BOSS_ORDER, LATEST_SAVE_COUNT } from '#/lib/models';
   import { viewerOffsetMinutes, whenLabel } from '#/lib/status';
 
   /** Getter for the snapshot the layout shares. */
@@ -32,11 +32,25 @@
     <StatGrid
       stats={[
         { label: 'World', value: snapshot.world ?? 'Not in this log' },
+        { label: 'In-game day', value: snapshot.day === null ? '–' : String(snapshot.day) },
         { label: 'Saves seen', value: String(snapshot.saves.length) },
         { label: 'Average save time', value: averageMs === null ? '–' : `${Math.round(averageMs)} ms` },
         { label: 'Backups seen', value: String(snapshot.backups.length) },
       ]}
     />
+
+    <section class="panel" aria-labelledby="bosses-title">
+      <h2 id="bosses-title" class="panel-title">BOSSES</h2>
+      <ol class="bosses">
+        {#each BOSS_ORDER as boss (boss)}
+          {@const isDefeated = snapshot.defeatedBosses.includes(boss)}
+          <li class:defeated={isDefeated}>
+            <span>{boss}</span>
+            <span class="mono muted">{isDefeated ? 'Defeated' : 'Not yet'}</span>
+          </li>
+        {/each}
+      </ol>
+    </section>
 
     <section class="panel" aria-labelledby="saves-title">
       <h2 id="saves-title" class="panel-title">LATEST SAVES</h2>
@@ -77,6 +91,31 @@
   /* Text under a panel title */
   p {
     margin: 0 0 10px;
+  }
+
+  /* Bosses in a row that wraps on narrow screens */
+  .bosses {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 130px), 1fr));
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* One boss: name above its state */
+  .bosses li {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+  }
+
+  /* A defeated boss stands out in gold */
+  .bosses li.defeated {
+    border-color: var(--gold);
+    color: var(--gold);
   }
 
   /* One save or backup: time on the left, details on the right */

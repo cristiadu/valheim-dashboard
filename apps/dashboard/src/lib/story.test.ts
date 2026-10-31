@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { daySummary, storyOf } from '#/lib/story';
+import { areaLabel, daySummary, gearLabel, storyOf } from '#/lib/story';
 import { sessionWith, snapshotWith } from '#/lib/test-common';
 
 describe('storyOf', () => {
@@ -29,27 +29,27 @@ describe('storyOf', () => {
   it('tells building in one line per stretch, naming the most common pieces', () => {
     // GIVEN Ragnar built five kinds of pieces, then one of his pieces and one of an unknown builder were destroyed
     const snapshot = snapshotWith({
-      builds: [
+      activities: [
         {
-          builder: 'Ragnar',
-          isDestroyed: false,
+          player: 'Ragnar',
+          kind: 'built',
           startUtc: '2026-10-29T10:00:00.000Z',
           endUtc: '2026-10-29T10:05:00.000Z',
-          pieces: { wood_fence: 8, wood_floor_1x1: 14, piece_groundtorch_wood: 3, stake_wall: 2, wood_stair: 1 },
+          things: { wood_fence: 8, wood_floor_1x1: 14, piece_groundtorch_wood: 3, stake_wall: 2, wood_stair: 1 },
         },
         {
-          builder: 'Ragnar',
-          isDestroyed: true,
+          player: 'Ragnar',
+          kind: 'destroyed',
           startUtc: '2026-10-29T10:06:00.000Z',
           endUtc: '2026-10-29T10:06:00.000Z',
-          pieces: { wood_fence: 1 },
+          things: { wood_fence: 1 },
         },
         {
-          builder: null,
-          isDestroyed: true,
+          player: null,
+          kind: 'destroyed',
           startUtc: '2026-10-29T10:07:00.000Z',
           endUtc: '2026-10-29T10:07:00.000Z',
-          pieces: { stake_wall: 2 },
+          things: { stake_wall: 2 },
         },
       ],
     });
@@ -62,6 +62,67 @@ describe('storyOf', () => {
       ['wrecked', '2 pieces were destroyed: 2 stake wall'],
       ['wrecked', '1 piece Ragnar built was destroyed: 1 wood fence'],
       ['built', 'Ragnar built 28 pieces: 14 wood floor 1x1, 8 wood fence, 3 groundtorch wood and more'],
+    ]);
+  });
+
+  it('tells plugin events in plain sentences and replaces the plain death line with its details', () => {
+    // GIVEN Ragnar died fighting a troll and Bjorn, then a few things happened in the world
+    const timeUtc = (minute: number): string => `2026-10-29T10:${String(minute).padStart(2, '0')}:00.000Z`;
+    const snapshot = snapshotWith({
+      sessions: [sessionWith({}), sessionWith({ character: 'Bjorn' })],
+      events: [
+        { type: 'playerDied', timeUtc: timeUtc(1), character: 'Ragnar' },
+        { type: 'deathDetails', timeUtc: timeUtc(1), character: 'Ragnar', area: 'BlackForest', fighting: ['Troll', 'Bjorn'] },
+        { type: 'bossSummoned', timeUtc: timeUtc(2), boss: 'gd_king', summoner: 'Ragnar' },
+        { type: 'globalKey', timeUtc: timeUtc(3), key: 'defeated_gdking', isSet: true },
+        { type: 'areaEntered', timeUtc: timeUtc(4), character: 'Ragnar', area: 'Swamp' },
+        { type: 'teleported', timeUtc: timeUtc(5), character: 'Ragnar', portal: 'Home' },
+        { type: 'gearSeen', timeUtc: timeUtc(6), character: 'Ragnar', item: 'SwordIron', quality: 2 },
+        { type: 'tameChanged', timeUtc: timeUtc(7), creature: 'Wolf', change: 'tamed', name: null },
+        { type: 'tameChanged', timeUtc: timeUtc(8), creature: 'Wolf', change: 'died', name: 'Fluffy' },
+        { type: 'signWritten', timeUtc: timeUtc(9), author: 'Bjorn', text: 'Keep out' },
+        { type: 'tombstoneEmptied', timeUtc: timeUtc(10), owner: 'Ragnar', player: 'Bjorn' },
+      ],
+      chat: [{ timeUtc: timeUtc(11), character: 'Bjorn', kind: 'said', text: 'sorry' }],
+    });
+
+    // WHEN the story is made
+    const story = storyOf(snapshot).filter((item) => item.kind !== 'joined');
+
+    // THEN each event reads as a sentence, newest first, with one death line
+    expect(story.map((item) => [item.kind, item.text])).toEqual([
+      ['chat', 'Bjorn: sorry'],
+      ['items', "Bjorn emptied Ragnar's tombstone"],
+      ['chat', 'Bjorn wrote on a sign: "Keep out"'],
+      ['tame', 'Fluffy the wolf died'],
+      ['tame', 'A wolf was tamed'],
+      ['items', 'Ragnar has new gear: sword iron (level 2)'],
+      ['travel', 'Ragnar took the portal to Home'],
+      ['travel', 'Ragnar reached the Swamp for the first time'],
+      ['boss', 'The Elder was defeated'],
+      ['boss', 'Ragnar summoned The Elder'],
+      ['died', 'Ragnar died in the Black Forest fighting a troll and Bjorn'],
+    ]);
+  });
+
+  it('tells kills and items in one line per stretch', () => {
+    // GIVEN Ragnar killed creatures, took items from chests and harvested turnips
+    const snapshot = snapshotWith({
+      activities: [
+        { player: 'Ragnar', kind: 'killed', startUtc: '2026-10-29T10:00:00.000Z', endUtc: '2026-10-29T10:05:00.000Z', things: { Greydwarf: 3, Troll: 1 } },
+        { player: 'Ragnar', kind: 'taken', startUtc: '2026-10-29T10:06:00.000Z', endUtc: '2026-10-29T10:06:00.000Z', things: { Wood: 20 } },
+        { player: 'Ragnar', kind: 'harvested', startUtc: '2026-10-29T10:07:00.000Z', endUtc: '2026-10-29T10:07:00.000Z', things: { Pickable_Turnip: 2 } },
+      ],
+    });
+
+    // WHEN the story is made
+    const story = storyOf(snapshot);
+
+    // THEN each stretch reads plainly
+    expect(story.map((item) => [item.kind, item.text])).toEqual([
+      ['items', 'Ragnar harvested 2 plants: 2 turnip'],
+      ['items', 'Ragnar took 20 items from chests: 20 wood'],
+      ['fight', 'Ragnar killed 4 creatures: 3 greydwarf, 1 troll'],
     ]);
   });
 });
@@ -91,20 +152,20 @@ describe('daySummary', () => {
     // GIVEN Ragnar played and built three pieces today, and a piece of his was destroyed
     const snapshot = snapshotWith({
       sessions: [sessionWith({ endUtc: '2026-10-29T11:00:00.000Z' })],
-      builds: [
+      activities: [
         {
-          builder: 'Ragnar',
-          isDestroyed: false,
+          player: 'Ragnar',
+          kind: 'built',
           startUtc: '2026-10-29T10:00:00.000Z',
           endUtc: '2026-10-29T10:05:00.000Z',
-          pieces: { wood_floor_1x1: 3 },
+          things: { wood_floor_1x1: 3 },
         },
         {
-          builder: 'Ragnar',
-          isDestroyed: true,
+          player: 'Ragnar',
+          kind: 'destroyed',
           startUtc: '2026-10-29T10:06:00.000Z',
           endUtc: '2026-10-29T10:06:00.000Z',
-          pieces: { wood_floor_1x1: 1 },
+          things: { wood_floor_1x1: 1 },
         },
       ],
     });
@@ -120,5 +181,13 @@ describe('daySummary', () => {
     // GIVEN no sessions
     // WHEN / THEN the summary says so
     expect(daySummary(snapshotWith({}), 0)).toBe('Nobody played in the last 24 hours');
+  });
+});
+
+describe('labels', () => {
+  it('names areas and gear the way the game shows them', () => {
+    // WHEN / THEN plugin names read plainly
+    expect(['BlackForest', 'Mountain', 'Ocean', 'Dungeon'].map(areaLabel)).toEqual(['Black Forest', 'Mountains', 'Ocean', 'Dungeon']);
+    expect(['SwordIron quality 2', 'ArmorBronzeChest'].map(gearLabel)).toEqual(['sword iron (level 2)', 'armor bronze chest']);
   });
 });

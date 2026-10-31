@@ -7,7 +7,7 @@
   import { playersOf } from '#/lib/players';
   import { clockTime, durationLabel, isServerOnline, viewerOffsetMinutes, whenLabel } from '#/lib/status';
   import { gigabytesLabel } from '#/lib/health';
-  import { daySummary, storyOf } from '#/lib/story';
+  import { areaLabel, daySummary, storyOf } from '#/lib/story';
 
   /** Getter for the snapshot the layout shares. */
   const getSnapshot = useSnapshot();
@@ -24,8 +24,8 @@
   /** Players online now. */
   const online = $derived(players.filter((player) => player.isOnline));
 
-  /** Newest story lines. */
-  const latest = $derived(storyOf(snapshot).slice(0, LATEST_EVENT_COUNT));
+  /** Newest story lines. Chat stays on the Saga tab. */
+  const latest = $derived(storyOf(snapshot).filter((item) => item.kind !== 'chat').slice(0, LATEST_EVENT_COUNT));
 
   /** Whether the server is up at the page clock. */
   const isUp = $derived(live.nowMs !== null && isServerOnline(snapshot, live.nowMs));
@@ -64,7 +64,7 @@
           {#each online as player (player.key)}
             <div class="line">
               <span class="diamond" aria-hidden="true" style:background={player.color}></span>
-              <span class="grow">{player.character}</span>
+              <span class="grow">{player.character}{#if player.area}<span class="muted">{` · ${areaLabel(player.area)}`}</span>{/if}</span>
               <span class="mono muted">since {at(player.sinceUtc!)} · {durationLabel(nowMs - Date.parse(player.sinceUtc!))}</span>
             </div>
           {:else}
