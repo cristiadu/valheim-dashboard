@@ -124,7 +124,7 @@ flowchart LR
 
 | Source | What it finds |
 | --- | --- |
-| World scan | New objects (pieces, summoned bosses), the in-game day, and each player's area, portal trips, death, PvP, bed and gear |
+| World scan | New objects (pieces, summoned bosses), the in-game day, each player's area, portal trips, death, PvP, bed and gear, tames, signs and item stands, and creatures that die, with every player who hit them |
 | Calls through the server | Chat and map pings, which the server passes from one player to the others, and creature attack moves, to say what a player was fighting when they died |
 | Game hooks | Global keys, such as a boss defeat, and the end of a raid |
 

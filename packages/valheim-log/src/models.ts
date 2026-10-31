@@ -18,6 +18,9 @@ export type SessionEndReason = 'left' | 'timedOut' | 'serverStopped' | 'serverCr
 /** How a chat message was sent: normal talk, a shout or a whisper. */
 export type ChatKind = 'said' | 'shouted' | 'whispered';
 
+/** How a tame changed: a creature was tamed, a young tame was born, a young tame grew up, or a tame died. */
+export type TameChange = 'tamed' | 'born' | 'grewUp' | 'died';
+
 /** One event read from `logs.txt`. `timeUtc` is the log time moved to UTC, as an ISO string. */
 export type LogEvent = { timeUtc: string } & (
   | { type: 'knownPlayer'; steamName: string; steamId: string }
@@ -48,6 +51,11 @@ export type LogEvent = { timeUtc: string } & (
   | { type: 'pvpChanged'; character: string; isOn: boolean }
   | { type: 'wentToBed'; character: string }
   | { type: 'gearSeen'; character: string; item: string; quality: number }
+  | { type: 'creatureKilled'; creature: string; level: number; attackers: string[] }
+  | { type: 'tameChanged'; creature: string; change: TameChange; name: string | null }
+  | { type: 'petNamed'; creature: string; name: string }
+  | { type: 'signWritten'; author: string | null; text: string }
+  | { type: 'itemHung'; item: string; player: string | null }
   | { type: 'worldSaveStep'; step: number; durationMs: number; saveNumber: number | null }
   | { type: 'backupCreated'; backup: string }
   | { type: 'diskSpace'; availableBytes: number; blockedBelowBytes: number; warnBelowBytes: number }
