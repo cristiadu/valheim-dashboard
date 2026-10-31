@@ -22,7 +22,7 @@ flowchart LR
 | `packages/valheim-log` | Turns log lines into game events and player sessions. No files, no network. |
 | `apps/dashboard` | SvelteKit app on Node. Follows `logs.txt` and serves the page. |
 | `plugins/event-log` | BepInEx plugin on the server only. Logs what the game does not. Friends install nothing. |
-| `scripts` | Start the dashboard and keep it running on Windows. |
+| `scripts` | Start the dashboard, keep it running and update it from `main` on Windows. |
 | `docs/log-events.md` | Every log line the dashboard reads, with its regex. |
 
 ## Reading a log line
@@ -156,7 +156,37 @@ flowchart TD
   run -->|stopped| wait[Wait 5 s] --> run
 ```
 
-`install-startup.cmd` adds the logon task once. Every window stays hidden when it starts at logon.
+`install-startup.cmd` adds the logon task and the update task once. Every window stays hidden when it
+starts at logon.
+
+## Updates from main
+
+The update task runs `update-from-main.ps1` every 5 minutes in a console with no window.
+
+```mermaid
+flowchart TD
+  run[Every 5 minutes] --> branch{Checkout on main, nothing uncommitted?}
+  branch -->|no| skip[Skip and log why]
+  branch -->|yes| pull[git fetch and fast-forward to origin/main]
+  pull --> dash{Dashboard built from this commit?}
+  dash -->|no| build[pnpm install and build, stop node] --> loop[Start script starts node again]
+  dash -->|yes| plugin
+  loop --> plugin{Plugin files changed since the installed plugin?}
+  plugin -->|no| done[Done]
+  plugin -->|yes| online{Anyone online?}
+  online -->|yes or dashboard not answering| wait[Wait for the next run]
+  online -->|no| stop[Build the plugin, Ctrl+C the game server, copy the DLL, start the server]
+  stop --> done
+```
+
+| Step | How |
+| --- | --- |
+| Who is online | Sessions without an end in `/api/status`. |
+| Stopping the game server | Ctrl+C sent to its console, as in its window. The game saves the world and exits. |
+| Starting the game server | `start_headless_server.bat` in a console with no window. A server that was already stopped stays stopped. |
+| Remembering what is installed | `updater-state.json` keeps the commit of the running dashboard and of the installed plugin. A step that fails or waits runs again on the next pass. |
+
+The first run takes the installed plugin as current and builds the dashboard once.
 
 ## Files on the server PC
 
@@ -167,6 +197,8 @@ Every log lives in `C:\Valheim Server`.
 | `logs.txt` | The Valheim server, the event log plugin and BepInEx |
 | `log-history\*.txt` | The dashboard, one file per server run |
 | `dashboard.log` | The start script, with the dashboard's output |
+| `updater.log` | The update script: what it updated, skipped or is waiting for |
+| `updater-state.json` | The update script: commits of the running dashboard and the installed plugin |
 
 ## CI
 
@@ -177,6 +209,8 @@ flowchart LR
 
 `pnpm lint` runs ESLint in each project. Besides the recommended TypeScript and Svelte rules, it rejects
 relative imports (use `#/`), `function` declarations, `.then()`, `console` and `if` without braces.
+
+A second job runs the Pester tests of the PowerShell scripts.
 
 Dependabot opens weekly upgrade PRs for npm packages and GitHub Actions. The plugin is built on the
 server PC, not in CI.

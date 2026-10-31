@@ -29,3 +29,11 @@ jobs:
       - run: pnpm lint
       - run: pnpm test
       - run: pnpm build
+
+  # Tests the PowerShell scripts that run on the server PC, with the Pester the runner image ships.
+  scripts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: Invoke-Pester -Path scripts -CI
+        shell: pwsh
