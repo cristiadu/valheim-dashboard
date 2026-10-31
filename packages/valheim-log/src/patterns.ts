@@ -1,4 +1,4 @@
-import type { JoinRefusedReason } from '#/models';
+import type { JoinRefusedReason, TameChange } from '#/models';
 
 /** Start of a timestamped line: `10/29/2026 02:43:13: message`. Month comes first. */
 export const TIMESTAMP_PATTERN =
@@ -70,6 +70,9 @@ export const UNKNOWN_PLAYER = 'an unknown player';
 /** A chat message. Checked first, since the text can hold anything. Written by the event log plugin. */
 export const CHAT_PATTERN = /^Chat: (?<character>.+?) (?<kind>said|shouted|whispered): (?<text>.*)$/;
 
+/** A player wrote on a sign. Checked early, since the text can hold anything. Written by the event log plugin. */
+export const SIGN_PATTERN = /^Sign written: (?<author>.+?): (?<text>.*)$/;
+
 /** A player pinged the map at a spot in world coordinates. Written by the event log plugin. */
 export const PING_PATTERN = /^Ping: (?<character>.+) at (?<x>-?\d+) (?<z>-?\d+)$/;
 
@@ -99,6 +102,39 @@ export const BED_PATTERN = /^Went to bed: (?<character>.+)$/;
 
 /** A player wore or held a piece of gear for the first time since the server started. Written by the event log plugin. */
 export const GEAR_PATTERN = /^Gear: (?<character>\S+) (?<item>\S+)(?: quality (?<quality>\d+))?$/;
+
+/** A creature died after players hit it, with everyone who hit it. Written by the event log plugin. */
+export const CREATURE_KILLED_PATTERN = /^Creature killed: (?<creature>\S+) level (?<level>\d+) by (?<attackers>.+)$/;
+
+/** A tame changed: tamed, born, grown up or died, with its name when it has one. Written by the event log plugin. */
+export const TAME_PATTERN = /^(?<change>Tamed|Tame born|Tame grew up|Tame died): (?<creature>\S+)(?: (?<name>.+))?$/;
+
+/** A player named a tame. Written by the event log plugin. */
+export const PET_NAMED_PATTERN = /^Pet named: (?<creature>\S+) (?<name>.+)$/;
+
+/** A player hung an item, such as a trophy, on an item stand. Written by the event log plugin. */
+export const ITEM_HUNG_PATTERN = /^Item hung: (?<item>\S+) by (?<player>.+)$/;
+
+/** A player picked up an item. Written by the event log plugin. */
+export const PICKED_UP_PATTERN = /^Picked up: (?<item>\S+) x(?<count>\d+) by (?<player>.+)$/;
+
+/** A player put items in a chest or took them out. Written by the event log plugin. */
+export const CHEST_PATTERN =
+  /^(?<change>Stored|Taken): (?<item>\S+) x(?<count>\d+) (?:in|from) (?<chest>\S+) by (?<player>.+)$/;
+
+/** A player harvested a plant, such as berries or a crop. Written by the event log plugin. */
+export const HARVESTED_PATTERN = /^Harvested: (?<plant>\S+) by (?<player>.+)$/;
+
+/** A player emptied a tombstone, their own or someone else's. Written by the event log plugin. */
+export const TOMBSTONE_EMPTIED_PATTERN = /^Tombstone emptied: (?<owner>.+?) by (?<player>.+)$/;
+
+/** How a tame changed, by the words the event log plugin writes. */
+export const TAME_CHANGES: ReadonlyMap<string, TameChange> = new Map([
+  ['Tamed', 'tamed'],
+  ['Tame born', 'born'],
+  ['Tame grew up', 'grewUp'],
+  ['Tame died', 'died'],
+]);
 
 /** Portal name the event log plugin writes when the portal has no name. */
 export const UNNAMED_PORTAL = 'an unnamed portal';

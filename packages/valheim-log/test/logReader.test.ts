@@ -253,6 +253,62 @@ describe('parseMessage', () => {
     ]);
   });
 
+  it('reads creature, tame, sign and item stand lines from the event log plugin', () => {
+    // GIVEN one line of each kind, with and without optional parts
+    const messages = [
+      'Creature killed: Troll level 2 by Ragnar, Bjorn',
+      'Tamed: Wolf',
+      'Tame born: Wolf_cub',
+      'Tame grew up: Wolf',
+      'Tame died: Wolf Fluffy',
+      'Pet named: Wolf Fluffy',
+      'Sign written: Ragnar: Keep out: trolls',
+      'Sign written: an unknown player: Hi',
+      'Item hung: TrophyDeer by Ragnar',
+    ];
+
+    // WHEN each message is read
+    const events = messages.map((message) => parseMessage(message, '2026-01-01T00:00:00.000Z'));
+
+    // THEN each line gives its event and values
+    const timeUtc = '2026-01-01T00:00:00.000Z';
+    expect(events).toEqual([
+      { type: 'creatureKilled', timeUtc, creature: 'Troll', level: 2, attackers: ['Ragnar', 'Bjorn'] },
+      { type: 'tameChanged', timeUtc, creature: 'Wolf', change: 'tamed', name: null },
+      { type: 'tameChanged', timeUtc, creature: 'Wolf_cub', change: 'born', name: null },
+      { type: 'tameChanged', timeUtc, creature: 'Wolf', change: 'grewUp', name: null },
+      { type: 'tameChanged', timeUtc, creature: 'Wolf', change: 'died', name: 'Fluffy' },
+      { type: 'petNamed', timeUtc, creature: 'Wolf', name: 'Fluffy' },
+      { type: 'signWritten', timeUtc, author: 'Ragnar', text: 'Keep out: trolls' },
+      { type: 'signWritten', timeUtc, author: null, text: 'Hi' },
+      { type: 'itemHung', timeUtc, item: 'TrophyDeer', player: 'Ragnar' },
+    ]);
+  });
+
+  it('reads item, chest, harvest and tombstone lines from the event log plugin', () => {
+    // GIVEN one line of each kind
+    const messages = [
+      'Picked up: Wood x20 by Ragnar',
+      'Stored: Wood x20 in piece_chest_wood by Ragnar',
+      'Taken: Coins x5 from piece_chest_wood by an unknown player',
+      'Harvested: RaspberryBush by Ragnar',
+      'Tombstone emptied: Ragnar by Bjorn',
+    ];
+
+    // WHEN each message is read
+    const events = messages.map((message) => parseMessage(message, '2026-01-01T00:00:00.000Z'));
+
+    // THEN each line gives its event and values
+    const timeUtc = '2026-01-01T00:00:00.000Z';
+    expect(events).toEqual([
+      { type: 'itemPickedUp', timeUtc, item: 'Wood', count: 20, player: 'Ragnar' },
+      { type: 'chestChanged', timeUtc, item: 'Wood', count: 20, chest: 'piece_chest_wood', player: 'Ragnar', isStored: true },
+      { type: 'chestChanged', timeUtc, item: 'Coins', count: 5, chest: 'piece_chest_wood', player: null, isStored: false },
+      { type: 'harvested', timeUtc, plant: 'RaspberryBush', player: 'Ragnar' },
+      { type: 'tombstoneEmptied', timeUtc, owner: 'Ragnar', player: 'Bjorn' },
+    ]);
+  });
+
   it('reads chat as chat even when its text looks like another line', () => {
     // GIVEN chat that holds text other patterns look for
     const messages = ['Chat: Ragnar said: the server is full', 'Chat: Ragnar said: day:3 OnApplicationQuit'];
