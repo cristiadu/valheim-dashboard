@@ -7,7 +7,7 @@ happens in the game, live, in their browser.
 flowchart LR
   subgraph pc[Server PC]
     game[Valheim server] -->|writes| log[logs.txt]
-    plugin[Build log plugin] -->|adds building lines| log
+    plugin[Event log plugin] -->|adds game event lines| log
     log --> dash[Dashboard]
     dash -->|copies each run| hist[log-history folder]
     hist -->|read on start| dash
@@ -21,7 +21,7 @@ flowchart LR
 | --- | --- |
 | `packages/valheim-log` | Turns log lines into game events and player sessions. No files, no network. |
 | `apps/dashboard` | SvelteKit app on Node. Follows `logs.txt` and serves the page. |
-| `plugins/build-log` | BepInEx plugin on the server only. Friends install nothing. |
+| `plugins/event-log` | BepInEx plugin on the server only. Logs what the game does not. Friends install nothing. |
 | `scripts` | Start the dashboard and keep it running on Windows. |
 | `docs/log-events.md` | Every log line the dashboard reads, with its regex. |
 
@@ -106,19 +106,31 @@ A snapshot is everything the page shows, as JSON. `/api/status` returns the same
 
 Recipe plans are saved in each viewer's browser (`localStorage`). The server stores nothing for them.
 
-## Build log plugin
+## Event log plugin
+
+The game logs joins, deaths and saves, but not building, chat or boss progress. The plugin watches what
+already passes through the server and writes a line for each event.
 
 ```mermaid
 flowchart LR
-  build[Player builds or removes a piece] --> world[Server world objects]
-  world -->|scan every 5 s| plugin[Build log plugin]
-  plugin -->|"Piece built: wood_floor_1x1 by Ragnar"| log[logs.txt]
-  bep[BepInEx messages] --> plugin
-  log --> saga[Saga: building lines]
+  world[Server world objects] -->|scan every 5 s| scan[World scan]
+  calls[Calls players send through the server] --> rpc[Chat reader]
+  keys[Global keys and raids] --> hooks[Game hooks]
+  scan -->|"Piece built: wood_floor_1x1 by Ragnar"| log[logs.txt]
+  rpc -->|"Chat: Ragnar shouted: Troll!"| log
+  hooks -->|"Global key set: defeated_eikthyr"| log
+  bep[BepInEx messages] --> log
 ```
 
-Pieces built within 10 minutes of each other show as one Saga line. BepInEx's own log file is turned off,
-so its messages land in `logs.txt` too.
+| Source | What it finds |
+| --- | --- |
+| World scan | New objects (pieces, summoned bosses), the in-game day, and each player's area, portal trips, death, PvP, bed and gear |
+| Calls through the server | Chat and map pings, which the server passes from one player to the others, and creature attack moves, to say what a player was fighting when they died |
+| Game hooks | Global keys, such as a boss defeat, and the end of a raid |
+
+Each line names a player only when the game data says who did it. Pieces built within 10 minutes of
+each other show as one Saga line. BepInEx's own log file is turned off, so its messages land in
+`logs.txt` too. Every line is listed in [log-events.md](log-events.md).
 
 ## Start scripts
 
@@ -141,7 +153,7 @@ Every log lives in `C:\Valheim Server`.
 
 | File | Written by |
 | --- | --- |
-| `logs.txt` | The Valheim server, the build log plugin and BepInEx |
+| `logs.txt` | The Valheim server, the event log plugin and BepInEx |
 | `log-history\*.txt` | The dashboard, one file per server run |
 | `dashboard.log` | The start script, with the dashboard's output |
 

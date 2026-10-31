@@ -159,20 +159,44 @@ Also not in the sample log.
 `OnApplicationQuit` may have no timestamp. If the log ends without it, the server crashed or was
 killed. Tools only match `day:` as text; nobody publishes the full night-skip line.
 
-## Building
+## Event log plugin
 
-The game does not log building. The build log plugin in `plugins/build-log` runs on the server only
-and writes these lines. The builder is the character name, or `an unknown player` when the builder's
-character was not online since the server started.
+The game does not log building, chat or boss progress. The event log plugin in `plugins/event-log`
+runs on the server only and writes these lines. A player is the character name, or `an unknown player`
+when the plugin does not know who it was.
 
 | Event | Example | Regex |
 | --- | --- | --- |
 | Piece built | `Piece built: wood_floor_1x1 by Ragnar` | `^Piece built: (?<piece>\S+) by (?<builder>.+)$` |
 | Piece destroyed or removed | `Piece destroyed: wood_fence built by Ragnar` | `^Piece destroyed: (?<piece>\S+) built by (?<builder>.+)$` |
+| Chat | `Chat: Ragnar shouted: Troll at the gate!` | `^Chat: (?<character>.+?) (?<kind>said\|shouted\|whispered): (?<text>.*)$` |
+| Map ping | `Ping: Ragnar at 120 -340` | `^Ping: (?<character>.+) at (?<x>-?\d+) (?<z>-?\d+)$` |
+| Global key set or removed | `Global key set: defeated_eikthyr` | `^Global key (?<change>set\|removed): (?<key>.+)$` |
+| Raid ended | `Raid ended: army_eikthyr` | `^Raid ended: (?<raid>\w+)$` |
+| Boss summoned | `Boss summoned: Eikthyr by Ragnar` | `^Boss summoned: (?<boss>\S+) by (?<summoner>.+)$` |
+| New in-game day | `Day started: 42` | `^Day started: (?<day>\d+)$` |
+| Player died | `Player died: Ragnar in BlackForest while fighting Troll` | `^Player died: (?<character>.+?) in (?<area>\w+)(?: while fighting (?<fighting>.+))?$` |
+| Area entered | `Area entered: Ragnar Swamp` | `^Area entered: (?<character>.+) (?<area>\w+)$` |
+| Came out of a portal | `Teleported: Ragnar to Home base` | `^Teleported: (?<character>.+?) to (?<portal>.+)$` |
+| PvP turned on or off | `PvP turned on: Ragnar` | `^PvP turned (?<state>on\|off): (?<character>.+)$` |
+| Went to bed | `Went to bed: Ragnar` | `^Went to bed: (?<character>.+)$` |
+| New gear | `Gear: Ragnar SwordIron quality 2` | `^Gear: (?<character>\S+) (?<item>\S+)(?: quality (?<quality>\d+))?$` |
+
+- **Chat** only reaches the server when another player is online to receive it. `said` is normal
+  talk, `shouted` reaches everyone, `whispered` reaches players close by.
+- **Global keys** mark world progress. The game sets `defeated_<boss>` each time a boss dies, for
+  example `defeated_eikthyr`, `defeated_gdking` (The Elder) or `defeated_bonemass`.
+- **Boss summoned** names the player whose offering summoned the boss.
+- **Player died** comes with the game's own `Got character ZDOID from Ragnar : 0:0`. `while fighting`
+  lists creatures that attacked within 5 seconds and 30 meters, and players who hit them in PvP.
+- **Area** is a biome (`Meadows`, `BlackForest`, `Swamp`, `Mountain`, `Plains`, `Mistlands`,
+  `AshLands`, `DeepNorth`, `Ocean`) or `Dungeon`. It is logged once the player stays in it for two scans.
+- **Teleported** is the portal's name, or `an unnamed portal`.
+- **Gear** is logged the first time a player wears or holds an item since the server started.
 
 To build it, install the .NET SDK and BepInExPack_Valheim on the server, run `dotnet build -c Release`
-in `plugins/build-log`, and copy `bin\Release\netstandard2.1\ValheimDashboard.BuildLog.dll` to the
-server's `BepInEx\plugins` folder.
+in `plugins/event-log`, and copy `bin\Release\netstandard2.1\ValheimDashboard.EventLog.dll` to the
+server's `BepInEx\plugins` folder. Remove the older `ValheimDashboard.BuildLog.dll` if it is there.
 
 The plugin also copies BepInEx's own messages, such as plugin errors, into `logs.txt` as
 `[Error : Source] message` lines. To keep every log in the server's log folder, turn off BepInEx's
