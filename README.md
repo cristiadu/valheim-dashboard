@@ -10,7 +10,8 @@ world last saved. It also has a recipe planner for working out what you still ne
 
 ## Run it
 
-You need [Node.js](https://nodejs.org) 26 or newer on the server PC.
+You need [Node.js](https://nodejs.org) 26 or newer on the server PC, and the pnpm version in `package.json`.
+`scripts\install-startup.cmd` installs that pnpm for you.
 
 1. Double-click `scripts\start-dashboard.cmd`. The first time, it installs and builds everything.
 2. Open http://localhost:3000. Friends use your PC's address on port 3000.
@@ -20,8 +21,9 @@ stops, it starts again after 5 seconds.
 
 To start it every time you log on to Windows, double-click `scripts\install-startup.cmd` once. It runs
 hidden, with no window. It also checks `main` every 5 minutes: it pulls, rebuilds and restarts the
-dashboard, and installs a changed event log plugin when nobody is online. It writes what it did to
-`C:\Valheim Server\updater.log`.
+dashboard, and installs a changed event log plugin when nobody is online. It only takes a commit once CI
+passed on it. It writes what it did to `C:\Valheim Server\updater.log`. When `package.json` moves to a new
+pnpm version, run `install-startup.cmd` again.
 
 After a manual `git pull`, start it with `scripts\start-dashboard.cmd -Rebuild`. Other settings are in
 [apps/dashboard/README.md](apps/dashboard/README.md).
