@@ -72,7 +72,7 @@ namespace ValheimDashboard.EventLog
             }
             else if (Names.Has<TombStone>(zdo))
             {
-                ZLog.Log($"Tombstone emptied: {zdo.GetString(ZDOVars.s_ownerName, Names.UnknownPlayer)} by {Names.Peer(zdo.GetOwner())}");
+                GameEventLog.Write($"Tombstone emptied: {zdo.GetString(ZDOVars.s_ownerName, Names.UnknownPlayer)} by {Names.Peer(zdo.GetOwner())}");
             }
             PickedBy.Remove(zdo.m_uid);
         }
@@ -103,7 +103,7 @@ namespace ValheimDashboard.EventLog
                 before.Counts.TryGetValue(item.Key, out int oldCount);
                 if (item.Value > oldCount)
                 {
-                    ZLog.Log($"Stored: {item.Key} x{item.Value - oldCount} in {chestName} by {player}");
+                    GameEventLog.Write($"Stored: {item.Key} x{item.Value - oldCount} in {chestName} by {player}");
                 }
             }
             foreach (KeyValuePair<string, int> item in before.Counts)
@@ -111,7 +111,7 @@ namespace ValheimDashboard.EventLog
                 counts.TryGetValue(item.Key, out int newCount);
                 if (item.Value > newCount)
                 {
-                    ZLog.Log($"Taken: {item.Key} x{item.Value - newCount} from {chestName} by {player}");
+                    GameEventLog.Write($"Taken: {item.Key} x{item.Value - newCount} from {chestName} by {player}");
                 }
             }
         }
@@ -143,7 +143,7 @@ namespace ValheimDashboard.EventLog
             {
                 return;
             }
-            ZLog.Log($"Picked up: {Names.PrefabName(item)} x{item.GetInt(ZDOVars.s_stack, 1)} by {peer.m_playerName}");
+            GameEventLog.Write($"Picked up: {Names.PrefabName(item)} x{item.GetInt(ZDOVars.s_stack, 1)} by {peer.m_playerName}");
         }
 
         /// <summary>Logs [plant] as harvested by the player who asked for it, or else by the player whose game owns it.</summary>
@@ -154,7 +154,7 @@ namespace ValheimDashboard.EventLog
                 player = Names.Peer(plant.GetOwner());
             }
             PickedBy.Remove(plant.m_uid);
-            ZLog.Log($"Harvested: {Names.PrefabName(plant)} by {player}");
+            GameEventLog.Write($"Harvested: {Names.PrefabName(plant)} by {player}");
         }
     }
 }
