@@ -181,6 +181,15 @@ when the plugin does not know who it was.
 | PvP turned on or off | `PvP turned on: Ragnar` | `^PvP turned (?<state>on\|off): (?<character>.+)$` |
 | Went to bed | `Went to bed: Ragnar` | `^Went to bed: (?<character>.+)$` |
 | New gear | `Gear: Ragnar SwordIron quality 2` | `^Gear: (?<character>\S+) (?<item>\S+)(?: quality (?<quality>\d+))?$` |
+| Creature killed | `Creature killed: Troll level 2 by Ragnar, Bjorn` | `^Creature killed: (?<creature>\S+) level (?<level>\d+) by (?<attackers>.+)$` |
+| Tame tamed, born, grown up or died | `Tame born: Wolf_cub` | `^(?<change>Tamed\|Tame born\|Tame grew up\|Tame died): (?<creature>\S+)(?: (?<name>.+))?$` |
+| Tame named | `Pet named: Wolf Fluffy` | `^Pet named: (?<creature>\S+) (?<name>.+)$` |
+| Sign written | `Sign written: Ragnar: Keep out` | `^Sign written: (?<author>.+?): (?<text>.*)$` |
+| Item hung on a stand | `Item hung: TrophyDeer by Ragnar` | `^Item hung: (?<item>\S+) by (?<player>.+)$` |
+| Item picked up | `Picked up: Wood x20 by Ragnar` | `^Picked up: (?<item>\S+) x(?<count>\d+) by (?<player>.+)$` |
+| Items put in or taken from a chest | `Stored: Wood x20 in piece_chest_wood by Ragnar` | `^(?<change>Stored\|Taken): (?<item>\S+) x(?<count>\d+) (?:in\|from) (?<chest>\S+) by (?<player>.+)$` |
+| Plant harvested | `Harvested: RaspberryBush by Ragnar` | `^Harvested: (?<plant>\S+) by (?<player>.+)$` |
+| Tombstone emptied | `Tombstone emptied: Ragnar by Bjorn` | `^Tombstone emptied: (?<owner>.+?) by (?<player>.+)$` |
 
 - **Chat** only reaches the server when another player is online to receive it. `said` is normal
   talk, `shouted` reaches everyone, `whispered` reaches players close by.
@@ -192,6 +201,14 @@ when the plugin does not know who it was.
 - **Area** is a biome (`Meadows`, `BlackForest`, `Swamp`, `Mountain`, `Plains`, `Mistlands`,
   `AshLands`, `DeepNorth`, `Ocean`) or `Dungeon`. It is logged once the player stays in it for two scans.
 - **Teleported** is the portal's name, or `an unnamed portal`.
+- **Creature killed** lists every player who hit the creature, since each creature remembers them.
+  Creatures that die without a player hitting them are not logged, except tames (`Tame died`).
+  `level` is 1 for a creature with no stars.
+- **Sign written**, **Item hung**, **Stored**, **Taken** and **Tombstone emptied** name the player whose
+  game changed the object. A game takes over an object before it changes it.
+- **Picked up** is only logged when that player stands within 10 meters of the item, since items left
+  alone despawn, and no creature that eats off the ground stands within 3 meters of it.
+- **Harvested** names the player who asked to harvest, or the player whose game owns the plant.
 - **Gear** is logged the first time a player wears or holds an item since the server started.
 
 To build it, install the .NET SDK and BepInExPack_Valheim on the server, run `dotnet build -c Release`

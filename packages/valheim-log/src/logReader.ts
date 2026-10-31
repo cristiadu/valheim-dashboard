@@ -5,6 +5,8 @@ import {
   BED_PATTERN,
   BOSS_SUMMONED_PATTERN,
   CHAT_PATTERN,
+  CHEST_PATTERN,
+  CREATURE_KILLED_PATTERN,
   DAY_STARTED_PATTERN,
   DEATH_DETAILS_PATTERN,
   CHARACTER_PATTERN,
@@ -14,11 +16,15 @@ import {
   GEAR_PATTERN,
   GLOBAL_KEY_PATTERN,
   HANDSHAKE_PATTERN,
+  HARVESTED_PATTERN,
+  ITEM_HUNG_PATTERN,
   KNOWN_PLAYER_PATTERN,
   LEGACY_WORLD_SAVED_PATTERN,
   MS_PER_MINUTE,
   NIGHT_SKIPPED_PATTERN,
   OBJECTS_REMOVED_PATTERN,
+  PET_NAMED_PATTERN,
+  PICKED_UP_PATTERN,
   PIECE_BUILT_PATTERN,
   PIECE_DESTROYED_PATTERN,
   PING_PATTERN,
@@ -31,12 +37,16 @@ import {
   REFUSED_JOIN_PATTERN,
   REFUSED_JOIN_REASONS,
   SERVER_STOPPED_PATTERN,
+  SIGN_PATTERN,
   SOCKET_CLOSED_PATTERN,
   STEAM_CONNECTED_PATTERN,
   STEAM_ID_PREFIX,
   STEAM_LINKED_PATTERN,
+  TAME_CHANGES,
+  TAME_PATTERN,
   TELEPORTED_PATTERN,
   TIMESTAMP_PATTERN,
+  TOMBSTONE_EMPTIED_PATTERN,
   UNKNOWN_PLAYER,
   UNNAMED_PORTAL,
   VERSION_PATTERN,
@@ -52,6 +62,10 @@ const playerOf = (player: string | undefined): string | null => (player === UNKN
 
 /** Every known message, in the order it is checked. */
 const MATCHERS: readonly Matcher[] = [
+  {
+    pattern: SIGN_PATTERN,
+    toEvent: (groups, timeUtc) => ({ type: 'signWritten', timeUtc, author: playerOf(groups.author), text: groups.text! }),
+  },
   {
     pattern: CHAT_PATTERN,
     toEvent: (groups, timeUtc) => ({
@@ -221,6 +235,69 @@ const MATCHERS: readonly Matcher[] = [
   {
     pattern: DAY_STARTED_PATTERN,
     toEvent: (groups, timeUtc) => ({ type: 'dayStarted', timeUtc, day: Number(groups.day) }),
+  },
+  {
+    pattern: CREATURE_KILLED_PATTERN,
+    toEvent: (groups, timeUtc) => ({
+      type: 'creatureKilled',
+      timeUtc,
+      creature: groups.creature!,
+      level: Number(groups.level),
+      attackers: groups.attackers!.split(', '),
+    }),
+  },
+  {
+    pattern: TAME_PATTERN,
+    toEvent: (groups, timeUtc) => ({
+      type: 'tameChanged',
+      timeUtc,
+      creature: groups.creature!,
+      change: TAME_CHANGES.get(groups.change!)!,
+      name: groups.name ?? null,
+    }),
+  },
+  {
+    pattern: PET_NAMED_PATTERN,
+    toEvent: (groups, timeUtc) => ({ type: 'petNamed', timeUtc, creature: groups.creature!, name: groups.name! }),
+  },
+  {
+    pattern: ITEM_HUNG_PATTERN,
+    toEvent: (groups, timeUtc) => ({ type: 'itemHung', timeUtc, item: groups.item!, player: playerOf(groups.player) }),
+  },
+  {
+    pattern: PICKED_UP_PATTERN,
+    toEvent: (groups, timeUtc) => ({
+      type: 'itemPickedUp',
+      timeUtc,
+      item: groups.item!,
+      count: Number(groups.count),
+      player: playerOf(groups.player),
+    }),
+  },
+  {
+    pattern: CHEST_PATTERN,
+    toEvent: (groups, timeUtc) => ({
+      type: 'chestChanged',
+      timeUtc,
+      item: groups.item!,
+      count: Number(groups.count),
+      chest: groups.chest!,
+      player: playerOf(groups.player),
+      isStored: groups.change === 'Stored',
+    }),
+  },
+  {
+    pattern: HARVESTED_PATTERN,
+    toEvent: (groups, timeUtc) => ({ type: 'harvested', timeUtc, plant: groups.plant!, player: playerOf(groups.player) }),
+  },
+  {
+    pattern: TOMBSTONE_EMPTIED_PATTERN,
+    toEvent: (groups, timeUtc) => ({
+      type: 'tombstoneEmptied',
+      timeUtc,
+      owner: playerOf(groups.owner),
+      player: playerOf(groups.player),
+    }),
   },
   {
     pattern: DEATH_DETAILS_PATTERN,

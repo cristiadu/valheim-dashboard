@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using HarmonyLib;
 using UnityEngine;
 
 namespace ValheimDashboard.EventLog
@@ -8,7 +7,6 @@ namespace ValheimDashboard.EventLog
     /// Logs chat and map pings as the server passes them between players. A message only reaches the server
     /// when another player is online to receive it.
     /// </summary>
-    [HarmonyPatch]
     internal static class ChatTracker
     {
         /// <summary>Hash of the call that carries shouts and pings to every player.</summary>
@@ -23,17 +21,9 @@ namespace ValheimDashboard.EventLog
         /// <summary>Game time each recent message was logged, in seconds, by sender, kind and text.</summary>
         private static readonly Dictionary<string, float> LoggedTimes = new Dictionary<string, float>();
 
-        /// <summary>Reads chat and pings from each call a player sends through the server.</summary>
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(ZRoutedRpc), "RPC_RoutedRPC")]
-        private static void BeforeRoutedRpc(ZPackage pkg)
+        /// <summary>Logs [data] when it is a chat message or a ping.</summary>
+        public static void Read(ZRoutedRpc.RoutedRPCData data)
         {
-            if (ZNet.instance == null || !ZNet.instance.IsServer())
-            {
-                return;
-            }
-            ZRoutedRpc.RoutedRPCData data = new ZRoutedRpc.RoutedRPCData();
-            data.Deserialize(new ZPackage(pkg.GetArray()));
             ZPackage parameters = data.m_parameters;
             if (data.m_methodHash == ChatMessageHash)
             {
