@@ -9,12 +9,12 @@ export const gigabytesLabel = (bytes: number): string => `${Math.round(bytes / B
 export const serverWarnings = (snapshot: Snapshot): ServerWarning[] => {
   const crashes = snapshot.runs
     .filter((run) => run.endReason === 'crashed')
-    .map((run) => ({ timeUtc: run.lastLineUtc, text: 'Server went down without a clean stop' }));
-  const drops = snapshot.steamDropsUtc.map((timeUtc) => ({ timeUtc, text: 'Server lost its Steam connection' }));
+    .map((run): ServerWarning => ({ kind: 'crash', timeUtc: run.lastLineUtc, text: 'Server went down without a clean stop' }));
+  const drops = snapshot.steamDropsUtc.map((timeUtc): ServerWarning => ({ kind: 'steam', timeUtc, text: 'Server lost its Steam connection' }));
   const disk = snapshot.diskSpace;
-  const lowDisk =
+  const lowDisk: ServerWarning[] =
     disk !== null && disk.availableBytes < disk.warnBelowBytes
-      ? [{ timeUtc: disk.timeUtc, text: `Disk almost full: ${(disk.availableBytes / BYTES_PER_GB).toFixed(1)} GB free` }]
+      ? [{ kind: 'disk', timeUtc: disk.timeUtc, text: `Disk almost full: ${(disk.availableBytes / BYTES_PER_GB).toFixed(1)} GB free` }]
       : [];
   return [...crashes, ...drops, ...lowDisk].sort((a, b) => Date.parse(b.timeUtc) - Date.parse(a.timeUtc));
 };

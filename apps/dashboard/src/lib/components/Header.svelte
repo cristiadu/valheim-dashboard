@@ -1,6 +1,9 @@
 <script lang="ts">
-  /** Server status line and whether it is online. Null until the page runs in the browser. */
-  let { status }: { status: { text: string; isOnline: boolean } | null } = $props();
+  import Pill from '#/lib/components/Pill';
+  import type { Pill as PillModel } from '#/lib/models';
+
+  /** Server status line and its Online or Offline pill (none before a log is read). Null until the page runs in the browser. */
+  let { status }: { status: { text: string; pill: PillModel | null } | null } = $props();
 </script>
 
 <header>
@@ -10,8 +13,8 @@
     <div class="muted">Server status and who was online</div>
   </div>
   {#if status}
-    <p class="status" class:online={status.isOnline} role="status">
-      <span class="dot" aria-hidden="true"></span>{status.text}
+    <p class="status" role="status">
+      {#if status.pill}<Pill pill={status.pill} />{/if}{status.text}
     </p>
   {/if}
 </header>
@@ -61,17 +64,5 @@
     margin: 0 0 0 auto;
     color: var(--muted);
     font-size: 14px;
-  }
-
-  /* Square status light: red when offline */
-  .dot {
-    width: 8px;
-    height: 8px;
-    background: var(--blood);
-  }
-
-  /* Green light while the server is online */
-  .online .dot {
-    background: var(--good);
   }
 </style>

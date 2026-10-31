@@ -414,12 +414,31 @@ export const SAGA_FILTERS: readonly { label: string; kinds: readonly StoryKind[]
 /** How many saves the World tab lists. */
 export const LATEST_SAVE_COUNT = 10;
 
+/** Kind of problem on the Server tab: the server crashed, lost Steam, or is low on disk. */
+export type WarningKind = 'crash' | 'steam' | 'disk';
+
 /** One problem on the Server tab. */
 export type ServerWarning = {
+  /** What went wrong, shown as a pill. */
+  kind: WarningKind;
   /** When it happened, as a UTC ISO string. */
   timeUtc: string;
   /** Plain sentence, for example `Server went down without a clean stop`. */
   text: string;
+};
+
+/**
+ * Color of a pill. `good` is green (online, ready), `bad` is red (offline, crashed),
+ * `gold` marks a win or something to watch (boss defeated, low disk), `quiet` is grey (not yet, unknown).
+ */
+export type PillTone = 'good' | 'bad' | 'gold' | 'quiet';
+
+/** A status or state in a word or two, shown as a rounded pill, for example `Online` in green. */
+export type Pill = {
+  /** Word or two on the pill. */
+  text: string;
+  /** Color of the pill. */
+  tone: PillTone;
 };
 
 /** Where a recipe is made in the game. `Hand` means the crafting menu, with no station. */
