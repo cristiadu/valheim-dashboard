@@ -1,11 +1,17 @@
 <script lang="ts">
-  /** Facts to show, each a label and a value. */
-  let { stats }: { stats: { label: string; value: string }[] } = $props();
+  import Pill from '#/lib/components/Pill';
+  import type { Pill as PillModel } from '#/lib/models';
+
+  /** Facts to show, each a label and a value. A status or state value shows as a pill. */
+  let { stats }: { stats: { label: string; value: string | PillModel }[] } = $props();
 </script>
 
 <dl>
   {#each stats as stat (stat.label)}
-    <div><dt>{stat.label}</dt><dd>{stat.value}</dd></div>
+    <div>
+      <dt>{stat.label}</dt>
+      <dd>{#if typeof stat.value === 'string'}{stat.value}{:else}<Pill pill={stat.value} />{/if}</dd>
+    </div>
   {/each}
 </dl>
 

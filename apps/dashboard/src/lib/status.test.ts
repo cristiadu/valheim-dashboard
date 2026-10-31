@@ -7,7 +7,6 @@ import {
   offsetLabel,
   onlinePlayers,
   statusLine,
-  steamLabel,
   whenLabel,
 } from '#/lib/status';
 import { MS_PER_MINUTE } from '#/lib/models';
@@ -53,7 +52,7 @@ describe('statusLine', () => {
     const line = statusLine(RUNNING, minutesAfterLastLine(5), -420);
 
     // THEN it has the uptime from the first line, one player and the zone
-    expect(line).toBe('Online · up 2h 22m · 1 online · times in UTC−7');
+    expect(line).toBe('Up 2h 22m · 1 online · times in UTC−7');
   });
 
   it('shows the last line time in the viewer zone while offline', () => {
@@ -62,7 +61,7 @@ describe('statusLine', () => {
     const line = statusLine(RUNNING, minutesAfterLastLine(60), -180);
 
     // THEN the last line time is 12:00Z moved to UTC−3
-    expect(line).toBe('Offline · last log line 09:00 · times in UTC−3');
+    expect(line).toBe('Last log line 09:00 · times in UTC−3');
   });
 
   it('says when no log was read yet', () => {
@@ -101,13 +100,5 @@ describe('whenLabel', () => {
     // THEN only the older one has a date
     expect(whenLabel('2026-10-29T09:15:00.000Z', 0, nowMs)).toBe('09:15');
     expect(whenLabel('2026-10-28T23:05:00.000Z', 0, nowMs)).toBe('Oct 28 23:05');
-  });
-});
-
-describe('steamLabel', () => {
-  it('names the Steam link in a word, or a dash before the log says', () => {
-    // GIVEN each state of the Steam link
-    // WHEN / THEN each reads as one word
-    expect([steamLabel(true), steamLabel(false), steamLabel(null)]).toEqual(['Connected', 'Disconnected', '–']);
   });
 });

@@ -1,11 +1,13 @@
 <script lang="ts">
   import NoData from '#/lib/components/NoData';
+  import Pill from '#/lib/components/Pill';
   import StatGrid from '#/lib/components/StatGrid';
   import { live, useSnapshot } from '#/lib/live.svelte';
   import { dayPercent } from '#/lib/day';
   import { gigabytesLabel, serverWarnings, upStretches } from '#/lib/health';
   import { DAY_MS } from '#/lib/models';
-  import { clockTime, durationLabel, isServerOnline, onlinePlayers, steamLabel, viewerOffsetMinutes, whenLabel } from '#/lib/status';
+  import { serverPill, steamPill, warningPill } from '#/lib/pills';
+  import { clockTime, durationLabel, isServerOnline, onlinePlayers, viewerOffsetMinutes, whenLabel } from '#/lib/status';
 
   /** Getter for the snapshot the layout shares. */
   const getSnapshot = useSnapshot();
@@ -29,14 +31,14 @@
   <div class="server">
     <StatGrid
       stats={[
-        { label: 'Status', value: isUp ? 'Online' : 'Offline' },
+        { label: 'Status', value: serverPill(isUp) },
         { label: 'Up for', value: isUp && snapshot.startedUtc ? durationLabel(nowMs - Date.parse(snapshot.startedUtc)) : '–' },
         { label: 'Players online', value: String(onlinePlayers(snapshot, nowMs).length) },
         { label: 'Last log line', value: whenLabel(snapshot.lastLineUtc, offset, nowMs) },
         { label: 'Last save', value: lastSave ? `${whenLabel(lastSave.timeUtc, offset, nowMs)} · ${lastSave.durationMs} ms` : '–' },
         { label: 'Disk free', value: snapshot.diskSpace ? gigabytesLabel(snapshot.diskSpace.availableBytes) : '–' },
         { label: 'Game version', value: snapshot.version ?? '–' },
-        { label: 'Steam', value: steamLabel(snapshot.isGameServerConnected) },
+        { label: 'Steam', value: steamPill(snapshot.isGameServerConnected) },
       ]}
     />
 
@@ -59,6 +61,7 @@
       {#each warnings as warning (warning.timeUtc + warning.text)}
         <div class="line">
           <span class="mono muted">{whenLabel(warning.timeUtc, offset, nowMs)}</span>
+          <span><Pill pill={warningPill(warning.kind)} /></span>
           <span>{warning.text}</span>
         </div>
       {:else}
@@ -118,10 +121,11 @@
     margin-right: 6px;
   }
 
-  /* One warning: time, then the sentence */
+  /* One warning: time, kind pill, then the sentence */
   .line {
     display: grid;
-    grid-template-columns: 110px minmax(0, 1fr);
+    grid-template-columns: 110px 70px minmax(0, 1fr);
+    align-items: center;
     gap: 12px;
     padding: 9px 0;
     border-top: 1px solid var(--line-soft);
