@@ -9,6 +9,7 @@ import {
   DAY_MS,
   DEATH_DETAILS_WINDOW_MS,
   DUNGEON_AREA,
+  GEAR_QUALITY_PATTERN,
   LISTED_THING_KINDS,
   type Snapshot,
   type StoryEvent,
@@ -19,7 +20,7 @@ import {
 const count = (amount: number, one: string, many: string): string => `${amount} ${amount === 1 ? one : many}`;
 
 /** Readable name of a prefab, for example `wood floor 1x1`, `sword iron`, `turnip` or `greydwarf elite`. */
-const thingName = (prefab: string): string =>
+export const thingName = (prefab: string): string =>
   prefab
     .replace(/^(piece|Pickable)_/, '')
     .replaceAll('_', ' ')
@@ -28,6 +29,15 @@ const thingName = (prefab: string): string =>
 
 /** [text] with its first letter in capitals. */
 const capitalized = (text: string): string => `${text.charAt(0).toUpperCase()}${text.slice(1)}`;
+
+/** Readable gear the plugin logged, for example `sword iron (level 2)` for `SwordIron quality 2`. */
+export const gearLabel = (gear: string): string => {
+  const match = GEAR_QUALITY_PATTERN.exec(gear);
+  return match === null ? thingName(gear) : `${thingName(gear.slice(0, match.index))} (level ${match[1]})`;
+};
+
+/** Short name of an area the plugin logs, for example `Black Forest` for `BlackForest`. */
+export const areaLabel = (area: string): string => capitalized((AREA_NAMES[area] ?? area).replace(/^(the|a) /, ''));
 
 /** [name] with `a` or `an` before it, for example `a troll` or `an abomination`. */
 const withArticle = (name: string): string => `${/^[aeiou]/i.test(name) ? 'an' : 'a'} ${name}`;

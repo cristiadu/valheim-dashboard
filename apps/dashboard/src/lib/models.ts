@@ -193,6 +193,14 @@ export type Snapshot = {
   visitedAreas: Record<string, string[]>;
   /** Gear each character was seen with, by character name, for example `SwordIron quality 2`. */
   gear: Record<string, string[]>;
+  /** Area each character was last in, by character name, for example `Swamp`. */
+  currentAreas: Record<string, string>;
+  /** Creatures each character helped kill, by character name, then how many of each creature. */
+  kills: Record<string, Record<string, number>>;
+  /** In-game day, as the game shows it, when the plugin has logged one. */
+  day: number | null;
+  /** Bosses defeated, by the name the game shows, in the order of their first defeat. */
+  defeatedBosses: string[];
 };
 
 /**
@@ -278,6 +286,15 @@ export const AREA_NAMES: Record<string, string> = {
   Dungeon: 'a dungeon',
 };
 
+/** Bosses in the order players usually meet them, by the name the game shows. */
+export const BOSS_ORDER = ['Eikthyr', 'The Elder', 'Bonemass', 'Moder', 'Yagluth', 'The Queen', 'Fader'] as const;
+
+/** Quality at the end of a piece of gear the snapshot keeps, for example ` quality 2` in `SwordIron quality 2`. */
+export const GEAR_QUALITY_PATTERN = / quality (\d+)$/;
+
+/** Most pieces of gear a player card lists. */
+export const LISTED_GEAR_COUNT = 4;
+
 /** Area name the plugin logs inside a dungeon. Every trip into one is news. */
 export const DUNGEON_AREA = 'Dungeon';
 
@@ -318,6 +335,16 @@ export type Player = {
   totalMs: number;
   /** Deaths in all sessions. */
   deaths: number;
+  /** Area the latest character was last in, for example `Swamp`, when the plugin logged one. */
+  area: string | null;
+  /** Creatures killed by all of the player's characters, counting kills shared with others. */
+  kills: number;
+  /** Creature the player killed most, when they killed any. */
+  topKill: string | null;
+  /** Areas any of the player's characters has been to. */
+  areas: string[];
+  /** Gear the latest character was seen with, newest first. */
+  gear: string[];
 };
 
 /** What kind of thing happened, which picks its rune and color. */

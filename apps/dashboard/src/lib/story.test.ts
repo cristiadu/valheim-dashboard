@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { daySummary, storyOf } from '#/lib/story';
+import { areaLabel, daySummary, gearLabel, storyOf } from '#/lib/story';
 import { sessionWith, snapshotWith } from '#/lib/test-common';
 
 describe('storyOf', () => {
@@ -181,5 +181,13 @@ describe('daySummary', () => {
     // GIVEN no sessions
     // WHEN / THEN the summary says so
     expect(daySummary(snapshotWith({}), 0)).toBe('Nobody played in the last 24 hours');
+  });
+});
+
+describe('labels', () => {
+  it('names areas and gear the way the game shows them', () => {
+    // WHEN / THEN plugin names read plainly
+    expect(['BlackForest', 'Mountain', 'Ocean', 'Dungeon'].map(areaLabel)).toEqual(['Black Forest', 'Mountains', 'Ocean', 'Dungeon']);
+    expect(['SwordIron quality 2', 'ArmorBronzeChest'].map(gearLabel)).toEqual(['sword iron (level 2)', 'armor bronze chest']);
   });
 });
