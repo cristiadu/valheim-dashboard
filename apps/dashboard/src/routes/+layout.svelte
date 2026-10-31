@@ -9,7 +9,7 @@
   import { connectLive, live, provideSnapshot } from '#/lib/live.svelte';
   import { PASSWORD_PATH, type Snapshot } from '#/lib/models';
   import { serverPill } from '#/lib/pills';
-  import { isServerOnline, statusLine, viewerOffsetMinutes } from '#/lib/status';
+  import { isServerOnline, statusLine, viewerTimeZone } from '#/lib/status';
   import { tabFor } from '#/lib/tabs';
 
   /** Snapshot from the server render, and the page for the current tab. */
@@ -23,7 +23,7 @@
     live.nowMs === null
       ? null
       : {
-          text: statusLine(snapshot, live.nowMs, viewerOffsetMinutes(live.nowMs)),
+          text: statusLine(snapshot, live.nowMs, viewerTimeZone()),
           pill: snapshot.lastLineUtc === null ? null : serverPill(isServerOnline(snapshot, live.nowMs)),
         },
   );
