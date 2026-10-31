@@ -3,7 +3,8 @@ import type { Handle, ServerInit } from '@sveltejs/kit/hooks';
 
 import { checkAccess, configuredPassword } from '#/lib/server/access';
 import { startIconDownload } from '#/lib/server/icons';
-import { NO_PASSWORD_SET_TEXT, PASSWORD_COOKIE, PASSWORD_NEEDED_TEXT, PASSWORD_PATH } from '#/lib/server/models';
+import { PASSWORD_PATH } from '#/lib/models';
+import { NO_PASSWORD_SET_TEXT, PASSWORD_COOKIE, PASSWORD_NEEDED_TEXT } from '#/lib/server/models';
 
 /** Downloads any missing item icons when the dashboard starts. */
 export const init: ServerInit = () => {

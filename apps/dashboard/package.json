@@ -5,7 +5,6 @@
   "imports": {
     "#/lib/components/*": "./src/lib/components/*.svelte",
     "#/app.css": "./src/app.css",
-    "#/app.css?raw": "./src/app.css?raw",
     "#/*": "./src/*.ts"
   },
   "engines": {

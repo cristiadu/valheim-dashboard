@@ -77,9 +77,6 @@ export const LOCAL_HOSTNAMES = ['localhost', '127.0.0.1', '[::1]'];
 /** Header a tunnel such as ngrok adds to every request it passes on. */
 export const FORWARDED_HEADER = 'x-forwarded-for';
 
-/** Address of the page where friends type the password. */
-export const PASSWORD_PATH = '/password';
-
 /** Cookie that remembers a friend typed the right password. */
 export const PASSWORD_COOKIE = 'dashboard_pass';
 

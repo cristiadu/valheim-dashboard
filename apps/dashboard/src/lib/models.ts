@@ -23,6 +23,9 @@ export const TABS: readonly Tab[] = [
   { path: '/server', label: 'Server', hint: 'Status and warnings', rune: 'ᚾ' },
 ];
 
+/** Address of the page where friends type the password. */
+export const PASSWORD_PATH = '/password';
+
 /** Milliseconds in one minute. */
 export const MS_PER_MINUTE = 60_000;
 
