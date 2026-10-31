@@ -104,11 +104,11 @@ namespace ValheimDashboard.EventLog
             }
             if (now.IsPvp != before.IsPvp)
             {
-                ZLog.Log($"PvP turned {(now.IsPvp ? "on" : "off")}: {name}");
+                GameEventLog.Write($"PvP turned {(now.IsPvp ? "on" : "off")}: {name}");
             }
             if (now.IsInBed && !before.IsInBed)
             {
-                ZLog.Log($"Went to bed: {name}");
+                GameEventLog.Write($"Went to bed: {name}");
             }
         }
 
@@ -130,7 +130,7 @@ namespace ValheimDashboard.EventLog
             }
             PendingAreas.Remove(name);
             LoggedAreas[name] = area;
-            ZLog.Log($"Area entered: {name} {area}");
+            GameEventLog.Write($"Area entered: {name} {area}");
         }
 
         /// <summary>
@@ -148,7 +148,7 @@ namespace ValheimDashboard.EventLog
                 }
             }
             string fightingText = fighting.Count == 0 ? string.Empty : $" while fighting {string.Join(", ", fighting)}";
-            ZLog.Log($"Player died: {name} in {now.Area}{fightingText}");
+            GameEventLog.Write($"Player died: {name} in {now.Area}{fightingText}");
         }
 
         /// <summary>Logs a trip of [name] through the portal at [position], if they landed next to one.</summary>
@@ -159,7 +159,7 @@ namespace ValheimDashboard.EventLog
                 if (Vector3.Distance(portal.GetPosition(), position) <= PortalRangeMeters)
                 {
                     string tag = portal.GetString(ZDOVars.s_tag, string.Empty);
-                    ZLog.Log($"Teleported: {name} to {(tag == string.Empty ? UnnamedPortal : tag)}");
+                    GameEventLog.Write($"Teleported: {name} to {(tag == string.Empty ? UnnamedPortal : tag)}");
                     return;
                 }
             }
@@ -179,7 +179,7 @@ namespace ValheimDashboard.EventLog
                 string gear = quality > 1 ? $"{Names.Item(item)} quality {quality}" : Names.Item(item);
                 if (SeenGear.Add($"{name}|{gear}"))
                 {
-                    ZLog.Log($"Gear: {name} {gear}");
+                    GameEventLog.Write($"Gear: {name} {gear}");
                 }
             }
         }

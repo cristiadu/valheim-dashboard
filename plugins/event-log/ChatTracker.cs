@@ -51,16 +51,16 @@ namespace ValheimDashboard.EventLog
             switch (type)
             {
                 case Talker.Type.Ping:
-                    ZLog.Log($"Ping: {sender} at {Mathf.RoundToInt(position.x)} {Mathf.RoundToInt(position.z)}");
+                    GameEventLog.Write($"Ping: {sender} at {Mathf.RoundToInt(position.x)} {Mathf.RoundToInt(position.z)}");
                     break;
                 case Talker.Type.Shout:
-                    ZLog.Log($"Chat: {sender} shouted: {text}");
+                    GameEventLog.Write($"Chat: {sender} shouted: {text}");
                     break;
                 case Talker.Type.Whisper:
-                    ZLog.Log($"Chat: {sender} whispered: {text}");
+                    GameEventLog.Write($"Chat: {sender} whispered: {text}");
                     break;
                 default:
-                    ZLog.Log($"Chat: {sender} said: {text}");
+                    GameEventLog.Write($"Chat: {sender} said: {text}");
                     break;
             }
         }

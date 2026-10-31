@@ -92,7 +92,7 @@ namespace ValheimDashboard.EventLog
             ItemTracker.Destroyed(zdo);
             if (zdo.GetLong(ZDOVars.s_creator, 0L) != 0L)
             {
-                ZLog.Log($"Piece destroyed: {Names.PrefabName(zdo)} built by {Names.Character(zdo.GetLong(ZDOVars.s_creator, 0L))}");
+                GameEventLog.Write($"Piece destroyed: {Names.PrefabName(zdo)} built by {Names.Character(zdo.GetLong(ZDOVars.s_creator, 0L))}");
             }
         }
 
@@ -105,13 +105,13 @@ namespace ValheimDashboard.EventLog
             long creator = zdo.GetLong(ZDOVars.s_creator, 0L);
             if (creator != 0L)
             {
-                ZLog.Log($"Piece built: {Names.PrefabName(zdo)} by {Names.Character(creator)}");
+                GameEventLog.Write($"Piece built: {Names.PrefabName(zdo)} by {Names.Character(creator)}");
                 return;
             }
             Character character = Names.Prefab(zdo)?.GetComponent<Character>();
             if (character != null && character.m_boss)
             {
-                ZLog.Log($"Boss summoned: {Names.PrefabName(zdo)} by {Names.Peer(zdo.GetOwner())}");
+                GameEventLog.Write($"Boss summoned: {Names.PrefabName(zdo)} by {Names.Peer(zdo.GetOwner())}");
             }
         }
 
@@ -125,7 +125,7 @@ namespace ValheimDashboard.EventLog
             int day = EnvMan.instance.GetDay();
             if (lastDay >= 0 && day > lastDay)
             {
-                ZLog.Log($"Day started: {day}");
+                GameEventLog.Write($"Day started: {day}");
             }
             lastDay = day;
         }
