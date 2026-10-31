@@ -33,17 +33,9 @@ export const durationLabel = (ms: number): string => {
   return hours > 0 ? `${hours}h ${totalMinutes % MINUTES_PER_HOUR}m` : `${totalMinutes}m`;
 };
 
-/** Steam link of the server in a word: `Connected`, `Disconnected`, or `–` when the log has not said. */
-export const steamLabel = (isConnected: boolean | null): string => {
-  if (isConnected === null) {
-    return '–';
-  }
-  return isConnected ? 'Connected' : 'Disconnected';
-};
-
 /**
- * One line about the server for the header, with times in the viewer's zone at [viewerOffsetMinutes].
- * For example `Online · up 3h 12m · 2 online · times in UTC−7`.
+ * Details about the server for the header, beside its Online or Offline pill, with times in the
+ * viewer's zone at [viewerOffsetMinutes]. For example `Up 3h 12m · 2 online · times in UTC−7`.
  */
 export const statusLine = (snapshot: Snapshot, nowMs: number, viewerOffsetMinutes: number): string => {
   const zone = `times in ${offsetLabel(viewerOffsetMinutes)}`;
@@ -51,10 +43,10 @@ export const statusLine = (snapshot: Snapshot, nowMs: number, viewerOffsetMinute
     return `No server log yet · ${zone}`;
   }
   if (!isServerOnline(snapshot, nowMs)) {
-    return `Offline · last log line ${clockTime(snapshot.lastLineUtc, viewerOffsetMinutes)} · ${zone}`;
+    return `Last log line ${clockTime(snapshot.lastLineUtc, viewerOffsetMinutes)} · ${zone}`;
   }
   const uptime = durationLabel(nowMs - Date.parse(snapshot.startedUtc ?? snapshot.lastLineUtc));
-  return `Online · up ${uptime} · ${onlinePlayers(snapshot, nowMs).length} online · ${zone}`;
+  return `Up ${uptime} · ${onlinePlayers(snapshot, nowMs).length} online · ${zone}`;
 };
 
 /** Time of [timeUtc] in the zone at [offsetMinutes]: `HH:MM` on the same day as [nowMs], else `Oct 29 HH:MM`. */

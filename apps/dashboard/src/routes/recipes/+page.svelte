@@ -2,7 +2,9 @@
   import { onMount } from 'svelte';
 
   import ItemIcon from '#/lib/components/ItemIcon';
+  import Pill from '#/lib/components/Pill';
   import { MAX_CRAFTS, RECIPE_BIOMES, RECIPE_ICON_PX, type Plan } from '#/lib/models';
+  import { planPill } from '#/lib/pills';
   import { clampCrafts, newPlan, planItems, stillNeeded, withHave } from '#/lib/planner';
   import { loadPlans, planner, savePlans } from '#/lib/plans.svelte';
   import { RECIPES, madeAt, recipeById } from '#/lib/recipes';
@@ -94,12 +96,12 @@
     {#each planner.plans as plan (plan.id)}
       {@const recipe = recipeById(plan.recipeId)!}
       {@const items = planItems(plan)}
-      {@const isReady = items.every((line) => line.missing === 0)}
+      {@const missingItems = items.filter((line) => line.missing > 0).length}
       <section class="panel" aria-label={recipe.name}>
         <div class="plan-head">
           <ItemIcon item={recipe.name} size={RECIPE_ICON_PX} />
           <h2 class="plan-title">{recipe.name}</h2>
-          {#if isReady}<span class="ready mono">READY TO CRAFT</span>{/if}
+          <Pill pill={planPill(missingItems)} />
           <label class="crafts">
             <span class="muted">{recipe.yields > 1 ? 'Batches' : 'How many'}</span>
             <input
@@ -259,12 +261,12 @@
     color: var(--ember);
   }
 
-  /* Ready plans and an empty shopping list */
+  /* Empty shopping list */
   .ready {
     color: var(--good);
   }
 
-  /* Plan name, ready mark, how many and remove in one row */
+  /* Plan name, state pill, how many and remove in one row */
   .plan-head {
     display: flex;
     flex-wrap: wrap;

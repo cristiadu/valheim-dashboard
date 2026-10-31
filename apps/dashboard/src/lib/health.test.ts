@@ -21,13 +21,13 @@ describe('serverWarnings', () => {
     });
 
     // WHEN warnings are listed
-    const texts = serverWarnings(snapshot).map((warning) => warning.text);
+    const warnings = serverWarnings(snapshot).map((warning) => [warning.kind, warning.text]);
 
-    // THEN each problem reads plainly, newest first
-    expect(texts).toEqual([
-      'Disk almost full: 0.0 GB free',
-      'Server lost its Steam connection',
-      'Server went down without a clean stop',
+    // THEN each problem has its kind and reads plainly, newest first
+    expect(warnings).toEqual([
+      ['disk', 'Disk almost full: 0.0 GB free'],
+      ['steam', 'Server lost its Steam connection'],
+      ['crash', 'Server went down without a clean stop'],
     ]);
   });
 });

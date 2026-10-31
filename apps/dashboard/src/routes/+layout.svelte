@@ -8,6 +8,7 @@
   import SideMenu from '#/lib/components/SideMenu';
   import { connectLive, live, provideSnapshot } from '#/lib/live.svelte';
   import type { Snapshot } from '#/lib/models';
+  import { serverPill } from '#/lib/pills';
   import { isServerOnline, statusLine, viewerOffsetMinutes } from '#/lib/status';
   import { tabFor } from '#/lib/tabs';
 
@@ -17,13 +18,13 @@
   /** Latest snapshot: live once the stream connects, the server render's until then. */
   const snapshot = $derived(live.snapshot ?? data.snapshot);
 
-  /** Header line, made in the browser only, because it depends on the viewer's clock and time zone. */
+  /** Header pill and line, made in the browser only, because they depend on the viewer's clock and time zone. */
   const status = $derived(
     live.nowMs === null
       ? null
       : {
           text: statusLine(snapshot, live.nowMs, viewerOffsetMinutes(live.nowMs)),
-          isOnline: isServerOnline(snapshot, live.nowMs),
+          pill: snapshot.lastLineUtc === null ? null : serverPill(isServerOnline(snapshot, live.nowMs)),
         },
   );
 
