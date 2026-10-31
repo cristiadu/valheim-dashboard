@@ -1,5 +1,5 @@
 import type { PageRouteId } from '$app/types';
-import type { LogEvent, PlayerSession } from 'valheim-log';
+import type { ChatKind, LogEvent, PlayerSession } from 'valheim-log';
 
 /** One dashboard tab and the page it opens. */
 export type Tab = {
@@ -86,8 +86,31 @@ export const WHEEL_MIN_ARC_HOURS = 0.05;
 /** Hours between the time labels above the Vikings lanes. */
 export const LANE_AXIS_STEP_HOURS = 4;
 
-/** Event types friends see in the story of the server. Joins and leaves come from the sessions. */
-export const STORY_EVENT_TYPES = ['playerDied', 'raidStarted', 'nightSkipped', 'worldLoaded', 'serverStopped'] as const;
+/**
+ * Event types friends see in the story of the server. Joins and leaves come from the sessions, and building,
+ * kills and items from the activities. Areas, gear and global keys are kept only when they are news.
+ */
+export const STORY_EVENT_TYPES = [
+  'playerDied',
+  'deathDetails',
+  'raidStarted',
+  'raidEnded',
+  'nightSkipped',
+  'wentToBed',
+  'worldLoaded',
+  'serverStopped',
+  'bossSummoned',
+  'globalKey',
+  'areaEntered',
+  'teleported',
+  'pvpChanged',
+  'gearSeen',
+  'tameChanged',
+  'petNamed',
+  'signWritten',
+  'itemHung',
+  'tombstoneEmptied',
+] as const;
 
 /** A game event friends see, such as a death or a raid. */
 export type StoryEvent = Extract<LogEvent, { type: (typeof STORY_EVENT_TYPES)[number] }>;
@@ -162,26 +185,104 @@ export type Snapshot = {
   runs: RunRecord[];
   /** Times the server lost its Steam connection, oldest first. */
   steamDropsUtc: string[];
-  /** Latest stretches of building and of destroyed pieces, from the build log plugin, oldest first. */
-  builds: BuildRecord[];
+  /** Latest stretches of building, kills and items, from the event log plugin, oldest first. */
+  activities: ActivityRecord[];
+  /** Latest chat messages and map pings, oldest first. */
+  chat: ChatRecord[];
+  /** Areas each character has been to, by character name, in the order they first went. */
+  visitedAreas: Record<string, string[]>;
+  /** Gear each character was seen with, by character name, for example `SwordIron quality 2`. */
+  gear: Record<string, string[]>;
 };
 
-/** Pieces one character built, or pieces of theirs that were destroyed, with pauses under a few minutes. */
-export type BuildRecord = {
-  /** Character who built the pieces, or null when the build log did not know. */
-  builder: string | null;
-  /** True for destroyed pieces, false for built ones. */
-  isDestroyed: boolean;
-  /** First piece of the stretch, as a UTC ISO string. */
+/**
+ * What a stretch of activity is: pieces built, a builder's pieces destroyed, creatures killed, items picked up,
+ * plants harvested, or items stored in or taken from chests.
+ */
+export type ActivityKind = 'built' | 'destroyed' | 'killed' | 'pickedUp' | 'harvested' | 'stored' | 'taken';
+
+/** One player's activity of one kind, with pauses under a few minutes, told as one story line. */
+export type ActivityRecord = {
+  /** Character who did it, or for destroyed pieces who built them. Null when the plugin did not know. */
+  player: string | null;
+  /** What kind of activity it is. */
+  kind: ActivityKind;
+  /** First action of the stretch, as a UTC ISO string. */
   startUtc: string;
-  /** Last piece of the stretch, as a UTC ISO string. */
+  /** Last action of the stretch, as a UTC ISO string. */
   endUtc: string;
-  /** How many of each piece, by prefab name, for example `{ wood_floor_1x1: 14 }`. */
-  pieces: Record<string, number>;
+  /** How many of each thing, by prefab name, for example `{ wood_floor_1x1: 14 }` or `{ Troll: 2 }`. */
+  things: Record<string, number>;
 };
 
-/** Most kinds of pieces a story line names. */
-export const LISTED_PIECE_KINDS = 3;
+/**
+ * Words for what a player did in each activity kind: the verb, the thing in singular and plural, and an
+ * ending. Destroyed pieces are told from the builder's side, with their own words.
+ */
+export const ACTIVITY_WORDS: Record<Exclude<ActivityKind, 'destroyed'>, { verb: string; one: string; many: string; ending: string }> = {
+  built: { verb: 'built', one: 'piece', many: 'pieces', ending: '' },
+  killed: { verb: 'killed', one: 'creature', many: 'creatures', ending: '' },
+  pickedUp: { verb: 'picked up', one: 'item', many: 'items', ending: '' },
+  harvested: { verb: 'harvested', one: 'plant', many: 'plants', ending: '' },
+  stored: { verb: 'stored', one: 'item', many: 'items', ending: ' in chests' },
+  taken: { verb: 'took', one: 'item', many: 'items', ending: ' from chests' },
+};
+
+/** One chat message or map ping. */
+export type ChatRecord = {
+  /** When it was sent, as a UTC ISO string. */
+  timeUtc: string;
+  /** Character who sent it. */
+  character: string;
+  /** How it was sent, or `ping` for a map ping. */
+  kind: ChatKind | 'ping';
+  /** What they wrote. Empty for a ping. */
+  text: string;
+};
+
+/** Most kinds of things a story line names. */
+export const LISTED_THING_KINDS = 3;
+
+/** Boss names as the game shows them, by the prefab a summon logs and by the key a defeat sets. */
+export const BOSS_NAMES: Record<string, string> = {
+  Eikthyr: 'Eikthyr',
+  gd_king: 'The Elder',
+  Bonemass: 'Bonemass',
+  Dragon: 'Moder',
+  GoblinKing: 'Yagluth',
+  SeekerQueen: 'The Queen',
+  Fader: 'Fader',
+  defeated_eikthyr: 'Eikthyr',
+  defeated_gdking: 'The Elder',
+  defeated_bonemass: 'Bonemass',
+  defeated_dragon: 'Moder',
+  defeated_goblinking: 'Yagluth',
+  defeated_queen: 'The Queen',
+  defeated_fader: 'Fader',
+};
+
+/** Start of the global key a boss defeat sets, for example `defeated_eikthyr`. */
+export const DEFEATED_KEY_PREFIX = 'defeated_';
+
+/** Area names for a sentence, by the biome name the plugin logs. */
+export const AREA_NAMES: Record<string, string> = {
+  Meadows: 'the Meadows',
+  BlackForest: 'the Black Forest',
+  Swamp: 'the Swamp',
+  Mountain: 'the Mountains',
+  Plains: 'the Plains',
+  Mistlands: 'the Mistlands',
+  AshLands: 'the Ashlands',
+  DeepNorth: 'the Deep North',
+  Ocean: 'the ocean',
+  Dungeon: 'a dungeon',
+};
+
+/** Area name the plugin logs inside a dungeon. Every trip into one is news. */
+export const DUNGEON_AREA = 'Dungeon';
+
+/** Longest time between the game's death line and the plugin's details of the same death. */
+export const DEATH_DETAILS_WINDOW_MS = 60_000;
 
 /** How many events the Hall shows. */
 export const LATEST_EVENT_COUNT = 5;
@@ -220,7 +321,22 @@ export type Player = {
 };
 
 /** What kind of thing happened, which picks its rune and color. */
-export type StoryKind = 'joined' | 'left' | 'died' | 'raid' | 'night' | 'world' | 'stopped' | 'built' | 'wrecked';
+export type StoryKind =
+  | 'joined'
+  | 'left'
+  | 'died'
+  | 'raid'
+  | 'night'
+  | 'world'
+  | 'stopped'
+  | 'built'
+  | 'wrecked'
+  | 'boss'
+  | 'fight'
+  | 'travel'
+  | 'items'
+  | 'tame'
+  | 'chat';
 
 /** One line in the story of the server. */
 export type StoryItem = {
@@ -243,15 +359,28 @@ export const STORY_STYLES: Record<StoryKind, { rune: string; color: string }> = 
   stopped: { rune: 'ᚾ', color: 'var(--muted)' },
   built: { rune: 'ᛒ', color: 'var(--good)' },
   wrecked: { rune: 'ᚺ', color: 'var(--ember)' },
+  boss: { rune: 'ᛏ', color: 'var(--gold)' },
+  fight: { rune: 'ᛉ', color: 'var(--blood)' },
+  travel: { rune: 'ᚱ', color: 'var(--frost)' },
+  items: { rune: 'ᚷ', color: 'var(--gold)' },
+  tame: { rune: 'ᚠ', color: 'var(--good)' },
+  chat: { rune: 'ᚨ', color: 'var(--frost)' },
 };
 
 /** Filters on the Saga tab and the story kinds each one shows. */
 export const SAGA_FILTERS: readonly { label: string; kinds: readonly StoryKind[] }[] = [
-  { label: 'All', kinds: ['joined', 'left', 'died', 'raid', 'night', 'world', 'stopped', 'built', 'wrecked'] },
+  {
+    label: 'All',
+    kinds: ['joined', 'left', 'died', 'raid', 'night', 'world', 'stopped', 'built', 'wrecked', 'boss', 'fight', 'travel', 'items', 'tame', 'chat'],
+  },
   { label: 'Joins and leaves', kinds: ['joined', 'left'] },
   { label: 'Deaths', kinds: ['died'] },
-  { label: 'Raids', kinds: ['raid'] },
+  { label: 'Fights and raids', kinds: ['fight', 'boss', 'raid'] },
+  { label: 'Travel', kinds: ['travel'] },
   { label: 'Building', kinds: ['built', 'wrecked'] },
+  { label: 'Items', kinds: ['items'] },
+  { label: 'Tames', kinds: ['tame'] },
+  { label: 'Chat and signs', kinds: ['chat'] },
   { label: 'Nights and server', kinds: ['night', 'world', 'stopped'] },
 ];
 
