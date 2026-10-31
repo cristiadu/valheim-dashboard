@@ -1,4 +1,4 @@
-import { ICON_FILES, WIKI_FILE_URL, type CraftingStation, type Recipe, type RecipeBiome } from './models';
+import { ICON_PATH, type CraftingStation, type Recipe, type RecipeBiome } from './models';
 
 /** Returns a recipe from its parts. [ingredients] maps each item name to the amount one craft uses. */
 const recipe = (
@@ -98,9 +98,17 @@ export const RECIPES: readonly Recipe[] = [
 /** Returns the recipe with [id], or undefined when the list has no such recipe. */
 export const recipeById = (id: string): Recipe | undefined => RECIPES.find((candidate) => candidate.id === id);
 
-/** Returns the wiki address of the icon for [item], for example `…/Special:FilePath/Deer_hide.png`. */
-export const iconUrl = (item: string): string =>
-  WIKI_FILE_URL + encodeURIComponent(ICON_FILES[item] ?? `${item.replaceAll(' ', '_')}.png`);
+/** Returns the file name of the icon for [item], for example `queens-jam.png` for Queen's jam. */
+export const iconFileName = (item: string): string =>
+  `${item.toLowerCase().replaceAll("'", '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}.png`;
+
+/** Returns the address of the icon for [item], for example `/icons/queens-jam.png`. */
+export const iconUrl = (item: string): string => ICON_PATH + iconFileName(item);
+
+/** Returns every item a recipe makes or uses, once each. */
+export const recipeItems = (): string[] => [
+  ...new Set(RECIPES.flatMap((candidate) => [candidate.name, ...candidate.ingredients.map(({ item }) => item)])),
+];
 
 /** Returns where [station] recipes are made, as a short sentence such as `Made at the Forge.` */
 export const madeAt = (station: CraftingStation): string => (station === 'Hand' ? 'Made by hand.' : `Made at the ${station}.`);
