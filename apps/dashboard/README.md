@@ -48,7 +48,7 @@ Both scripts take `-LogFile` and `-Port`. If Windows blocks scripts, run `Set-Ex
 | `SERVER_UTC_OFFSET_MINUTES` | This PC's offset | The server clock's offset from UTC, for example `-420` for UTC−7 |
 | `PORT` | `3000` | Port the dashboard listens on |
 | `HOST` | `0.0.0.0` | Address it listens on. The start script sets `127.0.0.1`, so only this PC reaches it directly |
-| `DASHBOARD_PASSWORD` | None | Password friends type when they come in through the shared link. The start script reads it from `dashboard-password.txt` next to `logs.txt` |
+| `DASHBOARD_PASSWORD` | None | Password friends type on the password page when they come in through the shared link. The start script reads it from `dashboard-password.txt` next to `logs.txt` |
 
 ## How it decides what is true
 

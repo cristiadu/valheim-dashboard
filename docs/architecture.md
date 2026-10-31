@@ -106,20 +106,22 @@ sequenceDiagram
   participant D as Dashboard
   F->>N: https://longhouse.ngrok-free.app
   N->>D: Same request, with X-Forwarded-For
-  D-->>F: 401, asks for the password
-  F->>N: Same request with the password
-  N->>D: Passes it on
-  D-->>F: The page
+  D-->>F: No cookie: go to /password
+  F->>D: Types the password (through ngrok)
+  D-->>F: Cookie, then back to the page they wanted
+  F->>D: Page and live stream, with the cookie
 ```
 
 | A request | Gets |
 | --- | --- |
 | Made on the PC (host `localhost`, no `X-Forwarded-For`), such as `/api/status` for the updater | Served, no password |
-| Through ngrok with the right password, any name | Served |
-| Through ngrok without it | Asked for the password (`401`) |
+| Through ngrok with the cookie | Served |
+| Through ngrok without it | Sent to `/password`; `/api/*` answers `401` |
 | Through ngrok when no password is set | Turned away (`403`) |
 
-The browser remembers the password until it closes, and sends it with the live stream too.
+The cookie (`dashboard_pass`) lasts 30 days. It holds a hash made from the password, so changing the
+password sends everyone back to the password page. A wrong password waits 1 second before the answer, so
+guessing is slow.
 
 ## Tabs
 

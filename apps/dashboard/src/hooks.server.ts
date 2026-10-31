@@ -1,28 +1,27 @@
+import { redirect } from '@sveltejs/kit';
 import type { Handle, ServerInit } from '@sveltejs/kit/hooks';
 
-import { checkAccess } from '#/lib/server/access';
-import { readConfig } from '#/lib/server/config';
+import { checkAccess, configuredPassword } from '#/lib/server/access';
 import { startIconDownload } from '#/lib/server/icons';
-import { NO_PASSWORD_SET_TEXT, PASSWORD_NEEDED_TEXT, PASSWORD_REALM } from '#/lib/server/models';
-
-/** Password friends type, read once when the dashboard starts. */
-const password = readConfig(process.env).password;
+import { NO_PASSWORD_SET_TEXT, PASSWORD_COOKIE, PASSWORD_NEEDED_TEXT, PASSWORD_PATH } from '#/lib/server/models';
 
 /** Downloads any missing item icons when the dashboard starts. */
 export const init: ServerInit = () => {
   startIconDownload();
 };
 
-/** Asks for the password on every request from outside this PC. */
+/** Sends friends from outside this PC to the password page until they type it. */
 export const handle: Handle = async ({ event, resolve }) => {
-  const access = checkAccess(event.request, password);
-  if (access === 'allowed') {
+  const { pathname, search } = event.url;
+  const access = checkAccess(event.request, configuredPassword, event.cookies.get(PASSWORD_COOKIE));
+  if (access === 'refused') {
+    return new Response(NO_PASSWORD_SET_TEXT, { status: 403, headers: { 'content-type': 'text/plain; charset=utf-8' } });
+  }
+  if (access === 'allowed' || pathname === PASSWORD_PATH) {
     return resolve(event);
   }
-  const headers = new Headers({ 'content-type': 'text/plain; charset=utf-8' });
-  if (access === 'refused') {
-    return new Response(NO_PASSWORD_SET_TEXT, { status: 403, headers });
+  if (pathname.startsWith('/api/')) {
+    return new Response(PASSWORD_NEEDED_TEXT, { status: 401, headers: { 'content-type': 'text/plain; charset=utf-8' } });
   }
-  headers.set('www-authenticate', `Basic realm="${PASSWORD_REALM}", charset="UTF-8"`);
-  return new Response(PASSWORD_NEEDED_TEXT, { status: 401, headers });
+  redirect(303, `${PASSWORD_PATH}?next=${encodeURIComponent(pathname + search)}`);
 };

@@ -1,16 +1,55 @@
 import { describe, expect, it } from 'vitest';
 
-import { checkAccess } from '#/lib/server/access';
+import { checkAccess, isSameSecret, passwordToken } from '#/lib/server/access';
 import { requestTo, TUNNEL_HOST } from '#/lib/test-common';
 
-/** Login header for the name `viking` and the password `skol`. */
-const RIGHT_LOGIN = 'Basic dmlraW5nOnNrb2w=';
-
-/** Login header for the name `viking` and the password `wrong`. */
-const WRONG_LOGIN = 'Basic dmlraW5nOndyb25n';
+/** Cookie value for the password `skol`. */
+const SKOL_TOKEN = '368a3b15864d6e32f5c02567aadc497bdec1974f47625a426a7031a9f315f67b';
 
 /** Header ngrok adds with the friend's address. */
 const FORWARDED = { 'x-forwarded-for': '203.0.113.7' };
+
+describe('passwordToken', () => {
+  it('gives the same cookie value for the same password', () => {
+    // GIVEN the password skol
+    const password = 'skol';
+
+    // WHEN its token is made
+    const token = passwordToken(password);
+
+    // THEN it is the known value
+    expect(token).toBe(SKOL_TOKEN);
+  });
+
+  it('gives another value when the password changes', () => {
+    // GIVEN a new password
+    const password = 'skol2';
+
+    // WHEN its token is made
+    const token = passwordToken(password);
+
+    // THEN the old cookie no longer matches
+    expect(token).not.toBe(SKOL_TOKEN);
+  });
+});
+
+describe('isSameSecret', () => {
+  it('matches the same text', () => {
+    // GIVEN / WHEN the right password is compared
+    const isRight = isSameSecret('skol', 'skol');
+
+    // THEN it matches
+    expect(isRight).toBe(true);
+  });
+
+  it('does not match other text, even a longer one', () => {
+    // GIVEN / WHEN a wrong password is compared
+    const isRight = isSameSecret('skol!', 'skol');
+
+    // THEN it does not match
+    expect(isRight).toBe(false);
+  });
+});
 
 describe('checkAccess', () => {
   it('lets requests made on this PC in without a password', () => {
@@ -18,7 +57,7 @@ describe('checkAccess', () => {
     const request = requestTo('localhost:3000');
 
     // WHEN access is checked
-    const access = checkAccess(request, 'skol');
+    const access = checkAccess(request, 'skol', undefined);
 
     // THEN it is allowed
     expect(access).toBe('allowed');
@@ -29,7 +68,7 @@ describe('checkAccess', () => {
     const request = requestTo('127.0.0.1:3000');
 
     // WHEN access is checked
-    const access = checkAccess(request, null);
+    const access = checkAccess(request, null, undefined);
 
     // THEN it is allowed
     expect(access).toBe('allowed');
@@ -40,7 +79,7 @@ describe('checkAccess', () => {
     const request = requestTo('localhost:3000', FORWARDED);
 
     // WHEN access is checked
-    const access = checkAccess(request, 'skol');
+    const access = checkAccess(request, 'skol', undefined);
 
     // THEN the password is needed
     expect(access).toBe('needsPassword');
@@ -51,53 +90,42 @@ describe('checkAccess', () => {
     const request = requestTo(TUNNEL_HOST, FORWARDED);
 
     // WHEN access is checked
-    const access = checkAccess(request, null);
+    const access = checkAccess(request, null, SKOL_TOKEN);
 
     // THEN it is refused
     expect(access).toBe('refused');
   });
 
-  it('asks for the password when none was typed', () => {
-    // GIVEN a friend's first visit through ngrok
+  it('asks for the password on a first visit', () => {
+    // GIVEN a friend with no cookie yet
     const request = requestTo(TUNNEL_HOST, FORWARDED);
 
     // WHEN access is checked
-    const access = checkAccess(request, 'skol');
+    const access = checkAccess(request, 'skol', undefined);
 
     // THEN the password is needed
     expect(access).toBe('needsPassword');
   });
 
-  it('asks again when the password is wrong', () => {
-    // GIVEN a friend who typed the wrong password
-    const request = requestTo(TUNNEL_HOST, { ...FORWARDED, authorization: WRONG_LOGIN });
+  it('asks again after the password changed', () => {
+    // GIVEN a friend whose cookie is for the old password
+    const request = requestTo(TUNNEL_HOST, FORWARDED);
 
-    // WHEN access is checked
-    const access = checkAccess(request, 'skol');
+    // WHEN access is checked with a new password
+    const access = checkAccess(request, 'skol2', SKOL_TOKEN);
 
     // THEN the password is needed
     expect(access).toBe('needsPassword');
   });
 
-  it('lets a friend in with the right password and any name', () => {
-    // GIVEN a friend who typed the right password
-    const request = requestTo(TUNNEL_HOST, { ...FORWARDED, authorization: RIGHT_LOGIN });
+  it('lets a friend in with the cookie from the password page', () => {
+    // GIVEN a friend who typed the right password before
+    const request = requestTo(TUNNEL_HOST, FORWARDED);
 
     // WHEN access is checked
-    const access = checkAccess(request, 'skol');
+    const access = checkAccess(request, 'skol', SKOL_TOKEN);
 
     // THEN it is allowed
     expect(access).toBe('allowed');
-  });
-
-  it('asks again when the login has no name and password separator', () => {
-    // GIVEN a login that is only the password, base64 of `skol`
-    const request = requestTo(TUNNEL_HOST, { ...FORWARDED, authorization: 'Basic c2tvbA==' });
-
-    // WHEN access is checked
-    const access = checkAccess(request, 'skol');
-
-    // THEN the password is needed
-    expect(access).toBe('needsPassword');
   });
 });

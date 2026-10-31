@@ -36,7 +36,7 @@ Friends open one link and type a password. They install nothing.
    ```
 
 Friends open `https://longhouse.ngrok-free.app`, click past ngrok's notice the first time, and type the
-password. Any name works. The link starts hidden each time you log on. `share-dashboard.ps1 -Remove` stops
+password on the dashboard's password page. It remembers them for 30 days. The link starts hidden each time you log on. `share-dashboard.ps1 -Remove` stops
 sharing.
 
 After a `git pull`, start it with `scripts\start-dashboard.cmd -Rebuild`. Other settings are in
