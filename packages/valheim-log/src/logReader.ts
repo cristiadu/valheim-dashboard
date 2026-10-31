@@ -1,13 +1,17 @@
 import type { ChatKind, LogEvent, LogReader, Matcher } from '#/models';
 import {
+  AREA_ENTERED_PATTERN,
   BACKUP_PATTERN,
+  BED_PATTERN,
   BOSS_SUMMONED_PATTERN,
   CHAT_PATTERN,
   DAY_STARTED_PATTERN,
+  DEATH_DETAILS_PATTERN,
   CHARACTER_PATTERN,
   DISCONNECT_PATTERN,
   DISK_SPACE_PATTERN,
   GAME_SERVER_PATTERN,
+  GEAR_PATTERN,
   GLOBAL_KEY_PATTERN,
   HANDSHAKE_PATTERN,
   KNOWN_PLAYER_PATTERN,
@@ -20,6 +24,7 @@ import {
   PING_PATTERN,
   PLAYER_COUNT_PATTERN,
   PLAYFAB_CONNECTED_PATTERN,
+  PVP_PATTERN,
   POSSIBLE_RAIDS_PATTERN,
   RAID_ENDED_PATTERN,
   RAID_PATTERN,
@@ -30,8 +35,10 @@ import {
   STEAM_CONNECTED_PATTERN,
   STEAM_ID_PREFIX,
   STEAM_LINKED_PATTERN,
+  TELEPORTED_PATTERN,
   TIMESTAMP_PATTERN,
   UNKNOWN_PLAYER,
+  UNNAMED_PORTAL,
   VERSION_PATTERN,
   WORLD_LOADED_PATTERN,
   WORLD_SAVE_STEP_PATTERN,
@@ -214,6 +221,47 @@ const MATCHERS: readonly Matcher[] = [
   {
     pattern: DAY_STARTED_PATTERN,
     toEvent: (groups, timeUtc) => ({ type: 'dayStarted', timeUtc, day: Number(groups.day) }),
+  },
+  {
+    pattern: DEATH_DETAILS_PATTERN,
+    toEvent: (groups, timeUtc) => ({
+      type: 'deathDetails',
+      timeUtc,
+      character: groups.character!,
+      area: groups.area!,
+      fighting: groups.fighting === undefined ? [] : groups.fighting.split(', '),
+    }),
+  },
+  {
+    pattern: AREA_ENTERED_PATTERN,
+    toEvent: (groups, timeUtc) => ({ type: 'areaEntered', timeUtc, character: groups.character!, area: groups.area! }),
+  },
+  {
+    pattern: TELEPORTED_PATTERN,
+    toEvent: (groups, timeUtc) => ({
+      type: 'teleported',
+      timeUtc,
+      character: groups.character!,
+      portal: groups.portal === UNNAMED_PORTAL ? null : groups.portal!,
+    }),
+  },
+  {
+    pattern: PVP_PATTERN,
+    toEvent: (groups, timeUtc) => ({ type: 'pvpChanged', timeUtc, character: groups.character!, isOn: groups.state === 'on' }),
+  },
+  {
+    pattern: BED_PATTERN,
+    toEvent: (groups, timeUtc) => ({ type: 'wentToBed', timeUtc, character: groups.character! }),
+  },
+  {
+    pattern: GEAR_PATTERN,
+    toEvent: (groups, timeUtc) => ({
+      type: 'gearSeen',
+      timeUtc,
+      character: groups.character!,
+      item: groups.item!,
+      quality: optionalNumber(groups.quality) ?? 1,
+    }),
   },
   {
     pattern: REFUSED_JOIN_PATTERN,

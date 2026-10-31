@@ -42,6 +42,12 @@ export type LogEvent = { timeUtc: string } & (
   | { type: 'raidEnded'; raid: string }
   | { type: 'bossSummoned'; boss: string; summoner: string | null }
   | { type: 'dayStarted'; day: number }
+  | { type: 'deathDetails'; character: string; area: string; fighting: string[] }
+  | { type: 'areaEntered'; character: string; area: string }
+  | { type: 'teleported'; character: string; portal: string | null }
+  | { type: 'pvpChanged'; character: string; isOn: boolean }
+  | { type: 'wentToBed'; character: string }
+  | { type: 'gearSeen'; character: string; item: string; quality: number }
   | { type: 'worldSaveStep'; step: number; durationMs: number; saveNumber: number | null }
   | { type: 'backupCreated'; backup: string }
   | { type: 'diskSpace'; availableBytes: number; blockedBelowBytes: number; warnBelowBytes: number }
