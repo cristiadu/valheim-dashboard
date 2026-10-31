@@ -124,8 +124,8 @@ flowchart LR
 
 | Source | What it finds |
 | --- | --- |
-| World scan | New objects (pieces, summoned bosses) and the in-game day |
-| Calls through the server | Chat and map pings, which the server passes from one player to the others |
+| World scan | New objects (pieces, summoned bosses), the in-game day, and each player's area, portal trips, death, PvP, bed and gear |
+| Calls through the server | Chat and map pings, which the server passes from one player to the others, and creature attack moves, to say what a player was fighting when they died |
 | Game hooks | Global keys, such as a boss defeat, and the end of a raid |
 
 Each line names a player only when the game data says who did it. Pieces built within 10 minutes of
