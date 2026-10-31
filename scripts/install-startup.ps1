@@ -18,6 +18,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+Import-Module (Join-Path $PSScriptRoot 'Shared.psm1') -Force
 
 # Name of the logon task in Task Scheduler.
 $TaskName = 'Valheim Dashboard'
@@ -36,6 +37,13 @@ if ($Remove) {
   Unregister-ScheduledTask -TaskName $UpdaterTaskName -Confirm:$false
   Write-Host "Removed the '$TaskName' and '$UpdaterTaskName' tasks."
   return
+}
+
+# The scripts use the installed pnpm, so builds never download it. This installs the version the repo asks for.
+$pnpmVersion = Get-PnpmVersion (Split-Path -Parent $PSScriptRoot)
+if ((Get-InstalledPnpmVersion) -ne $pnpmVersion) {
+  Write-Host "Installing pnpm $pnpmVersion"
+  Invoke-Checked 'npm' @('install', '--global', "pnpm@$pnpmVersion") | Out-Null
 }
 
 $startScript = Join-Path $PSScriptRoot 'start-dashboard.ps1'

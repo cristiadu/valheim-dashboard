@@ -171,8 +171,14 @@ The update task runs `update-from-main.ps1` every 5 minutes in a console with no
 flowchart TD
   run[Every 5 minutes] --> branch{Checkout on main, nothing uncommitted?}
   branch -->|no| skip[Skip and log why]
-  branch -->|yes| pull[git fetch and fast-forward to origin/main]
+  branch -->|yes| url{Token in the origin URL?}
+  url -->|yes| skip
+  url -->|no| fetch[git fetch]
+  fetch --> ci{CI passed on the newest main commit?}
+  ci -->|yes| pull[Fast-forward to it]
+  ci -->|no| stay[Stay on the current commit]
   pull --> dash{Dashboard built from this commit?}
+  stay --> dash
   dash -->|no| build[pnpm install and build, stop node] --> loop[Start script starts node again]
   dash -->|yes| plugin
   loop --> plugin{Plugin files changed since the installed plugin?}
@@ -191,6 +197,21 @@ flowchart TD
 | Remembering what is installed | `updater-state.json` keeps the commit of the running dashboard and of the installed plugin. A step that fails or waits runs again on the next pass. |
 
 The first run takes the installed plugin as current and builds the dashboard once.
+
+### What it trusts
+
+Whatever reaches `main` runs on the server PC as its Windows user, with nobody watching: the build scripts,
+the plugin build and the plugin inside the game server. These keep that to reviewed code.
+
+| Guard | What it stops |
+| --- | --- |
+| CI check | A commit runs only after the `ci` job passed on GitHub, read from GitHub's public check-runs API. |
+| Fast-forward only | A rewritten `main` stops updates instead of being followed. |
+| Installed pnpm | Builds use the pnpm `install-startup.cmd` installed, and stop if `package.json` asks for another version. Nothing downloads pnpm unattended. |
+| `--frozen-lockfile` | Installs exactly the lockfile's packages, checked against their hashes. pnpm does not run packages' install scripts. |
+| Dependabot cooldown | Upgrades are offered once a version has been out for 7 days. |
+| Plain origin URL | A token in the URL could end up in `updater.log`, so the run skips. |
+| Commit hashes only | Values from `updater-state.json` reach git only as full commit hashes. |
 
 ## Files on the server PC
 
@@ -216,5 +237,5 @@ relative imports (use `#/`), `function` declarations, `.then()`, `console` and `
 
 The PowerShell scripts' tests run with Pester 5: `Invoke-Pester scripts`.
 
-Dependabot opens weekly upgrade PRs for npm packages and GitHub Actions. The plugin is built on the
+Dependabot opens weekly upgrade PRs for npm packages and GitHub Actions, for versions out for 7 days. The plugin is built on the
 server PC, not in CI.

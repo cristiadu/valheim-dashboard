@@ -22,22 +22,17 @@ $FailureOutputLines = 20
 # Seconds between tries while waiting for the dashboard to answer.
 $DashboardRetrySeconds = 2
 
-# Runs in a separate PowerShell to send Ctrl+C to the console of process __PID__. The process attaches to that
-# console, so it cannot be this one. The game saves the world and exits on Ctrl+C.
-$CtrlCSender = @'
-$ProgressPreference = 'SilentlyContinue'
-Add-Type -Namespace Win32 -Name Console -MemberDefinition @"
-[DllImport("kernel32.dll")] public static extern bool FreeConsole();
-[DllImport("kernel32.dll")] public static extern bool AttachConsole(uint processId);
-[DllImport("kernel32.dll")] public static extern bool SetConsoleCtrlHandler(System.IntPtr handler, bool add);
-[DllImport("kernel32.dll")] public static extern bool GenerateConsoleCtrlEvent(uint ctrlEvent, uint processGroupId);
-"@
-[Win32.Console]::FreeConsole() | Out-Null
-if (-not [Win32.Console]::AttachConsole(__PID__)) { exit 1 }
-[Win32.Console]::SetConsoleCtrlHandler([System.IntPtr]::Zero, $true) | Out-Null
-if (-not [Win32.Console]::GenerateConsoleCtrlEvent(0, 0)) { exit 2 }
-exit 0
-'@
+# Script that sends Ctrl+C to the game server's console, next to this module.
+$CtrlCSender = Join-Path $PSScriptRoot 'Send-CtrlC.ps1'
+
+# Name of the CI job on GitHub that must pass on a commit before this PC runs it.
+$CiCheckName = 'ci'
+
+# A full git commit hash: 40 lowercase hex characters.
+$CommitHashPattern = '^[0-9a-f]{40}$'
+
+# A URL with a user name or token before the host, such as https://<token>@github.com/...
+$UrlWithCredentialsPattern = '^[a-z][a-z0-9+.-]*://[^/]*@'
 
 <#
 .SYNOPSIS
@@ -67,12 +62,34 @@ function Invoke-Checked([string]$FilePath, [string[]]$Arguments) {
 
 <#
 .SYNOPSIS
-  Runs pnpm [Arguments] in the current folder with the pnpm version in [RepoRoot]'s package.json, through npx,
-  so it needs no global install. Returns its output lines.
+  Returns the pnpm version [RepoRoot]'s package.json asks for, such as 12.16.1.
+#>
+function Get-PnpmVersion([string]$RepoRoot) {
+  $packageManager = (Get-Content (Join-Path $RepoRoot 'package.json') -Raw | ConvertFrom-Json).packageManager
+  return $packageManager -replace '^pnpm@', ''
+}
+
+<#
+.SYNOPSIS
+  Returns the version of the pnpm on the PATH, or 'none' when there is none.
+#>
+function Get-InstalledPnpmVersion {
+  if (-not (Get-Command 'pnpm' -ErrorAction SilentlyContinue)) { return 'none' }
+  return Invoke-Checked 'pnpm' @('--version')
+}
+
+<#
+.SYNOPSIS
+  Runs pnpm [Arguments] in the current folder with the installed pnpm. Throws when that is not the version
+  [RepoRoot]'s package.json asks for, so nothing downloads pnpm while nobody watches. Returns its output lines.
 #>
 function Invoke-Pnpm([string]$RepoRoot, [string[]]$Arguments) {
-  $pnpm = (Get-Content (Join-Path $RepoRoot 'package.json') -Raw | ConvertFrom-Json).packageManager
-  return Invoke-Checked 'npx' (@('--yes', $pnpm) + $Arguments)
+  $wantedVersion = Get-PnpmVersion $RepoRoot
+  $installedVersion = Get-InstalledPnpmVersion
+  if ($installedVersion -ne $wantedVersion) {
+    throw "pnpm $wantedVersion is needed, but the installed version is $installedVersion. Run scripts\install-startup.cmd again to install it."
+  }
+  return Invoke-Checked 'pnpm' $Arguments
 }
 
 <#
@@ -84,6 +101,33 @@ function Test-PluginChanged([string[]]$ChangedFiles) {
     if ($file.StartsWith($PluginSourceFolder)) { return $true }
   }
   return $false
+}
+
+<#
+.SYNOPSIS
+  Tells whether [Value] is a full git commit hash. Anything else must not reach git as an argument.
+#>
+function Test-CommitHash([string]$Value) {
+  return $Value -cmatch $CommitHashPattern
+}
+
+<#
+.SYNOPSIS
+  Tells whether [Url], a git remote URL, holds a user name or token. Git can print it in error messages.
+#>
+function Test-UrlHasCredentials([string]$Url) {
+  return $Url -match $UrlWithCredentialsPattern
+}
+
+<#
+.SYNOPSIS
+  Tells whether the CI job passed, from [CheckRuns] as GitHub's commit check-runs API returns them.
+#>
+function Test-CiPassed([psobject]$CheckRuns) {
+  $passedRuns = @($CheckRuns.check_runs | Where-Object {
+      $_.name -eq $CiCheckName -and $_.status -eq 'completed' -and $_.conclusion -eq 'success'
+    })
+  return $passedRuns.Count -gt 0
 }
 
 <#
@@ -126,9 +170,7 @@ function Get-GameServer {
 #>
 function Stop-GameServer([System.Diagnostics.Process]$Server, [int]$TimeoutSeconds) {
   $batchId = (Get-CimInstance Win32_Process -Filter "ProcessId=$($Server.Id)").ParentProcessId
-  $script = $CtrlCSender -replace '__PID__', $Server.Id
-  $encoded = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($script))
-  & powershell.exe -NoProfile -NonInteractive -EncodedCommand $encoded
+  & powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $CtrlCSender -ProcessId $Server.Id
   if ($LASTEXITCODE -ne 0) {
     throw "Could not send Ctrl+C to the game server (process $($Server.Id)), exit code $LASTEXITCODE"
   }

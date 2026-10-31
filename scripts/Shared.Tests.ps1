@@ -73,3 +73,111 @@ Describe 'Invoke-Checked' {
       Should -Throw -ExpectedMessage "git not-a-command failed with exit code 1*'not-a-command' is not a git command*"
   }
 }
+
+Describe 'Test-CommitHash' {
+  It 'is true for a full commit hash' {
+    # GIVEN a commit hash as git rev-parse prints it
+    $commit = '008e24f3565169dd09f93004564944ffcddb4646'
+
+    # WHEN checking it
+    $isCommitHash = Test-CommitHash $commit
+
+    # THEN it can go to git
+    $isCommitHash | Should -BeTrue
+  }
+
+  It 'is false for an option that git would run' {
+    # GIVEN a state file value that is a git option, not a commit
+    $value = '--output=C:\Windows\Temp\x.txt'
+
+    # WHEN checking it
+    $isCommitHash = Test-CommitHash $value
+
+    # THEN it must not go to git
+    $isCommitHash | Should -BeFalse
+  }
+
+  It 'is false for a short or uppercase hash' {
+    # GIVEN hashes git rev-parse never prints
+    $values = @('008e24f', '008E24F3565169DD09F93004564944FFCDDB4646')
+
+    # WHEN checking them
+    $results = $values | ForEach-Object { Test-CommitHash $_ }
+
+    # THEN neither is accepted
+    $results | Should -Be @($false, $false)
+  }
+}
+
+Describe 'Test-UrlHasCredentials' {
+  It 'is true when a token is in the URL' {
+    # GIVEN a remote URL with a token before the host
+    $url = 'https://ghp_example123@github.com/cristiadu/valheim-dashboard.git'
+
+    # WHEN checking it
+    $hasCredentials = Test-UrlHasCredentials $url
+
+    # THEN the updater stops before git can print it
+    $hasCredentials | Should -BeTrue
+  }
+
+  It 'is false for a plain URL' {
+    # GIVEN the remote URL GitHub shows for cloning
+    $url = 'https://github.com/cristiadu/valheim-dashboard.git'
+
+    # WHEN checking it
+    $hasCredentials = Test-UrlHasCredentials $url
+
+    # THEN the updater goes on
+    $hasCredentials | Should -BeFalse
+  }
+}
+
+Describe 'Test-CiPassed' {
+  It 'is true when the ci job passed' {
+    # GIVEN check runs where ci passed
+    $checkRuns = '{"check_runs":[{"name":"ci","status":"completed","conclusion":"success"}]}' | ConvertFrom-Json
+
+    # WHEN checking them
+    $isPassed = Test-CiPassed $checkRuns
+
+    # THEN the commit can run here
+    $isPassed | Should -BeTrue
+  }
+
+  It 'is false while ci runs or after it failed' {
+    # GIVEN check runs where ci is still going, and others where it failed
+    $running = '{"check_runs":[{"name":"ci","status":"in_progress","conclusion":null}]}' | ConvertFrom-Json
+    $failed = '{"check_runs":[{"name":"ci","status":"completed","conclusion":"failure"}]}' | ConvertFrom-Json
+
+    # WHEN checking them
+    $results = @((Test-CiPassed $running), (Test-CiPassed $failed))
+
+    # THEN the commit waits
+    $results | Should -Be @($false, $false)
+  }
+
+  It 'is false when only another check passed' {
+    # GIVEN check runs with no ci job
+    $checkRuns = '{"check_runs":[{"name":"Dependabot","status":"completed","conclusion":"success"}]}' | ConvertFrom-Json
+
+    # WHEN checking them
+    $isPassed = Test-CiPassed $checkRuns
+
+    # THEN the commit waits
+    $isPassed | Should -BeFalse
+  }
+}
+
+Describe 'Get-PnpmVersion' {
+  It 'reads the version from packageManager' {
+    # GIVEN a repo whose package.json asks for pnpm 12.16.1
+    Set-Content (Join-Path $TestDrive 'package.json') '{"name":"valheim-dashboard","packageManager":"pnpm@12.16.1"}'
+
+    # WHEN reading it
+    $version = Get-PnpmVersion $TestDrive
+
+    # THEN only the version is left
+    $version | Should -Be '12.16.1'
+  }
+}
