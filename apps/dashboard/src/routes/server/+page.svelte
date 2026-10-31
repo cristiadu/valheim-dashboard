@@ -7,7 +7,7 @@
   import { gigabytesLabel, serverWarnings, upStretches } from '#/lib/health';
   import { DAY_MS } from '#/lib/models';
   import { serverPill, steamPill, warningPill } from '#/lib/pills';
-  import { clockTime, durationLabel, isServerOnline, onlinePlayers, viewerOffsetMinutes, whenLabel } from '#/lib/status';
+  import { clockTime, durationLabel, isServerOnline, onlinePlayers, viewerTimeZone, whenLabel } from '#/lib/status';
 
   /** Getter for the snapshot the layout shares. */
   const getSnapshot = useSnapshot();
@@ -23,7 +23,7 @@
   <NoData />
 {:else if live.nowMs !== null}
   {@const nowMs = live.nowMs}
-  {@const offset = viewerOffsetMinutes(nowMs)}
+  {@const timeZone = viewerTimeZone()}
   {@const isUp = isServerOnline(snapshot, nowMs)}
   {@const lastSave = snapshot.saves.at(-1)}
   {@const startMs = nowMs - DAY_MS}
@@ -34,8 +34,8 @@
         { label: 'Status', value: serverPill(isUp) },
         { label: 'Up for', value: isUp && snapshot.startedUtc ? durationLabel(nowMs - Date.parse(snapshot.startedUtc)) : '–' },
         { label: 'Players online', value: String(onlinePlayers(snapshot, nowMs).length) },
-        { label: 'Last log line', value: whenLabel(snapshot.lastLineUtc, offset, nowMs) },
-        { label: 'Last save', value: lastSave ? `${whenLabel(lastSave.timeUtc, offset, nowMs)} · ${lastSave.durationMs} ms` : '–' },
+        { label: 'Last log line', value: whenLabel(snapshot.lastLineUtc, timeZone, nowMs) },
+        { label: 'Last save', value: lastSave ? `${whenLabel(lastSave.timeUtc, timeZone, nowMs)} · ${lastSave.durationMs} ms` : '–' },
         { label: 'Disk free', value: snapshot.diskSpace ? gigabytesLabel(snapshot.diskSpace.availableBytes) : '–' },
         { label: 'Game version', value: snapshot.version ?? '–' },
         { label: 'Steam', value: steamPill(snapshot.isGameServerConnected) },
@@ -44,13 +44,13 @@
 
     <section class="panel" aria-labelledby="uptime-title">
       <h2 id="uptime-title" class="panel-title">UPTIME, LAST 24 HOURS</h2>
-      <div class="bar" role="img" aria-label="Server up {upParts.map((part) => `${clockTime(new Date(part.startMs).toISOString(), offset)} to ${clockTime(new Date(part.endMs).toISOString(), offset)}`).join(', ') || 'never in the last 24 hours'}">
+      <div class="bar" role="img" aria-label="Server up {upParts.map((part) => `${clockTime(new Date(part.startMs).toISOString(), timeZone)} to ${clockTime(new Date(part.endMs).toISOString(), timeZone)}`).join(', ') || 'never in the last 24 hours'}">
         {#each upParts as part (part.startMs)}
           <div class="up" style:left={dayPercent(part.startMs, startMs)} style:width="max(2px, {dayPercent(part.endMs, part.startMs)})"></div>
         {/each}
       </div>
       <div class="axis mono muted">
-        <span>{clockTime(new Date(startMs).toISOString(), offset)} yesterday</span>
+        <span>{clockTime(new Date(startMs).toISOString(), timeZone)} yesterday</span>
         <span>now</span>
       </div>
       <p class="muted"><span class="swatch" aria-hidden="true"></span>Up. Gaps mean no log lines, or before the dashboard started.</p>
@@ -60,7 +60,7 @@
       <h2 id="warnings-title" class="panel-title">WARNINGS</h2>
       {#each warnings as warning (warning.timeUtc + warning.text)}
         <div class="line">
-          <span class="mono muted">{whenLabel(warning.timeUtc, offset, nowMs)}</span>
+          <span class="mono muted">{whenLabel(warning.timeUtc, timeZone, nowMs)}</span>
           <span><Pill pill={warningPill(warning.kind)} /></span>
           <span>{warning.text}</span>
         </div>

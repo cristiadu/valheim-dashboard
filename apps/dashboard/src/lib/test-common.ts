@@ -7,6 +7,9 @@ import { createServerState, readLogLine } from '#/lib/server/server-state';
 /** Offset of the test server's clock from UTC, in minutes (UTC−7). */
 export const TEST_OFFSET_MINUTES = -420;
 
+/** Time zone of the test viewer: UTC−7 until Nov 1 2026 at 09:00Z, then UTC−8. */
+export const TEST_TIME_ZONE = 'America/Los_Angeles';
+
 /** 12:00Z on the test day, Oct 29 2026. */
 export const TEST_NOON_MS = Date.parse('2026-10-29T12:00:00.000Z');
 

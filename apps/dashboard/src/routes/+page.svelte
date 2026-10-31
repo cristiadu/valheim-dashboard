@@ -7,7 +7,7 @@
   import { LATEST_EVENT_COUNT, STORY_STYLES } from '#/lib/models';
   import { serverPill } from '#/lib/pills';
   import { playersOf } from '#/lib/players';
-  import { clockTime, durationLabel, isServerOnline, viewerOffsetMinutes, whenLabel } from '#/lib/status';
+  import { clockTime, durationLabel, isServerOnline, viewerTimeZone, whenLabel } from '#/lib/status';
   import { gigabytesLabel } from '#/lib/health';
   import { areaLabel, daySummary, storyOf } from '#/lib/story';
 
@@ -17,8 +17,8 @@
   /** Current snapshot. */
   const snapshot = $derived(getSnapshot());
 
-  /** Viewer's offset from UTC; only known in the browser. */
-  const offset = $derived(live.nowMs === null ? 0 : viewerOffsetMinutes(live.nowMs));
+  /** Viewer's time zone from the browser. */
+  const timeZone = viewerTimeZone();
 
   /** Players at the page clock. */
   const players = $derived(live.nowMs === null ? [] : playersOf(snapshot, live.nowMs));
@@ -43,7 +43,7 @@
   const lastSave = $derived(snapshot.saves.at(-1));
 
   /** Clock time of [timeUtc] in the viewer's zone. */
-  const at = (timeUtc: string): string => clockTime(timeUtc, offset);
+  const at = (timeUtc: string): string => clockTime(timeUtc, timeZone);
 </script>
 
 {#if snapshot.lastLineUtc === null}
@@ -57,7 +57,7 @@
       <section class="panel" aria-labelledby="wheel-title">
         <h2 id="wheel-title" class="panel-title">LAST 24 HOURS</h2>
         <p class="muted">Who was online around the clock. Midnight at the top.</p>
-        <DayWheel {players} {snapshot} {nowMs} offsetMinutes={offset} />
+        <DayWheel {players} {snapshot} {nowMs} {timeZone} />
       </section>
 
       <div class="column">
@@ -83,7 +83,7 @@
           </div>
           {#each latest as item, i (i)}
             <div class="line event">
-              <span class="mono muted">{whenLabel(item.timeUtc, offset, nowMs)}</span>
+              <span class="mono muted">{whenLabel(item.timeUtc, timeZone, nowMs)}</span>
               <span class="rune" aria-hidden="true" style:color={STORY_STYLES[item.kind].color}>{STORY_STYLES[item.kind].rune}</span>
               <span>{item.text}</span>
             </div>

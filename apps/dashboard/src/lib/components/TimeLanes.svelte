@@ -4,19 +4,19 @@
   import { sessionEndMs } from '#/lib/players';
   import { clockTime } from '#/lib/status';
 
-  /** Players to draw, the snapshot, the clock and the viewer's offset from UTC in minutes. */
-  let { players, snapshot, nowMs, offsetMinutes }: {
+  /** Players to draw, the snapshot, the clock and the viewer's time zone. */
+  let { players, snapshot, nowMs, timeZone }: {
     players: Player[];
     snapshot: Snapshot;
     nowMs: number;
-    offsetMinutes: number;
+    timeZone: string;
   } = $props();
 
   /** Start of the last 24 hours. */
   const startMs = $derived(nowMs - DAY_MS);
 
   /** Clock time of [ms] in the viewer's zone. */
-  const clockAt = (ms: number): string => clockTime(new Date(ms).toISOString(), offsetMinutes);
+  const clockAt = (ms: number): string => clockTime(new Date(ms).toISOString(), timeZone);
 
   /** Axis labels from 24 hours ago to now. */
   const axis = $derived(

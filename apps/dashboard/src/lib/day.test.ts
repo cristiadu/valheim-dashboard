@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { arcPath, clip, dayPercent, hourOfDay, wheelPoint } from '#/lib/day';
+import { TEST_TIME_ZONE } from '#/lib/test-common';
 
 describe('day helpers', () => {
   it('keeps only the part of a range inside the window', () => {
@@ -23,9 +24,9 @@ describe('day helpers', () => {
 
   it('finds the hour of the day in the viewer zone', () => {
     // GIVEN 02:30Z
-    // WHEN it is read in UTC−7
+    // WHEN it is read in Los Angeles
     // THEN it is 19:30 the day before
-    expect(hourOfDay(Date.parse('2026-10-29T02:30:00.000Z'), -420)).toBe(19.5);
+    expect(hourOfDay(Date.parse('2026-10-29T02:30:00.000Z'), TEST_TIME_ZONE)).toBe(19.5);
   });
 
   it('puts midnight at the top and 6 on the right', () => {
