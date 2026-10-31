@@ -494,3 +494,10 @@ export const ITEM_ICON_PX = 28;
 /** Size of a recipe's icon beside its name or preview, in pixels. */
 export const RECIPE_ICON_PX = 40;
 
+/** The browser's live stream and page clock, while the page is open. */
+export type LiveConnection = {
+  /** Server-sent events from `/api/stream`. */
+  source: EventSource;
+  /** Timer that moves the page clock. */
+  clock: ReturnType<typeof setInterval>;
+};

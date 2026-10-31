@@ -1,10 +1,10 @@
 import { mkdir, readdir, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 
-import { iconFileName, recipeItems } from '../recipes';
-import { readConfig } from './config';
-import { logger } from './logger';
-import { ICON_FOLDER_NAME, WIKI_API_URL, WIKI_ICON_FILES, WIKI_TITLES_PER_REQUEST, type WikiImageResponse } from './models';
+import { iconFileName, recipeItems } from '#/lib/recipes';
+import { readConfig } from '#/lib/server/config';
+import { logger } from '#/lib/server/logger';
+import { ICON_FOLDER_NAME, WIKI_API_URL, WIKI_ICON_FILES, WIKI_TITLES_PER_REQUEST, type WikiImageResponse } from '#/lib/server/models';
 
 /** Returns the wiki file title of the icon for [item], for example `File:Deer_hide.png`. */
 const wikiTitleOf = (item: string): string => `File:${WIKI_ICON_FILES[item] ?? `${item.replaceAll(' ', '_')}.png`}`;

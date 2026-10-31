@@ -4,8 +4,8 @@ import { join } from 'node:path';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { iconFileName, recipeItems } from '../recipes';
-import { downloadMissingIcons } from './icons';
+import { iconFileName, recipeItems } from '#/lib/recipes';
+import { downloadMissingIcons } from '#/lib/server/icons';
 
 describe('downloadMissingIcons', () => {
   let folder: string;

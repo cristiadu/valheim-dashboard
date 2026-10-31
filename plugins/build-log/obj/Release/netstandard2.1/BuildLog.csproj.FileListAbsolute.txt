@@ -1,0 +1,11 @@
+D:\Projects\valheim-dashboard\plugins\build-log\bin\Release\netstandard2.1\ValheimDashboard.BuildLog.deps.json
+D:\Projects\valheim-dashboard\plugins\build-log\bin\Release\netstandard2.1\ValheimDashboard.BuildLog.dll
+D:\Projects\valheim-dashboard\plugins\build-log\bin\Release\netstandard2.1\ValheimDashboard.BuildLog.pdb
+D:\Projects\valheim-dashboard\plugins\build-log\obj\Release\netstandard2.1\BuildLog.csproj.AssemblyReference.cache
+D:\Projects\valheim-dashboard\plugins\build-log\obj\Release\netstandard2.1\BuildLog.GeneratedMSBuildEditorConfig.editorconfig
+D:\Projects\valheim-dashboard\plugins\build-log\obj\Release\netstandard2.1\BuildLog.AssemblyInfoInputs.cache
+D:\Projects\valheim-dashboard\plugins\build-log\obj\Release\netstandard2.1\BuildLog.AssemblyInfo.cs
+D:\Projects\valheim-dashboard\plugins\build-log\obj\Release\netstandard2.1\BuildLog.csproj.CoreCompileInputs.cache
+D:\Projects\valheim-dashboard\plugins\build-log\obj\Release\netstandard2.1\BuildLog.sourcelink.json
+D:\Projects\valheim-dashboard\plugins\build-log\obj\Release\netstandard2.1\ValheimDashboard.BuildLog.dll
+D:\Projects\valheim-dashboard\plugins\build-log\obj\Release\netstandard2.1\ValheimDashboard.BuildLog.pdb

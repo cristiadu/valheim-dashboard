@@ -1,15 +1,13 @@
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
-import { error } from '@sveltejs/kit';
+import { error, type RequestEvent } from '@sveltejs/kit';
 
-import { iconFolder } from '#lib/server/icons.ts';
-import { ICON_CACHE_SECONDS, ICON_FILE_PATTERN } from '#lib/server/models.ts';
-
-import type { RequestHandler } from './$types';
+import { iconFolder } from '#/lib/server/icons';
+import { ICON_CACHE_SECONDS, ICON_FILE_PATTERN } from '#/lib/server/models';
 
 /** Returns a downloaded item icon, or 404 when it is not downloaded yet. */
-export const GET: RequestHandler = async ({ params }) => {
+export const GET = async ({ params }: RequestEvent<{ file: string }>): Promise<Response> => {
   if (!ICON_FILE_PATTERN.test(params.file)) {
     error(404, 'No such icon');
   }
