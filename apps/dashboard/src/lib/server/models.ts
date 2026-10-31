@@ -13,6 +13,30 @@ export const DEFAULT_LOG_FILE = 'C:\\Valheim Server\\logs.txt';
  */
 export const HISTORY_FOLDER_NAME = 'log-history';
 
+/** Folder next to the server's log that holds one folder per world, for example `worlds_local\Cotil`. */
+export const WORLDS_FOLDER_NAME = 'worlds_local';
+
+/** Name of a world's main save file, with its save number, for example `_main.1561.db2`. */
+export const WORLD_SAVE_FILE_PATTERN = /^_main\.(?<saveNumber>\d+)\.db2$/;
+
+/** Where the length of the compressed zone data sits in a world save, in bytes: after the data version and the world time. */
+export const ZONE_DATA_LENGTH_OFFSET = 12;
+
+/** Size of a world save's header, in bytes: data version, world time and zone data length. */
+export const WORLD_SAVE_HEADER_BYTES = 16;
+
+/** Size of one 32-bit number in a world save, in bytes. */
+export const INT_BYTES = 4;
+
+/** Size of one generated zone in the zone data, in bytes: two 16-bit coordinates. */
+export const GENERATED_ZONE_BYTES = 4;
+
+/** Bits of a text's length each length byte holds in a world save. The game writes text as .NET's BinaryWriter does. */
+export const LENGTH_BITS_PER_BYTE = 7;
+
+/** Top bit of a length byte, set when another length byte follows. */
+export const MORE_LENGTH_FLAG = 0x80;
+
 /** Folder next to the server's log that keeps the item icons downloaded from the wiki, for example `deer-hide.png`. */
 export const ICON_FOLDER_NAME = 'item-icons';
 
@@ -140,6 +164,8 @@ export type Follower = {
   state: ServerState;
   /** True when lines arrived since the listeners were last told. */
   hasNewLines: boolean;
+  /** World and time of the save whose global keys were read last, for example `Cotil 2026-10-31T23:30:45.000Z`. */
+  worldSaveRead: string | null;
 };
 
 /** Part of the wiki API's answer to an image address query, for example for `File:Deer_hide.png`. */

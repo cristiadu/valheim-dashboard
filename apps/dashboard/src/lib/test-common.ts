@@ -1,3 +1,5 @@
+import { gzipSync } from 'node:zlib';
+
 import type { PlayerSession } from 'valheim-log';
 
 import type { Plan, Snapshot } from '#/lib/models';
@@ -66,3 +68,27 @@ export const TUNNEL_HOST = 'longhouse.ngrok-free.app';
 /** Returns a page request to [host] with [headers], as the dashboard receives it. */
 export const requestTo = (host: string, headers: Record<string, string> = {}): Request =>
   new Request(`http://${host}/`, { headers: { host, ...headers } });
+
+/** Returns the one or two bytes .NET's BinaryWriter writes before a text of [length] bytes, below 16,384. */
+const lengthBytesOf = (length: number): Buffer =>
+  Buffer.from(length < 0x80 ? [length] : [(length & 0x7f) | 0x80, length >> 7]);
+
+/**
+ * Returns a world save's `.db2` bytes as the game writes them, with two generated zones and [keys] as its global
+ * keys. Only the parts before the keys are real; the rest of the zone data is left out.
+ */
+export const worldSaveWith = (keys: string[]): Buffer => {
+  const keyBytes = keys.map((key) => Buffer.concat([lengthBytesOf(Buffer.byteLength(key)), Buffer.from(key)]));
+  const zoneData = gzipSync(
+    Buffer.concat([
+      Buffer.from([2, 0, 0, 0, 30, 0, 30, 0, 31, 0, 30, 0]),
+      Buffer.from([32, 0, 0, 0, keys.length, 0, 0, 0]),
+      ...keyBytes,
+    ]),
+  );
+  const header = Buffer.alloc(16);
+  header.writeInt32LE(42, 0);
+  header.writeDoubleLE(238655.36, 4);
+  header.writeInt32LE(zoneData.length, 12);
+  return Buffer.concat([header, zoneData]);
+};

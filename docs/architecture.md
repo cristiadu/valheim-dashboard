@@ -11,6 +11,8 @@ flowchart LR
     log --> dash[Dashboard]
     dash -->|copies each run| hist[log-history folder]
     hist -->|read on start| dash
+    game -->|saves| save[World save]
+    save -->|bosses defeated| dash
     ngrok[ngrok] -->|forwards| dash
   end
   friends[Friends' browsers] -->|shared link and password| ngrok
@@ -123,6 +125,19 @@ The password is the Valheim server's own, which the start script reads from `-pa
 `start_headless_server.bat`. The cookie (`dashboard_pass`) lasts 30 days. It holds a hash made from the password, so changing the
 password sends everyone back to the password page. A wrong password waits 1 second before the answer, so
 guessing is slow.
+
+## Bosses defeated
+
+```mermaid
+flowchart LR
+  log["logs.txt: Global key set: defeated_eikthyr"] --> bosses[Bosses defeated]
+  save["worlds_local\Cotil\_main.1561.db2"] -->|on start and after each save| bosses
+  bosses --> world[World tab]
+```
+
+A boss defeat sets a global key, such as `defeated_eikthyr`, which the world save keeps. The log only has
+defeats since the plugin was installed, so the dashboard also reads the keys from the newest save. A defeat
+from the save shows on the World tab, but has no Saga line, since its time is not known.
 
 ## Tabs
 
@@ -257,6 +272,8 @@ Every log lives in `C:\Valheim Server`.
 | `updater.log` | The update script: what it updated, skipped or is waiting for |
 | `updater-state.json` | The update script: commits of the running dashboard and the installed plugin |
 | `ngrok.log` | ngrok, warnings and errors only |
+
+The dashboard also reads the world save, `worlds_local\Cotil\_main.<save number>.db2`, and never writes to it.
 
 ## CI
 

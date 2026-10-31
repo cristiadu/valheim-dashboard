@@ -5,14 +5,36 @@ import { readConfig } from '#/lib/server/config';
 import { firstRunKey, LogHistory, readHistory } from '#/lib/server/log-history';
 import { LogTail } from '#/lib/server/log-tail';
 import { logger } from '#/lib/server/logger';
-import { HISTORY_FOLDER_NAME, POLL_INTERVAL_MS, type Follower, type ServerState } from '#/lib/server/models';
-import { createServerState, readLogLine, startNewLog } from '#/lib/server/server-state';
+import { HISTORY_FOLDER_NAME, POLL_INTERVAL_MS, WORLDS_FOLDER_NAME, type Follower, type ServerState } from '#/lib/server/models';
+import { addSavedBosses, createServerState, readLogLine, startNewLog } from '#/lib/server/server-state';
+import { readSavedGlobalKeys } from '#/lib/server/world-save';
 
 /** Functions to call with the snapshot after new log lines. */
 const listeners = new Set<(snapshot: Snapshot) => void>();
 
 /** Resolves with the state once the log was read the first time. Null until the first request. */
 let started: Promise<ServerState> | null = null;
+
+/**
+ * Reads the bosses defeated from the world's newest save once the world is known and after each save, so
+ * defeats from before the log was kept show too.
+ */
+const readSavedBosses = async (follower: Follower): Promise<void> => {
+  const { snapshot } = follower.state;
+  const saveRead = `${snapshot.world} ${snapshot.saves.at(-1)?.timeUtc ?? 'before the first save'}`;
+  if (snapshot.world === null || saveRead === follower.worldSaveRead) {
+    return;
+  }
+  follower.worldSaveRead = saveRead;
+  const worldFolder = join(dirname(follower.logFile), WORLDS_FOLDER_NAME, snapshot.world);
+  try {
+    if (addSavedBosses(snapshot, await readSavedGlobalKeys(worldFolder))) {
+      follower.hasNewLines = true;
+    }
+  } catch (error) {
+    logger.error(`Could not read the bosses defeated from the save in ${worldFolder}: ${String(error)}`);
+  }
+};
 
 /** Reads the new lines once and copies them to the history, then gives the listeners the snapshot if any arrived. */
 const poll = async (follower: Follower): Promise<void> => {
@@ -22,6 +44,7 @@ const poll = async (follower: Follower): Promise<void> => {
   } catch (error) {
     logger.error(`Could not read or copy ${follower.logFile}: ${String(error)}`);
   }
+  await readSavedBosses(follower);
   if (follower.hasNewLines) {
     follower.hasNewLines = false;
     listeners.forEach((listener) => listener(follower.state.snapshot));
@@ -57,6 +80,7 @@ const start = async (): Promise<ServerState> => {
     state,
     history,
     hasNewLines: false,
+    worldSaveRead: null,
     tail: new LogTail(config.logFile, {
       onLine: (line) => {
         readLogLine(state, line);

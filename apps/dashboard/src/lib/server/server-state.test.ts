@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import { logLine, readLines, RUN_START, TEST_OFFSET_MINUTES } from '#/lib/test-common';
 import type { ServerState } from '#/lib/server/models';
-import { createServerState, startNewLog } from '#/lib/server/server-state';
+import { addSavedBosses, createServerState, startNewLog } from '#/lib/server/server-state';
 
 describe('server state', () => {
   let state: ServerState;
@@ -112,6 +112,32 @@ describe('server state', () => {
     expect(state.snapshot.currentAreas).toEqual({ Ragnar: 'Swamp' });
     expect(state.snapshot.kills).toEqual({ Ragnar: { Draugr: 2 }, Bjorn: { Draugr: 1 } });
     expect(state.snapshot.day).toBe(42);
+    expect(state.snapshot.defeatedBosses).toEqual(['Eikthyr']);
+  });
+
+  it('adds the bosses a world save marks as defeated, without a Saga line', () => {
+    // GIVEN the log saw The Elder fall, and the save also knows Eikthyr and Bonemass from before the log was kept
+    readLines(state, [...RUN_START, logLine('03:40:00', 'Global key set: defeated_gdking')]);
+    const keys = ['activebosses 0', 'defeated_bonemass', 'defeated_eikthyr', 'defeated_gdking', 'killedtroll'];
+
+    // WHEN the save's keys are added
+    const isChanged = addSavedBosses(state.snapshot, keys);
+
+    // THEN the older defeats follow the logged one in the order players meet them, and the Saga is unchanged
+    expect(isChanged).toBe(true);
+    expect(state.snapshot.defeatedBosses).toEqual(['The Elder', 'Eikthyr', 'Bonemass']);
+    expect(state.snapshot.events.map((event) => event.type)).toEqual(['worldLoaded', 'globalKey']);
+  });
+
+  it('changes nothing when the save knows no new boss', () => {
+    // GIVEN Eikthyr's defeat is in the log
+    readLines(state, [...RUN_START, logLine('03:40:00', 'Global key set: defeated_eikthyr')]);
+
+    // WHEN a save with the same defeat is added
+    const isChanged = addSavedBosses(state.snapshot, ['defeated_eikthyr', 'killedtroll']);
+
+    // THEN nothing changed
+    expect(isChanged).toBe(false);
     expect(state.snapshot.defeatedBosses).toEqual(['Eikthyr']);
   });
 
