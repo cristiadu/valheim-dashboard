@@ -19,9 +19,11 @@ It reads `C:\Valheim Server\logs.txt` and writes its own output to `C:\Valheim S
 stops, it starts again after 5 seconds.
 
 To start it every time you log on to Windows, double-click `scripts\install-startup.cmd` once. It runs
-hidden, with no window.
+hidden, with no window. It also checks `main` every 5 minutes: it pulls, rebuilds and restarts the
+dashboard, and installs a changed event log plugin when nobody is online. It writes what it did to
+`C:\Valheim Server\updater.log`.
 
-After a `git pull`, start it with `scripts\start-dashboard.cmd -Rebuild`. Other settings are in
+After a manual `git pull`, start it with `scripts\start-dashboard.cmd -Rebuild`. Other settings are in
 [apps/dashboard/README.md](apps/dashboard/README.md).
 
 ## Work on it

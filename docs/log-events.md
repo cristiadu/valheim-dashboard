@@ -214,6 +214,7 @@ when the plugin does not know who it was.
 To build it, install the .NET SDK and BepInExPack_Valheim on the server, run `dotnet build -c Release`
 in `plugins/event-log`, and copy `bin\Release\netstandard2.1\ValheimDashboard.EventLog.dll` to the
 server's `BepInEx\plugins` folder. Remove the older `ValheimDashboard.BuildLog.dll` if it is there.
+After that, the update task in `scripts` installs each new version from `main` by itself.
 
 The plugin also copies BepInEx's own messages, such as plugin errors, into `logs.txt` as
 `[Error : Source] message` lines. To keep every log in the server's log folder, turn off BepInEx's
