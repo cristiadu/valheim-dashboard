@@ -3,7 +3,8 @@
 
   import ItemIcon from '#/lib/components/ItemIcon';
   import Pill from '#/lib/components/Pill';
-  import { MAX_CRAFTS, RECIPE_BIOMES, RECIPE_ICON_PX, type Plan } from '#/lib/models';
+  import RecipePicker from '#/lib/components/RecipePicker';
+  import { MAX_CRAFTS, RECIPE_ICON_PX, type Plan } from '#/lib/models';
   import { planPill } from '#/lib/pills';
   import { clampCrafts, newPlan, planItems, stillNeeded, withHave } from '#/lib/planner';
   import { loadPlans, planner, savePlans } from '#/lib/plans.svelte';
@@ -44,18 +45,7 @@
   <section class="panel" aria-labelledby="new-title">
     <h2 id="new-title" class="panel-title">START A PLAN</h2>
     <form onsubmit={addPlan}>
-      <label>
-        <span class="muted">What do you want to make?</span>
-        <select bind:value={pickedId}>
-          {#each RECIPE_BIOMES as biome (biome)}
-            <optgroup label={biome}>
-              {#each RECIPES.filter((recipe) => recipe.biome === biome) as recipe (recipe.id)}
-                <option value={recipe.id}>{recipe.name}</option>
-              {/each}
-            </optgroup>
-          {/each}
-        </select>
-      </label>
+      <RecipePicker bind:value={pickedId} label="What do you want to make?" />
       <label>
         <span class="muted">{picked.yields > 1 ? 'How many batches?' : 'How many?'}</span>
         <input type="number" min="1" max={MAX_CRAFTS} bind:value={pickedCrafts} />
@@ -182,7 +172,6 @@
   }
 
   /* Inputs and buttons share the Longhouse look and stay 44px tall for touch */
-  select,
   input[type='number'],
   button {
     min-height: 44px;
@@ -193,12 +182,6 @@
     color: var(--text);
     font: inherit;
     font-size: 14px;
-  }
-
-  /* Recipe list gets room for long names */
-  select {
-    min-width: 220px;
-    max-width: 100%;
   }
 
   /* Number fields only need a few digits */
