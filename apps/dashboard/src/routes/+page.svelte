@@ -24,8 +24,8 @@
   /** Players online now. */
   const online = $derived(players.filter((player) => player.isOnline));
 
-  /** Newest story lines. */
-  const latest = $derived(storyOf(snapshot).slice(0, LATEST_EVENT_COUNT));
+  /** Newest story lines. Chat stays on the Saga tab. */
+  const latest = $derived(storyOf(snapshot).filter((item) => item.kind !== 'chat').slice(0, LATEST_EVENT_COUNT));
 
   /** Whether the server is up at the page clock. */
   const isUp = $derived(live.nowMs !== null && isServerOnline(snapshot, live.nowMs));
