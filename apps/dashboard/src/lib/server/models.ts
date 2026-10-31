@@ -1,4 +1,4 @@
-import type { LogEvent, LogReader, SessionState } from 'valheim-log';
+import type { LogReader, SessionState } from 'valheim-log';
 
 import type { Snapshot } from '#/lib/models';
 import type { LogHistory } from '#/lib/server/log-history';
@@ -31,14 +31,14 @@ export const MAX_BACKUPS = 50;
 /** Most server runs and Steam drops kept. */
 export const MAX_RUNS = 50;
 
-/** Most stretches of building kept. */
-export const MAX_BUILDS = 300;
+/** Most stretches of activity kept, such as building or kills. */
+export const MAX_ACTIVITIES = 500;
 
-/** Longest pause between two pieces of one stretch of building. */
-export const BUILD_GAP_MS = 10 * 60_000;
+/** Longest pause between two actions of one stretch of activity. */
+export const ACTIVITY_GAP_MS = 10 * 60_000;
 
-/** A piece built or destroyed, from the build log plugin. */
-export type PieceEvent = Extract<LogEvent, { type: 'pieceBuilt' | 'pieceDestroyed' }>;
+/** Most chat messages and pings kept. */
+export const MAX_CHAT = 300;
 
 /** Dashboard settings, read from environment variables. */
 export type Config = {
