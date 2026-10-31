@@ -114,7 +114,7 @@ sequenceDiagram
 
 | A request | Gets |
 | --- | --- |
-| Made on the PC (host `localhost`, no `X-Forwarded-For`), such as `/api/status` for the updater | Served, no password |
+| Made on the PC (host `localhost` or `127.0.0.1`, no `X-Forwarded-For`), such as `/api/status` for the updater | Served, no password |
 | Through ngrok with the cookie | Served |
 | Through ngrok without it | Sent to `/password`; `/api/*` answers `401` |
 | Through ngrok when no password is set | Turned away (`403`) |
