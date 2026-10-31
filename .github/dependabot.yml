@@ -1,11 +1,15 @@
-# Opens weekly upgrade PRs for npm packages and GitHub Actions.
+# Opens weekly upgrade PRs for npm packages and GitHub Actions, for versions out for at least 7 days.
 version: 2
 updates:
   - package-ecosystem: npm
     directory: /
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 7
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 7

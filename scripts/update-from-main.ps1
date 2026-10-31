@@ -23,6 +23,12 @@ Import-Module (Join-Path $PSScriptRoot 'Shared.psm1') -Force
 # Branch this PC runs.
 $Branch = 'main'
 
+# GitHub repo, as owner/name, whose CI must pass on a commit before this PC runs it.
+$GitHubRepo = 'cristiadu/valheim-dashboard'
+
+# Seconds to wait for GitHub to answer.
+$GitHubTimeoutSeconds = 30
+
 # Seconds to wait for the dashboard to answer after it restarts.
 $DashboardStartSeconds = 120
 
@@ -62,13 +68,36 @@ try {
     return
   }
 
+  if (Test-UrlHasCredentials (Invoke-Checked 'git' @('remote', 'get-url', 'origin'))) {
+    Write-LogLine $UpdaterLog "Skipped: the origin URL has a user name or token in it. Remove it with: git remote set-url origin https://github.com/$GitHubRepo.git"
+    return
+  }
+
   Invoke-Checked 'git' @('fetch', '--quiet', 'origin', $Branch) | Out-Null
-  Invoke-Checked 'git' @('merge', '--quiet', '--ff-only', "origin/$Branch") | Out-Null
   $head = Invoke-Checked 'git' @('rev-parse', 'HEAD')
+  $latest = Invoke-Checked 'git' @('rev-parse', "origin/$Branch")
+  if ($latest -ne $head) {
+    # Only commits that passed CI on GitHub run here. The repo is public, so this needs no token.
+    $checkRunsUrl = "https://api.github.com/repos/$GitHubRepo/commits/$latest/check-runs"
+    $checkRuns = Invoke-RestMethod -Uri $checkRunsUrl -TimeoutSec $GitHubTimeoutSeconds
+    if (Test-CiPassed $checkRuns) {
+      Invoke-Checked 'git' @('merge', '--quiet', '--ff-only', $latest) | Out-Null
+      $head = $latest
+    } else {
+      Write-LogLine $UpdaterLog "Waiting: CI has not passed on $latest yet. Staying on $head."
+    }
+  }
 
   # The first run takes the installed plugin as current, and builds the dashboard once.
   $state = [pscustomobject]@{ dashboardCommit = ''; pluginCommit = $head }
-  if (Test-Path $StateFile) { $state = Get-Content $StateFile -Raw | ConvertFrom-Json }
+  if (Test-Path $StateFile) {
+    $savedState = Get-Content $StateFile -Raw | ConvertFrom-Json
+    if ((Test-CommitHash $savedState.dashboardCommit) -and (Test-CommitHash $savedState.pluginCommit)) {
+      $state = $savedState
+    } else {
+      Write-LogLine $UpdaterLog "Warning: $StateFile does not hold two commit hashes, so this run starts over."
+    }
+  }
 
   if ($state.dashboardCommit -ne $head) {
     Write-LogLine $UpdaterLog "Building the dashboard at $head."
@@ -96,7 +125,6 @@ try {
         Write-LogLine $UpdaterLog "Plugin update waiting: $onlineCount player(s) online."
         return
       }
-
 
       $server = Get-GameServer
       if ($server) {
