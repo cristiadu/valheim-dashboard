@@ -149,8 +149,11 @@ Every log lives in `C:\Valheim Server`.
 
 ```mermaid
 flowchart LR
-  pr[Pull request or push to main] --> install[pnpm install] --> check[pnpm check] --> test[pnpm test] --> build[pnpm build]
+  pr[Pull request or push to main] --> install[pnpm install] --> check[pnpm check] --> lint[pnpm lint] --> test[pnpm test] --> build[pnpm build]
 ```
+
+`pnpm lint` runs ESLint in each project. Besides the recommended TypeScript and Svelte rules, it rejects
+relative imports (use `#/`), `function` declarations, `.then()`, `console` and `if` without braces.
 
 Dependabot opens weekly upgrade PRs for npm packages and GitHub Actions. The plugin is built on the
 server PC, not in CI.

@@ -4,6 +4,7 @@
   "packageManager": "pnpm@12.16.1",
   "scripts": {
     "check": "pnpm -r --if-present run check",
+    "lint": "pnpm -r --if-present run lint",
     "test": "pnpm -r --if-present run test",
     "build": "pnpm -r --if-present run build"
   }

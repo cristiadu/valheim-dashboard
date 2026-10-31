@@ -66,3 +66,6 @@ export const whenLabel = (timeUtc: string, offsetMinutes: number, nowMs: number)
     ? time
     : `${MONTHS[local.getUTCMonth()]} ${local.getUTCDate()} ${time}`;
 };
+
+/** The viewer's offset from UTC in minutes at [nowMs], for example `-420` for UTC−7. */
+export const viewerOffsetMinutes = (nowMs: number): number => -new Date(nowMs).getTimezoneOffset();

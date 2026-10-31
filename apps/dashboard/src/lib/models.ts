@@ -1,9 +1,10 @@
+import type { PageRouteId } from '$app/types';
 import type { LogEvent, PlayerSession } from 'valheim-log';
 
 /** One dashboard tab and the page it opens. */
 export type Tab = {
   /** Page path, for example `/saga`. */
-  path: string;
+  path: PageRouteId;
   /** Name shown in the menu and as the page heading. */
   label: string;
   /** Short line under the label in the menu. */
