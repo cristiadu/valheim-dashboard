@@ -6,9 +6,9 @@ node_modules/
 build/
 .vite/
 
-# Plugin build output
-/plugins/event-log/bin/
-/plugins/event-log/obj/
+# Plugin build output (.NET bin and obj folders), for every plugin
+/plugins/*/bin/
+/plugins/*/obj/
 
 # Logs, such as dashboard.log
 *.log
