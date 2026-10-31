@@ -6,6 +6,7 @@ import {
   type ActivityKind,
   type ActivityRecord,
   BOSS_NAMES,
+  BOSS_ORDER,
   DEFEATED_KEY_PREFIX,
   DUNGEON_AREA,
   type Snapshot,
@@ -163,6 +164,17 @@ export const startNewLog = (state: ServerState): void => {
     stoppedUtc: null,
     isGameServerConnected: null,
   });
+};
+
+/**
+ * Adds the bosses that the world save's global [keys] mark as defeated to [snapshot], in the order players
+ * meet them. This covers defeats from before the log was kept. Returns true when any boss was new.
+ */
+export const addSavedBosses = (snapshot: Snapshot, keys: string[]): boolean => {
+  const savedBosses = new Set(keys.filter((key) => key.startsWith(DEFEATED_KEY_PREFIX)).map((key) => BOSS_NAMES[key]));
+  const newBosses = BOSS_ORDER.filter((boss) => savedBosses.has(boss) && !snapshot.defeatedBosses.includes(boss));
+  snapshot.defeatedBosses.push(...newBosses);
+  return newBosses.length > 0;
 };
 
 /** Reads one log [line] into [state]. Lines the parser does not know only move the last line time. */
