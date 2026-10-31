@@ -54,6 +54,17 @@ Describe 'Get-OnlinePlayerCount' {
   }
 }
 
+Describe 'Get-DashboardSnapshot' {
+  It 'is $null when nothing answers in time' {
+    # GIVEN a port nothing listens on
+
+    # WHEN asking it for a snapshot for 1 second
+    $snapshot = Get-DashboardSnapshot 'http://127.0.0.1:9/api/status' 1
+
+    # THEN there is no snapshot
+    $snapshot | Should -BeNullOrEmpty
+  }
+}
 Describe 'Invoke-Checked' {
   It 'returns the output of a command that succeeds' {
     # GIVEN git, which every PC running these scripts has
