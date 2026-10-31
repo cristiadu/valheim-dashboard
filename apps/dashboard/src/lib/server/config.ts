@@ -10,5 +10,9 @@ export const readConfig = (env: Record<string, string | undefined>, nowMs = Date
   if (!Number.isInteger(serverUtcOffsetMinutes)) {
     throw new Error(`SERVER_UTC_OFFSET_MINUTES must be whole minutes, for example -420. Got "${offset}".`);
   }
-  return { logFile: env.LOG_FILE?.trim() || DEFAULT_LOG_FILE, serverUtcOffsetMinutes };
+  return {
+    logFile: env.LOG_FILE?.trim() || DEFAULT_LOG_FILE,
+    serverUtcOffsetMinutes,
+    password: env.DASHBOARD_PASSWORD?.trim() || null,
+  };
 };

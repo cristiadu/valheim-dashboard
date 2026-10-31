@@ -11,8 +11,9 @@ flowchart LR
     log --> dash[Dashboard]
     dash -->|copies each run| hist[log-history folder]
     hist -->|read on start| dash
+    ngrok[ngrok] -->|forwards| dash
   end
-  dash -->|live page| friends[Friends' browsers]
+  friends[Friends' browsers] -->|shared link and password| ngrok
 ```
 
 ## Parts
@@ -22,7 +23,7 @@ flowchart LR
 | `packages/valheim-log` | Turns log lines into game events and player sessions. No files, no network. |
 | `apps/dashboard` | SvelteKit app on Node. Follows `logs.txt` and serves the page. |
 | `plugins/event-log` | BepInEx plugin on the server only. Logs what the game does not. Friends install nothing. |
-| `scripts` | Start the dashboard and keep it running on Windows. |
+| `scripts` | Start the dashboard, keep it running on Windows and share it through ngrok. |
 | `docs/log-events.md` | Every log line the dashboard reads, with its regex. |
 
 ## Reading a log line
@@ -93,6 +94,33 @@ sequenceDiagram
 
 A snapshot is everything the page shows, as JSON. `/api/status` returns the same snapshot once.
 
+## Sharing with friends
+
+The dashboard listens only on the server PC (`127.0.0.1`). ngrok connects out from the PC and passes the
+shared link's requests in, so no router port is open.
+
+```mermaid
+sequenceDiagram
+  participant F as Friend's browser
+  participant N as ngrok
+  participant D as Dashboard
+  F->>N: https://longhouse.ngrok-free.app
+  N->>D: Same request, with X-Forwarded-For
+  D-->>F: 401, asks for the password
+  F->>N: Same request with the password
+  N->>D: Passes it on
+  D-->>F: The page
+```
+
+| A request | Gets |
+| --- | --- |
+| Made on the PC (host `localhost`, no `X-Forwarded-For`), such as `/api/status` for the updater | Served, no password |
+| Through ngrok with the right password, any name | Served |
+| Through ngrok without it | Asked for the password (`401`) |
+| Through ngrok when no password is set | Turned away (`403`) |
+
+The browser remembers the password until it closes, and sends it with the live stream too.
+
 ## Tabs
 
 | Tab | Shows | Data from |
@@ -156,7 +184,7 @@ flowchart TD
   run -->|stopped| wait[Wait 5 s] --> run
 ```
 
-`install-startup.cmd` adds the logon task once. Every window stays hidden when it starts at logon.
+`install-startup.cmd` adds the logon task once. `share-dashboard.ps1` adds a second one that starts ngrok with no window. Every window stays hidden when it starts at logon.
 
 ## Files on the server PC
 
@@ -167,6 +195,8 @@ Every log lives in `C:\Valheim Server`.
 | `logs.txt` | The Valheim server, the event log plugin and BepInEx |
 | `log-history\*.txt` | The dashboard, one file per server run |
 | `dashboard.log` | The start script, with the dashboard's output |
+| `ngrok.log` | ngrok, warnings and errors only |
+| `dashboard-password.txt` | You, with the password friends type. Not a log, and never in the repo |
 
 ## CI
 

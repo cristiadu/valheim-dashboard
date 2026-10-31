@@ -13,13 +13,31 @@ world last saved. It also has a recipe planner for working out what you still ne
 You need [Node.js](https://nodejs.org) 26 or newer on the server PC.
 
 1. Double-click `scripts\start-dashboard.cmd`. The first time, it installs and builds everything.
-2. Open http://localhost:3000. Friends use your PC's address on port 3000.
+2. Open http://localhost:3000. Only this PC can open that address. Friends use the shared link below.
 
 It reads `C:\Valheim Server\logs.txt` and writes its own output to `C:\Valheim Server\dashboard.log`. If it
 stops, it starts again after 5 seconds.
 
 To start it every time you log on to Windows, double-click `scripts\install-startup.cmd` once. It runs
 hidden, with no window.
+
+## Share it with friends
+
+Friends open one link and type a password. They install nothing.
+
+1. Make a free account at [ngrok.com](https://dashboard.ngrok.com/signup). Copy your auth token, and the free
+   domain under Domains.
+2. Put the password friends will type in `C:\Valheim Server\dashboard-password.txt`, then restart the
+   dashboard.
+3. In PowerShell, run once:
+
+   ```powershell
+   .\scripts\share-dashboard.ps1 -Domain "longhouse.ngrok-free.app" -AuthToken "<your token>"
+   ```
+
+Friends open `https://longhouse.ngrok-free.app`, click past ngrok's notice the first time, and type the
+password. Any name works. The link starts hidden each time you log on. `share-dashboard.ps1 -Remove` stops
+sharing.
 
 After a `git pull`, start it with `scripts\start-dashboard.cmd -Rebuild`. Other settings are in
 [apps/dashboard/README.md](apps/dashboard/README.md).

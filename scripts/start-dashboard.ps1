@@ -32,6 +32,9 @@ $BuildEntry = Join-Path $RepoRoot 'apps\dashboard\build\index.js'
 # File that collects the dashboard's output, next to the server's log so every log stays in one folder.
 $OutputLog = Join-Path (Split-Path -Parent $LogFile) 'dashboard.log'
 
+# File holding the password friends type to open the dashboard through the shared link.
+$PasswordFile = Join-Path (Split-Path -Parent $LogFile) 'dashboard-password.txt'
+
 # Writes [Message] with the time to the screen and the output log.
 function Write-Status([string]$Message) {
   $line = "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') $Message"
@@ -60,6 +63,13 @@ if (-not (Test-Path $LogFile)) {
 
 $env:LOG_FILE = $LogFile
 $env:PORT = "$Port"
+# Only this PC reaches the dashboard directly. Friends come in through the ngrok link.
+$env:HOST = '127.0.0.1'
+if (Test-Path $PasswordFile) {
+  $env:DASHBOARD_PASSWORD = (Get-Content -Path $PasswordFile -Raw).Trim()
+} else {
+  Write-Status "Warning: $PasswordFile does not exist. The shared link turns everyone away until it does."
+}
 
 while ($true) {
   Write-Status "Starting the dashboard on http://localhost:$Port"

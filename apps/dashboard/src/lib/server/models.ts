@@ -71,13 +71,36 @@ export const ACTIVITY_GAP_MS = 10 * 60_000;
 /** Most chat messages and pings kept. */
 export const MAX_CHAT = 300;
 
+/** Host names that mean a request came from this PC, not through the tunnel. */
+export const LOCAL_HOSTNAMES = ['localhost', '127.0.0.1', '[::1]'];
+
+/** Header a tunnel such as ngrok adds to every request it passes on. */
+export const FORWARDED_HEADER = 'x-forwarded-for';
+
+/** Name the browser's password prompt may show. */
+export const PASSWORD_REALM = 'Valheim dashboard';
+
+/** Page text when a friend has not typed the right password. */
+export const PASSWORD_NEEDED_TEXT = "This is our Valheim server's page. Ask the host for the password, then reload.";
+
+/** Page text when the dashboard is reached from outside but has no password set. */
+export const NO_PASSWORD_SET_TEXT = 'This page only opens on the server PC until the host sets a password.';
+
 /** Dashboard settings, read from environment variables. */
 export type Config = {
   /** Path of the server's `logs.txt`. From `LOG_FILE`. */
   logFile: string;
   /** Offset of the server's clock from UTC, in minutes. From `SERVER_UTC_OFFSET_MINUTES`. */
   serverUtcOffsetMinutes: number;
+  /** Password friends type to open the page from outside this PC, or null when none is set. From `DASHBOARD_PASSWORD`. */
+  password: string | null;
 };
+
+/**
+ * What happens to a request: `allowed` serves it, `needsPassword` asks the browser for the password and
+ * `refused` turns it away because it came from outside and no password is set.
+ */
+export type AccessDecision = 'allowed' | 'needsPassword' | 'refused';
 
 /** What a tail sends to its listener. */
 export type TailListener = {

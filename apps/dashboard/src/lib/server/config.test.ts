@@ -20,18 +20,18 @@ describe('readConfig', () => {
     const config = readConfig({}, nowMs);
 
     // THEN the defaults are used
-    expect(config).toEqual({ logFile: 'C:\\Valheim Server\\logs.txt', serverUtcOffsetMinutes: -420 });
+    expect(config).toEqual({ logFile: 'C:\\Valheim Server\\logs.txt', serverUtcOffsetMinutes: -420, password: null });
   });
 
-  it('reads the log path and offset from the settings', () => {
-    // GIVEN both settings
-    const env = { LOG_FILE: 'D:\\Valheim\\logs.txt', SERVER_UTC_OFFSET_MINUTES: '-420' };
+  it('reads the log path, offset and password from the settings', () => {
+    // GIVEN every setting
+    const env = { LOG_FILE: 'D:\\Valheim\\logs.txt', SERVER_UTC_OFFSET_MINUTES: '-420', DASHBOARD_PASSWORD: ' skol ' };
 
     // WHEN the config is read
     const config = readConfig(env);
 
-    // THEN both are used
-    expect(config).toEqual({ logFile: 'D:\\Valheim\\logs.txt', serverUtcOffsetMinutes: -420 });
+    // THEN each is used, with the password trimmed
+    expect(config).toEqual({ logFile: 'D:\\Valheim\\logs.txt', serverUtcOffsetMinutes: -420, password: 'skol' });
   });
 
   it('refuses an offset that is not whole minutes', () => {
