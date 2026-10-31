@@ -59,3 +59,10 @@ export const readLines = (state: ServerState, lines: readonly string[]): void =>
     readLogLine(state, line);
   }
 };
+
+/** Free ngrok address used as the tunnel's host in tests. */
+export const TUNNEL_HOST = 'longhouse.ngrok-free.app';
+
+/** Returns a page request to [host] with [headers], as the dashboard receives it. */
+export const requestTo = (host: string, headers: Record<string, string> = {}): Request =>
+  new Request(`http://${host}/`, { headers: { host, ...headers } });

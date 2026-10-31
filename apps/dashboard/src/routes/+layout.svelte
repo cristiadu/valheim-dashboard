@@ -7,7 +7,7 @@
   import Header from '#/lib/components/Header';
   import SideMenu from '#/lib/components/SideMenu';
   import { connectLive, live, provideSnapshot } from '#/lib/live.svelte';
-  import type { Snapshot } from '#/lib/models';
+  import { PASSWORD_PATH, type Snapshot } from '#/lib/models';
   import { serverPill } from '#/lib/pills';
   import { isServerOnline, statusLine, viewerOffsetMinutes } from '#/lib/status';
   import { tabFor } from '#/lib/tabs';
@@ -28,25 +28,32 @@
         },
   );
 
+  /** True on the password page, which shows no tabs and no live data. */
+  const isPasswordPage = $derived(page.url.pathname === PASSWORD_PATH);
+
   provideSnapshot(() => snapshot);
-  onMount(connectLive);
+  onMount(() => (isPasswordPage ? undefined : connectLive()));
 
   /** Tab that matches the current address. */
   const current = $derived(tabFor(page.url.pathname));
 </script>
 
 <svelte:head>
-  <title>{current.label} · Valheim Dashboard</title>
+  <title>{isPasswordPage ? 'Password' : current.label} · Valheim Dashboard</title>
 </svelte:head>
 
 <Header {status} />
-<div class="frame">
-  <aside><SideMenu {current} /></aside>
-  <main>
-    <h1>{current.label}</h1>
-    {@render children()}
-  </main>
-</div>
+{#if isPasswordPage}
+  {@render children()}
+{:else}
+  <div class="frame">
+    <aside><SideMenu {current} /></aside>
+    <main>
+      <h1>{current.label}</h1>
+      {@render children()}
+    </main>
+  </div>
+{/if}
 
 <style>
   /* Menu beside the page; wraps so the menu sits on top on phones */

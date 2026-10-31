@@ -192,3 +192,41 @@ Describe 'Get-PnpmVersion' {
     $version | Should -Be '12.16.1'
   }
 }
+
+Describe 'Get-GameServerPassword' {
+  It 'reads a quoted password from the start file' {
+    # GIVEN a start file like the one Valheim ships
+    Set-Content -Path (Join-Path $TestDrive 'start_headless_server.bat') -Value @(
+      'set SteamAppId=892970',
+      'valheim_server -nographics -batchmode -name "Cotil" -port 2456 -world "Cotil" -password "skol 123" -crossplay'
+    )
+
+    # WHEN reading the password
+    $password = Get-GameServerPassword $TestDrive
+
+    # THEN it is the text inside the quotes
+    $password | Should -Be 'skol 123'
+  }
+
+  It 'reads a password without quotes' {
+    # GIVEN a start file with an unquoted password
+    Set-Content -Path (Join-Path $TestDrive 'start_headless_server.bat') -Value 'valheim_server -world Cotil -password skol123 -public 1'
+
+    # WHEN reading the password
+    $password = Get-GameServerPassword $TestDrive
+
+    # THEN it is the next word
+    $password | Should -Be 'skol123'
+  }
+
+  It 'gives nothing when the start file has no password' {
+    # GIVEN a start file without -password
+    Set-Content -Path (Join-Path $TestDrive 'start_headless_server.bat') -Value 'valheim_server -world Cotil'
+
+    # WHEN reading the password
+    $password = Get-GameServerPassword $TestDrive
+
+    # THEN there is none
+    $password | Should -BeNullOrEmpty
+  }
+}

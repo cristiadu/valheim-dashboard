@@ -13,6 +13,9 @@ $GameServerProcessName = 'valheim_server'
 # Batch file Valheim ships to start the dedicated server, in the server folder.
 $GameServerStartFile = 'start_headless_server.bat'
 
+# The -password argument in the start file, quoted or not, for example -password "skol123".
+$GameServerPasswordPattern = '-password\s+(?:"(?<password>[^"]*)"|(?<password>\S+))'
+
 # Title of the game server's console window.
 $GameServerWindowTitle = 'Valheim server'
 
@@ -196,6 +199,19 @@ function Start-GameServer([string]$ServerDir) {
   # conhost keeps it a classic console window, which Ctrl+C can reach, whatever the default terminal app is.
   $arguments = @('/c', 'start', "`"$GameServerWindowTitle`"", 'conhost.exe', 'cmd.exe', '/c', $GameServerStartFile)
   Start-Process -FilePath 'cmd.exe' -ArgumentList $arguments -WorkingDirectory $ServerDir -WindowStyle Hidden
+}
+
+<#
+.SYNOPSIS
+  Returns the server password from the -password argument in the start file in [ServerDir], or $null when
+  the file or the argument is missing. Friends type the same password on the dashboard.
+#>
+function Get-GameServerPassword([string]$ServerDir) {
+  $startFile = Join-Path $ServerDir $GameServerStartFile
+  if (-not (Test-Path $startFile)) { return $null }
+  $match = [regex]::Match((Get-Content -Path $startFile -Raw), $GameServerPasswordPattern)
+  if (-not $match.Success) { return $null }
+  return $match.Groups['password'].Value
 }
 
 Export-ModuleMember -Function *

@@ -11,8 +11,9 @@ flowchart LR
     log --> dash[Dashboard]
     dash -->|copies each run| hist[log-history folder]
     hist -->|read on start| dash
+    ngrok[ngrok] -->|forwards| dash
   end
-  dash -->|live page| friends[Friends' browsers]
+  friends[Friends' browsers] -->|shared link and password| ngrok
 ```
 
 ## Parts
@@ -22,7 +23,7 @@ flowchart LR
 | `packages/valheim-log` | Turns log lines into game events and player sessions. No files, no network. |
 | `apps/dashboard` | SvelteKit app on Node. Follows `logs.txt` and serves the page. |
 | `plugins/event-log` | BepInEx plugin on the server only. Logs what the game does not. Friends install nothing. |
-| `scripts` | Start the dashboard, keep it running and update it from `main` on Windows. |
+| `scripts` | Start the dashboard, keep it running and update it from `main` on Windows, and share it through ngrok. |
 | `docs/log-events.md` | Every log line the dashboard reads, with its regex. |
 
 ## Reading a log line
@@ -93,6 +94,36 @@ sequenceDiagram
 
 A snapshot is everything the page shows, as JSON. `/api/status` returns the same snapshot once.
 
+## Sharing with friends
+
+The dashboard listens only on the server PC (`127.0.0.1`). ngrok connects out from the PC and passes the
+shared link's requests in, so no router port is open.
+
+```mermaid
+sequenceDiagram
+  participant F as Friend's browser
+  participant N as ngrok
+  participant D as Dashboard
+  F->>N: https://longhouse.ngrok-free.app
+  N->>D: Same request, with X-Forwarded-For
+  D-->>F: No cookie: go to /password
+  F->>D: Types the password (through ngrok)
+  D-->>F: Cookie, then back to the page they wanted
+  F->>D: Page and live stream, with the cookie
+```
+
+| A request | Gets |
+| --- | --- |
+| Made on the PC (host `localhost` or `127.0.0.1`, no `X-Forwarded-For`), such as `/api/status` for the updater | Served, no password |
+| Through ngrok with the cookie | Served |
+| Through ngrok without it | Sent to `/password`; `/api/*` answers `401` |
+| Through ngrok when no password is set | Turned away (`403`) |
+
+The password is the Valheim server's own, which the start script reads from `-password` in
+`start_headless_server.bat`. The cookie (`dashboard_pass`) lasts 30 days. It holds a hash made from the password, so changing the
+password sends everyone back to the password page. A wrong password waits 1 second before the answer, so
+guessing is slow.
+
 ## Tabs
 
 | Tab | Shows | Data from |
@@ -160,7 +191,8 @@ flowchart TD
   run -->|stopped| wait[Wait 5 s] --> run
 ```
 
-`install-startup.cmd` adds the logon task and the update task once. Every window stays hidden when it
+`install-startup.cmd` adds the logon task and the update task once. `share-dashboard.ps1` adds one more
+that starts ngrok with no window. Every window stays hidden when it
 starts at logon.
 
 ## Updates from main
@@ -224,6 +256,7 @@ Every log lives in `C:\Valheim Server`.
 | `dashboard.log` | The start script, with the dashboard's output |
 | `updater.log` | The update script: what it updated, skipped or is waiting for |
 | `updater-state.json` | The update script: commits of the running dashboard and the installed plugin |
+| `ngrok.log` | ngrok, warnings and errors only |
 
 ## CI
 
