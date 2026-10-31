@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <AssemblyName>ValheimDashboard.BuildLog</AssemblyName>
+    <AssemblyName>ValheimDashboard.EventLog</AssemblyName>
     <LangVersion>latest</LangVersion>
     <!-- Dedicated server folder, which holds the game and BepInEx assemblies this plugin builds against. -->
     <ValheimServerDir Condition="'$(ValheimServerDir)' == ''">C:\Program Files (x86)\Steam\steamapps\common\Valheim dedicated server</ValheimServerDir>
