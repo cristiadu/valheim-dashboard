@@ -18,12 +18,12 @@
   import { sessionEndMs } from '#/lib/players';
   import { clockTime } from '#/lib/status';
 
-  /** Players to draw, the snapshot, the clock and the viewer's offset from UTC in minutes. */
-  let { players, snapshot, nowMs, offsetMinutes }: {
+  /** Players to draw, the snapshot, the clock and the viewer's time zone. */
+  let { players, snapshot, nowMs, timeZone }: {
     players: Player[];
     snapshot: Snapshot;
     nowMs: number;
-    offsetMinutes: number;
+    timeZone: string;
   } = $props();
 
   /** Hour ticks around the edge, longer every 6 hours. */
@@ -42,8 +42,8 @@
         if (part === null) {
           return [];
         }
-        const label = `${player.character} ${clockTime(new Date(part.startMs).toISOString(), offsetMinutes)} to ${clockTime(new Date(part.endMs).toISOString(), offsetMinutes)}`;
-        const path = arcPath(hourOfDay(part.startMs, offsetMinutes), hourOfDay(part.endMs, offsetMinutes), WHEEL_OUTER_RING_RADIUS - index * WHEEL_RING_STEP);
+        const label = `${player.character} ${clockTime(new Date(part.startMs).toISOString(), timeZone)} to ${clockTime(new Date(part.endMs).toISOString(), timeZone)}`;
+        const path = arcPath(hourOfDay(part.startMs, timeZone), hourOfDay(part.endMs, timeZone), WHEEL_OUTER_RING_RADIUS - index * WHEEL_RING_STEP);
         return [{ path, label }];
       }),
     })),
@@ -51,7 +51,7 @@
 
   /** Clock hand pointing at now. */
   const hand = $derived.by(() => {
-    const [x, y] = wheelPoint(hourOfDay(nowMs, offsetMinutes), WHEEL_HAND_RADIUS);
+    const [x, y] = wheelPoint(hourOfDay(nowMs, timeZone), WHEEL_HAND_RADIUS);
     return `M ${WHEEL_CENTER} ${WHEEL_CENTER} L ${x.toFixed(1)} ${y.toFixed(1)}`;
   });
 
@@ -74,7 +74,7 @@
   <text x="294" y="154" text-anchor="end">06</text>
   <text x="150" y="298" text-anchor="middle">12</text>
   <text x="6" y="154">18</text>
-  <text x="150" y="190" text-anchor="middle" class="now">{clockTime(new Date(nowMs).toISOString(), offsetMinutes)}</text>
+  <text x="150" y="190" text-anchor="middle" class="now">{clockTime(new Date(nowMs).toISOString(), timeZone)}</text>
 </svg>
 <ul class="legend">
   {#each players as player (player.key)}
