@@ -56,7 +56,7 @@
     <div class="grid">
       <section class="panel" aria-labelledby="wheel-title">
         <h2 id="wheel-title" class="panel-title">LAST 24 HOURS</h2>
-        <p class="muted">Who was online around the clock. Midnight at the top.</p>
+        <p class="muted">Who was online around the clock. Midnight is at the top, and the shaded part is yesterday.</p>
         <DayWheel {players} {snapshot} {nowMs} {timeZone} />
       </section>
 

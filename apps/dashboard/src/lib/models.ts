@@ -100,6 +100,12 @@ export const WHEEL_MAX_ARC_HOURS = 23.99;
 /** Shortest arc on the wheel, in hours, so a short session still shows. */
 export const WHEEL_MIN_ARC_HOURS = 0.05;
 
+/** Radius of the "today" and "yesterday" labels, inside the smallest player ring. */
+export const WHEEL_DAY_LABEL_RADIUS = 58;
+
+/** Smallest part of the wheel, in hours, that gets a "today" or "yesterday" label. */
+export const WHEEL_MIN_LABEL_HOURS = 2;
+
 /** Hours between the time labels above the Vikings lanes. */
 export const LANE_AXIS_STEP_HOURS = 4;
 
@@ -329,6 +335,14 @@ export const PLAYER_COLORS = ['var(--gold)', 'var(--frost)', 'var(--ember)', 'va
 
 /** Color for players past the fourth. */
 export const OTHER_PLAYER_COLOR = 'var(--muted)';
+
+/** Part of a time range that falls on one day in the viewer's zone. */
+export type DayPart = {
+  startMs: number;
+  endMs: number;
+  /** True when the part is before the viewer's last midnight. */
+  isYesterday: boolean;
+};
 
 /** One person: every session with the same Steam ID, or the same character when there is no Steam ID. */
 export type Player = {
