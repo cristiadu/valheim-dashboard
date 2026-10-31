@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using HarmonyLib;
 using UnityEngine;
 
 namespace ValheimDashboard.EventLog
@@ -8,7 +7,6 @@ namespace ValheimDashboard.EventLog
     /// Keeps the time of each creature's latest attack move. A creature's game sends its animations to every
     /// player through the server, so the server sees which creatures are fighting.
     /// </summary>
-    [HarmonyPatch]
     internal static class CombatTracker
     {
         /// <summary>Hash of the call that plays an animation, such as an attack, on every player's game.</summary>
@@ -26,17 +24,9 @@ namespace ValheimDashboard.EventLog
         /// <summary>Creatures whose last move is too old to count, gathered before they are removed.</summary>
         private static readonly List<ZDOID> StaleCreatures = new List<ZDOID>();
 
-        /// <summary>Records the time of a creature's animation as it passes through the server.</summary>
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(ZRoutedRpc), "RPC_RoutedRPC")]
-        private static void BeforeRoutedRpc(ZPackage pkg)
+        /// <summary>Records the time of [data] when it is a creature's animation.</summary>
+        public static void Read(ZRoutedRpc.RoutedRPCData data)
         {
-            if (ZNet.instance == null || !ZNet.instance.IsServer())
-            {
-                return;
-            }
-            ZRoutedRpc.RoutedRPCData data = new ZRoutedRpc.RoutedRPCData();
-            data.Deserialize(new ZPackage(pkg.GetArray()));
             if (data.m_methodHash != SetTriggerHash)
             {
                 return;

@@ -58,6 +58,7 @@ namespace ValheimDashboard.EventLog
                 bool isNew = SeenObjects.Add(entry.Key) && hasSeenWorld;
                 CreatureTracker.See(zdo, isNew);
                 PlacedItemTracker.See(zdo, isNew);
+                ItemTracker.See(zdo);
                 if (isNew)
                 {
                     NewObjects.Add(zdo);
@@ -88,6 +89,7 @@ namespace ValheimDashboard.EventLog
                 return;
             }
             CreatureTracker.Destroyed(zdo);
+            ItemTracker.Destroyed(zdo);
             if (zdo.GetLong(ZDOVars.s_creator, 0L) != 0L)
             {
                 ZLog.Log($"Piece destroyed: {Names.PrefabName(zdo)} built by {Names.Character(zdo.GetLong(ZDOVars.s_creator, 0L))}");

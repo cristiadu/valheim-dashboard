@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace ValheimDashboard.EventLog
 {
@@ -13,6 +14,26 @@ namespace ValheimDashboard.EventLog
 
         /// <summary>Name of each tameable creature at the last scan, by object ID.</summary>
         private static readonly Dictionary<ZDOID, string> TameNames = new Dictionary<ZDOID, string>();
+
+        /// <summary>Farthest a creature reaches to eat food off the ground, in meters, with some margin.</summary>
+        private const float EatingRangeMeters = 3f;
+
+        /// <summary>
+        /// Returns true when a creature that eats food off the ground, such as a wolf or a boar, stands within
+        /// reach of [position].
+        /// </summary>
+        public static bool IsEaterNear(Vector3 position)
+        {
+            foreach (ZDOID creature in TameStates.Keys)
+            {
+                ZDO zdo = ZDOMan.instance.GetZDO(creature);
+                if (zdo != null && Vector3.Distance(zdo.GetPosition(), position) <= EatingRangeMeters)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
 
         /// <summary>Logs what changed on a tameable creature since the last scan. [isNew] is true for a new object.</summary>
         public static void See(ZDO zdo, bool isNew)

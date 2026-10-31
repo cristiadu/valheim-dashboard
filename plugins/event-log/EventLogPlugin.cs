@@ -25,8 +25,7 @@ namespace ValheimDashboard.EventLog
             BepInEx.Logging.Logger.Listeners.Add(new ServerLogListener());
             Harmony harmony = new Harmony(PluginGuid);
             harmony.PatchAll(typeof(WorldScanner));
-            harmony.PatchAll(typeof(ChatTracker));
-            harmony.PatchAll(typeof(CombatTracker));
+            harmony.PatchAll(typeof(RoutedRpcTracker));
             harmony.PatchAll(typeof(WorldEventTracker));
             Logger.LogInfo($"{PluginName} {PluginVersion} loaded");
         }

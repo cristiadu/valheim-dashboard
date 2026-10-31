@@ -186,6 +186,10 @@ when the plugin does not know who it was.
 | Tame named | `Pet named: Wolf Fluffy` | `^Pet named: (?<creature>\S+) (?<name>.+)$` |
 | Sign written | `Sign written: Ragnar: Keep out` | `^Sign written: (?<author>.+?): (?<text>.*)$` |
 | Item hung on a stand | `Item hung: TrophyDeer by Ragnar` | `^Item hung: (?<item>\S+) by (?<player>.+)$` |
+| Item picked up | `Picked up: Wood x20 by Ragnar` | `^Picked up: (?<item>\S+) x(?<count>\d+) by (?<player>.+)$` |
+| Items put in or taken from a chest | `Stored: Wood x20 in piece_chest_wood by Ragnar` | `^(?<change>Stored\|Taken): (?<item>\S+) x(?<count>\d+) (?:in\|from) (?<chest>\S+) by (?<player>.+)$` |
+| Plant harvested | `Harvested: RaspberryBush by Ragnar` | `^Harvested: (?<plant>\S+) by (?<player>.+)$` |
+| Tombstone emptied | `Tombstone emptied: Ragnar by Bjorn` | `^Tombstone emptied: (?<owner>.+?) by (?<player>.+)$` |
 
 - **Chat** only reaches the server when another player is online to receive it. `said` is normal
   talk, `shouted` reaches everyone, `whispered` reaches players close by.
@@ -200,7 +204,11 @@ when the plugin does not know who it was.
 - **Creature killed** lists every player who hit the creature, since each creature remembers them.
   Creatures that die without a player hitting them are not logged, except tames (`Tame died`).
   `level` is 1 for a creature with no stars.
-- **Sign written** and **Item hung** name the player whose game changed the sign or stand.
+- **Sign written**, **Item hung**, **Stored**, **Taken** and **Tombstone emptied** name the player whose
+  game changed the object. A game takes over an object before it changes it.
+- **Picked up** is only logged when that player stands within 10 meters of the item, since items left
+  alone despawn, and no creature that eats off the ground stands within 3 meters of it.
+- **Harvested** names the player who asked to harvest, or the player whose game owns the plant.
 - **Gear** is logged the first time a player wears or holds an item since the server started.
 
 To build it, install the .NET SDK and BepInExPack_Valheim on the server, run `dotnet build -c Release`
