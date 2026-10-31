@@ -97,10 +97,10 @@ A snapshot is everything the page shows, as JSON. `/api/status` returns the same
 
 | Tab | Shows | Data from |
 | --- | --- | --- |
-| Hall | Who is online, the last 24 hours on a day wheel, the latest events | Snapshot |
-| Vikings | Each player and when they were online | Snapshot |
+| Hall | Who is online and where, the last 24 hours on a day wheel, the latest events | Snapshot |
+| Vikings | Each player, when they were online, kills, areas visited and gear | Snapshot |
 | Saga | Every game event and chat, with filters | Snapshot |
-| World | Saves, backups, disk space | Snapshot |
+| World | The in-game day, bosses defeated, saves, backups, disk space | Snapshot |
 | Recipes | Crafting plans and what is still missing | The viewer's browser |
 | Server | Up or down, uptime in the last 24 hours, warnings | Snapshot |
 
@@ -137,7 +137,10 @@ On the dashboard, plugin lines become:
 | Activities | Pieces built or destroyed, kills, pickups, harvests, chests | One Saga line per player and kind, until a 10 minute pause |
 | Story events | Deaths, bosses, raids, portals, tames, signs, item stands, tombstones | One Saga line each |
 | News only | Areas, gear, global keys | A Saga line for a first visit or a dungeon trip, new gear, or a boss defeat |
-| Chat | Chat and pings | The Saga's "Chat and signs" filter, kept apart so it never pushes out events | BepInEx's own log file is turned off, so its messages land in
+| Stats | Areas, kills, the day, boss keys | Where each player is now and their kills, areas and gear on Vikings, the day and bosses on World |
+| Chat | Chat and pings | The Saga's "Chat and signs" filter, kept apart so it never pushes out events |
+
+BepInEx's own log file is turned off, so its messages land in
 `logs.txt` too. Every line is listed in [log-events.md](log-events.md).
 
 ## Start scripts
