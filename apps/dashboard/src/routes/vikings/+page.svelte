@@ -2,8 +2,10 @@
   import NoData from '#/lib/components/NoData';
   import TimeLanes from '#/lib/components/TimeLanes';
   import { live, useSnapshot } from '#/lib/live.svelte';
+  import { LISTED_GEAR_COUNT } from '#/lib/models';
   import { playersOf } from '#/lib/players';
   import { clockTime, durationLabel, viewerOffsetMinutes } from '#/lib/status';
+  import { areaLabel, gearLabel, thingName } from '#/lib/story';
 
   /** Getter for the snapshot the layout shares. */
   const getSnapshot = useSnapshot();
@@ -39,7 +41,14 @@
             <div><dt>TIME</dt><dd class="mono">{durationLabel(player.totalMs)}</dd></div>
             <div><dt>VISITS</dt><dd class="mono">{player.sessions.length}</dd></div>
             <div><dt>DEATHS</dt><dd class="mono">{player.deaths}</dd></div>
+            <div><dt>KILLS</dt><dd class="mono">{player.kills}</dd></div>
           </dl>
+          {#if player.isOnline && player.area}<p>Now in {areaLabel(player.area)}</p>{/if}
+          {#if player.topKill}<p><span class="muted">Most killed:</span> {thingName(player.topKill)}</p>{/if}
+          {#if player.areas.length > 0}<p><span class="muted">Been to:</span> {player.areas.map(areaLabel).join(', ')}</p>{/if}
+          {#if player.gear.length > 0}
+            <p><span class="muted">Gear:</span> {player.gear.slice(0, LISTED_GEAR_COUNT).map(gearLabel).join(', ')}</p>
+          {/if}
         </article>
       {/each}
     </div>
@@ -91,10 +100,10 @@
     margin: 0;
   }
 
-  /* Three numbers side by side */
+  /* Numbers two by two, so they fit a narrow card */
   dl {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
     margin: 0;
   }

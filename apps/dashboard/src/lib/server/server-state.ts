@@ -5,6 +5,7 @@ import type { LogEvent } from 'valheim-log';
 import {
   type ActivityKind,
   type ActivityRecord,
+  BOSS_NAMES,
   DEFEATED_KEY_PREFIX,
   DUNGEON_AREA,
   type Snapshot,
@@ -131,6 +132,10 @@ export const createServerState = (serverUtcOffsetMinutes: number): ServerState =
       chat: [],
       visitedAreas: {},
       gear: {},
+      currentAreas: {},
+      kills: {},
+      day: null,
+      defeatedBosses: [],
     },
   };
 };
@@ -207,6 +212,25 @@ export const readLogLine = (state: ServerState, line: string): void => {
     case 'chatMessage': {
       const { timeUtc, character, kind, text } = event;
       pushCapped(snapshot.chat, { timeUtc, character, kind, text }, MAX_CHAT);
+      break;
+    }
+    case 'areaEntered':
+      snapshot.currentAreas[event.character] = event.area;
+      break;
+    case 'creatureKilled':
+      for (const attacker of event.attackers) {
+        const kills = (snapshot.kills[attacker] ??= {});
+        kills[event.creature] = (kills[event.creature] ?? 0) + 1;
+      }
+      break;
+    case 'dayStarted':
+      snapshot.day = event.day;
+      break;
+    case 'globalKey': {
+      const boss = BOSS_NAMES[event.key];
+      if (event.isSet && boss !== undefined && !snapshot.defeatedBosses.includes(boss)) {
+        snapshot.defeatedBosses.push(boss);
+      }
       break;
     }
     case 'ping':

@@ -95,6 +95,26 @@ describe('server state', () => {
     expect(state.snapshot.gear).toEqual({ Ragnar: ['SwordIron'] });
   });
 
+  it('tracks where players are, their kills, the day and the bosses defeated', () => {
+    // GIVEN Ragnar moves to the Swamp, kills with Bjorn, a day starts and Eikthyr falls twice
+    readLines(state, [
+      ...RUN_START,
+      logLine('03:00:00', 'Area entered: Ragnar Meadows'),
+      logLine('03:10:00', 'Area entered: Ragnar Swamp'),
+      logLine('03:20:00', 'Creature killed: Draugr level 1 by Ragnar, Bjorn'),
+      logLine('03:21:00', 'Creature killed: Draugr level 2 by Ragnar'),
+      logLine('03:30:00', 'Day started: 42'),
+      logLine('03:40:00', 'Global key set: defeated_eikthyr'),
+      logLine('03:50:00', 'Global key set: defeated_eikthyr'),
+    ]);
+
+    // WHEN / THEN the snapshot knows each
+    expect(state.snapshot.currentAreas).toEqual({ Ragnar: 'Swamp' });
+    expect(state.snapshot.kills).toEqual({ Ragnar: { Draugr: 2 }, Bjorn: { Draugr: 1 } });
+    expect(state.snapshot.day).toBe(42);
+    expect(state.snapshot.defeatedBosses).toEqual(['Eikthyr']);
+  });
+
   it('keeps chat and pings apart from the game events', () => {
     // GIVEN a shout and a ping
     readLines(state, [...RUN_START, logLine('03:00:00', 'Chat: Ragnar shouted: Troll!'), logLine('03:00:05', 'Ping: Ragnar at 1 2')]);
