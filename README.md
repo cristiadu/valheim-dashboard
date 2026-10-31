@@ -19,7 +19,9 @@ It reads `C:\Valheim Server\logs.txt` and writes its own output to `C:\Valheim S
 stops, it starts again after 5 seconds.
 
 To start it every time you log on to Windows, double-click `scripts\install-startup.cmd` once. It runs
-hidden, with no window.
+hidden, with no window. It also checks `main` every 5 minutes: it pulls, rebuilds and restarts the
+dashboard, and installs a changed event log plugin when nobody is online. It writes what it did to
+`C:\Valheim Server\updater.log`.
 
 ## Share it with friends
 
@@ -27,19 +29,18 @@ Friends open one link and type a password. They install nothing.
 
 1. Make a free account at [ngrok.com](https://dashboard.ngrok.com/signup). Copy your auth token, and the free
    domain under Domains.
-2. Put the password friends will type in `C:\Valheim Server\dashboard-password.txt`, then restart the
-   dashboard.
-3. In PowerShell, run once:
+2. In PowerShell, run once:
 
    ```powershell
    .\scripts\share-dashboard.ps1 -Domain "longhouse.ngrok-free.app" -AuthToken "<your token>"
    ```
 
 Friends open `https://longhouse.ngrok-free.app`, click past ngrok's notice the first time, and type the
-password on the dashboard's password page. It remembers them for 30 days. The link starts hidden each time you log on. `share-dashboard.ps1 -Remove` stops
-sharing.
+Valheim server's password on the dashboard's password page. The dashboard reads it from
+`start_headless_server.bat`, so change it there and restart the dashboard. The page remembers them for 30
+days. The link starts hidden each time you log on. `share-dashboard.ps1 -Remove` stops sharing.
 
-After a `git pull`, start it with `scripts\start-dashboard.cmd -Rebuild`. Other settings are in
+After a manual `git pull`, start it with `scripts\start-dashboard.cmd -Rebuild`. Other settings are in
 [apps/dashboard/README.md](apps/dashboard/README.md).
 
 ## Work on it
