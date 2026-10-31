@@ -22,7 +22,7 @@ namespace ValheimDashboard.EventLog
                 string text = zdo.GetString(ZDOVars.s_text, string.Empty).Replace('\n', ' ');
                 if ((isNew || SignTexts.TryGetValue(zdo.m_uid, out string oldText) && text != oldText) && text != string.Empty)
                 {
-                    ZLog.Log($"Sign written: {Names.Peer(zdo.GetOwner())}: {text}");
+                    GameEventLog.Write($"Sign written: {Names.Peer(zdo.GetOwner())}: {text}");
                 }
                 SignTexts[zdo.m_uid] = text;
             }
@@ -31,7 +31,7 @@ namespace ValheimDashboard.EventLog
                 int item = zdo.GetInt(ZDOVars.s_item);
                 if ((isNew || StandItems.TryGetValue(zdo.m_uid, out int oldItem) && item != oldItem) && item != 0)
                 {
-                    ZLog.Log($"Item hung: {Names.Item(item)} by {Names.Peer(zdo.GetOwner())}");
+                    GameEventLog.Write($"Item hung: {Names.Item(item)} by {Names.Peer(zdo.GetOwner())}");
                 }
                 StandItems[zdo.m_uid] = item;
             }
