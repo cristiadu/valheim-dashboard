@@ -55,7 +55,10 @@ namespace ValheimDashboard.EventLog
                     Names.CharacterNames[zdo.GetLong(ZDOVars.s_playerID, 0L)] = zdo.GetString(ZDOVars.s_playerName, string.Empty);
                 }
                 PlayerTracker.See(zdo);
-                if (SeenObjects.Add(entry.Key) && hasSeenWorld)
+                bool isNew = SeenObjects.Add(entry.Key) && hasSeenWorld;
+                CreatureTracker.See(zdo, isNew);
+                PlacedItemTracker.See(zdo, isNew);
+                if (isNew)
                 {
                     NewObjects.Add(zdo);
                 }
@@ -71,15 +74,21 @@ namespace ValheimDashboard.EventLog
             LogNewDay();
         }
 
-        /// <summary>Logs a built piece just before the server forgets it.</summary>
+        /// <summary>Logs a built piece or a creature just before the server forgets it.</summary>
         [HarmonyPrefix]
         [HarmonyPatch(typeof(ZDOMan), "HandleDestroyedZDO")]
         private static void BeforeDestroyed(ZDOMan __instance, ZDOID uid)
         {
             SeenObjects.Remove(uid);
             PlayerTracker.Forget(uid);
+            PlacedItemTracker.Destroyed(uid);
             ZDO zdo = __instance.GetZDO(uid);
-            if (zdo != null && zdo.GetLong(ZDOVars.s_creator, 0L) != 0L)
+            if (zdo == null)
+            {
+                return;
+            }
+            CreatureTracker.Destroyed(zdo);
+            if (zdo.GetLong(ZDOVars.s_creator, 0L) != 0L)
             {
                 ZLog.Log($"Piece destroyed: {Names.PrefabName(zdo)} built by {Names.Character(zdo.GetLong(ZDOVars.s_creator, 0L))}");
             }
