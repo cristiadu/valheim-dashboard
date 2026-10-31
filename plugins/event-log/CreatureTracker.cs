@@ -47,15 +47,15 @@ namespace ValheimDashboard.EventLog
             string creature = Names.PrefabName(zdo);
             if (isNew && isTame)
             {
-                ZLog.Log(Names.Has<Growup>(zdo) ? $"Tame born: {creature}" : $"Tame grew up: {creature}");
+                GameEventLog.Write(Names.Has<Growup>(zdo) ? $"Tame born: {creature}" : $"Tame grew up: {creature}");
             }
             else if (TameStates.TryGetValue(zdo.m_uid, out bool wasTame) && isTame && !wasTame)
             {
-                ZLog.Log($"Tamed: {creature}");
+                GameEventLog.Write($"Tamed: {creature}");
             }
             if (TameNames.TryGetValue(zdo.m_uid, out string oldName) && name != oldName && name != string.Empty)
             {
-                ZLog.Log($"Pet named: {creature} {name}");
+                GameEventLog.Write($"Pet named: {creature} {name}");
             }
             TameStates[zdo.m_uid] = isTame;
             TameNames[zdo.m_uid] = name;
@@ -85,11 +85,11 @@ namespace ValheimDashboard.EventLog
             int level = zdo.GetInt(ZDOVars.s_level, 1);
             if (attackers.Count > 0)
             {
-                ZLog.Log($"Creature killed: {creature} level {level} by {string.Join(", ", attackers)}");
+                GameEventLog.Write($"Creature killed: {creature} level {level} by {string.Join(", ", attackers)}");
             }
             else if (zdo.GetBool(ZDOVars.s_tamed))
             {
-                ZLog.Log($"Tame died: {creature} {zdo.GetString(ZDOVars.s_tamedName, string.Empty)}".TrimEnd());
+                GameEventLog.Write($"Tame died: {creature} {zdo.GetString(ZDOVars.s_tamedName, string.Empty)}".TrimEnd());
             }
         }
     }

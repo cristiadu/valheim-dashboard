@@ -161,6 +161,10 @@ flowchart LR
 
 Each line names a player only when the game data says who did it.
 
+The server sends its own log only to `logs.txt`, so the plugin also shows each event line in the server's
+console window, for example `[Info   :Game event] Chat: Ragnar shouted: Troll!`. Only `logs.txt` feeds the
+dashboard.
+
 On the dashboard, plugin lines become:
 
 | Kept as | Lines | Shown as |
@@ -215,7 +219,7 @@ flowchart TD
 | --- | --- |
 | Who is online | Sessions without an end in `/api/status`. |
 | Stopping the game server | Ctrl+C sent to its console, as in its window. The game saves the world and exits. |
-| Starting the game server | `start_headless_server.bat` in its own "Valheim server" window, minimized and without taking focus. A server that was already stopped stays stopped. |
+| Starting the game server | `start_headless_server.bat` in its own console window, in the foreground. A server that was already stopped stays stopped. |
 | Remembering what is installed | `updater-state.json` keeps the commit of the running dashboard and of the installed plugin. A step that fails or waits runs again on the next pass. |
 
 The first run takes the installed plugin as current and builds the dashboard once.
