@@ -56,6 +56,10 @@ export type LogEvent = { timeUtc: string } & (
   | { type: 'petNamed'; creature: string; name: string }
   | { type: 'signWritten'; author: string | null; text: string }
   | { type: 'itemHung'; item: string; player: string | null }
+  | { type: 'itemPickedUp'; item: string; count: number; player: string | null }
+  | { type: 'chestChanged'; item: string; count: number; chest: string; player: string | null; isStored: boolean }
+  | { type: 'harvested'; plant: string; player: string | null }
+  | { type: 'tombstoneEmptied'; owner: string | null; player: string | null }
   | { type: 'worldSaveStep'; step: number; durationMs: number; saveNumber: number | null }
   | { type: 'backupCreated'; backup: string }
   | { type: 'diskSpace'; availableBytes: number; blockedBelowBytes: number; warnBelowBytes: number }

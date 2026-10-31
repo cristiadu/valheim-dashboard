@@ -1,0 +1,160 @@
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace ValheimDashboard.EventLog
+{
+    /// <summary>
+    /// Logs items players pick up, put in or take out of chests, and harvest, and tombstones they empty. A
+    /// player's game takes over an item, chest or tombstone before changing it, so its owner is the player who
+    /// did it. A player harvesting a plant another game owns asks that game through the server, so the server
+    /// sees who asked.
+    /// </summary>
+    internal static class ItemTracker
+    {
+        /// <summary>Hash of the call a player sends to harvest a plant another player's game owns.</summary>
+        private static readonly int PickHash = "RPC_Pick".GetStableHashCode();
+
+        /// <summary>Farthest a player stands from an item they pick up, in meters. Items left alone despawn instead.</summary>
+        private const float PickupRangeMeters = 10f;
+
+        /// <summary>Width and height of the inventory chest contents are read into, larger than any chest.</summary>
+        private const int ChestReadSize = 16;
+
+        /// <summary>Contents of each chest at the last scan, by object ID, kept with the data they came from.</summary>
+        private static readonly Dictionary<ZDOID, (byte[] Data, Dictionary<string, int> Counts)> ChestContents =
+            new Dictionary<ZDOID, (byte[] Data, Dictionary<string, int> Counts)>();
+
+        /// <summary>Whether each plant was harvested at the last scan, by object ID.</summary>
+        private static readonly Dictionary<ZDOID, bool> PickedStates = new Dictionary<ZDOID, bool>();
+
+        /// <summary>Player who asked to harvest each plant, by object ID, until the harvest is logged.</summary>
+        private static readonly Dictionary<ZDOID, string> PickedBy = new Dictionary<ZDOID, string>();
+
+        /// <summary>Remembers who asked to harvest a plant when [data] is such a request.</summary>
+        public static void Read(ZRoutedRpc.RoutedRPCData data)
+        {
+            if (data.m_methodHash == PickHash)
+            {
+                PickedBy[data.m_targetZDO] = Names.Peer(data.m_senderPeerID);
+            }
+        }
+
+        /// <summary>Logs a chest whose contents changed, or a plant harvested, since the last scan.</summary>
+        public static void See(ZDO zdo)
+        {
+            if (Names.Has<Container>(zdo) && !Names.Has<TombStone>(zdo))
+            {
+                SeeChest(zdo);
+            }
+            else if (Names.Has<Pickable>(zdo))
+            {
+                bool isPicked = zdo.GetBool(ZDOVars.s_picked);
+                if (PickedStates.TryGetValue(zdo.m_uid, out bool wasPicked) && isPicked && !wasPicked)
+                {
+                    LogHarvest(zdo);
+                }
+                PickedStates[zdo.m_uid] = isPicked;
+            }
+        }
+
+        /// <summary>Logs an item picked up, a plant harvested away, or a tombstone emptied, as the server destroys it.</summary>
+        public static void Destroyed(ZDO zdo)
+        {
+            ChestContents.Remove(zdo.m_uid);
+            PickedStates.Remove(zdo.m_uid);
+            if (Names.Has<ItemDrop>(zdo))
+            {
+                LogPickup(zdo);
+            }
+            else if (Names.Has<Pickable>(zdo))
+            {
+                LogHarvest(zdo);
+            }
+            else if (Names.Has<TombStone>(zdo))
+            {
+                ZLog.Log($"Tombstone emptied: {zdo.GetString(ZDOVars.s_ownerName, Names.UnknownPlayer)} by {Names.Peer(zdo.GetOwner())}");
+            }
+            PickedBy.Remove(zdo.m_uid);
+        }
+
+        /// <summary>Logs each item that went into or out of [chest] since the last scan.</summary>
+        private static void SeeChest(ZDO chest)
+        {
+            byte[] data = chest.GetByteArray(ZDOVars.s_items);
+            if (data == null)
+            {
+                return;
+            }
+            bool isKnown = ChestContents.TryGetValue(chest.m_uid, out (byte[] Data, Dictionary<string, int> Counts) before);
+            if (isKnown && before.Data == data)
+            {
+                return;
+            }
+            Dictionary<string, int> counts = CountItems(data);
+            ChestContents[chest.m_uid] = (data, counts);
+            if (!isKnown)
+            {
+                return;
+            }
+            string player = Names.Peer(chest.GetOwner());
+            string chestName = Names.PrefabName(chest);
+            foreach (KeyValuePair<string, int> item in counts)
+            {
+                before.Counts.TryGetValue(item.Key, out int oldCount);
+                if (item.Value > oldCount)
+                {
+                    ZLog.Log($"Stored: {item.Key} x{item.Value - oldCount} in {chestName} by {player}");
+                }
+            }
+            foreach (KeyValuePair<string, int> item in before.Counts)
+            {
+                counts.TryGetValue(item.Key, out int newCount);
+                if (item.Value > newCount)
+                {
+                    ZLog.Log($"Taken: {item.Key} x{item.Value - newCount} from {chestName} by {player}");
+                }
+            }
+        }
+
+        /// <summary>Returns how many of each item the chest contents in [data] hold, by item name.</summary>
+        private static Dictionary<string, int> CountItems(byte[] data)
+        {
+            Inventory inventory = new Inventory(string.Empty, null, ChestReadSize, ChestReadSize);
+            inventory.Load(new ZPackage(data));
+            Dictionary<string, int> counts = new Dictionary<string, int>();
+            foreach (ItemDrop.ItemData item in inventory.GetAllItems())
+            {
+                string name = item.m_dropPrefab == null ? item.m_shared.m_name : item.m_dropPrefab.name;
+                counts.TryGetValue(name, out int count);
+                counts[name] = count + item.m_stack;
+            }
+            return counts;
+        }
+
+        /// <summary>
+        /// Logs [item] as picked up by the player whose game owns it, if that player stands next to it. An item
+        /// next to a creature that eats food off the ground is skipped, since the creature may have eaten it.
+        /// </summary>
+        private static void LogPickup(ZDO item)
+        {
+            ZNetPeer peer = ZNet.instance.GetPeer(item.GetOwner());
+            bool isPlayerNear = peer != null && Vector3.Distance(peer.GetRefPos(), item.GetPosition()) <= PickupRangeMeters;
+            if (!isPlayerNear || CreatureTracker.IsEaterNear(item.GetPosition()))
+            {
+                return;
+            }
+            ZLog.Log($"Picked up: {Names.PrefabName(item)} x{item.GetInt(ZDOVars.s_stack, 1)} by {peer.m_playerName}");
+        }
+
+        /// <summary>Logs [plant] as harvested by the player who asked for it, or else by the player whose game owns it.</summary>
+        private static void LogHarvest(ZDO plant)
+        {
+            if (!PickedBy.TryGetValue(plant.m_uid, out string player))
+            {
+                player = Names.Peer(plant.GetOwner());
+            }
+            PickedBy.Remove(plant.m_uid);
+            ZLog.Log($"Harvested: {Names.PrefabName(plant)} by {player}");
+        }
+    }
+}

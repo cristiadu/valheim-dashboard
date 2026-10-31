@@ -5,6 +5,7 @@ import {
   BED_PATTERN,
   BOSS_SUMMONED_PATTERN,
   CHAT_PATTERN,
+  CHEST_PATTERN,
   CREATURE_KILLED_PATTERN,
   DAY_STARTED_PATTERN,
   DEATH_DETAILS_PATTERN,
@@ -15,6 +16,7 @@ import {
   GEAR_PATTERN,
   GLOBAL_KEY_PATTERN,
   HANDSHAKE_PATTERN,
+  HARVESTED_PATTERN,
   ITEM_HUNG_PATTERN,
   KNOWN_PLAYER_PATTERN,
   LEGACY_WORLD_SAVED_PATTERN,
@@ -22,6 +24,7 @@ import {
   NIGHT_SKIPPED_PATTERN,
   OBJECTS_REMOVED_PATTERN,
   PET_NAMED_PATTERN,
+  PICKED_UP_PATTERN,
   PIECE_BUILT_PATTERN,
   PIECE_DESTROYED_PATTERN,
   PING_PATTERN,
@@ -43,6 +46,7 @@ import {
   TAME_PATTERN,
   TELEPORTED_PATTERN,
   TIMESTAMP_PATTERN,
+  TOMBSTONE_EMPTIED_PATTERN,
   UNKNOWN_PLAYER,
   UNNAMED_PORTAL,
   VERSION_PATTERN,
@@ -259,6 +263,41 @@ const MATCHERS: readonly Matcher[] = [
   {
     pattern: ITEM_HUNG_PATTERN,
     toEvent: (groups, timeUtc) => ({ type: 'itemHung', timeUtc, item: groups.item!, player: playerOf(groups.player) }),
+  },
+  {
+    pattern: PICKED_UP_PATTERN,
+    toEvent: (groups, timeUtc) => ({
+      type: 'itemPickedUp',
+      timeUtc,
+      item: groups.item!,
+      count: Number(groups.count),
+      player: playerOf(groups.player),
+    }),
+  },
+  {
+    pattern: CHEST_PATTERN,
+    toEvent: (groups, timeUtc) => ({
+      type: 'chestChanged',
+      timeUtc,
+      item: groups.item!,
+      count: Number(groups.count),
+      chest: groups.chest!,
+      player: playerOf(groups.player),
+      isStored: groups.change === 'Stored',
+    }),
+  },
+  {
+    pattern: HARVESTED_PATTERN,
+    toEvent: (groups, timeUtc) => ({ type: 'harvested', timeUtc, plant: groups.plant!, player: playerOf(groups.player) }),
+  },
+  {
+    pattern: TOMBSTONE_EMPTIED_PATTERN,
+    toEvent: (groups, timeUtc) => ({
+      type: 'tombstoneEmptied',
+      timeUtc,
+      owner: playerOf(groups.owner),
+      player: playerOf(groups.player),
+    }),
   },
   {
     pattern: DEATH_DETAILS_PATTERN,

@@ -115,6 +115,19 @@ export const PET_NAMED_PATTERN = /^Pet named: (?<creature>\S+) (?<name>.+)$/;
 /** A player hung an item, such as a trophy, on an item stand. Written by the event log plugin. */
 export const ITEM_HUNG_PATTERN = /^Item hung: (?<item>\S+) by (?<player>.+)$/;
 
+/** A player picked up an item. Written by the event log plugin. */
+export const PICKED_UP_PATTERN = /^Picked up: (?<item>\S+) x(?<count>\d+) by (?<player>.+)$/;
+
+/** A player put items in a chest or took them out. Written by the event log plugin. */
+export const CHEST_PATTERN =
+  /^(?<change>Stored|Taken): (?<item>\S+) x(?<count>\d+) (?:in|from) (?<chest>\S+) by (?<player>.+)$/;
+
+/** A player harvested a plant, such as berries or a crop. Written by the event log plugin. */
+export const HARVESTED_PATTERN = /^Harvested: (?<plant>\S+) by (?<player>.+)$/;
+
+/** A player emptied a tombstone, their own or someone else's. Written by the event log plugin. */
+export const TOMBSTONE_EMPTIED_PATTERN = /^Tombstone emptied: (?<owner>.+?) by (?<player>.+)$/;
+
 /** How a tame changed, by the words the event log plugin writes. */
 export const TAME_CHANGES: ReadonlyMap<string, TameChange> = new Map([
   ['Tamed', 'tamed'],
