@@ -18,7 +18,7 @@ namespace ValheimDashboard.EventLog
         [HarmonyPatch(typeof(ZoneSystem), "RPC_SetGlobalKey")]
         private static void BeforeSetGlobalKey(string name)
         {
-            ZLog.Log($"Global key set: {name}");
+            GameEventLog.Write($"Global key set: {name}");
         }
 
         /// <summary>Logs a global key a player's game asked the server to remove.</summary>
@@ -26,7 +26,7 @@ namespace ValheimDashboard.EventLog
         [HarmonyPatch(typeof(ZoneSystem), "RPC_RemoveGlobalKey")]
         private static void BeforeRemoveGlobalKey(string name)
         {
-            ZLog.Log($"Global key removed: {name}");
+            GameEventLog.Write($"Global key removed: {name}");
         }
 
         /// <summary>Logs the raid in progress as ended when the server replaces or clears it.</summary>
@@ -37,7 +37,7 @@ namespace ValheimDashboard.EventLog
             RandomEvent raid = CurrentRaid(__instance);
             if (raid != null && ZNet.instance != null && ZNet.instance.IsServer())
             {
-                ZLog.Log($"Raid ended: {raid.m_name}");
+                GameEventLog.Write($"Raid ended: {raid.m_name}");
             }
         }
     }

@@ -130,6 +130,10 @@ flowchart LR
 
 Each line names a player only when the game data says who did it.
 
+The server sends its own log only to `logs.txt`, so the plugin also shows each event line in the server's
+console window, for example `[Info   :Game event] Chat: Ragnar shouted: Troll!`. Only `logs.txt` feeds the
+dashboard.
+
 On the dashboard, plugin lines become:
 
 | Kept as | Lines | Shown as |

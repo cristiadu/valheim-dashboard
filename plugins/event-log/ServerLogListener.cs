@@ -4,7 +4,7 @@ namespace ValheimDashboard.EventLog
 {
     /// <summary>
     /// Copies BepInEx messages, such as plugin errors, into the server's log. BepInEx's own log file is turned
-    /// off so that every log stays in the server's log folder.
+    /// off so that every log stays in the server's log folder. Game events are already written there.
     /// </summary>
     internal sealed class ServerLogListener : ILogListener
     {
@@ -18,7 +18,8 @@ namespace ValheimDashboard.EventLog
         /// <summary>Writes one BepInEx message to the server's log.</summary>
         public void LogEvent(object sender, LogEventArgs eventArgs)
         {
-            if (eventArgs.Source.SourceName == UnityLogSourceName || (eventArgs.Level & CopiedLevels) == 0)
+            string sourceName = eventArgs.Source.SourceName;
+            if (sourceName == UnityLogSourceName || sourceName == GameEventLog.SourceName || (eventArgs.Level & CopiedLevels) == 0)
             {
                 return;
             }
