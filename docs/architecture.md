@@ -210,7 +210,7 @@ flowchart LR
 `pnpm lint` runs ESLint in each project. Besides the recommended TypeScript and Svelte rules, it rejects
 relative imports (use `#/`), `function` declarations, `.then()`, `console` and `if` without braces.
 
-A second job runs the Pester tests of the PowerShell scripts.
+The PowerShell scripts' tests run with Pester 5: `Invoke-Pester scripts`.
 
 Dependabot opens weekly upgrade PRs for npm packages and GitHub Actions. The plugin is built on the
 server PC, not in CI.
