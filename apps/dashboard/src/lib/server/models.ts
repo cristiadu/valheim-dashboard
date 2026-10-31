@@ -13,6 +13,37 @@ export const DEFAULT_LOG_FILE = 'C:\\Valheim Server\\logs.txt';
  */
 export const HISTORY_FOLDER_NAME = 'log-history';
 
+/** Folder next to the server's log that keeps the item icons downloaded from the wiki, for example `deer-hide.png`. */
+export const ICON_FOLDER_NAME = 'item-icons';
+
+/** Valheim wiki API, which gives the image address of an uploaded file. */
+export const WIKI_API_URL = 'https://valheim.fandom.com/api.php';
+
+/** Most file titles one wiki API request may ask about. */
+export const WIKI_TITLES_PER_REQUEST = 50;
+
+/** How long browsers may keep an icon before asking again, in seconds. */
+export const ICON_CACHE_SECONDS = 86_400;
+
+/** Shape of an icon file name the icon route serves, so a request cannot reach other files. */
+export const ICON_FILE_PATTERN = /^[a-z0-9-]+\.png$/;
+
+/** Wiki icon files whose name is not the item name, by item name. */
+export const WIKI_ICON_FILES: Record<string, string> = {
+  'Flint arrow': 'Flinthead Arrow.png',
+  'Fine wood': 'Finewood.png',
+  'Core wood': 'Corewood.png',
+  'Wolf armor chest': 'Wolf Hide Chestpiece.png',
+  'Wolf armor legs': 'Wolf Hide Trousers.png',
+  'Minor healing mead base': 'Mead Base - Minor Healing.png',
+  'Minor stamina mead base': 'Mead Base - Minor Stamina.png',
+  'Poison resistance mead base': 'Mead Base - Poison Resistance.png',
+  'Frost resistance mead base': 'Mead Base - Frost Resistance.png',
+  'Blackmetal sword': 'Black Metal Sword.png',
+  'Blackmetal axe': 'Black Metal Axe.png',
+  'Blackmetal shield': 'Black Metal Shield.png',
+};
+
 /** How often the log file is checked for new lines. */
 export const POLL_INTERVAL_MS = 2_000;
 
@@ -80,4 +111,14 @@ export type Follower = {
   state: ServerState;
   /** True when lines arrived since the listeners were last told. */
   hasNewLines: boolean;
+};
+
+/** Part of the wiki API's answer to an image address query, for example for `File:Deer_hide.png`. */
+export type WikiImageResponse = {
+  query: {
+    /** Titles the wiki rewrote, such as `File:Deer_hide.png` to `File:Deer hide.png`. */
+    normalized?: { from: string; to: string }[];
+    /** Files by page id, with `imageinfo` only when the file exists. */
+    pages: Record<string, { title: string; imageinfo?: { url: string }[] }>;
+  };
 };
