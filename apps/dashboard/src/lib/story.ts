@@ -17,7 +17,7 @@ import {
   type StoryKind,
   type StoryText,
 } from '#/lib/models';
-import { sourceKey } from '#/lib/sources';
+import { mergedSource, sourceKey } from '#/lib/sources';
 
 /** Returns `1 death` or `2 deaths` style text. */
 const count = (amount: number, one: string, many: string): string => `${amount} ${amount === 1 ? one : many}`;
@@ -228,25 +228,41 @@ export const storyOf = (snapshot: Snapshot): StoryItem[] => {
   return [...sessionItems, ...eventItems, ...activityItems, ...chatItems].sort((a, b) => Date.parse(b.timeUtc) - Date.parse(a.timeUtc));
 };
 
-/** One plain line about the last 24 hours, for example `2 players in the last 24 hours · 1 death · 1 raid`. */
-export const daySummary = (snapshot: Snapshot, nowMs: number): string => {
+/** Log lines of [events], told as [kind]. */
+const eventsSource = (events: StoryEvent[], kind: StoryKind): SourceLines => ({
+  total: events.length,
+  lines: events.map(({ timeUtc, line }) => ({ timeUtc, line, kind })),
+});
+
+/**
+ * Parts of the one line about the last 24 hours, each with its log lines, for example `2 players in the last
+ * 24 hours`, `1 death` and `1 raid`. Empty when nobody played.
+ */
+export const daySummaryParts = (snapshot: Snapshot, nowMs: number): { text: string; source: SourceLines }[] => {
   const sinceMs = nowMs - DAY_MS;
-  const players = new Set(
-    snapshot.sessions
-      .filter((session) => session.endUtc === null || Date.parse(session.endUtc) > sinceMs)
-      .map((session) => session.steamId ?? session.character),
-  );
+  const sessions = snapshot.sessions.filter((session) => session.endUtc === null || Date.parse(session.endUtc) > sinceMs);
+  const players = new Set(sessions.map((session) => session.steamId ?? session.character));
   if (players.size === 0) {
-    return 'Nobody played in the last 24 hours';
+    return [];
   }
+  const visitTimes = new Set(sessions.flatMap((session) => [session.startUtc, session.endUtc ?? session.startUtc]));
+  const visits = mergedSource(
+    [...new Set(sessions.map((session) => session.character))].map((character) => {
+      const lines = (snapshot.sources[sourceKey('visits', character)]?.lines ?? []).filter((record) => visitTimes.has(record.timeUtc));
+      return { total: lines.length, lines };
+    }),
+  );
   const recent = snapshot.events.filter((event) => Date.parse(event.timeUtc) > sinceMs);
-  const piecesBuilt = snapshot.activities
-    .filter((activity) => activity.kind === 'built' && Date.parse(activity.endUtc) > sinceMs)
-    .reduce((sum, activity) => sum + activityTotal(activity), 0);
+  const deaths = recent.filter((event) => event.type === 'playerDied');
+  const raids = recent.filter((event) => event.type === 'raidStarted');
+  const building = snapshot.activities.filter((activity) => activity.kind === 'built' && Date.parse(activity.endUtc) > sinceMs);
+  const piecesBuilt = building.reduce((sum, activity) => sum + activityTotal(activity), 0);
   return [
-    `${count(players.size, 'player', 'players')} in the last 24 hours`,
-    count(recent.filter((event) => event.type === 'playerDied').length, 'death', 'deaths'),
-    count(recent.filter((event) => event.type === 'raidStarted').length, 'raid', 'raids'),
-    ...(piecesBuilt > 0 ? [count(piecesBuilt, 'piece built', 'pieces built')] : []),
-  ].join(' · ');
+    { text: `${count(players.size, 'player', 'players')} in the last 24 hours`, source: visits },
+    { text: count(deaths.length, 'death', 'deaths'), source: eventsSource(deaths, 'died') },
+    { text: count(raids.length, 'raid', 'raids'), source: eventsSource(raids, 'raid') },
+    ...(piecesBuilt > 0
+      ? [{ text: count(piecesBuilt, 'piece built', 'pieces built'), source: mergedSource(building.map((activity) => activity.source)) }]
+      : []),
+  ];
 };

@@ -1,20 +1,33 @@
 <script lang="ts">
+  import LogLines from '#/lib/components/LogLines';
   import Pill from '#/lib/components/Pill';
-  import type { Pill as PillModel } from '#/lib/models';
+  import type { Pill as PillModel, SourceLines } from '#/lib/models';
 
-  /** Facts to show, each a label and a value. A status or state value shows as a pill. */
-  let { stats }: { stats: { label: string; value: string | PillModel }[] } = $props();
+  /**
+   * Facts to show, each a label and a value. A status or state value shows as a pill. A fact with log lines
+   * opens them when clicked.
+   */
+  let { stats }: { stats: { label: string; value: string | PillModel; source?: SourceLines }[] } = $props();
 </script>
+
+{#snippet value(stat: { value: string | PillModel })}
+  {#if typeof stat.value === 'string'}{stat.value}{:else}<Pill pill={stat.value} />{/if}
+{/snippet}
 
 <dl>
   {#each stats as stat (stat.label)}
     <div>
       <dt>{stat.label}</dt>
-      <dd>{#if typeof stat.value === 'string'}{stat.value}{:else}<Pill pill={stat.value} />{/if}</dd>
+      <dd>
+        {#if stat.source}
+          <LogLines title={stat.label} source={stat.source}>{@render value(stat)}</LogLines>
+        {:else}
+          {@render value(stat)}
+        {/if}
+      </dd>
     </div>
   {/each}
 </dl>
-
 <style>
   /* Grid of cells sharing hairline borders */
   dl {
