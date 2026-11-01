@@ -1,15 +1,26 @@
 import type { LogEvent, PlayerSession } from 'valheim-log';
 
-import type { Snapshot, SourceKind } from '#/lib/models';
+import type { Snapshot, SourceKind, StoryKind } from '#/lib/models';
 import { MAX_SOURCE_LINES } from '#/lib/server/models';
 import { sourceKey } from '#/lib/sources';
 
-/** Keeps [line], written at [timeUtc], behind the number of [kind] for [character], and drops the oldest past the limit. */
-const keepLine = (snapshot: Snapshot, line: string, timeUtc: string, kind: SourceKind, character: string, thing?: string): void => {
+/**
+ * Keeps [line], written at [timeUtc] about [lineKind], behind the number of [kind] for [character], and drops the
+ * oldest past the limit.
+ */
+const keepLine = (
+  snapshot: Snapshot,
+  line: string,
+  timeUtc: string,
+  lineKind: StoryKind,
+  kind: SourceKind,
+  character: string,
+  thing?: string,
+): void => {
   const key = sourceKey(kind, character, thing);
   const source = (snapshot.sources[key] ??= { total: 0, lines: [] });
   source.total += 1;
-  source.lines.push({ timeUtc, line });
+  source.lines.push({ timeUtc, line, kind: lineKind });
   source.lines.splice(0, Math.max(0, source.lines.length - MAX_SOURCE_LINES));
 };
 
@@ -20,24 +31,24 @@ const keepLine = (snapshot: Snapshot, line: string, timeUtc: string, kind: Sourc
 export const keepSourceLines = (snapshot: Snapshot, event: LogEvent, line: string, visitSessions: PlayerSession[]): void => {
   const { timeUtc } = event;
   for (const session of visitSessions) {
-    keepLine(snapshot, line, timeUtc, 'visits', session.character);
+    keepLine(snapshot, line, timeUtc, session.endUtc === timeUtc ? 'left' : 'joined', 'visits', session.character);
   }
   switch (event.type) {
     case 'playerDied':
     case 'deathDetails':
-      keepLine(snapshot, line, timeUtc, 'deaths', event.character);
+      keepLine(snapshot, line, timeUtc, 'died', 'deaths', event.character);
       break;
     case 'creatureKilled':
       for (const attacker of event.attackers) {
-        keepLine(snapshot, line, timeUtc, 'kills', attacker);
-        keepLine(snapshot, line, timeUtc, 'killed', attacker, event.creature);
+        keepLine(snapshot, line, timeUtc, 'fight', 'kills', attacker);
+        keepLine(snapshot, line, timeUtc, 'fight', 'killed', attacker, event.creature);
       }
       break;
     case 'areaEntered':
-      keepLine(snapshot, line, timeUtc, 'area', event.character, event.area);
+      keepLine(snapshot, line, timeUtc, 'travel', 'area', event.character, event.area);
       break;
     case 'gearSeen':
-      keepLine(snapshot, line, timeUtc, 'gear', event.character, event.item);
+      keepLine(snapshot, line, timeUtc, 'items', 'gear', event.character, event.item);
       break;
     default:
       break;

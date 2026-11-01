@@ -241,6 +241,8 @@ export type LogLineRecord = {
   timeUtc: string;
   /** The whole line, for example `10/29/2026 02:43:13: Got character ZDOID from Ragnar : 549297305:1`. */
   line: string;
+  /** What happened in it, which picks its rune, color and label as on the Saga tab. */
+  kind: StoryKind;
 };
 
 /** Log lines behind one number or item. */
@@ -546,23 +548,23 @@ export type StoryItem = {
   text: string;
 };
 
-/** Rune and color for each story kind. */
-export const STORY_STYLES: Record<StoryKind, { rune: string; color: string }> = {
-  joined: { rune: 'ᛖ', color: 'var(--good)' },
-  left: { rune: 'ᛚ', color: 'var(--muted)' },
-  died: { rune: 'ᛞ', color: 'var(--blood)' },
-  raid: { rune: 'ᚦ', color: 'var(--ember)' },
-  night: { rune: 'ᛜ', color: 'var(--frost)' },
-  world: { rune: 'ᛃ', color: 'var(--gold)' },
-  stopped: { rune: 'ᚾ', color: 'var(--muted)' },
-  built: { rune: 'ᛒ', color: 'var(--good)' },
-  wrecked: { rune: 'ᚺ', color: 'var(--ember)' },
-  boss: { rune: 'ᛏ', color: 'var(--gold)' },
-  fight: { rune: 'ᛉ', color: 'var(--blood)' },
-  travel: { rune: 'ᚱ', color: 'var(--frost)' },
-  items: { rune: 'ᚷ', color: 'var(--gold)' },
-  tame: { rune: 'ᚠ', color: 'var(--good)' },
-  chat: { rune: 'ᚨ', color: 'var(--frost)' },
+/** Rune, color and pill label for each story kind. */
+export const STORY_STYLES: Record<StoryKind, { rune: string; color: string; label: string }> = {
+  joined: { rune: 'ᛖ', color: 'var(--good)', label: 'Joined' },
+  left: { rune: 'ᛚ', color: 'var(--muted)', label: 'Left' },
+  died: { rune: 'ᛞ', color: 'var(--blood)', label: 'Death' },
+  raid: { rune: 'ᚦ', color: 'var(--ember)', label: 'Raid' },
+  night: { rune: 'ᛜ', color: 'var(--frost)', label: 'Night' },
+  world: { rune: 'ᛃ', color: 'var(--gold)', label: 'World' },
+  stopped: { rune: 'ᚾ', color: 'var(--muted)', label: 'Stopped' },
+  built: { rune: 'ᛒ', color: 'var(--good)', label: 'Built' },
+  wrecked: { rune: 'ᚺ', color: 'var(--ember)', label: 'Wrecked' },
+  boss: { rune: 'ᛏ', color: 'var(--gold)', label: 'Boss' },
+  fight: { rune: 'ᛉ', color: 'var(--blood)', label: 'Fight' },
+  travel: { rune: 'ᚱ', color: 'var(--frost)', label: 'Travel' },
+  items: { rune: 'ᚷ', color: 'var(--gold)', label: 'Gear and items' },
+  tame: { rune: 'ᚠ', color: 'var(--good)', label: 'Tame' },
+  chat: { rune: 'ᚨ', color: 'var(--frost)', label: 'Chat' },
 };
 
 /** Filters on the Saga tab and the story kinds each one shows. */

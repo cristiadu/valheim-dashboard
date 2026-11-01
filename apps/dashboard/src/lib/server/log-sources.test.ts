@@ -43,7 +43,11 @@ describe('keepSourceLines', () => {
       '10/29/2026 02:54:00: Got character ZDOID from Ragnar : 0:0',
       '10/29/2026 02:54:01: Player died: Ragnar in Swamp while fighting Draugr',
     ]);
-    expect(state.snapshot.sources['visits:Ragnar']!.lines[0]!.timeUtc).toBe('2026-10-29T09:43:13.000Z');
+    expect(state.snapshot.sources['visits:Ragnar']!.lines.map(({ timeUtc, kind }) => [timeUtc, kind])).toEqual([
+      ['2026-10-29T09:43:13.000Z', 'joined'],
+      ['2026-10-29T09:59:00.000Z', 'left'],
+    ]);
+    expect(state.snapshot.sources['gear:Ragnar:SpearFlint']!.lines[0]!.kind).toBe('items');
   });
 
   it('keeps only the latest 50 lines but counts them all', () => {

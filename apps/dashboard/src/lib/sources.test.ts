@@ -20,9 +20,9 @@ describe('playerSource', () => {
       sessionWith({ character: 'Ragnhild', steamId: 'Steam_1', startUtc: '2026-10-29T11:00:00.000Z' }),
     ],
     sources: {
-      'deaths:Ragnhild': { total: 1, lines: [{ timeUtc: '2026-10-29T11:30:00.000Z', line: 'Ragnhild death' }] },
-      'deaths:Ragnar': { total: 3, lines: [{ timeUtc: '2026-10-29T09:30:00.000Z', line: 'Ragnar death' }] },
-      'gear:Ragnar:Club': { total: 1, lines: [{ timeUtc: '2026-10-29T09:10:00.000Z', line: 'Ragnar club' }] },
+      'deaths:Ragnhild': { total: 1, lines: [{ timeUtc: '2026-10-29T11:30:00.000Z', line: 'Ragnhild death', kind: 'died' }] },
+      'deaths:Ragnar': { total: 3, lines: [{ timeUtc: '2026-10-29T09:30:00.000Z', line: 'Ragnar death', kind: 'died' }] },
+      'gear:Ragnar:Club': { total: 1, lines: [{ timeUtc: '2026-10-29T09:10:00.000Z', line: 'Ragnar club', kind: 'items' }] },
     },
   });
   const [player] = playersOf(snapshot, TEST_NOON_MS);
@@ -35,8 +35,8 @@ describe('playerSource', () => {
     expect(source).toEqual({
       total: 4,
       lines: [
-        { timeUtc: '2026-10-29T09:30:00.000Z', line: 'Ragnar death' },
-        { timeUtc: '2026-10-29T11:30:00.000Z', line: 'Ragnhild death' },
+        { timeUtc: '2026-10-29T09:30:00.000Z', line: 'Ragnar death', kind: 'died' },
+        { timeUtc: '2026-10-29T11:30:00.000Z', line: 'Ragnhild death', kind: 'died' },
       ],
     });
   });

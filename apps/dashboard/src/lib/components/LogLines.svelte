@@ -1,8 +1,9 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
 
+  import Pill from '#/lib/components/Pill';
   import { live } from '#/lib/live.svelte';
-  import type { SourceLines } from '#/lib/models';
+  import { type SourceLines, STORY_STYLES } from '#/lib/models';
   import { viewerTimeZone, whenLabel } from '#/lib/status';
 
   /** What the lines are about, the lines, and what to show as the button that opens them. */
@@ -41,8 +42,13 @@
       </p>
       <ol>
         {#each newestFirst as record, i (i)}
+          {@const style = STORY_STYLES[record.kind]}
           <li>
-            {#if live.nowMs !== null}<span class="mono muted">{whenLabel(record.timeUtc, viewerTimeZone(), live.nowMs)}</span>{/if}
+            <span class="rune" aria-hidden="true" style:color={style.color} style:border-color={style.color}>{style.rune}</span>
+            <div class="what">
+              <Pill pill={{ text: style.label, tone: 'quiet' }} --tone={style.color} />
+              {#if live.nowMs !== null}<span class="mono muted">{whenLabel(record.timeUtc, viewerTimeZone(), live.nowMs)}</span>{/if}
+            </div>
             <code>{record.line}</code>
           </li>
         {/each}
@@ -120,13 +126,33 @@
     list-style: none;
   }
 
-  /* One log line under its time */
+  /* One log line: rune on the left, label and time above the line, as on the Saga tab */
   li {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
+    display: grid;
+    grid-template-columns: 22px minmax(0, 1fr);
+    gap: 4px 12px;
     padding: 10px 0;
     border-top: 1px solid var(--line-soft);
+  }
+
+  /* Rune box in the color of what happened */
+  .rune {
+    grid-row: span 2;
+    display: grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    border: 1px solid;
+    font-family: var(--font-rune);
+    font-size: 13px;
+  }
+
+  /* Label pill and time side by side */
+  .what {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
   }
 
   /* Log line as written, wrapped on narrow screens */
