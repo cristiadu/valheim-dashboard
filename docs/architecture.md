@@ -196,11 +196,23 @@ On the dashboard, plugin lines become:
 
 | Kept as | Lines | Shown as |
 | --- | --- | --- |
-| Activities | Pieces built or destroyed, kills, pickups, harvests, chests | One Saga line per player and kind, until a 10 minute pause |
+| Activities | Pieces built or destroyed, kills, items gathered, chests | One Saga line per player and kind, until a 10 minute pause, naming every thing |
 | Story events | Deaths, bosses, raids, portals, tames, signs, item stands, tombstones | One Saga line each |
 | News only | Areas, gear, global keys | A Saga line for a first visit or a dungeon trip, new gear, or a boss defeat |
 | Stats | Areas, kills, the day, boss keys | Where each player is now and their kills, areas and gear on Vikings, the day and bosses on World |
 | Chat | Chat and pings | The Saga's "Chat and signs" filter, kept apart so it never pushes out events |
+
+### Gathering
+
+```mermaid
+flowchart LR
+  tree[Tree falls, drops Wood] --> first["Picked up: Wood x1 by Ragnar"] --> gathered[Gathered]
+  first --> chest[Stored and taken from chests] --> notgathered[Not gathered again]
+  first --> drop[Dropped on the ground] --> again["Picked up again: Wood x1 by Ragnar"] --> notgathered
+```
+
+An item counts as gathered only the first time anyone picks it up. Harvest lines are not counted, since the
+player then picks up what the plant drops, which is already counted.
 
 BepInEx's own log file is turned off, so its messages land in
 `logs.txt` too. Every line is listed in [log-events.md](log-events.md).

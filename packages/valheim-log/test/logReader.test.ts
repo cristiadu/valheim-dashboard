@@ -289,6 +289,7 @@ describe('parseMessage', () => {
     // GIVEN one line of each kind
     const messages = [
       'Picked up: Wood x20 by Ragnar',
+      'Picked up again: Wood x3 by Bjorn',
       'Stored: Wood x20 in piece_chest_wood by Ragnar',
       'Taken: Coins x5 from piece_chest_wood by an unknown player',
       'Harvested: RaspberryBush by Ragnar',
@@ -301,7 +302,8 @@ describe('parseMessage', () => {
     // THEN each line gives its event and values
     const timeUtc = '2026-01-01T00:00:00.000Z';
     expect(events).toEqual([
-      { type: 'itemPickedUp', timeUtc, item: 'Wood', count: 20, player: 'Ragnar' },
+      { type: 'itemPickedUp', timeUtc, item: 'Wood', count: 20, player: 'Ragnar', isFirstPickup: true },
+      { type: 'itemPickedUp', timeUtc, item: 'Wood', count: 3, player: 'Bjorn', isFirstPickup: false },
       { type: 'chestChanged', timeUtc, item: 'Wood', count: 20, chest: 'piece_chest_wood', player: 'Ragnar', isStored: true },
       { type: 'chestChanged', timeUtc, item: 'Coins', count: 5, chest: 'piece_chest_wood', player: null, isStored: false },
       { type: 'harvested', timeUtc, plant: 'RaspberryBush', player: 'Ragnar' },
