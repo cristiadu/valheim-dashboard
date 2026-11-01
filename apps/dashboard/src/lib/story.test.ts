@@ -26,7 +26,7 @@ describe('storyOf', () => {
     ]);
   });
 
-  it('tells building in one line per stretch, naming the most common pieces', () => {
+  it('tells building in one line per stretch, naming every piece, most first', () => {
     // GIVEN Ragnar built five kinds of pieces, then one of his pieces and one of an unknown builder were destroyed
     const snapshot = snapshotWith({
       activities: [
@@ -61,7 +61,7 @@ describe('storyOf', () => {
     expect(story.map((item) => [item.kind, item.text])).toEqual([
       ['wrecked', '2 pieces were destroyed: 2 stake wall'],
       ['wrecked', '1 piece Ragnar built was destroyed: 1 wood fence'],
-      ['built', 'Ragnar built 28 pieces: 14 wood floor 1x1, 8 wood fence, 3 groundtorch wood and more'],
+      ['built', 'Ragnar built 28 pieces: 14 wood floor 1x1, 8 wood fence, 3 groundtorch wood, 2 stake wall, 1 wood stair'],
     ]);
   });
 
@@ -106,12 +106,12 @@ describe('storyOf', () => {
   });
 
   it('tells kills and items in one line per stretch', () => {
-    // GIVEN Ragnar killed creatures, took items from chests and harvested turnips
+    // GIVEN Ragnar killed creatures, took items from chests and gathered turnips
     const snapshot = snapshotWith({
       activities: [
         { player: 'Ragnar', kind: 'killed', startUtc: '2026-10-29T10:00:00.000Z', endUtc: '2026-10-29T10:05:00.000Z', things: { Greydwarf: 3, Troll: 1 } },
         { player: 'Ragnar', kind: 'taken', startUtc: '2026-10-29T10:06:00.000Z', endUtc: '2026-10-29T10:06:00.000Z', things: { Wood: 20 } },
-        { player: 'Ragnar', kind: 'harvested', startUtc: '2026-10-29T10:07:00.000Z', endUtc: '2026-10-29T10:07:00.000Z', things: { Pickable_Turnip: 2 } },
+        { player: 'Ragnar', kind: 'gathered', startUtc: '2026-10-29T10:07:00.000Z', endUtc: '2026-10-29T10:07:00.000Z', things: { Turnip: 2 } },
       ],
     });
 
@@ -120,7 +120,7 @@ describe('storyOf', () => {
 
     // THEN each stretch reads plainly
     expect(story.map((item) => [item.kind, item.text])).toEqual([
-      ['items', 'Ragnar harvested 2 plants: 2 turnip'],
+      ['items', 'Ragnar gathered 2 items: 2 turnip'],
       ['items', 'Ragnar took 20 items from chests: 20 wood'],
       ['fight', 'Ragnar killed 4 creatures: 3 greydwarf, 1 troll'],
     ]);

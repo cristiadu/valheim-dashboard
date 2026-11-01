@@ -67,9 +67,25 @@ describe('server state', () => {
     expect(kinds).toEqual([
       ['Ragnar', 'killed', { Troll: 1 }],
       ['Bjorn', 'killed', { Troll: 1 }],
-      ['Ragnar', 'pickedUp', { Wood: 20 }],
+      ['Ragnar', 'gathered', { Wood: 20 }],
       ['Ragnar', 'stored', { Wood: 15 }],
     ]);
+  });
+
+  it('counts an item as gathered only the first time anyone picks it up', () => {
+    // GIVEN Ragnar harvests a dandelion and picks it up, then drops wood he carried and picks it up again
+    readLines(state, [
+      ...RUN_START,
+      logLine('03:00:00', 'Picked up: Dandelion x1 by Ragnar'),
+      logLine('03:00:01', 'Harvested: Pickable_Dandelion by Ragnar'),
+      logLine('03:01:00', 'Picked up again: Wood x20 by Ragnar'),
+    ]);
+
+    // WHEN the activities are listed
+    const kinds = state.snapshot.activities.map((activity) => [activity.player, activity.kind, activity.things]);
+
+    // THEN only the dandelion counts, once
+    expect(kinds).toEqual([['Ragnar', 'gathered', { Dandelion: 1 }]]);
   });
 
   it('keeps areas, gear and global keys in the story only when they are news', () => {

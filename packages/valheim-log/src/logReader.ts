@@ -272,6 +272,7 @@ const MATCHERS: readonly Matcher[] = [
       item: groups.item!,
       count: Number(groups.count),
       player: playerOf(groups.player),
+      isFirstPickup: groups.again === undefined,
     }),
   },
   {

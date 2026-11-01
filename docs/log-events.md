@@ -186,7 +186,7 @@ when the plugin does not know who it was.
 | Tame named | `Pet named: Wolf Fluffy` | `^Pet named: (?<creature>\S+) (?<name>.+)$` |
 | Sign written | `Sign written: Ragnar: Keep out` | `^Sign written: (?<author>.+?): (?<text>.*)$` |
 | Item hung on a stand | `Item hung: TrophyDeer by Ragnar` | `^Item hung: (?<item>\S+) by (?<player>.+)$` |
-| Item picked up | `Picked up: Wood x20 by Ragnar` | `^Picked up: (?<item>\S+) x(?<count>\d+) by (?<player>.+)$` |
+| Item picked up | `Picked up: Wood x20 by Ragnar`, or `Picked up again: Wood x20 by Ragnar` | `^Picked up(?<again> again)?: (?<item>\S+) x(?<count>\d+) by (?<player>.+)$` |
 | Items put in or taken from a chest | `Stored: Wood x20 in piece_chest_wood by Ragnar` | `^(?<change>Stored\|Taken): (?<item>\S+) x(?<count>\d+) (?:in\|from) (?<chest>\S+) by (?<player>.+)$` |
 | Plant harvested | `Harvested: RaspberryBush by Ragnar` | `^Harvested: (?<plant>\S+) by (?<player>.+)$` |
 | Tombstone emptied | `Tombstone emptied: Ragnar by Bjorn` | `^Tombstone emptied: (?<owner>.+?) by (?<player>.+)$` |
@@ -207,7 +207,9 @@ when the plugin does not know who it was.
 - **Sign written**, **Item hung**, **Stored**, **Taken** and **Tombstone emptied** name the player whose
   game changed the object. A game takes over an object before it changes it.
 - **Picked up** is only logged when that player stands within 10 meters of the item, since items left
-  alone despawn, and no creature that eats off the ground stands within 3 meters of it.
+  alone despawn, and no creature that eats off the ground stands within 3 meters of it. The game marks an
+  item the first time it reaches anyone's inventory, and the mark stays through drops and chests. An item
+  with the mark is logged as **Picked up again**.
 - **Harvested** names the player who asked to harvest, or the player whose game owns the plant.
 - **Gear** is logged the first time a player wears or holds an item since the server started.
 

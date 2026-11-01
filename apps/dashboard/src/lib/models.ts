@@ -227,10 +227,10 @@ export type Snapshot = {
 };
 
 /**
- * What a stretch of activity is: pieces built, a builder's pieces destroyed, creatures killed, items picked up,
- * plants harvested, or items stored in or taken from chests.
+ * What a stretch of activity is: pieces built, a builder's pieces destroyed, creatures killed, items gathered
+ * from the world, or items stored in or taken from chests.
  */
-export type ActivityKind = 'built' | 'destroyed' | 'killed' | 'pickedUp' | 'harvested' | 'stored' | 'taken';
+export type ActivityKind = 'built' | 'destroyed' | 'killed' | 'gathered' | 'stored' | 'taken';
 
 /** One player's activity of one kind, with pauses under a few minutes, told as one story line. */
 export type ActivityRecord = {
@@ -253,8 +253,7 @@ export type ActivityRecord = {
 export const ACTIVITY_WORDS: Record<Exclude<ActivityKind, 'destroyed'>, { verb: string; one: string; many: string; ending: string }> = {
   built: { verb: 'built', one: 'piece', many: 'pieces', ending: '' },
   killed: { verb: 'killed', one: 'creature', many: 'creatures', ending: '' },
-  pickedUp: { verb: 'picked up', one: 'item', many: 'items', ending: '' },
-  harvested: { verb: 'harvested', one: 'plant', many: 'plants', ending: '' },
+  gathered: { verb: 'gathered', one: 'item', many: 'items', ending: '' },
   stored: { verb: 'stored', one: 'item', many: 'items', ending: ' in chests' },
   taken: { verb: 'took', one: 'item', many: 'items', ending: ' from chests' },
 };
@@ -270,9 +269,6 @@ export type ChatRecord = {
   /** What they wrote. Empty for a ping. */
   text: string;
 };
-
-/** Most kinds of things a story line names. */
-export const LISTED_THING_KINDS = 3;
 
 /** Boss names as the game shows them, by the prefab a summon logs and by the key a defeat sets. */
 export const BOSS_NAMES: Record<string, string> = {

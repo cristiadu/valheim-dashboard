@@ -9,7 +9,6 @@ import {
   DAY_MS,
   DEATH_DETAILS_WINDOW_MS,
   DUNGEON_AREA,
-  LISTED_THING_KINDS,
   type Snapshot,
   type StoryEvent,
   type StoryItem,
@@ -43,15 +42,12 @@ const listText = (names: string[]): string =>
 const activityTotal = (activity: ActivityRecord): number =>
   Object.values(activity.things).reduce((sum, amount) => sum + amount, 0);
 
-/** Most common things of a stretch, for example `14 wood floor 1x1, 8 wood fence and more`. */
-const thingList = (activity: ActivityRecord): string => {
-  const kinds = Object.entries(activity.things).sort(([, firstAmount], [, secondAmount]) => secondAmount - firstAmount);
-  const listed = kinds
-    .slice(0, LISTED_THING_KINDS)
+/** Every thing of a stretch, most first, for example `14 wood floor 1x1, 8 wood fence, 1 workbench`. */
+const thingList = (activity: ActivityRecord): string =>
+  Object.entries(activity.things)
+    .sort(([, firstAmount], [, secondAmount]) => secondAmount - firstAmount)
     .map(([thing, amount]) => `${amount} ${thingName(thing)}`)
     .join(', ');
-  return kinds.length > LISTED_THING_KINDS ? `${listed} and more` : listed;
-};
 
 /** Story line for one stretch of activity, such as building or kills. */
 const activityItem = (activity: ActivityRecord): StoryItem => {
