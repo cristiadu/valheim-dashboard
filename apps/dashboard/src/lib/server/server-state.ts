@@ -10,6 +10,7 @@ import {
   BOSS_ORDER,
   DEFEATED_KEY_PREFIX,
   DUNGEON_AREA,
+  MAP_SQUARE_METERS,
   type Snapshot,
   STORY_EVENT_TYPES,
   type StoryEvent,
@@ -145,13 +146,18 @@ export const createServerState = (serverUtcOffsetMinutes: number): ServerState =
       day: null,
       defeatedBosses: [],
       sources: {},
+      explored: {},
+      positions: {},
+      chests: {},
+      deathItems: {},
     },
   };
 };
 
 /**
  * Starts a new run when the server writes a new `logs.txt`. Sessions still open had no clean stop, so they
- * end at the old log's last line as a crash. History is kept.
+ * end at the old log's last line as a crash. History is kept, except chests: the new run lists them again
+ * with new IDs.
  */
 export const startNewLog = (state: ServerState): void => {
   const { snapshot } = state;
@@ -171,6 +177,7 @@ export const startNewLog = (state: ServerState): void => {
     lastLineUtc: null,
     stoppedUtc: null,
     isGameServerConnected: null,
+    chests: {},
   });
 };
 
@@ -259,6 +266,26 @@ export const readLogLine = (state: ServerState, line: string): void => {
     }
     case 'ping':
       pushCapped(snapshot.chat, { timeUtc: event.timeUtc, character: event.character, kind: 'ping', text: '', line }, MAX_CHAT);
+      break;
+    case 'position': {
+      const { character, x, z, timeUtc } = event;
+      snapshot.positions[character] = { x, z, timeUtc };
+      addNew(snapshot.explored, character, `${Math.floor(x / MAP_SQUARE_METERS)},${Math.floor(z / MAP_SQUARE_METERS)}`);
+      break;
+    }
+    case 'chestContents': {
+      const { id, chest, x, z, builder, items, timeUtc } = event;
+      snapshot.chests[id] = { chest, x, z, builder, items, timeUtc };
+      break;
+    }
+    case 'chestRemoved':
+      delete snapshot.chests[event.id];
+      break;
+    case 'tombstoneContents':
+      if (event.owner !== null) {
+        const { x, z, items, timeUtc } = event;
+        snapshot.deathItems[event.owner] = { x, z, items, timeUtc };
+      }
       break;
     case 'backupCreated':
       pushCapped(snapshot.backups, { timeUtc: event.timeUtc, backup: event.backup }, MAX_BACKUPS);

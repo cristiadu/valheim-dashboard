@@ -10,5 +10,8 @@ namespace ValheimDashboard.EventLog
     {
         /// <summary>True when the prefab with that hash has a component of type <typeparamref name="T"/>.</summary>
         public static readonly Dictionary<int, bool> HasComponent = new Dictionary<int, bool>();
+
+        /// <summary>True when the prefab with that hash, or a part of it, has a component of type <typeparamref name="T"/>.</summary>
+        public static readonly Dictionary<int, bool> HasComponentInParts = new Dictionary<int, bool>();
     }
 }

@@ -10,7 +10,7 @@
   import { playersOf } from '#/lib/players';
   import { playerSource } from '#/lib/sources';
   import { clockTime, durationLabel, viewerTimeZone } from '#/lib/status';
-  import { areaLabel, thingName } from '#/lib/story';
+  import { areaLabel, thingList, thingName } from '#/lib/story';
 
   /** Getter for the snapshot the layout shares. */
   const getSnapshot = useSnapshot();
@@ -85,6 +85,13 @@
                 {/each}
               </ul>
             </div>
+          {/if}
+          {#if snapshot.deathItems[player.character]}
+            {@const death = snapshot.deathItems[player.character]!}
+            <p>
+              <span class="muted">Carried at last death, {clockTime(death.timeUtc, timeZone)}:</span>
+              {Object.keys(death.items).length === 0 ? 'nothing' : thingList(death.items)}
+            </p>
           {/if}
         </article>
       {/each}

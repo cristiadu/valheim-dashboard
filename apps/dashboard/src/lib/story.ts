@@ -47,9 +47,9 @@ const listText = (names: string[]): string =>
 const activityTotal = (activity: ActivityRecord): number =>
   Object.values(activity.things).reduce((sum, amount) => sum + amount, 0);
 
-/** Every thing of a stretch, most first, for example `14 wood floor 1x1, 8 wood fence, 1 workbench`. */
-const thingList = (activity: ActivityRecord): string =>
-  Object.entries(activity.things)
+/** Every thing of [things], most first, for example `14 wood floor 1x1, 8 wood fence, 1 workbench`. */
+export const thingList = (things: Record<string, number>): string =>
+  Object.entries(things)
     .sort(([, firstAmount], [, secondAmount]) => secondAmount - firstAmount)
     .map(([thing, amount]) => `${amount} ${thingName(thing)}`)
     .join(', ');
@@ -61,11 +61,11 @@ const activityItem = (activity: ActivityRecord): StoryText => {
   if (activity.kind === 'destroyed') {
     const pieces = count(total, 'piece', 'pieces');
     const whose = activity.player === null ? pieces : `${pieces} ${activity.player} built`;
-    return { timeUtc, kind: ACTIVITY_STORY_KINDS.destroyed, text: `${whose} ${total === 1 ? 'was' : 'were'} destroyed: ${thingList(activity)}` };
+    return { timeUtc, kind: ACTIVITY_STORY_KINDS.destroyed, text: `${whose} ${total === 1 ? 'was' : 'were'} destroyed: ${thingList(activity.things)}` };
   }
   const words = ACTIVITY_WORDS[activity.kind];
   const kind = ACTIVITY_STORY_KINDS[activity.kind];
-  const text = `${activity.player ?? 'Someone'} ${words.verb} ${count(total, words.one, words.many)}${words.ending}: ${thingList(activity)}`;
+  const text = `${activity.player ?? 'Someone'} ${words.verb} ${count(total, words.one, words.many)}${words.ending}: ${thingList(activity.things)}`;
   return { timeUtc, kind, text };
 };
 

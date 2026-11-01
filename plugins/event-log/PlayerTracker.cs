@@ -15,6 +15,9 @@ namespace ValheimDashboard.EventLog
         /// <summary>Farthest a player lands from the portal they came through, in meters.</summary>
         private const float PortalRangeMeters = 10f;
 
+        /// <summary>Shortest walk from the last logged position that logs a new one, in meters.</summary>
+        private const float PathStepMeters = 20f;
+
         /// <summary>Portal name logged when its sign is empty.</summary>
         private const string UnnamedPortal = "an unnamed portal";
 
@@ -39,6 +42,9 @@ namespace ValheimDashboard.EventLog
 
         /// <summary>Area each character was first seen in at the last scan, before it is logged.</summary>
         private static readonly Dictionary<string, string> PendingAreas = new Dictionary<string, string>();
+
+        /// <summary>Last position logged for each character, by name.</summary>
+        private static readonly Dictionary<string, Vector3> LoggedPositions = new Dictionary<string, Vector3>();
 
         /// <summary>Gear each character was seen with since the server started, so each piece is logged once.</summary>
         private static readonly HashSet<string> SeenGear = new HashSet<string>();
@@ -78,6 +84,7 @@ namespace ValheimDashboard.EventLog
                     LogChanges(player, name, before, now);
                 }
                 LogArea(name, now.Area);
+                LogPosition(name, now);
                 States[player.m_uid] = now;
                 LogNewGear(player, name);
             }
@@ -131,6 +138,24 @@ namespace ValheimDashboard.EventLog
             PendingAreas.Remove(name);
             LoggedAreas[name] = area;
             GameEventLog.Write($"Area entered: {name} {area}");
+        }
+
+        /// <summary>
+        /// Logs where the character [name] stands once they walked far enough from the last position logged.
+        /// Positions inside a dungeon are skipped, since dungeons sit high above the map.
+        /// </summary>
+        private static void LogPosition(string name, PlayerState now)
+        {
+            if (now.Area == PlayerState.DungeonArea)
+            {
+                return;
+            }
+            if (LoggedPositions.TryGetValue(name, out Vector3 logged) && Vector3.Distance(logged, now.Position) < PathStepMeters)
+            {
+                return;
+            }
+            LoggedPositions[name] = now.Position;
+            GameEventLog.Write($"Position: {name} {Names.MapPosition(now.Position)}");
         }
 
         /// <summary>

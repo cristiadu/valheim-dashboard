@@ -5,7 +5,9 @@ import {
   BED_PATTERN,
   BOSS_SUMMONED_PATTERN,
   CHAT_PATTERN,
+  CHEST_CONTENTS_PATTERN,
   CHEST_PATTERN,
+  CHEST_REMOVED_PATTERN,
   CREATURE_KILLED_PATTERN,
   DAY_STARTED_PATTERN,
   DEATH_DETAILS_PATTERN,
@@ -17,11 +19,13 @@ import {
   GLOBAL_KEY_PATTERN,
   HANDSHAKE_PATTERN,
   HARVESTED_PATTERN,
+  HELD_ITEM_PATTERN,
   ITEM_HUNG_PATTERN,
   KNOWN_PLAYER_PATTERN,
   LEGACY_WORLD_SAVED_PATTERN,
   MS_PER_MINUTE,
   NIGHT_SKIPPED_PATTERN,
+  NOTHING_HELD,
   OBJECTS_REMOVED_PATTERN,
   PET_NAMED_PATTERN,
   PICKED_UP_PATTERN,
@@ -30,6 +34,7 @@ import {
   PING_PATTERN,
   PLAYER_COUNT_PATTERN,
   PLAYFAB_CONNECTED_PATTERN,
+  POSITION_PATTERN,
   PVP_PATTERN,
   POSSIBLE_RAIDS_PATTERN,
   RAID_ENDED_PATTERN,
@@ -47,6 +52,7 @@ import {
   TELEPORTED_PATTERN,
   TIMESTAMP_PATTERN,
   TOMBSTONE_EMPTIED_PATTERN,
+  TOMBSTONE_PATTERN,
   UNKNOWN_PLAYER,
   UNNAMED_PORTAL,
   VERSION_PATTERN,
@@ -56,6 +62,21 @@ import {
 
 /** Reads an optional number group, or null when it did not match. */
 const optionalNumber = (value: string | undefined): number | null => (value === undefined ? null : Number(value));
+
+/** Reads a held items list, such as `Wood x20, Stone x3` or `nothing`, into counts by item name. */
+const heldItemsOf = (text: string): Record<string, number> => {
+  const items: Record<string, number> = {};
+  if (text === NOTHING_HELD) {
+    return items;
+  }
+  for (const entry of text.split(', ')) {
+    const groups = HELD_ITEM_PATTERN.exec(entry)?.groups;
+    if (groups !== undefined) {
+      items[groups.item!] = (items[groups.item!] ?? 0) + Number(groups.count);
+    }
+  }
+  return items;
+};
 
 /** Reads a player from the event log plugin, or null when the plugin did not know who it was. */
 const playerOf = (player: string | undefined): string | null => (player === UNKNOWN_PLAYER ? null : player!);
@@ -290,6 +311,44 @@ const MATCHERS: readonly Matcher[] = [
   {
     pattern: HARVESTED_PATTERN,
     toEvent: (groups, timeUtc) => ({ type: 'harvested', timeUtc, plant: groups.plant!, player: playerOf(groups.player) }),
+  },
+  {
+    pattern: POSITION_PATTERN,
+    toEvent: (groups, timeUtc) => ({
+      type: 'position',
+      timeUtc,
+      character: groups.character!,
+      x: Number(groups.x),
+      z: Number(groups.z),
+    }),
+  },
+  {
+    pattern: CHEST_CONTENTS_PATTERN,
+    toEvent: (groups, timeUtc) => ({
+      type: 'chestContents',
+      timeUtc,
+      id: groups.id!,
+      chest: groups.chest!,
+      x: Number(groups.x),
+      z: Number(groups.z),
+      builder: playerOf(groups.builder),
+      items: heldItemsOf(groups.items!),
+    }),
+  },
+  {
+    pattern: CHEST_REMOVED_PATTERN,
+    toEvent: (groups, timeUtc) => ({ type: 'chestRemoved', timeUtc, id: groups.id! }),
+  },
+  {
+    pattern: TOMBSTONE_PATTERN,
+    toEvent: (groups, timeUtc) => ({
+      type: 'tombstoneContents',
+      timeUtc,
+      owner: playerOf(groups.owner),
+      x: Number(groups.x),
+      z: Number(groups.z),
+      items: heldItemsOf(groups.items!),
+    }),
   },
   {
     pattern: TOMBSTONE_EMPTIED_PATTERN,

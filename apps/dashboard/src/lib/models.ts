@@ -19,6 +19,7 @@ export const TABS: readonly Tab[] = [
   { path: '/vikings', label: 'Vikings', hint: 'Who was online', rune: 'ᛗ' },
   { path: '/saga', label: 'Saga', hint: 'Every game event', rune: 'ᚱ' },
   { path: '/world', label: 'World', hint: 'Saves and backups', rune: 'ᛃ' },
+  { path: '/map', label: 'Map', hint: 'Where everyone went', rune: 'ᛉ' },
   { path: '/recipes', label: 'Recipes', hint: 'Plan what to make', rune: 'ᚲ' },
   { path: '/server', label: 'Server', hint: 'Status and warnings', rune: 'ᚾ' },
 ];
@@ -229,6 +230,14 @@ export type Snapshot = {
   defeatedBosses: string[];
   /** Log lines behind each number and item, by [sourceKey], for example `deaths:Ragnar`. */
   sources: Record<string, SourceLines>;
+  /** Map squares each character has walked through, by character name, as `x,z` square numbers. */
+  explored: Record<string, string[]>;
+  /** Where each character was last seen, by character name. */
+  positions: Record<string, MapPoint>;
+  /** Every chest, cart and ship of the current run, by the ID the plugin logs. */
+  chests: Record<string, ChestRecord>;
+  /** What each character carried at their last death, by character name. */
+  deathItems: Record<string, DeathItems>;
 };
 
 /**
@@ -254,6 +263,53 @@ export type SourceLines = {
   total: number;
   /** Latest lines, oldest first. */
   lines: LogLineRecord[];
+};
+
+/** A spot on the map, in meters east (`x`) and north (`z`) of the world's center, and when it was logged. */
+export type MapPoint = {
+  /** Meters east of the world's center. */
+  x: number;
+  /** Meters north of the world's center. */
+  z: number;
+  /** When it was logged, as a UTC ISO string. */
+  timeUtc: string;
+};
+
+/** A chest, cart or ship, where it stands and what it holds. */
+export type ChestRecord = MapPoint & {
+  /** Prefab name, for example `piece_chest_wood` or `Cart`. */
+  chest: string;
+  /** Character or Steam name of who built it, or null when the plugin did not know. */
+  builder: string | null;
+  /** How many of each item it holds, by item name, for example `{ Wood: 20 }`. */
+  items: Record<string, number>;
+};
+
+/** Everything a character carried when they died, as their tombstone held it, and where they died. */
+export type DeathItems = MapPoint & {
+  /** How many of each item, by item name. */
+  items: Record<string, number>;
+};
+
+/** Side of one map square, in meters. A position marks the whole square it falls in as explored. */
+export const MAP_SQUARE_METERS = 32;
+
+/** Space kept around everything the map shows, in meters. */
+export const MAP_MARGIN_METERS = 64;
+
+/** Size of a chest mark on the map, in meters. */
+export const MAP_CHEST_METERS = 12;
+
+/** What the map draws, in map units: meters east as `x` and meters south as `y`, so north is up. */
+export type MapView = {
+  /** SVG view box that fits everything, with a margin. */
+  viewBox: string;
+  /** Explored squares, one per character and square, in that character's player color. */
+  squares: { key: string; x: number; y: number; color: string }[];
+  /** Chests, carts and ships, by their ID. */
+  chests: { id: string; x: number; y: number; record: ChestRecord }[];
+  /** Where each online player stands and where each character last died. */
+  marks: { key: string; kind: 'player' | 'death'; label: string; x: number; y: number; color: string }[];
 };
 
 /**

@@ -33,12 +33,12 @@ describe('tabFor', () => {
 });
 
 describe('TABS', () => {
-  it('lists the six tabs in menu order', () => {
+  it('lists the seven tabs in menu order', () => {
     // GIVEN the tab list
     // WHEN the labels are read
     const labels = TABS.map((tab) => tab.label);
 
     // THEN they are in menu order
-    expect(labels).toEqual(['Hall', 'Vikings', 'Saga', 'World', 'Recipes', 'Server']);
+    expect(labels).toEqual(['Hall', 'Vikings', 'Saga', 'World', 'Map', 'Recipes', 'Server']);
   });
 });
