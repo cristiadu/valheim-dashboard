@@ -1,20 +1,25 @@
 <script lang="ts">
   import ItemIcon from '#/lib/components/ItemIcon';
-  import { GEAR_ICON_PX, GEAR_SLOT_NAMES, GEAR_SLOTS, type GearPiece } from '#/lib/models';
+  import LogLines from '#/lib/components/LogLines';
+  import { GEAR_ICON_PX, GEAR_SLOT_NAMES, GEAR_SLOTS, type GearPiece, type SourceLines } from '#/lib/models';
   import { gearLabel, gearSheet } from '#/lib/gear';
 
-  /** Gear a character was seen with, newest first, as the snapshot keeps it. */
-  let { gear }: { gear: string[] } = $props();
+  /** Gear a character was seen with, newest first, as the snapshot keeps it, and the log lines behind a piece by its prefab. */
+  let { gear, sourceOf }: { gear: string[]; sourceOf: (prefab: string) => SourceLines } = $props();
 
   /** Gear laid out in slots, plus what is carried. */
   const sheet = $derived(gearSheet(gear));
 </script>
 
-{#snippet pieceIcon(piece: GearPiece)}
-  <ItemIcon item={piece.name} size={GEAR_ICON_PX}>
-    {#snippet fallback()}<span class="initials" aria-hidden="true">{piece.name.slice(0, 2)}</span>{/snippet}
-  </ItemIcon>
-  {#if piece.quality > 1}<span class="level" aria-hidden="true">{piece.quality}</span>{/if}
+{#snippet pieceSlot(piece: GearPiece, label: string)}
+  <LogLines title={gearLabel(piece)} source={sourceOf(piece.prefab)}>
+    <span class="slot" role="img" aria-label={label} title={label}>
+      <ItemIcon item={piece.name} size={GEAR_ICON_PX}>
+        {#snippet fallback()}<span class="initials" aria-hidden="true">{piece.name.slice(0, 2)}</span>{/snippet}
+      </ItemIcon>
+      {#if piece.quality > 1}<span class="level" aria-hidden="true">{piece.quality}</span>{/if}
+    </span>
+  </LogLines>
 {/snippet}
 
 <div class="sheet">
@@ -22,11 +27,11 @@
     {#each GEAR_SLOTS as slot (slot)}
       {@const piece = sheet.worn[slot]}
       {@const label = `${GEAR_SLOT_NAMES[slot]}: ${piece ? gearLabel(piece) : 'nothing seen yet'}`}
-      <li class="slot" class:empty={piece === undefined} style:grid-area={slot} role="img" aria-label={label} title={label}>
+      <li style:grid-area={slot}>
         {#if piece}
-          {@render pieceIcon(piece)}
+          {@render pieceSlot(piece, label)}
         {:else}
-          <span class="slot-name" aria-hidden="true">{GEAR_SLOT_NAMES[slot]}</span>
+          <span class="slot empty" role="img" aria-label={label} title={label}><span class="slot-name" aria-hidden="true">{GEAR_SLOT_NAMES[slot]}</span></span>
         {/if}
       </li>
     {/each}
@@ -36,7 +41,7 @@
       <p class="muted carried-title">Also carries</p>
       <ul class="carried">
         {#each sheet.carried as piece (piece.prefab)}
-          <li class="slot" role="img" aria-label={gearLabel(piece)} title={gearLabel(piece)}>{@render pieceIcon(piece)}</li>
+          <li>{@render pieceSlot(piece, gearLabel(piece))}</li>
         {/each}
       </ul>
     </div>

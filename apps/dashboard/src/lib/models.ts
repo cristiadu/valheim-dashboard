@@ -224,6 +224,31 @@ export type Snapshot = {
   day: number | null;
   /** Bosses defeated, by the name the game shows, in the order of their first defeat. */
   defeatedBosses: string[];
+  /** Log lines behind each number and item, by [sourceKey], for example `deaths:Ragnar`. */
+  sources: Record<string, SourceLines>;
+};
+
+/**
+ * What a group of log lines counts, for a character: `visits` are joins and leaves, `deaths` are deaths,
+ * `kills` are all kills, `killed` are kills of one creature, `area` is going into one area, and `gear` is one
+ * piece of gear first seen, at each level.
+ */
+export type SourceKind = 'visits' | 'deaths' | 'kills' | 'killed' | 'area' | 'gear';
+
+/** One line of `logs.txt`, as written. */
+export type LogLineRecord = {
+  /** When it was written, as a UTC ISO string. */
+  timeUtc: string;
+  /** The whole line, for example `10/29/2026 02:43:13: Got character ZDOID from Ragnar : 549297305:1`. */
+  line: string;
+};
+
+/** Log lines behind one number or item. */
+export type SourceLines = {
+  /** How many lines there were in all, also counting the old ones no longer kept. */
+  total: number;
+  /** Latest lines, oldest first. */
+  lines: LogLineRecord[];
 };
 
 /**
