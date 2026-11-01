@@ -158,6 +158,7 @@ from the save shows on the World tab, but has no Saga line, since its time is no
 | Vikings | Each player, when they were online, kills, areas visited, and gear laid out like a character sheet | Snapshot |
 | Saga | Every game event and chat, with filters | Snapshot |
 | World | The in-game day, bosses defeated, saves, backups, disk space | Snapshot |
+| Map | Land each player walked, chests with what they hold, who is where, last deaths | Snapshot |
 | Recipes | Crafting plans and what is still missing | The viewer's browser |
 | Server | Up or down, uptime in the last 24 hours, warnings | Snapshot |
 
@@ -213,6 +214,7 @@ On the dashboard, plugin lines become:
 | News only | Areas, gear, global keys | A Saga line for a first visit or a dungeon trip, new gear, or a boss defeat |
 | Stats | Areas, kills, the day, boss keys | Where each player is now and their kills, areas and gear on Vikings, the day and bosses on World |
 | Chat | Chat and pings | The Saga's "Chat and signs" filter, kept apart so it never pushes out events |
+| Map | Positions, chests, tombstones | Explored squares, chests and last deaths on Map, and what each player carried at their last death on Vikings |
 
 ### Gathering
 
@@ -225,6 +227,19 @@ flowchart LR
 
 An item counts as gathered only the first time anyone picks it up. Harvest lines are not counted, since the
 player then picks up what the plant drops, which is already counted.
+
+### Map
+
+```mermaid
+flowchart LR
+  pos["Position: Ragnar 120 -340"] --> square["Square 3,-11 explored by Ragnar"]
+  chest["Chest: 5273:1203 piece_chest_wood at 118 -336 ... holds Wood x20"] --> chests[Chest by ID]
+  removed["Chest removed: 5273:1203"] --> chests
+  tomb["Tombstone: Ragnar at 410 -77 holds ..."] --> death[Ragnar's last death]
+```
+
+A position marks its whole 32 m square as explored. Chest IDs last until the server stops, and every run lists
+all chests again, so a new run starts the chest list over.
 
 BepInEx's own log file is turned off, so its messages land in
 `logs.txt` too. Every line is listed in [log-events.md](log-events.md).

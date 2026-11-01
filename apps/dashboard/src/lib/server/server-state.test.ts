@@ -88,6 +88,44 @@ describe('server state', () => {
     expect(kinds).toEqual([['Ragnar', 'gathered', { Dandelion: 1 }]]);
   });
 
+  it('keeps explored squares, last positions, chests and what a player carried at death', () => {
+    // GIVEN Ragnar walks three spots, two in one 32 m square, two chests are listed and one goes, then he dies
+    readLines(state, [
+      ...RUN_START,
+      logLine('03:00:00', 'Position: Ragnar 10 20'),
+      logLine('03:00:05', 'Position: Ragnar 30 -5'),
+      logLine('03:00:10', 'Position: Ragnar 70 20'),
+      logLine('03:01:00', 'Chest: 1:10 piece_chest_wood at 12 18 built by Ragnar holds Wood x20'),
+      logLine('03:01:00', 'Chest: 1:11 Cart at 40 0 built by Tony Example holds nothing'),
+      logLine('03:02:00', 'Chest removed: 1:11'),
+      logLine('03:03:00', 'Tombstone: Ragnar at 70 20 holds SwordBronze x1, Coins x55'),
+    ]);
+
+    // WHEN the snapshot is read
+    const { explored, positions, chests, deathItems } = state.snapshot;
+
+    // THEN each square counts once, the last spot is kept, the removed cart is gone and the death is kept
+    expect(explored).toEqual({ Ragnar: ['0,0', '0,-1', '2,0'] });
+    expect(positions).toEqual({ Ragnar: { x: 70, z: 20, timeUtc: '2026-10-29T10:00:10.000Z' } });
+    expect(chests).toEqual({
+      '1:10': { chest: 'piece_chest_wood', x: 12, z: 18, builder: 'Ragnar', items: { Wood: 20 }, timeUtc: '2026-10-29T10:01:00.000Z' },
+    });
+    expect(deathItems).toEqual({
+      Ragnar: { x: 70, z: 20, items: { SwordBronze: 1, Coins: 55 }, timeUtc: '2026-10-29T10:03:00.000Z' },
+    });
+  });
+
+  it("forgets the old run's chests when a new log starts, since their IDs change", () => {
+    // GIVEN a chest in the first run
+    readLines(state, [...RUN_START, logLine('03:01:00', 'Chest: 1:10 piece_chest_wood at 12 18 built by Ragnar holds Wood x20')]);
+
+    // WHEN a new log starts
+    startNewLog(state);
+
+    // THEN no chest is left
+    expect(state.snapshot.chests).toEqual({});
+  });
+
   it('keeps areas, gear and global keys in the story only when they are news', () => {
     // GIVEN two visits to the Swamp, two trips into a dungeon, the same gear twice, a boss defeat and another key
     readLines(state, [
