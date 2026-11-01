@@ -2,7 +2,7 @@ import { gzipSync } from 'node:zlib';
 
 import type { PlayerSession } from 'valheim-log';
 
-import type { Plan, Snapshot } from '#/lib/models';
+import type { Plan, Snapshot, SourceLines } from '#/lib/models';
 import type { ServerState } from '#/lib/server/models';
 import { createServerState, readLogLine } from '#/lib/server/server-state';
 
@@ -29,6 +29,9 @@ export const RUN_START = [
   logLine('02:42:45', 'Got handshake from client playfab/A1B2C3D4E5F60718'),
   logLine('02:43:13', 'Got character ZDOID from Ragnar : 549297305:1'),
 ];
+
+/** Log lines of a test record that was not read from a log. */
+export const NO_LINES: SourceLines = { total: 0, lines: [] };
 
 /** Returns an empty snapshot changed by [changes]. */
 export const snapshotWith = (changes: Partial<Snapshot>): Snapshot => ({

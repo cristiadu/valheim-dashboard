@@ -1,12 +1,14 @@
 <script lang="ts">
   import { resolve } from '$app/paths';
   import DayWheel from '#/lib/components/DayWheel';
+  import LogLines from '#/lib/components/LogLines';
   import NoData from '#/lib/components/NoData';
   import Pill from '#/lib/components/Pill';
   import { live, useSnapshot } from '#/lib/live.svelte';
   import { LATEST_EVENT_COUNT, STORY_STYLES } from '#/lib/models';
   import { serverPill } from '#/lib/pills';
   import { playersOf } from '#/lib/players';
+  import { playerSource } from '#/lib/sources';
   import { clockTime, durationLabel, isServerOnline, viewerTimeZone, whenLabel } from '#/lib/status';
   import { gigabytesLabel } from '#/lib/health';
   import { areaLabel, daySummary, storyOf } from '#/lib/story';
@@ -64,11 +66,13 @@
         <section class="panel" aria-labelledby="online-title">
           <h2 id="online-title" class="panel-title">ONLINE NOW</h2>
           {#each online as player (player.key)}
-            <div class="line">
-              <span class="diamond" aria-hidden="true" style:background={player.color}></span>
-              <span class="grow">{player.character}{#if player.area}<span class="muted">{` · ${areaLabel(player.area)}`}</span>{/if}</span>
-              <span class="mono muted">since {at(player.sinceUtc!)} · {durationLabel(nowMs - Date.parse(player.sinceUtc!))}</span>
-            </div>
+            <LogLines title="{player.character}: joins and leaves" source={playerSource(snapshot, player, 'visits')}>
+              <span class="line">
+                <span class="diamond" aria-hidden="true" style:background={player.color}></span>
+                <span class="grow">{player.character}{#if player.area}<span class="muted">{` · ${areaLabel(player.area)}`}</span>{/if}</span>
+                <span class="mono muted">since {at(player.sinceUtc!)} · {durationLabel(nowMs - Date.parse(player.sinceUtc!))}</span>
+              </span>
+            </LogLines>
           {:else}
             <p class="muted">
               Nobody is online.{#if lastOut}{` Last to leave: ${lastOut.character} at ${at(lastOut.lastSeenUtc!)}.`}{/if}
@@ -82,11 +86,13 @@
             <a href={resolve('/saga')}>See all events</a>
           </div>
           {#each latest as item, i (i)}
-            <div class="line event">
-              <span class="mono muted">{whenLabel(item.timeUtc, timeZone, nowMs)}</span>
-              <span class="rune" aria-hidden="true" style:color={STORY_STYLES[item.kind].color}>{STORY_STYLES[item.kind].rune}</span>
-              <span>{item.text}</span>
-            </div>
+            <LogLines title={item.text} source={item.source}>
+              <span class="line event">
+                <span class="mono muted">{whenLabel(item.timeUtc, timeZone, nowMs)}</span>
+                <span class="rune" aria-hidden="true" style:color={STORY_STYLES[item.kind].color}>{STORY_STYLES[item.kind].rune}</span>
+                <span>{item.text}</span>
+              </span>
+            </LogLines>
           {:else}
             <p class="muted">Nothing happened yet.</p>
           {/each}
