@@ -203,6 +203,21 @@ has the game's line and the plugin's details, a join or leave has its line from 
 stretch of building, kills or items keeps its latest 50 lines. Every line in the list shows the rune, color
 and label of its Saga kind.
 
+The server numbers on World, Server and the Hall keep their lines the same way:
+
+| Number | Lines |
+| --- | --- |
+| World, up for, status | World loaded and clean stops |
+| In-game day | New day and night skipped |
+| Saves seen, average save time, each save | Save finished |
+| Backups seen, each backup | Backup created |
+| Disk free, low disk warning | Free disk space |
+| Steam, lost Steam warning | Steam connected or lost |
+| A boss defeated | The defeat's global key. A boss read only from the world save has none. |
+| Last log line | The newest line |
+| Crash warning | The last line before the crash |
+| Hall summary | Joins and leaves, deaths, raids and pieces built in the last 24 hours |
+
 ## Event log plugin
 
 The game logs joins, deaths and saves, but not building, chat or boss progress. The plugin watches what

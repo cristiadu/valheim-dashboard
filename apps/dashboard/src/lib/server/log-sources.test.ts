@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import { logLine, readLines, RUN_START, TEST_OFFSET_MINUTES } from '#/lib/test-common';
 import type { ServerState } from '#/lib/server/models';
-import { createServerState } from '#/lib/server/server-state';
+import { createServerState, startNewLog } from '#/lib/server/server-state';
 
 describe('keepSourceLines', () => {
   let state: ServerState;
@@ -62,5 +62,43 @@ describe('keepSourceLines', () => {
     expect(source.total).toBe(60);
     expect(source.lines).toHaveLength(50);
     expect(source.lines[0]!.line).toBe('10/29/2026 03:10:00: Creature killed: Greydwarf level 1 by Ragnar');
+  });
+
+  it('keeps the lines behind the server numbers', () => {
+    // GIVEN a run with a save, a backup, a lost Steam connection and Eikthyr defeated
+    readLines(state, [
+      ...RUN_START,
+      logLine('03:52:15', 'World save (5/5) done. Total time [40ms]'),
+      logLine('03:52:16', 'Backup created in Cotil_backup_auto-20261029-035216 [23.522ms]'),
+      logLine('03:53:00', 'Game server disconnected'),
+      logLine('03:54:00', 'Global key set: defeated_eikthyr'),
+    ]);
+
+    // WHEN the lines are read back
+    const lines = (key: string): string[] => state.snapshot.sources[key]!.lines.map((record) => `${record.kind} ${record.line}`);
+
+    // THEN each server number has its line, and the newest line is kept on its own
+    expect(lines('runs')).toEqual(['world 10/29/2026 02:42:18: ZNet.LoadWorld: Cotil (Cotil), save number 1183']);
+    expect(lines('saves')).toEqual(['world 10/29/2026 03:52:15: World save (5/5) done. Total time [40ms]']);
+    expect(lines('backups')).toEqual(['world 10/29/2026 03:52:16: Backup created in Cotil_backup_auto-20261029-035216 [23.522ms]']);
+    expect(lines('steam')).toEqual([
+      'world 10/29/2026 02:42:23: Game server connected',
+      'stopped 10/29/2026 03:53:00: Game server disconnected',
+    ]);
+    expect(lines('boss:Eikthyr')).toEqual(['boss 10/29/2026 03:54:00: Global key set: defeated_eikthyr']);
+    expect(lines('latest')).toEqual(['world 10/29/2026 03:54:00: Global key set: defeated_eikthyr']);
+  });
+
+  it('keeps the last line before a crash', () => {
+    // GIVEN a run that ends without a clean stop
+    readLines(state, RUN_START);
+
+    // WHEN a new log starts
+    startNewLog(state);
+
+    // THEN its last line is kept as the crash line
+    expect(state.snapshot.sources.crashes!.lines).toEqual([
+      { timeUtc: '2026-10-29T09:43:13.000Z', line: '10/29/2026 02:43:13: Got character ZDOID from Ragnar : 549297305:1', kind: 'stopped' },
+    ]);
   });
 });

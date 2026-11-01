@@ -1,10 +1,12 @@
 <script lang="ts">
+  import LogLines from '#/lib/components/LogLines';
   import NoData from '#/lib/components/NoData';
   import Pill from '#/lib/components/Pill';
   import StatGrid from '#/lib/components/StatGrid';
   import { live, useSnapshot } from '#/lib/live.svelte';
   import { BOSS_ORDER, LATEST_SAVE_COUNT } from '#/lib/models';
   import { bossPill } from '#/lib/pills';
+  import { linesAt, serverSource } from '#/lib/sources';
   import { viewerTimeZone, whenLabel } from '#/lib/status';
 
   /** Getter for the snapshot the layout shares. */
@@ -33,11 +35,11 @@
   <div class="world">
     <StatGrid
       stats={[
-        { label: 'World', value: snapshot.world ?? 'Not in this log' },
-        { label: 'In-game day', value: snapshot.day === null ? '–' : String(snapshot.day) },
-        { label: 'Saves seen', value: String(snapshot.saves.length) },
-        { label: 'Average save time', value: averageMs === null ? '–' : `${Math.round(averageMs)} ms` },
-        { label: 'Backups seen', value: String(snapshot.backups.length) },
+        { label: 'World', value: snapshot.world ?? 'Not in this log', source: serverSource(snapshot, 'runs') },
+        { label: 'In-game day', value: snapshot.day === null ? '–' : String(snapshot.day), source: serverSource(snapshot, 'day') },
+        { label: 'Saves seen', value: String(snapshot.saves.length), source: serverSource(snapshot, 'saves') },
+        { label: 'Average save time', value: averageMs === null ? '–' : `${Math.round(averageMs)} ms`, source: serverSource(snapshot, 'saves') },
+        { label: 'Backups seen', value: String(snapshot.backups.length), source: serverSource(snapshot, 'backups') },
       ]}
     />
 
@@ -47,8 +49,17 @@
         {#each BOSS_ORDER as boss (boss)}
           {@const isDefeated = snapshot.defeatedBosses.includes(boss)}
           <li class:defeated={isDefeated}>
-            <span>{boss}</span>
-            <span><Pill pill={bossPill(isDefeated)} /></span>
+            {#if isDefeated}
+              <LogLines title="{boss} defeated" source={serverSource(snapshot, 'boss', boss)} emptyText="Read from the world save. The log has no line for it, since it happened before the log was kept.">
+                <span class="boss">
+                  <span>{boss}</span>
+                  <span><Pill pill={bossPill(isDefeated)} /></span>
+                </span>
+              </LogLines>
+            {:else}
+              <span>{boss}</span>
+              <span><Pill pill={bossPill(isDefeated)} /></span>
+            {/if}
           </li>
         {/each}
       </ol>
@@ -58,10 +69,12 @@
       <h2 id="saves-title" class="panel-title">LATEST SAVES</h2>
       <p class="muted">The server saves the world every 10 minutes.</p>
       {#each saves as save (save.timeUtc)}
-        <div class="line">
-          <span>{whenLabel(save.timeUtc, timeZone, nowMs)}</span>
-          <span class="mono muted">{save.saveNumber === null ? '' : `save ${save.saveNumber} · `}{save.durationMs} ms</span>
-        </div>
+        <LogLines title="Save at {whenLabel(save.timeUtc, timeZone, nowMs)}" source={linesAt(serverSource(snapshot, 'saves').lines, save.timeUtc)}>
+          <span class="line">
+            <span>{whenLabel(save.timeUtc, timeZone, nowMs)}</span>
+            <span class="mono muted">{save.saveNumber === null ? '' : `save ${save.saveNumber} · `}{save.durationMs} ms</span>
+          </span>
+        </LogLines>
       {:else}
         <p class="muted">No save yet in this log.</p>
       {/each}
@@ -70,10 +83,12 @@
     <section class="panel" aria-labelledby="backups-title">
       <h2 id="backups-title" class="panel-title">AUTO BACKUPS</h2>
       {#each backups as backup (backup.timeUtc)}
-        <div class="line">
-          <span>{whenLabel(backup.timeUtc, timeZone, nowMs)}</span>
-          <code class="mono muted">{backup.backup}</code>
-        </div>
+        <LogLines title="Backup {backup.backup}" source={linesAt(serverSource(snapshot, 'backups').lines, backup.timeUtc)}>
+          <span class="line">
+            <span>{whenLabel(backup.timeUtc, timeZone, nowMs)}</span>
+            <code class="mono muted">{backup.backup}</code>
+          </span>
+        </LogLines>
       {:else}
         <p class="muted">No backup yet in this log.</p>
       {/each}
@@ -112,6 +127,13 @@
     gap: 6px;
     padding: 10px 12px;
     border: 1px solid var(--line);
+  }
+
+  /* A defeated boss opens its log lines, with the same name-above-state layout */
+  .boss {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
   }
 
   /* A defeated boss stands out in gold */
