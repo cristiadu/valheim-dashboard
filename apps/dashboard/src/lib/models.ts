@@ -137,7 +137,10 @@ export const STORY_EVENT_TYPES = [
 ] as const;
 
 /** A game event friends see, such as a death or a raid. */
-export type StoryEvent = Extract<LogEvent, { type: (typeof STORY_EVENT_TYPES)[number] }>;
+export type StoryEvent = Extract<LogEvent, { type: (typeof STORY_EVENT_TYPES)[number] }> & {
+  /** The log line it was read from. */
+  line: string;
+};
 
 /** One finished world save. */
 export type SaveRecord = {
@@ -362,6 +365,23 @@ export type ActivityRecord = {
   endUtc: string;
   /** How many of each thing, by prefab name, for example `{ wood_floor_1x1: 14 }` or `{ Troll: 2 }`. */
   things: Record<string, number>;
+  /** Log lines of the stretch. */
+  source: SourceLines;
+};
+
+/** Story kind of each activity kind, which picks its rune, color and label. */
+export const ACTIVITY_STORY_KINDS: Record<ActivityKind, StoryKind> = {
+  built: 'built',
+  destroyed: 'wrecked',
+  killed: 'fight',
+  gathered: 'items',
+  stored: 'items',
+  taken: 'items',
+  planted: 'built',
+  ate: 'items',
+  smelted: 'items',
+  cut: 'items',
+  mined: 'items',
 };
 
 /**
@@ -391,6 +411,8 @@ export type ChatRecord = {
   kind: ChatKind | 'ping';
   /** What they wrote. Empty for a ping. */
   text: string;
+  /** The log line it was read from. */
+  line: string;
 };
 
 /** Boss names as the game shows them, by the prefab a summon logs and by the key a defeat sets. */
@@ -642,7 +664,12 @@ export type StoryItem = {
   kind: StoryKind;
   /** Plain sentence, for example `Ragnar died`. */
   text: string;
+  /** Log lines it was told from. */
+  source: SourceLines;
 };
+
+/** A story line's words, before its log lines are added. */
+export type StoryText = Omit<StoryItem, 'source'>;
 
 /** Rune, color and pill label for each story kind. */
 export const STORY_STYLES: Record<StoryKind, { rune: string; color: string; label: string }> = {

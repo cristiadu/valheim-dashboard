@@ -198,6 +198,11 @@ newest first. Only the latest 50 lines per number are kept, but all of them are 
 | An area | Area entered |
 | A piece of gear | Gear first seen, at each level |
 
+Each Saga and Hall event keeps its lines too: a game event, chat message or ping has its own line, a death
+has the game's line and the plugin's details, a join or leave has its line from the table above, and a
+stretch of building, kills or items keeps its latest 50 lines. Every line in the list shows the rune, color
+and label of its Saga kind.
+
 ## Event log plugin
 
 The game logs joins, deaths and saves, but not building, chat or boss progress. The plugin watches what
@@ -264,8 +269,7 @@ flowchart LR
 A position marks its whole 32 m square as explored. Chest IDs last until the server stops, and every run lists
 all chests again, so a new run starts the chest list over. The plugin writes the terrain file once per world
 from the game's own world generator, and the map colors only squares someone walked.
-Nothing nobody has seen shows: a chest the world came with appears once someone walks next to it, and a boss
-once it is beaten.
+Nothing nobody has seen shows: a chest the world came with appears once someone walks next to it.
 
 BepInEx's own log file is turned off, so its messages land in
 `logs.txt` too. Every line is listed in [log-events.md](log-events.md).

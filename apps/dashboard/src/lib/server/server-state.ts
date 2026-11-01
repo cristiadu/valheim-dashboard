@@ -3,6 +3,7 @@ import { applyEvent, createLogReader, createSessionState, endAllSessions, online
 import type { LogEvent } from 'valheim-log';
 
 import {
+  ACTIVITY_STORY_KINDS,
   type ActivityKind,
   type ActivityRecord,
   BOSS_NAMES,
@@ -14,7 +15,7 @@ import {
   STORY_EVENT_TYPES,
   type StoryEvent,
 } from '#/lib/models';
-import { keepSourceLines } from '#/lib/server/log-sources';
+import { addSourceLine, keepSourceLines } from '#/lib/server/log-sources';
 import {
   ACTIVITY_GAP_MS,
   MAX_ACTIVITIES,
@@ -34,11 +35,12 @@ const pushCapped = <T>(list: T[], item: T, max: number): void => {
 };
 
 /**
- * Adds [count] of [thing] to the player's latest stretch of the same [kind], or starts a new stretch when the
- * player paused longer than [ACTIVITY_GAP_MS].
+ * Adds [count] of [thing] and its log [line] to the player's latest stretch of the same [kind], or starts a new
+ * stretch when the player paused longer than [ACTIVITY_GAP_MS].
  */
 const addActivity = (
   activities: ActivityRecord[],
+  line: string,
   timeUtc: string,
   player: string | null,
   kind: ActivityKind,
@@ -49,9 +51,11 @@ const addActivity = (
   if (stretch && Date.parse(timeUtc) - Date.parse(stretch.endUtc) <= ACTIVITY_GAP_MS) {
     stretch.endUtc = timeUtc;
     stretch.things[thing] = (stretch.things[thing] ?? 0) + count;
+    addSourceLine(stretch.source, timeUtc, line, ACTIVITY_STORY_KINDS[kind]);
     return;
   }
-  pushCapped(activities, { player, kind, startUtc: timeUtc, endUtc: timeUtc, things: { [thing]: count } }, MAX_ACTIVITIES);
+  const source = { total: 1, lines: [{ timeUtc, line, kind: ACTIVITY_STORY_KINDS[kind] }] };
+  pushCapped(activities, { player, kind, startUtc: timeUtc, endUtc: timeUtc, things: { [thing]: count }, source }, MAX_ACTIVITIES);
 };
 
 /** Returns the terrain letter of the square with [key], such as `3,-11`, or null when [terrain] has none there. */
@@ -112,43 +116,43 @@ const characterOf = (snapshot: Snapshot, name: string | null): string | null =>
   snapshot.sessions.findLast((session) => session.steamName !== null && session.steamName === name)?.character ?? name;
 
 /**
- * Adds the activity [event] stands for, such as a piece built or a creature killed, to [activities]. An item
- * counts as gathered only the first time anyone picks it up.
+ * Adds the activity [event] stands for, such as a piece built or a creature killed, read from [line], to the
+ * activities of [snapshot]. An item counts as gathered only the first time anyone picks it up.
  */
-const addActivityOf = (snapshot: Snapshot, event: LogEvent): void => {
+const addActivityOf = (snapshot: Snapshot, event: LogEvent, line: string): void => {
   const { activities } = snapshot;
   const { timeUtc } = event;
   switch (event.type) {
     case 'pieceBuilt':
-      addActivity(activities, timeUtc, characterOf(snapshot, event.builder), 'built', event.piece, 1);
+      addActivity(activities, line, timeUtc, characterOf(snapshot, event.builder), 'built', event.piece, 1);
       break;
     case 'pieceDestroyed':
-      addActivity(activities, timeUtc, characterOf(snapshot, event.builder), 'destroyed', event.piece, 1);
+      addActivity(activities, line, timeUtc, characterOf(snapshot, event.builder), 'destroyed', event.piece, 1);
       break;
     case 'creatureKilled':
       for (const attacker of event.attackers) {
-        addActivity(activities, timeUtc, attacker, 'killed', event.creature, 1);
+        addActivity(activities, line, timeUtc, attacker, 'killed', event.creature, 1);
       }
       break;
     case 'itemPickedUp':
       if (event.isFirstPickup) {
-        addActivity(activities, timeUtc, event.player, 'gathered', event.item, event.count);
+        addActivity(activities, line, timeUtc, event.player, 'gathered', event.item, event.count);
       }
       break;
     case 'chestChanged':
-      addActivity(activities, timeUtc, event.player, event.isStored ? 'stored' : 'taken', event.item, event.count);
+      addActivity(activities, line, timeUtc, event.player, event.isStored ? 'stored' : 'taken', event.item, event.count);
       break;
     case 'planted':
-      addActivity(activities, timeUtc, event.player, 'planted', event.plant, 1);
+      addActivity(activities, line, timeUtc, event.player, 'planted', event.plant, 1);
       break;
     case 'ate':
-      addActivity(activities, timeUtc, event.character, 'ate', event.item, 1);
+      addActivity(activities, line, timeUtc, event.character, 'ate', event.item, 1);
       break;
     case 'smelting':
-      addActivity(activities, timeUtc, event.player, 'smelted', event.item, event.count);
+      addActivity(activities, line, timeUtc, event.player, 'smelted', event.item, event.count);
       break;
     case 'depleted':
-      addActivity(activities, timeUtc, event.player, event.kind === 'tree' ? 'cut' : 'mined', event.thing, 1);
+      addActivity(activities, line, timeUtc, event.player, event.kind === 'tree' ? 'cut' : 'mined', event.thing, 1);
       break;
     default:
       break;
@@ -253,9 +257,9 @@ export const readLogLine = (state: ServerState, line: string): void => {
   const endedSessions = openSessions.filter((session) => session.endUtc !== null);
   keepSourceLines(snapshot, event, line, [...endedSessions, ...snapshot.sessions.slice(sessionCount)]);
   if (isStoryNews(snapshot, event)) {
-    pushCapped(snapshot.events, event as StoryEvent, MAX_EVENTS);
+    pushCapped(snapshot.events, { ...event, line } as StoryEvent, MAX_EVENTS);
   }
-  addActivityOf(snapshot, event);
+  addActivityOf(snapshot, event, line);
   switch (event.type) {
     case 'worldLoaded':
       snapshot.world = event.world;
@@ -284,7 +288,7 @@ export const readLogLine = (state: ServerState, line: string): void => {
       break;
     case 'chatMessage': {
       const { timeUtc, character, kind, text } = event;
-      pushCapped(snapshot.chat, { timeUtc, character, kind, text }, MAX_CHAT);
+      pushCapped(snapshot.chat, { timeUtc, character, kind, text, line }, MAX_CHAT);
       break;
     }
     case 'areaEntered':
@@ -307,7 +311,7 @@ export const readLogLine = (state: ServerState, line: string): void => {
       break;
     }
     case 'ping':
-      pushCapped(snapshot.chat, { timeUtc: event.timeUtc, character: event.character, kind: 'ping', text: '' }, MAX_CHAT);
+      pushCapped(snapshot.chat, { timeUtc: event.timeUtc, character: event.character, kind: 'ping', text: '', line }, MAX_CHAT);
       break;
     case 'position': {
       const { character, x, z, timeUtc } = event;

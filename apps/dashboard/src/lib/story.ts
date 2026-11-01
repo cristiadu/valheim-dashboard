@@ -1,6 +1,7 @@
 import type { PlayerSession } from 'valheim-log';
 
 import {
+  ACTIVITY_STORY_KINDS,
   ACTIVITY_WORDS,
   type ActivityRecord,
   AREA_NAMES,
@@ -10,9 +11,13 @@ import {
   DEATH_DETAILS_WINDOW_MS,
   DUNGEON_AREA,
   type Snapshot,
+  type SourceLines,
   type StoryEvent,
   type StoryItem,
+  type StoryKind,
+  type StoryText,
 } from '#/lib/models';
+import { sourceKey } from '#/lib/sources';
 
 /** Returns `1 death` or `2 deaths` style text. */
 const count = (amount: number, one: string, many: string): string => `${amount} ${amount === 1 ? one : many}`;
@@ -50,22 +55,22 @@ export const thingList = (things: Record<string, number>): string =>
     .join(', ');
 
 /** Story line for one stretch of activity, such as building or kills. */
-const activityItem = (activity: ActivityRecord): StoryItem => {
+const activityItem = (activity: ActivityRecord): StoryText => {
   const total = activityTotal(activity);
   const timeUtc = activity.endUtc;
   if (activity.kind === 'destroyed') {
     const pieces = count(total, 'piece', 'pieces');
     const whose = activity.player === null ? pieces : `${pieces} ${activity.player} built`;
-    return { timeUtc, kind: 'wrecked', text: `${whose} ${total === 1 ? 'was' : 'were'} destroyed: ${thingList(activity.things)}` };
+    return { timeUtc, kind: ACTIVITY_STORY_KINDS.destroyed, text: `${whose} ${total === 1 ? 'was' : 'were'} destroyed: ${thingList(activity.things)}` };
   }
   const words = ACTIVITY_WORDS[activity.kind];
-  const kind = activity.kind === 'built' || activity.kind === 'planted' ? 'built' : activity.kind === 'killed' ? 'fight' : 'items';
+  const kind = ACTIVITY_STORY_KINDS[activity.kind];
   const text = `${activity.player ?? 'Someone'} ${words.verb} ${count(total, words.one, words.many)}${words.ending}: ${thingList(activity.things)}`;
   return { timeUtc, kind, text };
 };
 
 /** Story line for one chat message or ping. */
-const chatItem = (chat: ChatRecord): StoryItem => {
+const chatItem = (chat: ChatRecord): StoryText => {
   const { timeUtc, character, text } = chat;
   switch (chat.kind) {
     case 'ping':
@@ -113,7 +118,7 @@ const leaveText = (session: PlayerSession): string => {
 };
 
 /** Story line for one game event. [players] are the character names, which are never given an article. */
-const eventItem = (event: StoryEvent, players: Set<string>): StoryItem => {
+const eventItem = (event: StoryEvent, players: Set<string>): StoryText => {
   const { timeUtc } = event;
   switch (event.type) {
     case 'playerDied':
@@ -179,29 +184,48 @@ const eventItem = (event: StoryEvent, players: Set<string>): StoryItem => {
   }
 };
 
-/** True when [event] is the game's own death line and the plugin also told where and how that death happened. */
-const hasDeathDetails = (event: StoryEvent, events: StoryEvent[]): boolean =>
-  event.type === 'playerDied' &&
-  events.some(
-    (other) =>
-      other.type === 'deathDetails' &&
-      other.character === event.character &&
-      Math.abs(Date.parse(other.timeUtc) - Date.parse(event.timeUtc)) <= DEATH_DETAILS_WINDOW_MS,
-  );
+/** True when [other] is the game's own death line for the death the plugin told about in [event]. */
+const isSameDeath = (event: StoryEvent, other: StoryEvent): boolean =>
+  event.type === 'deathDetails' &&
+  other.type === 'playerDied' &&
+  other.character === event.character &&
+  Math.abs(Date.parse(other.timeUtc) - Date.parse(event.timeUtc)) <= DEATH_DETAILS_WINDOW_MS;
+
+/** Log lines behind [event]: its own line, and for death details also the game's death line. */
+const eventSource = (event: StoryEvent, events: StoryEvent[], kind: StoryKind): SourceLines => {
+  const told = [...events.filter((other) => isSameDeath(event, other)), event];
+  return { total: told.length, lines: told.map(({ timeUtc, line }) => ({ timeUtc, line, kind })) };
+};
+
+/** Log lines of [character] at [timeUtc] among the joins and leaves, for one join or leave. */
+const visitSource = (snapshot: Snapshot, character: string, timeUtc: string): SourceLines => {
+  const lines = (snapshot.sources[sourceKey('visits', character)]?.lines ?? []).filter((record) => record.timeUtc === timeUtc);
+  return { total: lines.length, lines };
+};
 
 /** Everything that happened, newest first: joins and leaves from the sessions, game events, activity and chat. */
 export const storyOf = (snapshot: Snapshot): StoryItem[] => {
   const sessionItems = snapshot.sessions.flatMap((session): StoryItem[] => [
-    { timeUtc: session.startUtc, kind: 'joined', text: `${session.character} joined` },
-    ...(session.endUtc === null ? [] : [{ timeUtc: session.endUtc, kind: 'left' as const, text: leaveText(session) }]),
+    {
+      timeUtc: session.startUtc,
+      kind: 'joined',
+      text: `${session.character} joined`,
+      source: visitSource(snapshot, session.character, session.startUtc),
+    },
+    ...(session.endUtc === null
+      ? []
+      : [{ timeUtc: session.endUtc, kind: 'left' as const, text: leaveText(session), source: visitSource(snapshot, session.character, session.endUtc) }]),
   ]);
   const players = new Set(snapshot.sessions.map((session) => session.character));
   const eventItems = snapshot.events
-    .filter((event) => !hasDeathDetails(event, snapshot.events))
-    .map((event) => eventItem(event, players));
-  return [...sessionItems, ...eventItems, ...snapshot.activities.map(activityItem), ...snapshot.chat.map(chatItem)].sort(
-    (a, b) => Date.parse(b.timeUtc) - Date.parse(a.timeUtc),
-  );
+    .filter((event) => !snapshot.events.some((other) => isSameDeath(other, event)))
+    .map((event) => {
+      const item = eventItem(event, players);
+      return { ...item, source: eventSource(event, snapshot.events, item.kind) };
+    });
+  const activityItems = snapshot.activities.map((activity) => ({ ...activityItem(activity), source: activity.source }));
+  const chatItems = snapshot.chat.map((chat) => ({ ...chatItem(chat), source: { total: 1, lines: [{ timeUtc: chat.timeUtc, line: chat.line, kind: 'chat' as const }] } }));
+  return [...sessionItems, ...eventItems, ...activityItems, ...chatItems].sort((a, b) => Date.parse(b.timeUtc) - Date.parse(a.timeUtc));
 };
 
 /** One plain line about the last 24 hours, for example `2 players in the last 24 hours · 1 death · 1 raid`. */

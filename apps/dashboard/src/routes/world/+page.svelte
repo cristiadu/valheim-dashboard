@@ -13,9 +13,6 @@
   /** Current snapshot. */
   const snapshot = $derived(getSnapshot());
 
-  /** Bosses beaten so far, in the order players meet them. Bosses nobody has beaten stay hidden. */
-  const defeated = $derived(BOSS_ORDER.filter((boss) => snapshot.defeatedBosses.includes(boss)));
-
   /** Latest saves, newest first. */
   const saves = $derived(snapshot.saves.slice(-LATEST_SAVE_COUNT).reverse());
 
@@ -46,18 +43,15 @@
 
     <section class="panel" aria-labelledby="bosses-title">
       <h2 id="bosses-title" class="panel-title">BOSSES</h2>
-      {#if defeated.length === 0}
-        <p class="muted">No boss beaten yet. Each one shows up here once it falls.</p>
-      {:else}
-        <ol class="bosses">
-          {#each defeated as boss (boss)}
-            <li class="defeated">
-              <span>{boss}</span>
-              <span><Pill pill={bossPill(true)} /></span>
-            </li>
-          {/each}
-        </ol>
-      {/if}
+      <ol class="bosses">
+        {#each BOSS_ORDER as boss (boss)}
+          {@const isDefeated = snapshot.defeatedBosses.includes(boss)}
+          <li class:defeated={isDefeated}>
+            <span>{boss}</span>
+            <span><Pill pill={bossPill(isDefeated)} /></span>
+          </li>
+        {/each}
+      </ol>
     </section>
 
     <section class="panel" aria-labelledby="saves-title">
