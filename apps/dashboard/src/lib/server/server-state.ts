@@ -78,7 +78,10 @@ const isStoryNews = (snapshot: Snapshot, event: LogEvent): boolean => {
   }
 };
 
-/** Adds the activity [event] stands for, such as a piece built or a creature killed, to [activities]. */
+/**
+ * Adds the activity [event] stands for, such as a piece built or a creature killed, to [activities]. An item
+ * counts as gathered only the first time anyone picks it up.
+ */
 const addActivityOf = (activities: ActivityRecord[], event: LogEvent): void => {
   const { timeUtc } = event;
   switch (event.type) {
@@ -94,10 +97,9 @@ const addActivityOf = (activities: ActivityRecord[], event: LogEvent): void => {
       }
       break;
     case 'itemPickedUp':
-      addActivity(activities, timeUtc, event.player, 'pickedUp', event.item, event.count);
-      break;
-    case 'harvested':
-      addActivity(activities, timeUtc, event.player, 'harvested', event.plant, 1);
+      if (event.isFirstPickup) {
+        addActivity(activities, timeUtc, event.player, 'gathered', event.item, event.count);
+      }
       break;
     case 'chestChanged':
       addActivity(activities, timeUtc, event.player, event.isStored ? 'stored' : 'taken', event.item, event.count);

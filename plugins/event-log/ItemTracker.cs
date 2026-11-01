@@ -133,7 +133,9 @@ namespace ValheimDashboard.EventLog
 
         /// <summary>
         /// Logs [item] as picked up by the player whose game owns it, if that player stands next to it. An item
-        /// next to a creature that eats food off the ground is skipped, since the creature may have eaten it.
+        /// next to a creature that eats food off the ground is skipped, since the creature may have eaten it. The
+        /// game marks an item the first time it reaches anyone's inventory, so an item that was already carried,
+        /// such as one a player dropped, is logged as picked up again.
         /// </summary>
         private static void LogPickup(ZDO item)
         {
@@ -143,7 +145,10 @@ namespace ValheimDashboard.EventLog
             {
                 return;
             }
-            GameEventLog.Write($"Picked up: {Names.PrefabName(item)} x{item.GetInt(ZDOVars.s_stack, 1)} by {peer.m_playerName}");
+            ItemDrop.ItemData itemData = new ItemDrop.ItemData();
+            ItemDrop.LoadFromZDO(itemData, item);
+            string pickedUp = itemData.m_pickedUp ? "Picked up again" : "Picked up";
+            GameEventLog.Write($"{pickedUp}: {Names.PrefabName(item)} x{itemData.m_stack} by {peer.m_playerName}");
         }
 
         /// <summary>Logs [plant] as harvested by the player who asked for it, or else by the player whose game owns it.</summary>

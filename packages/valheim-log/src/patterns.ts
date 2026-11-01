@@ -115,8 +115,11 @@ export const PET_NAMED_PATTERN = /^Pet named: (?<creature>\S+) (?<name>.+)$/;
 /** A player hung an item, such as a trophy, on an item stand. Written by the event log plugin. */
 export const ITEM_HUNG_PATTERN = /^Item hung: (?<item>\S+) by (?<player>.+)$/;
 
-/** A player picked up an item. Written by the event log plugin. */
-export const PICKED_UP_PATTERN = /^Picked up: (?<item>\S+) x(?<count>\d+) by (?<player>.+)$/;
+/**
+ * A player picked up an item. `again` marks an item someone already carried, such as one a player dropped.
+ * Written by the event log plugin.
+ */
+export const PICKED_UP_PATTERN = /^Picked up(?<again> again)?: (?<item>\S+) x(?<count>\d+) by (?<player>.+)$/;
 
 /** A player put items in a chest or took them out. Written by the event log plugin. */
 export const CHEST_PATTERN =
