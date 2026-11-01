@@ -17,7 +17,7 @@ namespace ValheimDashboard.EventLog
         public const string PluginName = "Valheim Dashboard Event Log";
 
         /// <summary>Plugin version.</summary>
-        public const string PluginVersion = "2.1.0";
+        public const string PluginVersion = "2.1.1";
 
         /// <summary>Sends BepInEx messages to the server's log and applies the patches of every tracker.</summary>
         private void Awake()
