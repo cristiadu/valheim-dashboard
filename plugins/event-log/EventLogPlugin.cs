@@ -17,11 +17,15 @@ namespace ValheimDashboard.EventLog
         public const string PluginName = "Valheim Dashboard Event Log";
 
         /// <summary>Plugin version.</summary>
-        public const string PluginVersion = "2.1.1";
+        public const string PluginVersion = "2.1.2";
 
-        /// <summary>Sends BepInEx messages to the server's log and applies the patches of every tracker.</summary>
+        /// <summary>
+        /// Keeps clicks from freezing the console, sends BepInEx messages to the server's log and applies the
+        /// patches of every tracker.
+        /// </summary>
         private void Awake()
         {
+            ConsoleWindow.TurnOffQuickEdit();
             BepInEx.Logging.Logger.Listeners.Add(new ServerLogListener());
             Harmony harmony = new Harmony(PluginGuid);
             harmony.PatchAll(typeof(WorldScanner));
