@@ -162,10 +162,10 @@ the page gives nothing away.
 | Saga | Every game event and chat, with filters | Snapshot |
 | World | The in-game day, bosses defeated, saves, backups, disk space | Snapshot |
 | Map | Land each player walked, chests with what they hold, who is where, last deaths | Snapshot |
-| Recipes | Crafting plans and what is still missing | The viewer's browser |
+| Recipes | Crafting plans and what is still missing, and what the chests can make | The viewer's browser, and chests from the snapshot |
 | Server | Up or down, uptime in the last 24 hours, warnings | Snapshot |
 
-Recipe plans are saved in each viewer's browser (`localStorage`). The server stores nothing for them.
+Recipe plans are saved in each viewer's browser (`localStorage`). The server stores nothing for them. Chest items are matched to recipe items by name, so `DeerHide` counts as `Deer hide`; a short list covers names that differ more, such as `RoundLog` for `Core wood`.
 
 The plugin logs gear the first time a player holds or wears it, not what they wear now. So the Vikings
 character sheet puts the newest piece of each kind in its slot, for example the newest helmet on the head.

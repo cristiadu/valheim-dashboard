@@ -4,13 +4,37 @@
   import ItemIcon from '#/lib/components/ItemIcon';
   import Pill from '#/lib/components/Pill';
   import RecipePicker from '#/lib/components/RecipePicker';
+  import { live, useSnapshot } from '#/lib/live.svelte';
   import { MAX_CRAFTS, RECIPE_ICON_PX, type Plan } from '#/lib/models';
   import { planPill } from '#/lib/pills';
   import { clampCrafts, newPlan, planItems, stillNeeded, withHave } from '#/lib/planner';
+  import { playersOf } from '#/lib/players';
   import { loadPlans, planner, savePlans } from '#/lib/plans.svelte';
   import { RECIPES, madeAt, recipeById } from '#/lib/recipes';
+  import { builderNames, chestStock, craftables } from '#/lib/stock';
 
   onMount(loadPlans);
+
+  /** Getter for the snapshot the layout shares. */
+  const getSnapshot = useSnapshot();
+
+  /** Current snapshot. */
+  const snapshot = $derived(getSnapshot());
+
+  /** Players at the page clock, whose chests the viewer can pick. */
+  const players = $derived(live.nowMs === null ? [] : playersOf(snapshot, live.nowMs));
+
+  /** Key of the player whose chests count, or empty for every chest. */
+  let ownerKey = $state('');
+
+  /** Items in the picked chests, by recipe item name. */
+  const stock = $derived.by(() => {
+    const owner = players.find((player) => player.key === ownerKey);
+    return chestStock(snapshot, owner === undefined ? null : builderNames(owner));
+  });
+
+  /** Recipes the picked chests have enough for. */
+  const canMake = $derived(craftables(stock));
 
   /** Recipe picked in the new plan form. */
   let pickedId = $state(RECIPES[0]!.id);
@@ -65,6 +89,32 @@
         </ul>
       </div>
     </div>
+  </section>
+
+  <section class="panel" aria-labelledby="chests-title">
+    <h2 id="chests-title" class="panel-title">WHAT THE CHESTS CAN MAKE</h2>
+    <label>
+      <span class="muted">Whose chests?</span>
+      <select bind:value={ownerKey}>
+        <option value="">Every chest</option>
+        {#each players as player (player.key)}
+          <option value={player.key}>Built by {player.character}</option>
+        {/each}
+      </select>
+    </label>
+    {#if canMake.length === 0}
+      <p class="muted">Not enough in these chests for any recipe yet. Chests show up once the server has seen them.</p>
+    {:else}
+      <p class="muted">How many of each you could make from what's stored, if nobody takes anything out first.</p>
+      <ul class="items">
+        {#each canMake as craftable (craftable.recipe.id)}
+          <li>
+            <ItemIcon item={craftable.recipe.name} />
+            <span class="amount">{craftable.times * craftable.recipe.yields}</span>{craftable.recipe.name}
+          </li>
+        {/each}
+      </ul>
+    {/if}
   </section>
 
   {#if planner.isLoaded}
@@ -130,7 +180,7 @@
                     value={line.have}
                     onchange={(event) => updatePlan(plan, withHave(plan, line.item, event.currentTarget.valueAsNumber))}
                   />
-                  <span class="muted">of {line.need}</span>
+                  <span class="muted">of {line.need}{#if stock[line.item]}&nbsp;· {stock[line.item]} in chests{/if}</span>
                 </td>
                 <td class="mono">{line.missing === 0 ? '–' : line.missing}</td>
               </tr>
@@ -171,8 +221,9 @@
     gap: 4px;
   }
 
-  /* Inputs and buttons share the Longhouse look and stay 44px tall for touch */
+  /* Inputs, lists and buttons share the Longhouse look and stay 44px tall for touch */
   input[type='number'],
+  select,
   button {
     min-height: 44px;
     box-sizing: border-box;
@@ -182,6 +233,12 @@
     color: var(--text);
     font: inherit;
     font-size: 14px;
+  }
+
+  /* Owner list fits the longest player name */
+  select {
+    align-self: flex-start;
+    min-width: 200px;
   }
 
   /* Number fields only need a few digits */
