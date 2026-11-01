@@ -4,7 +4,8 @@ import { join } from 'node:path';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { iconFileName, recipeItems } from '#/lib/recipes';
+import { iconItems } from '#/lib/gear';
+import { iconFileName } from '#/lib/recipes';
 import { downloadMissingIcons } from '#/lib/server/icons';
 
 describe('downloadMissingIcons', () => {
@@ -14,7 +15,7 @@ describe('downloadMissingIcons', () => {
     // Every icon except Deer hide's is already downloaded
     folder = await mkdtemp(join(tmpdir(), 'item-icons-'));
     await Promise.all(
-      recipeItems()
+      iconItems()
         .filter((item) => item !== 'Deer hide')
         .map((item) => writeFile(join(folder, iconFileName(item)), 'old')),
     );

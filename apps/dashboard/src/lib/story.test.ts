@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { areaLabel, daySummary, gearLabel, storyOf } from '#/lib/story';
+import { areaLabel, daySummary, storyOf } from '#/lib/story';
 import { sessionWith, snapshotWith } from '#/lib/test-common';
 
 describe('storyOf', () => {
@@ -185,9 +185,8 @@ describe('daySummary', () => {
 });
 
 describe('labels', () => {
-  it('names areas and gear the way the game shows them', () => {
+  it('names areas the way the game shows them', () => {
     // WHEN / THEN plugin names read plainly
     expect(['BlackForest', 'Mountain', 'Ocean', 'Dungeon'].map(areaLabel)).toEqual(['Black Forest', 'Mountains', 'Ocean', 'Dungeon']);
-    expect(['SwordIron quality 2', 'ArmorBronzeChest'].map(gearLabel)).toEqual(['sword iron (level 2)', 'armor bronze chest']);
   });
 });

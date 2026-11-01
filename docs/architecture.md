@@ -155,13 +155,25 @@ from the save shows on the World tab, but has no Saga line, since its time is no
 | Tab | Shows | Data from |
 | --- | --- | --- |
 | Hall | Who is online and where, the last 24 hours on a day wheel, the latest events | Snapshot |
-| Vikings | Each player, when they were online, kills, areas visited and gear | Snapshot |
+| Vikings | Each player, when they were online, kills, areas visited, and gear laid out like a character sheet | Snapshot |
 | Saga | Every game event and chat, with filters | Snapshot |
 | World | The in-game day, bosses defeated, saves, backups, disk space | Snapshot |
 | Recipes | Crafting plans and what is still missing | The viewer's browser |
 | Server | Up or down, uptime in the last 24 hours, warnings | Snapshot |
 
 Recipe plans are saved in each viewer's browser (`localStorage`). The server stores nothing for them.
+
+The plugin logs gear the first time a player holds or wears it, not what they wear now. So the Vikings
+character sheet puts the newest piece of each kind in its slot, for example the newest helmet on the head.
+Tools, such as the hammer, and older pieces show under "Also carries".
+
+```mermaid
+flowchart LR
+  wiki[Valheim wiki] -->|on start, missing icons only| icons["item-icons folder next to logs.txt"]
+  icons -->|/icons/flint-spear.png| pages[Recipes and Vikings tabs]
+```
+
+Icons are downloaded for every recipe item and every piece of gear the dashboard knows by name.
 
 ## Event log plugin
 

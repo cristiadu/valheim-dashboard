@@ -1,13 +1,14 @@
 <script lang="ts">
+  import GearSheet from '#/lib/components/GearSheet';
   import NoData from '#/lib/components/NoData';
   import Pill from '#/lib/components/Pill';
   import TimeLanes from '#/lib/components/TimeLanes';
   import { live, useSnapshot } from '#/lib/live.svelte';
-  import { LISTED_GEAR_COUNT } from '#/lib/models';
+  import { type Player, STORY_STYLES, type StoryKind } from '#/lib/models';
   import { playerPill } from '#/lib/pills';
   import { playersOf } from '#/lib/players';
   import { clockTime, durationLabel, viewerTimeZone } from '#/lib/status';
-  import { areaLabel, gearLabel, thingName } from '#/lib/story';
+  import { areaLabel, thingName } from '#/lib/story';
 
   /** Getter for the snapshot the layout shares. */
   const getSnapshot = useSnapshot();
@@ -20,6 +21,14 @@
 
   /** Players at the page clock. */
   const players = $derived(live.nowMs === null ? [] : playersOf(snapshot, live.nowMs));
+
+  /** Numbers on a player's card, each with the rune of the story kind it counts. */
+  const statsOf = (player: Player): { label: string; value: string; kind: StoryKind }[] => [
+    { label: 'Time played', value: durationLabel(player.totalMs), kind: 'night' },
+    { label: 'Visits', value: String(player.sessions.length), kind: 'joined' },
+    { label: 'Deaths', value: String(player.deaths), kind: 'died' },
+    { label: 'Kills', value: String(player.kills), kind: 'fight' },
+  ];
 </script>
 
 {#if snapshot.sessions.length === 0}
@@ -42,17 +51,28 @@
             {#if player.steamName}Steam: {player.steamName} ·{/if}
             {player.isOnline ? `Since ${clockTime(player.sinceUtc!, timeZone)}` : `Last seen ${clockTime(player.lastSeenUtc!, timeZone)}`}
           </p>
-          <dl>
-            <div><dt>TIME</dt><dd class="mono">{durationLabel(player.totalMs)}</dd></div>
-            <div><dt>VISITS</dt><dd class="mono">{player.sessions.length}</dd></div>
-            <div><dt>DEATHS</dt><dd class="mono">{player.deaths}</dd></div>
-            <div><dt>KILLS</dt><dd class="mono">{player.kills}</dd></div>
-          </dl>
-          {#if player.isOnline && player.area}<p>Now in {areaLabel(player.area)}</p>{/if}
+          <ul class="stats">
+            {#each statsOf(player) as stat (stat.label)}
+              <li>
+                <span class="rune" aria-hidden="true" style:color={STORY_STYLES[stat.kind].color} style:border-color={STORY_STYLES[stat.kind].color}>{STORY_STYLES[stat.kind].rune}</span>
+                <span class="value mono">{stat.value}</span>
+                <span class="label muted">{stat.label}</span>
+              </li>
+            {/each}
+          </ul>
+          {#if player.gear.length > 0}<GearSheet gear={player.gear} />{/if}
           {#if player.topKill}<p><span class="muted">Most killed:</span> {thingName(player.topKill)}</p>{/if}
-          {#if player.areas.length > 0}<p><span class="muted">Been to:</span> {player.areas.map(areaLabel).join(', ')}</p>{/if}
-          {#if player.gear.length > 0}
-            <p><span class="muted">Gear:</span> {player.gear.slice(0, LISTED_GEAR_COUNT).map(gearLabel).join(', ')}</p>
+          {#if player.areas.length > 0}
+            <div>
+              <p class="muted">Been to</p>
+              <ul class="areas">
+                {#each player.areas as area (area)}
+                  <li class:here={player.isOnline && player.area === area}>
+                    <span class="area-rune" aria-hidden="true">{STORY_STYLES.travel.rune}</span>{areaLabel(area)}{#if player.isOnline && player.area === area}<span class="muted">&nbsp;· here now</span>{/if}
+                  </li>
+                {/each}
+              </ul>
+            </div>
           {/if}
         </article>
       {/each}
@@ -114,24 +134,76 @@
     margin: 0;
   }
 
+  /* Lists drop their bullets and indent */
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
   /* Numbers two by two, so they fit a narrow card */
-  dl {
+  .stats {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
-    margin: 0;
   }
 
-  /* Number label */
-  dt {
-    font-size: 11px;
-    letter-spacing: 0.08em;
-    color: var(--muted);
+  /* One number: rune on the left, value above its label */
+  .stats li {
+    display: grid;
+    grid-template-columns: 26px minmax(0, 1fr);
+    column-gap: 8px;
+    align-items: center;
+  }
+
+  /* Rune box in the color of what it counts, as on the Saga tab */
+  .rune {
+    grid-row: span 2;
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    border: 1px solid;
+    font-family: var(--font-rune);
+    font-size: 13px;
   }
 
   /* Number value */
-  dd {
-    margin: 0;
-    font-size: 14px;
+  .value {
+    font-size: 15px;
+    line-height: 1.2;
+  }
+
+  /* Number label */
+  .label {
+    font-size: 11px;
+    letter-spacing: 0.04em;
+  }
+
+  /* Areas as small tags that wrap */
+  .areas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 4px;
+  }
+
+  /* One area tag */
+  .areas li {
+    padding: 2px 8px;
+    border: 1px solid var(--line);
+    font-size: 13px;
+  }
+
+  /* The area the player is in right now */
+  .areas li.here {
+    border-color: var(--frost);
+  }
+
+  /* Travel rune before an area name */
+  .area-rune {
+    margin-right: 5px;
+    font-family: var(--font-rune);
+    color: var(--frost);
   }
 </style>
