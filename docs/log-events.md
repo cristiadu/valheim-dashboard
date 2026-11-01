@@ -189,6 +189,10 @@ when the plugin does not know who it was.
 | Item picked up | `Picked up: Wood x20 by Ragnar`, or `Picked up again: Wood x20 by Ragnar` | `^Picked up(?<again> again)?: (?<item>\S+) x(?<count>\d+) by (?<player>.+)$` |
 | Items put in or taken from a chest | `Stored: Wood x20 in piece_chest_wood by Ragnar` | `^(?<change>Stored\|Taken): (?<item>\S+) x(?<count>\d+) (?:in\|from) (?<chest>\S+) by (?<player>.+)$` |
 | Plant harvested | `Harvested: RaspberryBush by Ragnar` | `^Harvested: (?<plant>\S+) by (?<player>.+)$` |
+| Where a player stands | `Position: Ragnar 120 -340` | `^Position: (?<character>.+) (?<x>-?\d+) (?<z>-?\d+)$` |
+| What a chest, cart or ship holds | `Chest: 52731986:1203 piece_chest_wood at 118 -336 built by Ragnar holds Wood x20, Stone x3` | `^Chest: (?<id>\S+) (?<chest>\S+) at (?<x>-?\d+) (?<z>-?\d+) built by (?<builder>.+?) holds (?<items>.+)$` |
+| Chest, cart or ship destroyed | `Chest removed: 52731986:1203` | `^Chest removed: (?<id>\S+)$` |
+| What a player carried when they died | `Tombstone: Ragnar at 410 -77 holds SwordBronze x1, Coins x55` | `^Tombstone: (?<owner>.+?) at (?<x>-?\d+) (?<z>-?\d+) holds (?<items>.+)$` |
 | Tombstone emptied | `Tombstone emptied: Ragnar by Bjorn` | `^Tombstone emptied: (?<owner>.+?) by (?<player>.+)$` |
 
 - **Chat** only reaches the server when another player is online to receive it. `said` is normal
@@ -211,6 +215,12 @@ when the plugin does not know who it was.
   item the first time it reaches anyone's inventory, and the mark stays through drops and chests. An item
   with the mark is logged as **Picked up again**.
 - **Harvested** names the player who asked to harvest, or the player whose game owns the plant.
+- **Position** is logged each time a player has walked 20 meters from the last one, outside dungeons. `x` is
+  meters east and `z` meters north of the world's center.
+- **Chest** is logged for every chest, cart and ship when the server starts, and again each time what it holds
+  changes. `holds nothing` is an empty one. The ID stays the same until the server stops. `built by` is the
+  character name, or the Steam name when the builder has not been online since the server started.
+- **Tombstone** is logged when a player dies, with everything they carried.
 - **Gear** is logged the first time a player wears or holds an item since the server started.
 
 To build it, install the .NET SDK and BepInExPack_Valheim on the server, run `dotnet build -c Release`

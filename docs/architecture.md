@@ -193,7 +193,7 @@ flowchart LR
 
 | Source | What it finds |
 | --- | --- |
-| World scan | New objects (pieces, summoned bosses), the in-game day, each player's area, portal trips, death, PvP, bed and gear, tames, signs, item stands, chests and harvested plants, and objects destroyed, such as creatures with every player who hit them, items picked up and emptied tombstones |
+| World scan | New objects (pieces, summoned bosses), the in-game day, each player's position, area, portal trips, death, PvP, bed and gear, what each chest, cart, ship and new tombstone holds, tames, signs, item stands, chests and harvested plants, and objects destroyed, such as creatures with every player who hit them, items picked up and emptied tombstones |
 | Calls through the server | Chat and map pings, which the server passes from one player to the others, creature attack moves, to say what a player was fighting when they died, and who asked to harvest a plant |
 | Game hooks | Global keys, such as a boss defeat, and the end of a raid |
 

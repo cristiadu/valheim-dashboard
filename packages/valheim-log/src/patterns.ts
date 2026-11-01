@@ -128,6 +128,28 @@ export const CHEST_PATTERN =
 /** A player harvested a plant, such as berries or a crop. Written by the event log plugin. */
 export const HARVESTED_PATTERN = /^Harvested: (?<plant>\S+) by (?<player>.+)$/;
 
+/** Where a player stands, in whole meters east and north of the world's center. Written by the event log plugin. */
+export const POSITION_PATTERN = /^Position: (?<character>.+) (?<x>-?\d+) (?<z>-?\d+)$/;
+
+/**
+ * Everything a chest, cart or ship holds, where it stands and who built it, with the ID the server gives it until
+ * it stops. Written by the event log plugin.
+ */
+export const CHEST_CONTENTS_PATTERN =
+  /^Chest: (?<id>\S+) (?<chest>\S+) at (?<x>-?\d+) (?<z>-?\d+) built by (?<builder>.+?) holds (?<items>.+)$/;
+
+/** A chest, cart or ship was destroyed. Written by the event log plugin. */
+export const CHEST_REMOVED_PATTERN = /^Chest removed: (?<id>\S+)$/;
+
+/** Everything a player carried when they died, as their tombstone holds it. Written by the event log plugin. */
+export const TOMBSTONE_PATTERN = /^Tombstone: (?<owner>.+?) at (?<x>-?\d+) (?<z>-?\d+) holds (?<items>.+)$/;
+
+/** One item of a held items list, for example `Wood x20`. */
+export const HELD_ITEM_PATTERN = /^(?<item>\S+) x(?<count>\d+)$/;
+
+/** Held items list of an empty chest or tombstone. */
+export const NOTHING_HELD = 'nothing';
+
 /** A player emptied a tombstone, their own or someone else's. Written by the event log plugin. */
 export const TOMBSTONE_EMPTIED_PATTERN = /^Tombstone emptied: (?<owner>.+?) by (?<player>.+)$/;
 

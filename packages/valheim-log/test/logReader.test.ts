@@ -311,6 +311,39 @@ describe('parseMessage', () => {
     ]);
   });
 
+  it('reads positions, chest contents and tombstones from the event log plugin', () => {
+    // GIVEN a position, a full chest, an empty cart, a removed chest and a tombstone
+    const messages = [
+      'Position: Ragnar 120 -340',
+      'Chest: 52731986:1203 piece_chest_wood at 118 -336 built by Ragnar holds Wood x20, Stone x3',
+      'Chest: 52731986:1300 Cart at -5 12 built by Tony Example holds nothing',
+      'Chest removed: 52731986:1203',
+      'Tombstone: Ragnar at 410 -77 holds SwordBronze x1, Coins x55',
+    ];
+
+    // WHEN each message is read
+    const events = messages.map((message) => parseMessage(message, '2026-01-01T00:00:00.000Z'));
+
+    // THEN each line gives its event, with items counted by name
+    const timeUtc = '2026-01-01T00:00:00.000Z';
+    expect(events).toEqual([
+      { type: 'position', timeUtc, character: 'Ragnar', x: 120, z: -340 },
+      {
+        type: 'chestContents',
+        timeUtc,
+        id: '52731986:1203',
+        chest: 'piece_chest_wood',
+        x: 118,
+        z: -336,
+        builder: 'Ragnar',
+        items: { Wood: 20, Stone: 3 },
+      },
+      { type: 'chestContents', timeUtc, id: '52731986:1300', chest: 'Cart', x: -5, z: 12, builder: 'Tony Example', items: {} },
+      { type: 'chestRemoved', timeUtc, id: '52731986:1203' },
+      { type: 'tombstoneContents', timeUtc, owner: 'Ragnar', x: 410, z: -77, items: { SwordBronze: 1, Coins: 55 } },
+    ]);
+  });
+
   it('reads chat as chat even when its text looks like another line', () => {
     // GIVEN chat that holds text other patterns look for
     const messages = ['Chat: Ragnar said: the server is full', 'Chat: Ragnar said: day:3 OnApplicationQuit'];

@@ -24,6 +24,27 @@ namespace ValheimDashboard.EventLog
             return hasComponent;
         }
 
+        /// <summary>
+        /// Returns true when the prefab of [zdo] or one of its parts has a component of type <typeparamref name="T"/>,
+        /// such as the storage of a cart or a ship.
+        /// </summary>
+        public static bool HasInParts<T>(ZDO zdo) where T : Component
+        {
+            int prefab = zdo.GetPrefab();
+            if (!PrefabsWith<T>.HasComponentInParts.TryGetValue(prefab, out bool hasComponent))
+            {
+                hasComponent = Prefab(zdo)?.GetComponentInChildren<T>(true) != null;
+                PrefabsWith<T>.HasComponentInParts[prefab] = hasComponent;
+            }
+            return hasComponent;
+        }
+
+        /// <summary>Returns [position] on the map, as whole meters east and north of the world's center.</summary>
+        public static string MapPosition(Vector3 position)
+        {
+            return $"{Mathf.RoundToInt(position.x)} {Mathf.RoundToInt(position.z)}";
+        }
+
         /// <summary>Returns the item name for item prefab [hash], for example <c>SwordIron</c>.</summary>
         public static string Item(int hash)
         {
@@ -48,6 +69,22 @@ namespace ValheimDashboard.EventLog
         public static string Character(long playerId)
         {
             return CharacterNames.TryGetValue(playerId, out string name) && name != string.Empty ? name : UnknownPlayer;
+        }
+
+        /// <summary>
+        /// Returns who built the piece [zdo]: the character name when that player was online since the server
+        /// started, or else the Steam name the world keeps for every player who joined it.
+        /// </summary>
+        public static string Builder(ZDO zdo)
+        {
+            string character = Character(zdo.GetLong(ZDOVars.s_creator, 0L));
+            int historyIndex = zdo.GetInt(ZDOVars.s_creatorIndex, -1);
+            List<ZNet.CrossNetworkUserInfo> history = ZNet.World?.m_playerHistory;
+            if (character != UnknownPlayer || history == null || historyIndex < 0 || historyIndex >= history.Count)
+            {
+                return character;
+            }
+            return history[historyIndex].m_displayName;
         }
 
         /// <summary>Returns the character name of the player on connection [peerId].</summary>
