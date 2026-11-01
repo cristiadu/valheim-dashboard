@@ -1,12 +1,14 @@
 <script lang="ts">
   import GearSheet from '#/lib/components/GearSheet';
+  import LogLines from '#/lib/components/LogLines';
   import NoData from '#/lib/components/NoData';
   import Pill from '#/lib/components/Pill';
   import TimeLanes from '#/lib/components/TimeLanes';
   import { live, useSnapshot } from '#/lib/live.svelte';
-  import { type Player, STORY_STYLES, type StoryKind } from '#/lib/models';
+  import { type Player, type SourceKind, STORY_STYLES, type StoryKind } from '#/lib/models';
   import { playerPill } from '#/lib/pills';
   import { playersOf } from '#/lib/players';
+  import { playerSource } from '#/lib/sources';
   import { clockTime, durationLabel, viewerTimeZone } from '#/lib/status';
   import { areaLabel, thingList, thingName } from '#/lib/story';
 
@@ -22,12 +24,12 @@
   /** Players at the page clock. */
   const players = $derived(live.nowMs === null ? [] : playersOf(snapshot, live.nowMs));
 
-  /** Numbers on a player's card, each with the rune of the story kind it counts. */
-  const statsOf = (player: Player): { label: string; value: string; kind: StoryKind }[] => [
-    { label: 'Time played', value: durationLabel(player.totalMs), kind: 'night' },
-    { label: 'Visits', value: String(player.sessions.length), kind: 'joined' },
-    { label: 'Deaths', value: String(player.deaths), kind: 'died' },
-    { label: 'Kills', value: String(player.kills), kind: 'fight' },
+  /** Numbers on a player's card, each with the rune of the story kind it counts and the log lines behind it. */
+  const statsOf = (player: Player): { label: string; value: string; kind: StoryKind; source: SourceKind }[] => [
+    { label: 'Time played', value: durationLabel(player.totalMs), kind: 'night', source: 'visits' },
+    { label: 'Visits', value: String(player.sessions.length), kind: 'joined', source: 'visits' },
+    { label: 'Deaths', value: String(player.deaths), kind: 'died', source: 'deaths' },
+    { label: 'Kills', value: String(player.kills), kind: 'fight', source: 'kills' },
   ];
 </script>
 
@@ -54,21 +56,31 @@
           <ul class="stats">
             {#each statsOf(player) as stat (stat.label)}
               <li>
-                <span class="rune" aria-hidden="true" style:color={STORY_STYLES[stat.kind].color} style:border-color={STORY_STYLES[stat.kind].color}>{STORY_STYLES[stat.kind].rune}</span>
-                <span class="value mono">{stat.value}</span>
-                <span class="label muted">{stat.label}</span>
+                <LogLines title="{player.character}: {stat.label.toLowerCase()}" source={playerSource(snapshot, player, stat.source)}>
+                  <span class="stat">
+                    <span class="rune" aria-hidden="true" style:color={STORY_STYLES[stat.kind].color} style:border-color={STORY_STYLES[stat.kind].color}>{STORY_STYLES[stat.kind].rune}</span>
+                    <span class="value mono">{stat.value}</span>
+                    <span class="label muted">{stat.label}</span>
+                  </span>
+                </LogLines>
               </li>
             {/each}
           </ul>
-          {#if player.gear.length > 0}<GearSheet gear={player.gear} />{/if}
-          {#if player.topKill}<p><span class="muted">Most killed:</span> {thingName(player.topKill)}</p>{/if}
+          {#if player.gear.length > 0}<GearSheet gear={player.gear} sourceOf={(prefab) => playerSource(snapshot, player, 'gear', prefab)} />{/if}
+          {#if player.topKill}
+            <LogLines title="{player.character} killed {thingName(player.topKill)}" source={playerSource(snapshot, player, 'killed', player.topKill)}>
+              <p><span class="muted">Most killed:</span> {thingName(player.topKill)}</p>
+            </LogLines>
+          {/if}
           {#if player.areas.length > 0}
             <div>
               <p class="muted">Been to</p>
               <ul class="areas">
                 {#each player.areas as area (area)}
                   <li class:here={player.isOnline && player.area === area}>
-                    <span class="area-rune" aria-hidden="true">{STORY_STYLES.travel.rune}</span>{areaLabel(area)}{#if player.isOnline && player.area === area}<span class="muted">&nbsp;· here now</span>{/if}
+                    <LogLines title="{player.character} in {areaLabel(area)}" source={playerSource(snapshot, player, 'area', area)}>
+                      <span class="area-rune" aria-hidden="true">{STORY_STYLES.travel.rune}</span>{areaLabel(area)}{#if player.isOnline && player.area === area}<span class="muted">&nbsp;· here now</span>{/if}
+                    </LogLines>
                   </li>
                 {/each}
               </ul>
@@ -156,7 +168,7 @@
   }
 
   /* One number: rune on the left, value above its label */
-  .stats li {
+  .stat {
     display: grid;
     grid-template-columns: 26px minmax(0, 1fr);
     column-gap: 8px;
@@ -197,7 +209,7 @@
 
   /* One area tag */
   .areas li {
-    padding: 2px 8px;
+    padding: 2px 8px 2px 4px;
     border: 1px solid var(--line);
     font-size: 13px;
   }

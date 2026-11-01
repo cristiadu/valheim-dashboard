@@ -225,6 +225,8 @@ export type Snapshot = {
   day: number | null;
   /** Bosses defeated, by the name the game shows, in the order of their first defeat. */
   defeatedBosses: string[];
+  /** Log lines behind each number and item, by [sourceKey], for example `deaths:Ragnar`. */
+  sources: Record<string, SourceLines>;
   /** Map squares each character has walked through, by character name, as `x,z` square numbers. */
   explored: Record<string, string[]>;
   /** Where each character was last seen, by character name. */
@@ -233,6 +235,31 @@ export type Snapshot = {
   chests: Record<string, ChestRecord>;
   /** What each character carried at their last death, by character name. */
   deathItems: Record<string, DeathItems>;
+};
+
+/**
+ * What a group of log lines counts, for a character: `visits` are joins and leaves, `deaths` are deaths,
+ * `kills` are all kills, `killed` are kills of one creature, `area` is going into one area, and `gear` is one
+ * piece of gear first seen, at each level.
+ */
+export type SourceKind = 'visits' | 'deaths' | 'kills' | 'killed' | 'area' | 'gear';
+
+/** One line of `logs.txt`, as written. */
+export type LogLineRecord = {
+  /** When it was written, as a UTC ISO string. */
+  timeUtc: string;
+  /** The whole line, for example `10/29/2026 02:43:13: Got character ZDOID from Ragnar : 549297305:1`. */
+  line: string;
+  /** What happened in it, which picks its rune, color and label as on the Saga tab. */
+  kind: StoryKind;
+};
+
+/** Log lines behind one number or item. */
+export type SourceLines = {
+  /** How many lines there were in all, also counting the old ones no longer kept. */
+  total: number;
+  /** Latest lines, oldest first. */
+  lines: LogLineRecord[];
 };
 
 /** A spot on the map, in meters east (`x`) and north (`z`) of the world's center, and when it was logged. */
@@ -577,23 +604,23 @@ export type StoryItem = {
   text: string;
 };
 
-/** Rune and color for each story kind. */
-export const STORY_STYLES: Record<StoryKind, { rune: string; color: string }> = {
-  joined: { rune: 'ᛖ', color: 'var(--good)' },
-  left: { rune: 'ᛚ', color: 'var(--muted)' },
-  died: { rune: 'ᛞ', color: 'var(--blood)' },
-  raid: { rune: 'ᚦ', color: 'var(--ember)' },
-  night: { rune: 'ᛜ', color: 'var(--frost)' },
-  world: { rune: 'ᛃ', color: 'var(--gold)' },
-  stopped: { rune: 'ᚾ', color: 'var(--muted)' },
-  built: { rune: 'ᛒ', color: 'var(--good)' },
-  wrecked: { rune: 'ᚺ', color: 'var(--ember)' },
-  boss: { rune: 'ᛏ', color: 'var(--gold)' },
-  fight: { rune: 'ᛉ', color: 'var(--blood)' },
-  travel: { rune: 'ᚱ', color: 'var(--frost)' },
-  items: { rune: 'ᚷ', color: 'var(--gold)' },
-  tame: { rune: 'ᚠ', color: 'var(--good)' },
-  chat: { rune: 'ᚨ', color: 'var(--frost)' },
+/** Rune, color and pill label for each story kind. */
+export const STORY_STYLES: Record<StoryKind, { rune: string; color: string; label: string }> = {
+  joined: { rune: 'ᛖ', color: 'var(--good)', label: 'Joined' },
+  left: { rune: 'ᛚ', color: 'var(--muted)', label: 'Left' },
+  died: { rune: 'ᛞ', color: 'var(--blood)', label: 'Death' },
+  raid: { rune: 'ᚦ', color: 'var(--ember)', label: 'Raid' },
+  night: { rune: 'ᛜ', color: 'var(--frost)', label: 'Night' },
+  world: { rune: 'ᛃ', color: 'var(--gold)', label: 'World' },
+  stopped: { rune: 'ᚾ', color: 'var(--muted)', label: 'Stopped' },
+  built: { rune: 'ᛒ', color: 'var(--good)', label: 'Built' },
+  wrecked: { rune: 'ᚺ', color: 'var(--ember)', label: 'Wrecked' },
+  boss: { rune: 'ᛏ', color: 'var(--gold)', label: 'Boss' },
+  fight: { rune: 'ᛉ', color: 'var(--blood)', label: 'Fight' },
+  travel: { rune: 'ᚱ', color: 'var(--frost)', label: 'Travel' },
+  items: { rune: 'ᚷ', color: 'var(--gold)', label: 'Gear and items' },
+  tame: { rune: 'ᚠ', color: 'var(--good)', label: 'Tame' },
+  chat: { rune: 'ᚨ', color: 'var(--frost)', label: 'Chat' },
 };
 
 /** Filters on the Saga tab and the story kinds each one shows. */

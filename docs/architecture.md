@@ -176,6 +176,28 @@ flowchart LR
 
 Icons are downloaded for every recipe item and every piece of gear the dashboard knows by name.
 
+## Where a number comes from
+
+```mermaid
+flowchart LR
+  line["Creature killed: Troll level 1 by Ragnar"] --> reader[Log reader]
+  reader --> count[Kills: 12]
+  reader --> kept["Lines kept behind kills:Ragnar"]
+  count --> card[Vikings card]
+  kept -->|click the number| popup[List of log lines]
+```
+
+Each line that changes a number or an item on Vikings is kept with it, so a click shows the lines behind it,
+newest first. Only the latest 50 lines per number are kept, but all of them are counted.
+
+| Kept for | Lines |
+| --- | --- |
+| Time played, visits | Joins and leaves |
+| Deaths | The game's death line and the plugin's death details |
+| Kills, most killed | Creature killed |
+| An area | Area entered |
+| A piece of gear | Gear first seen, at each level |
+
 ## Event log plugin
 
 The game logs joins, deaths and saves, but not building, chat or boss progress. The plugin watches what

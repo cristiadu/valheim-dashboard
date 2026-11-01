@@ -14,6 +14,7 @@ import {
   STORY_EVENT_TYPES,
   type StoryEvent,
 } from '#/lib/models';
+import { keepSourceLines } from '#/lib/server/log-sources';
 import {
   ACTIVITY_GAP_MS,
   MAX_ACTIVITIES,
@@ -140,6 +141,7 @@ export const createServerState = (serverUtcOffsetMinutes: number): ServerState =
       kills: {},
       day: null,
       defeatedBosses: [],
+      sources: {},
       explored: {},
       positions: {},
       chests: {},
@@ -199,7 +201,11 @@ export const readLogLine = (state: ServerState, line: string): void => {
   }
   snapshot.lastLineUtc = event.timeUtc;
   snapshot.runs.at(-1)!.lastLineUtc = event.timeUtc;
+  const openSessions = onlineSessions(state.sessionState);
+  const sessionCount = snapshot.sessions.length;
   applyEvent(state.sessionState, event);
+  const endedSessions = openSessions.filter((session) => session.endUtc !== null);
+  keepSourceLines(snapshot, event, line, [...endedSessions, ...snapshot.sessions.slice(sessionCount)]);
   if (isStoryNews(snapshot, event)) {
     pushCapped(snapshot.events, event as StoryEvent, MAX_EVENTS);
   }
