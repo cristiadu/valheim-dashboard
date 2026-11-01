@@ -92,6 +92,9 @@ export const MAX_ACTIVITIES = 500;
 /** Longest pause between two actions of one stretch of activity. */
 export const ACTIVITY_GAP_MS = 10 * 60_000;
 
+/** Most log lines kept behind one number or item. */
+export const MAX_SOURCE_LINES = 50;
+
 /** Most chat messages and pings kept. */
 export const MAX_CHAT = 300;
 

@@ -8,17 +8,16 @@
 <span class="pill {pill.tone}">{pill.text}</span>
 
 <style>
-  /* Rounded label with a tinted fill, so a status reads at a glance and not as plain text */
+  /* Rounded label with a tinted fill, so a status reads at a glance and not as plain text. A parent can set --tone. */
   .pill {
-    --tone: var(--muted);
     display: inline-flex;
     align-items: center;
     gap: 6px;
     padding: 2px 10px;
-    border: 1px solid color-mix(in srgb, var(--tone) 55%, transparent);
+    border: 1px solid color-mix(in srgb, var(--tone, var(--muted)) 55%, transparent);
     border-radius: 999px;
-    background: color-mix(in srgb, var(--tone) 14%, transparent);
-    color: var(--tone);
+    background: color-mix(in srgb, var(--tone, var(--muted)) 14%, transparent);
+    color: var(--tone, var(--muted));
     font-family: var(--font-body);
     font-size: 12px;
     font-weight: 600;
