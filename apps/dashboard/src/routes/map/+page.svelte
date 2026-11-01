@@ -2,7 +2,7 @@
   import NoData from '#/lib/components/NoData';
   import { live, useSnapshot } from '#/lib/live.svelte';
   import { mapOf } from '#/lib/map';
-  import { MAP_CHEST_METERS, MAP_SQUARE_METERS } from '#/lib/models';
+  import { MAP_CHEST_METERS, MAP_SQUARE_METERS, MAP_TRAIL_METERS, TERRAIN_STYLES } from '#/lib/models';
   import { playersOf } from '#/lib/players';
   import { viewerTimeZone, whenLabel } from '#/lib/status';
   import { thingList, thingName } from '#/lib/story';
@@ -28,6 +28,11 @@
   /** Chest picked on the map, while it still exists. */
   const picked = $derived(map?.chests.find((chest) => chest.id === pickedId) ?? null);
 
+  /** Terrain kinds on the explored squares, in legend order. */
+  const terrainKinds = $derived(
+    Object.entries(TERRAIN_STYLES).filter(([letter]) => Object.values(snapshot.terrain).includes(letter)),
+  );
+
   /** Chests with the most items first. */
   const chestList = $derived(
     (map?.chests ?? []).toSorted(
@@ -43,17 +48,26 @@
   <div class="map-page">
     <section class="panel" aria-labelledby="map-title">
       <h2 id="map-title" class="panel-title">WHERE EVERYONE HAS BEEN</h2>
-      <p class="muted">Each square is {MAP_SQUARE_METERS} m, colored by who walked there. North is up. Tap a chest to see what it holds.</p>
+      <p class="muted">
+        Each square is {MAP_SQUARE_METERS} m of land someone walked, in its terrain color, with a dot for each player who
+        was there. North is up. Tap a chest to see what it holds.
+      </p>
       <div class="legend">
         {#each players as player (player.key)}
           <span><span class="swatch" style:background={player.color}></span>{player.character}</span>
         {/each}
         <span><span class="swatch chest-swatch"></span>Chest, cart or ship</span>
         <span><span class="death-swatch" aria-hidden="true">✕</span>Last death</span>
+        {#each terrainKinds as [letter, style] (letter)}
+          <span><span class="swatch" style:background={style.color}></span>{style.name}</span>
+        {/each}
       </div>
       <svg viewBox={map.viewBox} role="img" aria-label="Map of explored land, chests and players">
-        {#each map.squares as square (square.key)}
-          <rect class="square" x={square.x} y={square.y} width={MAP_SQUARE_METERS} height={MAP_SQUARE_METERS} fill={square.color} />
+        {#each map.land as square (square.key)}
+          <rect x={square.x} y={square.y} width={MAP_SQUARE_METERS} height={MAP_SQUARE_METERS} fill={square.color} />
+        {/each}
+        {#each map.trails as trail (trail.key)}
+          <rect class="trail" x={trail.x} y={trail.y} width={MAP_TRAIL_METERS} height={MAP_TRAIL_METERS} fill={trail.color} />
         {/each}
         {#each map.chests as chest (chest.id)}
           <rect
@@ -154,9 +168,10 @@
     border: 1px solid var(--line);
   }
 
-  /* Explored squares stay see-through so overlapping players both show */
-  .square {
-    opacity: 0.45;
+  /* Player dots sit on the terrain with a dark edge so they read on light land */
+  .trail {
+    stroke: var(--background);
+    stroke-width: 2;
   }
 
   /* Chest marks stand out from the squares and look tappable */

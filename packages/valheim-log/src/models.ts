@@ -61,6 +61,10 @@ export type LogEvent = { timeUtc: string } & (
   | { type: 'harvested'; plant: string; player: string | null }
   | { type: 'tombstoneEmptied'; owner: string | null; player: string | null }
   | { type: 'position'; character: string; x: number; z: number }
+  | { type: 'planted'; plant: string; player: string | null }
+  | { type: 'ate'; character: string; item: string }
+  | { type: 'smelting'; item: string; count: number; station: string; player: string | null }
+  | { type: 'depleted'; kind: 'tree' | 'rock'; thing: string; player: string | null }
   | {
       type: 'chestContents';
       id: string;

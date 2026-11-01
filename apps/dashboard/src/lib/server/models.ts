@@ -153,7 +153,26 @@ export type ServerState = {
   pendingSaveNumber: number | null;
   /** What the page shows. Its `sessions` is the session state's list. */
   snapshot: Snapshot;
+  /** The world's terrain from the plugin's terrain file, once read. */
+  terrain: Terrain | null;
 };
+
+/**
+ * The world's terrain, one letter per map square, as the plugin writes it: `M` Meadows, `B` Black Forest, `S`
+ * Swamp, `O` Mountains, `P` Plains, `I` Mistlands, `A` Ashlands, `N` Deep North, `~` water and `.` past the edge.
+ */
+export type Terrain = {
+  /** Number of the westmost square, and of the southmost one, for example `-329`. */
+  first: number;
+  /** Rows of letters from west to east, northmost row first. */
+  rows: string[];
+};
+
+/** Start of the terrain file's name, followed by the world name and `.txt`, for example `terrain-Cotil.txt`. */
+export const TERRAIN_FILE_PREFIX = 'terrain-';
+
+/** First line of the terrain file, with the number of the westmost and southmost square. */
+export const TERRAIN_HEADER_PATTERN = /^squareMeters (?<squareMeters>\d+) first (?<first>-?\d+)$/;
 
 /** A log being followed and what was read from it. */
 export type Follower = {
@@ -169,6 +188,8 @@ export type Follower = {
   hasNewLines: boolean;
   /** World and time of the save whose global keys were read last, for example `Cotil 2026-10-31T23:30:45.000Z`. */
   worldSaveRead: string | null;
+  /** World and run start whose terrain file was read or reported missing, for example `Cotil 2026-11-01T10:43:52.000Z`. */
+  terrainRead: string | null;
 };
 
 /** Part of the wiki API's answer to an image address query, for example for `File:Deer_hide.png`. */

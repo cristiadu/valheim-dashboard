@@ -239,8 +239,8 @@ flowchart LR
 
 | Source | What it finds |
 | --- | --- |
-| World scan | New objects (pieces, summoned bosses), the in-game day, each player's position, area, portal trips, death, PvP, bed and gear, what each chest, cart, ship and new tombstone holds, tames, signs, item stands, chests and harvested plants, and objects destroyed, such as creatures with every player who hit them, items picked up and emptied tombstones |
-| Calls through the server | Chat and map pings, which the server passes from one player to the others, creature attack moves, to say what a player was fighting when they died, and who asked to harvest a plant |
+| World scan | New objects (pieces, plants, summoned bosses), items put into smelters, the in-game day, each player's position, area, portal trips, death, PvP, bed and gear, what each chest, cart, ship and new tombstone holds, tames, signs, item stands, chests and harvested plants, and objects destroyed, such as creatures with every player who hit them, trees cut down, rocks mined out, items picked up and emptied tombstones |
+| Calls through the server | Chat and map pings, which the server passes from one player to the others, creature attack moves, to say what a player was fighting when they died, the eat animation, to read the food in hand, and who asked to harvest a plant, hit a tree or rock, or fill a smelter |
 | Game hooks | Global keys, such as a boss defeat, and the end of a raid |
 
 Each line names a player only when the game data says who did it.
@@ -254,7 +254,7 @@ On the dashboard, plugin lines become:
 
 | Kept as | Lines | Shown as |
 | --- | --- | --- |
-| Activities | Pieces built or destroyed, kills, items gathered, chests | One Saga line per player and kind, until a 10 minute pause, naming every thing |
+| Activities | Pieces built or destroyed, kills, items gathered, chests, planting, eating, smelting, trees and rocks | One Saga line per player and kind, until a 10 minute pause, naming every thing |
 | Story events | Deaths, bosses, raids, portals, tames, signs, item stands, tombstones | One Saga line each |
 | News only | Areas, gear, global keys | A Saga line for a first visit or a dungeon trip, new gear, or a boss defeat |
 | Stats | Areas, kills, the day, boss keys | Where each player is now and their kills, areas and gear on Vikings, the day and bosses on World |
@@ -281,10 +281,13 @@ flowchart LR
   chest["Chest: 5273:1203 piece_chest_wood at 118 -336 ... holds Wood x20"] --> chests[Chest by ID]
   removed["Chest removed: 5273:1203"] --> chests
   tomb["Tombstone: Ragnar at 410 -77 holds ..."] --> death[Ragnar's last death]
+  terrain["terrain-Cotil.txt, once per world"] --> land[Terrain color of each explored square]
 ```
 
 A position marks its whole 32 m square as explored. Chest IDs last until the server stops, and every run lists
-all chests again, so a new run starts the chest list over.
+all chests again, so a new run starts the chest list over. The plugin writes the terrain file once per world
+from the game's own world generator, and the map colors only squares someone walked.
+Nothing nobody has seen shows: a chest the world came with appears once someone walks next to it.
 
 BepInEx's own log file is turned off, so its messages land in
 `logs.txt` too. Every line is listed in [log-events.md](log-events.md).
@@ -368,6 +371,7 @@ Every log lives in `C:\Valheim Server`.
 | `updater.log` | The update script: what it updated, skipped or is waiting for |
 | `updater-state.json` | The update script: commits of the running dashboard and the installed plugin |
 | `ngrok.log` | ngrok, warnings and errors only |
+| `terrain-<world>.txt` | The event log plugin, once per world: the land type of every 32 m square |
 
 The dashboard also reads the world save, `worlds_local\Cotil\_main.<save number>.db2`, and never writes to it.
 

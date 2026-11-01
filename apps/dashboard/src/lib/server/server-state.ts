@@ -25,6 +25,7 @@ import {
   MAX_RUNS,
   MAX_SAVES,
   type ServerState,
+  type Terrain,
 } from '#/lib/server/models';
 import { sourceKey } from '#/lib/sources';
 
@@ -58,6 +59,29 @@ const addActivity = (
   pushCapped(activities, { player, kind, startUtc: timeUtc, endUtc: timeUtc, things: { [thing]: count }, source }, MAX_ACTIVITIES);
 };
 
+/** Returns the terrain letter of the square with [key], such as `3,-11`, or null when [terrain] has none there. */
+const terrainLetter = (terrain: Terrain, key: string): string | null => {
+  const [column, row] = key.split(',').map(Number);
+  const letter = terrain.rows[-terrain.first - 1 - row!]?.[column! - terrain.first];
+  return letter === undefined ? null : letter;
+};
+
+/** Adds the terrain letter of the explored square [key] to [snapshot], when [terrain] is known and has one. */
+const addTerrainOf = (snapshot: Snapshot, terrain: Terrain | null, key: string): void => {
+  const letter = terrain === null ? null : terrainLetter(terrain, key);
+  if (letter !== null) {
+    snapshot.terrain[key] = letter;
+  }
+};
+
+/** Keeps [terrain] in [state] and adds its letter for every square explored so far. */
+export const setTerrain = (state: ServerState, terrain: Terrain): void => {
+  state.terrain = terrain;
+  for (const key of new Set(Object.values(state.snapshot.explored).flat())) {
+    addTerrainOf(state.snapshot, terrain, key);
+  }
+};
+
 /** Adds [value] to the list of [key] in [lists] and returns true when it was not there yet. */
 const addNew = (lists: Record<string, string[]>, key: string, value: string): boolean => {
   const list = lists[key] ?? [];
@@ -86,17 +110,25 @@ const isStoryNews = (snapshot: Snapshot, event: LogEvent): boolean => {
 };
 
 /**
- * Adds the activity [event] stands for, such as a piece built or a creature killed, read from [line], to
- * [activities]. An item counts as gathered only the first time anyone picks it up.
+ * Returns the character of the player whose Steam name is [name], since the plugin names a builder by Steam name
+ * when they have not been online since the server started. Any other name is returned as it is.
  */
-const addActivityOf = (activities: ActivityRecord[], event: LogEvent, line: string): void => {
+const characterOf = (snapshot: Snapshot, name: string | null): string | null =>
+  snapshot.sessions.findLast((session) => session.steamName !== null && session.steamName === name)?.character ?? name;
+
+/**
+ * Adds the activity [event] stands for, such as a piece built or a creature killed, read from [line], to the
+ * activities of [snapshot]. An item counts as gathered only the first time anyone picks it up.
+ */
+const addActivityOf = (snapshot: Snapshot, event: LogEvent, line: string): void => {
+  const { activities } = snapshot;
   const { timeUtc } = event;
   switch (event.type) {
     case 'pieceBuilt':
-      addActivity(activities, line, timeUtc, event.builder, 'built', event.piece, 1);
+      addActivity(activities, line, timeUtc, characterOf(snapshot, event.builder), 'built', event.piece, 1);
       break;
     case 'pieceDestroyed':
-      addActivity(activities, line, timeUtc, event.builder, 'destroyed', event.piece, 1);
+      addActivity(activities, line, timeUtc, characterOf(snapshot, event.builder), 'destroyed', event.piece, 1);
       break;
     case 'creatureKilled':
       for (const attacker of event.attackers) {
@@ -111,6 +143,18 @@ const addActivityOf = (activities: ActivityRecord[], event: LogEvent, line: stri
     case 'chestChanged':
       addActivity(activities, line, timeUtc, event.player, event.isStored ? 'stored' : 'taken', event.item, event.count);
       break;
+    case 'planted':
+      addActivity(activities, line, timeUtc, event.player, 'planted', event.plant, 1);
+      break;
+    case 'ate':
+      addActivity(activities, line, timeUtc, event.character, 'ate', event.item, 1);
+      break;
+    case 'smelting':
+      addActivity(activities, line, timeUtc, event.player, 'smelted', event.item, event.count);
+      break;
+    case 'depleted':
+      addActivity(activities, line, timeUtc, event.player, event.kind === 'tree' ? 'cut' : 'mined', event.thing, 1);
+      break;
     default:
       break;
   }
@@ -123,6 +167,7 @@ export const createServerState = (serverUtcOffsetMinutes: number): ServerState =
     reader: createLogReader(serverUtcOffsetMinutes),
     sessionState,
     pendingSaveNumber: null,
+    terrain: null,
     snapshot: {
       serverUtcOffsetMinutes,
       world: null,
@@ -151,6 +196,7 @@ export const createServerState = (serverUtcOffsetMinutes: number): ServerState =
       positions: {},
       chests: {},
       deathItems: {},
+      terrain: {},
     },
   };
 };
@@ -218,7 +264,7 @@ export const readLogLine = (state: ServerState, line: string): void => {
   if (isStoryNews(snapshot, event)) {
     pushCapped(snapshot.events, { ...event, line } as StoryEvent, MAX_EVENTS);
   }
-  addActivityOf(snapshot.activities, event, line);
+  addActivityOf(snapshot, event, line);
   switch (event.type) {
     case 'worldLoaded':
       snapshot.world = event.world;
@@ -275,12 +321,14 @@ export const readLogLine = (state: ServerState, line: string): void => {
     case 'position': {
       const { character, x, z, timeUtc } = event;
       snapshot.positions[character] = { x, z, timeUtc };
-      addNew(snapshot.explored, character, `${Math.floor(x / MAP_SQUARE_METERS)},${Math.floor(z / MAP_SQUARE_METERS)}`);
+      const key = `${Math.floor(x / MAP_SQUARE_METERS)},${Math.floor(z / MAP_SQUARE_METERS)}`;
+      addNew(snapshot.explored, character, key);
+      addTerrainOf(snapshot, state.terrain, key);
       break;
     }
     case 'chestContents': {
       const { id, chest, x, z, builder, items, timeUtc } = event;
-      snapshot.chests[id] = { chest, x, z, builder, items, timeUtc };
+      snapshot.chests[id] = { chest, x, z, builder: characterOf(snapshot, builder), items, timeUtc };
       break;
     }
     case 'chestRemoved':

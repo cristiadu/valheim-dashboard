@@ -1,6 +1,7 @@
 import type { ChatKind, LogEvent, LogReader, Matcher } from '#/models';
 import {
   AREA_ENTERED_PATTERN,
+  ATE_PATTERN,
   BACKUP_PATTERN,
   BED_PATTERN,
   BOSS_SUMMONED_PATTERN,
@@ -11,6 +12,7 @@ import {
   CREATURE_KILLED_PATTERN,
   DAY_STARTED_PATTERN,
   DEATH_DETAILS_PATTERN,
+  DEPLETED_PATTERN,
   CHARACTER_PATTERN,
   DISCONNECT_PATTERN,
   DISK_SPACE_PATTERN,
@@ -31,6 +33,7 @@ import {
   PICKED_UP_PATTERN,
   PIECE_BUILT_PATTERN,
   PIECE_DESTROYED_PATTERN,
+  PLANTED_PATTERN,
   PING_PATTERN,
   PLAYER_COUNT_PATTERN,
   PLAYFAB_CONNECTED_PATTERN,
@@ -43,6 +46,7 @@ import {
   REFUSED_JOIN_REASONS,
   SERVER_STOPPED_PATTERN,
   SIGN_PATTERN,
+  SMELTING_PATTERN,
   SOCKET_CLOSED_PATTERN,
   STEAM_CONNECTED_PATTERN,
   STEAM_ID_PREFIX,
@@ -311,6 +315,35 @@ const MATCHERS: readonly Matcher[] = [
   {
     pattern: HARVESTED_PATTERN,
     toEvent: (groups, timeUtc) => ({ type: 'harvested', timeUtc, plant: groups.plant!, player: playerOf(groups.player) }),
+  },
+  {
+    pattern: PLANTED_PATTERN,
+    toEvent: (groups, timeUtc) => ({ type: 'planted', timeUtc, plant: groups.plant!, player: playerOf(groups.player) }),
+  },
+  {
+    pattern: ATE_PATTERN,
+    toEvent: (groups, timeUtc) => ({ type: 'ate', timeUtc, character: groups.character!, item: groups.item! }),
+  },
+  {
+    pattern: SMELTING_PATTERN,
+    toEvent: (groups, timeUtc) => ({
+      type: 'smelting',
+      timeUtc,
+      item: groups.item!,
+      count: Number(groups.count),
+      station: groups.station!,
+      player: playerOf(groups.player),
+    }),
+  },
+  {
+    pattern: DEPLETED_PATTERN,
+    toEvent: (groups, timeUtc) => ({
+      type: 'depleted',
+      timeUtc,
+      kind: groups.kind === 'Tree cut' ? 'tree' : 'rock',
+      thing: groups.thing!,
+      player: playerOf(groups.player),
+    }),
   },
   {
     pattern: POSITION_PATTERN,

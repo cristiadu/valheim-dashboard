@@ -23,6 +23,8 @@ namespace ValheimDashboard.EventLog
             ChatTracker.Read(data);
             CombatTracker.Read(data);
             ItemTracker.Read(data);
+            WorkTracker.Read(data);
+            EatTracker.Read(data);
         }
     }
 }

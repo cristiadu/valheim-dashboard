@@ -238,6 +238,8 @@ export type Snapshot = {
   chests: Record<string, ChestRecord>;
   /** What each character carried at their last death, by character name. */
   deathItems: Record<string, DeathItems>;
+  /** Terrain letter of each explored square, by `x,z` square number, once the plugin's terrain file was read. */
+  terrain: Record<string, string>;
 };
 
 /**
@@ -272,6 +274,25 @@ export type SourceLines = {
   /** Latest lines, oldest first. */
   lines: LogLineRecord[];
 };
+
+/** Map colors and names of each terrain letter the plugin writes. */
+export const TERRAIN_STYLES: Record<string, { color: string; name: string }> = {
+  M: { color: '#5f7a3a', name: 'Meadows' },
+  B: { color: '#2f4a2c', name: 'Black Forest' },
+  S: { color: '#5a4a32', name: 'Swamp' },
+  O: { color: '#a7a9b0', name: 'Mountains' },
+  P: { color: '#b39a4e', name: 'Plains' },
+  I: { color: '#4a4258', name: 'Mistlands' },
+  A: { color: '#7a3424', name: 'Ashlands' },
+  N: { color: '#cfd9e0', name: 'Deep North' },
+  '~': { color: '#2b5268', name: 'Water' },
+};
+
+/** Size of the player color mark inside each explored square, in meters. */
+export const MAP_TRAIL_METERS = 12;
+
+/** Color of an explored square whose terrain is not known yet. */
+export const UNKNOWN_TERRAIN_COLOR = 'var(--line)';
 
 /** A spot on the map, in meters east (`x`) and north (`z`) of the world's center, and when it was logged. */
 export type MapPoint = {
@@ -312,8 +333,10 @@ export const MAP_CHEST_METERS = 12;
 export type MapView = {
   /** SVG view box that fits everything, with a margin. */
   viewBox: string;
-  /** Explored squares, one per character and square, in that character's player color. */
-  squares: { key: string; x: number; y: number; color: string }[];
+  /** Explored squares, once each, in their terrain color, or the line color before the terrain is known. */
+  land: { key: string; x: number; y: number; color: string }[];
+  /** A small mark in the middle of each square a character walked, in that character's player color. */
+  trails: { key: string; x: number; y: number; color: string }[];
   /** Chests, carts and ships, by their ID. */
   chests: { id: string; x: number; y: number; record: ChestRecord }[];
   /** Where each online player stands and where each character last died. */
@@ -322,9 +345,21 @@ export type MapView = {
 
 /**
  * What a stretch of activity is: pieces built, a builder's pieces destroyed, creatures killed, items gathered
- * from the world, or items stored in or taken from chests.
+ * from the world, items stored in or taken from chests, crops planted, food eaten, items put into smelters, trees
+ * cut down or rocks mined out.
  */
-export type ActivityKind = 'built' | 'destroyed' | 'killed' | 'gathered' | 'stored' | 'taken';
+export type ActivityKind =
+  | 'built'
+  | 'destroyed'
+  | 'killed'
+  | 'gathered'
+  | 'stored'
+  | 'taken'
+  | 'planted'
+  | 'ate'
+  | 'smelted'
+  | 'cut'
+  | 'mined';
 
 /** One player's activity of one kind, with pauses under a few minutes, told as one story line. */
 export type ActivityRecord = {
@@ -350,6 +385,11 @@ export const ACTIVITY_STORY_KINDS: Record<ActivityKind, StoryKind> = {
   gathered: 'items',
   stored: 'items',
   taken: 'items',
+  planted: 'built',
+  ate: 'items',
+  smelted: 'items',
+  cut: 'items',
+  mined: 'items',
 };
 
 /**
@@ -362,6 +402,11 @@ export const ACTIVITY_WORDS: Record<Exclude<ActivityKind, 'destroyed'>, { verb: 
   gathered: { verb: 'gathered', one: 'item', many: 'items', ending: '' },
   stored: { verb: 'stored', one: 'item', many: 'items', ending: ' in chests' },
   taken: { verb: 'took', one: 'item', many: 'items', ending: ' from chests' },
+  planted: { verb: 'planted', one: 'plant', many: 'plants', ending: '' },
+  ate: { verb: 'ate or drank', one: 'thing', many: 'things', ending: '' },
+  smelted: { verb: 'put', one: 'item', many: 'items', ending: ' into smelters and kilns' },
+  cut: { verb: 'cut down', one: 'tree', many: 'trees', ending: '' },
+  mined: { verb: 'mined out', one: 'rock', many: 'rocks', ending: '' },
 };
 
 /** One chat message or map ping. */

@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import { logLine, readLines, RUN_START, TEST_OFFSET_MINUTES } from '#/lib/test-common';
 import type { ServerState } from '#/lib/server/models';
-import { addSavedBosses, createServerState, startNewLog } from '#/lib/server/server-state';
+import { addSavedBosses, createServerState, setTerrain, startNewLog } from '#/lib/server/server-state';
 
 describe('server state', () => {
   let state: ServerState;
@@ -91,6 +91,47 @@ describe('server state', () => {
     expect(kinds).toEqual([['Ragnar', 'gathered', { Dandelion: 1 }]]);
   });
 
+  it('keeps planting, eating, smelting, trees and rocks as activities per player', () => {
+    // GIVEN Ragnar plants, eats, fills a smelter, cuts a tree and mines a rock
+    readLines(state, [
+      ...RUN_START,
+      logLine('03:00:00', 'Planted: sapling_carrot by Ragnar'),
+      logLine('03:01:00', 'Ate: Ragnar CookedMeat'),
+      logLine('03:02:00', 'Smelting: CopperOre x3 in smelter by Ragnar'),
+      logLine('03:03:00', 'Tree cut: Beech1 by Ragnar'),
+      logLine('03:04:00', 'Rock mined: rock4_copper by Ragnar'),
+    ]);
+
+    // WHEN the activities are listed
+    const kinds = state.snapshot.activities.map((activity) => [activity.player, activity.kind, activity.things]);
+
+    // THEN each has its own kind
+    expect(kinds).toEqual([
+      ['Ragnar', 'planted', { sapling_carrot: 1 }],
+      ['Ragnar', 'ate', { CookedMeat: 1 }],
+      ['Ragnar', 'smelted', { CopperOre: 3 }],
+      ['Ragnar', 'cut', { Beech1: 1 }],
+      ['Ragnar', 'mined', { rock4_copper: 1 }],
+    ]);
+  });
+
+  it('names builders the plugin gave by Steam name by their character instead', () => {
+    // GIVEN Tony Example plays Ragnar, and the plugin names a chest and pieces by his Steam name
+    readLines(state, [
+      ...RUN_START,
+      logLine('03:00:00', 'Chest: 1:10 piece_chest_wood at 12 18 built by Tony Example holds Wood x20'),
+      logLine('03:01:00', 'Piece built: wood_floor_1x1 by Tony Example'),
+      logLine('03:02:00', 'Piece destroyed: wood_fence built by Tony Example'),
+    ]);
+
+    // WHEN the snapshot is read
+    const { chests, activities } = state.snapshot;
+
+    // THEN the chest and both activities belong to Ragnar
+    expect(chests['1:10']?.builder).toBe('Ragnar');
+    expect(activities.map((activity) => activity.player)).toEqual(['Ragnar', 'Ragnar']);
+  });
+
   it('keeps explored squares, last positions, chests and what a player carried at death', () => {
     // GIVEN Ragnar walks three spots, two in one 32 m square, two chests are listed and one goes, then he dies
     readLines(state, [
@@ -116,6 +157,18 @@ describe('server state', () => {
     expect(deathItems).toEqual({
       Ragnar: { x: 70, z: 20, items: { SwordBronze: 1, Coins: 55 }, timeUtc: '2026-10-29T10:03:00.000Z' },
     });
+  });
+
+  it('adds the terrain of squares explored before and after the terrain file was read', () => {
+    // GIVEN Ragnar explored square 0,0, then the terrain of four squares around the center is read
+    readLines(state, [...RUN_START, logLine('03:00:00', 'Position: Ragnar 10 20')]);
+    setTerrain(state, { first: -1, rows: ['MB', '~S'] });
+
+    // WHEN he walks into square -1,-1
+    readLines(state, [logLine('03:00:05', 'Position: Ragnar -10 -20')]);
+
+    // THEN both squares have their letter: 0,0 is northeast, -1,-1 southwest
+    expect(state.snapshot.terrain).toEqual({ '0,0': 'B', '-1,-1': '~' });
   });
 
   it("forgets the old run's chests when a new log starts, since their IDs change", () => {

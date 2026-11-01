@@ -115,6 +115,8 @@ describe('storyOf', () => {
         { player: 'Ragnar', kind: 'killed', startUtc: '2026-10-29T10:00:00.000Z', endUtc: '2026-10-29T10:05:00.000Z', things: { Greydwarf: 3, Troll: 1 }, source: NO_LINES },
         { player: 'Ragnar', kind: 'taken', startUtc: '2026-10-29T10:06:00.000Z', endUtc: '2026-10-29T10:06:00.000Z', things: { Wood: 20 }, source: NO_LINES },
         { player: 'Ragnar', kind: 'gathered', startUtc: '2026-10-29T10:07:00.000Z', endUtc: '2026-10-29T10:07:00.000Z', things: { Turnip: 2 }, source: NO_LINES },
+        { player: 'Ragnar', kind: 'ate', startUtc: '2026-10-29T10:08:00.000Z', endUtc: '2026-10-29T10:08:00.000Z', things: { CookedMeat: 1 }, source: NO_LINES },
+        { player: 'Ragnar', kind: 'planted', startUtc: '2026-10-29T10:09:00.000Z', endUtc: '2026-10-29T10:09:00.000Z', things: { sapling_carrot: 3 }, source: NO_LINES },
       ],
     });
 
@@ -123,6 +125,8 @@ describe('storyOf', () => {
 
     // THEN each stretch reads plainly
     expect(story.map((item) => [item.kind, item.text])).toEqual([
+      ['built', 'Ragnar planted 3 plants: 3 sapling carrot'],
+      ['items', 'Ragnar ate or drank 1 thing: 1 cooked meat'],
       ['items', 'Ragnar gathered 2 items: 2 turnip'],
       ['items', 'Ragnar took 20 items from chests: 20 wood'],
       ['fight', 'Ragnar killed 4 creatures: 3 greydwarf, 1 troll'],

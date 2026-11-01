@@ -5,8 +5,16 @@ import { readConfig } from '#/lib/server/config';
 import { firstRunKey, LogHistory, readHistory } from '#/lib/server/log-history';
 import { LogTail } from '#/lib/server/log-tail';
 import { logger } from '#/lib/server/logger';
-import { HISTORY_FOLDER_NAME, POLL_INTERVAL_MS, WORLDS_FOLDER_NAME, type Follower, type ServerState } from '#/lib/server/models';
-import { addSavedBosses, createServerState, readLogLine, startNewLog } from '#/lib/server/server-state';
+import {
+  HISTORY_FOLDER_NAME,
+  POLL_INTERVAL_MS,
+  TERRAIN_FILE_PREFIX,
+  WORLDS_FOLDER_NAME,
+  type Follower,
+  type ServerState,
+} from '#/lib/server/models';
+import { addSavedBosses, createServerState, readLogLine, setTerrain, startNewLog } from '#/lib/server/server-state';
+import { readTerrain } from '#/lib/server/terrain';
 import { readSavedGlobalKeys } from '#/lib/server/world-save';
 
 /** Functions to call with the snapshot after new log lines. */
@@ -36,6 +44,29 @@ const readSavedBosses = async (follower: Follower): Promise<void> => {
   }
 };
 
+/**
+ * Reads the terrain file the plugin writes next to the log on each server start, once per world and run. A
+ * missing file is reported once, since the plugin writes it a few seconds after the start.
+ */
+const readWorldTerrain = async (follower: Follower): Promise<void> => {
+  const { world, startedUtc } = follower.state.snapshot;
+  const terrainKey = `${world} ${startedUtc}`;
+  if (world === null || terrainKey === follower.terrainRead) {
+    return;
+  }
+  const path = join(dirname(follower.logFile), `${TERRAIN_FILE_PREFIX}${world}.txt`);
+  try {
+    setTerrain(follower.state, await readTerrain(path));
+    follower.terrainRead = terrainKey;
+    follower.hasNewLines = true;
+  } catch (error) {
+    if (follower.state.terrain === null && follower.terrainRead !== `missing ${terrainKey}`) {
+      follower.terrainRead = `missing ${terrainKey}`;
+      logger.warn(`No terrain in ${path} yet: ${String(error)}`);
+    }
+  }
+};
+
 /** Reads the new lines once and copies them to the history, then gives the listeners the snapshot if any arrived. */
 const poll = async (follower: Follower): Promise<void> => {
   try {
@@ -45,6 +76,7 @@ const poll = async (follower: Follower): Promise<void> => {
     logger.error(`Could not read or copy ${follower.logFile}: ${String(error)}`);
   }
   await readSavedBosses(follower);
+  await readWorldTerrain(follower);
   if (follower.hasNewLines) {
     follower.hasNewLines = false;
     listeners.forEach((listener) => listener(follower.state.snapshot));
@@ -81,6 +113,7 @@ const start = async (): Promise<ServerState> => {
     history,
     hasNewLines: false,
     worldSaveRead: null,
+    terrainRead: null,
     tail: new LogTail(config.logFile, {
       onLine: (line) => {
         readLogLine(state, line);
