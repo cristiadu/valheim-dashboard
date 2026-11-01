@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { mapOf } from '#/lib/map';
+import { foundChests, mapOf } from '#/lib/map';
 import { playersOf } from '#/lib/players';
 import { sessionWith, snapshotWith, TEST_NOON_MS } from '#/lib/test-common';
 
@@ -50,5 +50,44 @@ describe('mapOf', () => {
         { key: 'death:Ragnar', kind: 'death', label: 'Ragnar died here', x: 50, y: 20, color: 'var(--gold)' },
       ],
     });
+  });
+});
+
+describe('mapOf chest builders', () => {
+  it("names a chest built under a Steam name by that player's character", () => {
+    // GIVEN Ragnar plays as Steam name Tony Example, who built a chest listed before Ragnar joined
+    const snapshot = snapshotWith({
+      sessions: [sessionWith({ steamName: 'Tony Example' })],
+      chests: {
+        '1:10': { chest: 'piece_chest_wood', x: 12, z: 18, builder: 'Tony Example', items: {}, timeUtc: '2026-10-29T11:00:00.000Z' },
+      },
+    });
+
+    // WHEN the map is made
+    const map = mapOf(snapshot, playersOf(snapshot, TEST_NOON_MS));
+
+    // THEN the chest is Ragnar's
+    expect(map?.chests[0]?.record.builder).toBe('Ragnar');
+  });
+});
+
+describe('foundChests', () => {
+  it('keeps chests players built and world chests next to walked land, and hides the rest', () => {
+    // GIVEN Ragnar walked square 0,0, and the world has one chest next to it and one far away
+    const chest = { chest: 'TreasureChest_meadows', items: {}, timeUtc: '2026-10-29T11:00:00.000Z' };
+    const snapshot = snapshotWith({
+      explored: { Ragnar: ['0,0'] },
+      chests: {
+        '1:10': { ...chest, chest: 'piece_chest_wood', x: 900, z: 900, builder: 'Ragnar' },
+        '1:11': { ...chest, x: 40, z: -20, builder: null },
+        '1:12': { ...chest, x: 400, z: 400, builder: null },
+      },
+    });
+
+    // WHEN the found chests are listed
+    const ids = foundChests(snapshot).map(([id]) => id);
+
+    // THEN Ragnar's chest and the nearby world chest show, and the far one stays hidden
+    expect(ids).toEqual(['1:10', '1:11']);
   });
 });

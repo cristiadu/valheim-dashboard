@@ -264,6 +264,8 @@ flowchart LR
 A position marks its whole 32 m square as explored. Chest IDs last until the server stops, and every run lists
 all chests again, so a new run starts the chest list over. The plugin writes the terrain file once per world
 from the game's own world generator, and the map colors only squares someone walked.
+Nothing nobody has seen shows: a chest the world came with appears once someone walks next to it, and a boss
+once it is beaten.
 
 BepInEx's own log file is turned off, so its messages land in
 `logs.txt` too. Every line is listed in [log-events.md](log-events.md).
