@@ -58,7 +58,7 @@ namespace ValheimDashboard.EventLog
                 bool isNew = SeenObjects.Add(entry.Key) && hasSeenWorld;
                 CreatureTracker.See(zdo, isNew);
                 PlacedItemTracker.See(zdo, isNew);
-                ItemTracker.See(zdo);
+                ItemTracker.See(zdo, isNew);
                 if (isNew)
                 {
                     NewObjects.Add(zdo);

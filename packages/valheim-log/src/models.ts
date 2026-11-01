@@ -60,6 +60,18 @@ export type LogEvent = { timeUtc: string } & (
   | { type: 'chestChanged'; item: string; count: number; chest: string; player: string | null; isStored: boolean }
   | { type: 'harvested'; plant: string; player: string | null }
   | { type: 'tombstoneEmptied'; owner: string | null; player: string | null }
+  | { type: 'position'; character: string; x: number; z: number }
+  | {
+      type: 'chestContents';
+      id: string;
+      chest: string;
+      x: number;
+      z: number;
+      builder: string | null;
+      items: Record<string, number>;
+    }
+  | { type: 'chestRemoved'; id: string }
+  | { type: 'tombstoneContents'; owner: string | null; x: number; z: number; items: Record<string, number> }
   | { type: 'worldSaveStep'; step: number; durationMs: number; saveNumber: number | null }
   | { type: 'backupCreated'; backup: string }
   | { type: 'diskSpace'; availableBytes: number; blockedBelowBytes: number; warnBelowBytes: number }
