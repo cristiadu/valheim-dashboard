@@ -1,10 +1,11 @@
 <script lang="ts">
+  import { seenBosses } from '#/lib/bosses';
   import LogLines from '#/lib/components/LogLines';
   import NoData from '#/lib/components/NoData';
   import Pill from '#/lib/components/Pill';
   import StatGrid from '#/lib/components/StatGrid';
   import { live, useSnapshot } from '#/lib/live.svelte';
-  import { BOSS_ORDER, LATEST_SAVE_COUNT } from '#/lib/models';
+  import { LATEST_SAVE_COUNT } from '#/lib/models';
   import { bossPill } from '#/lib/pills';
   import { linesAt, serverSource } from '#/lib/sources';
   import { viewerTimeZone, whenLabel } from '#/lib/status';
@@ -46,7 +47,7 @@
     <section class="panel" aria-labelledby="bosses-title">
       <h2 id="bosses-title" class="panel-title">BOSSES</h2>
       <ol class="bosses">
-        {#each BOSS_ORDER as boss (boss)}
+        {#each seenBosses(snapshot) as boss (boss)}
           {@const isDefeated = snapshot.defeatedBosses.includes(boss)}
           <li class:defeated={isDefeated}>
             {#if isDefeated}
@@ -61,6 +62,8 @@
               <span><Pill pill={bossPill(isDefeated)} /></span>
             {/if}
           </li>
+        {:else}
+          <li class="muted">Nobody has met a boss yet.</li>
         {/each}
       </ol>
     </section>

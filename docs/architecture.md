@@ -150,6 +150,9 @@ A boss defeat sets a global key, such as `defeated_eikthyr`, which the world sav
 defeats since the plugin was installed, so the dashboard also reads the keys from the newest save. A defeat
 from the save shows on the World tab, but has no Saga line, since its time is not known.
 
+The World tab lists only bosses someone has defeated or summoned. A boss nobody has met stays hidden, so
+the page gives nothing away.
+
 ## Tabs
 
 | Tab | Shows | Data from |
