@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { PICKER_RECIPES, movedIndex } from '#/lib/picker';
+import { PICKER_RECIPES, knownRecipes, movedIndex } from '#/lib/picker';
 
 describe('PICKER_RECIPES', () => {
   it('lists every recipe once, Meadows first and Plains last', () => {
@@ -12,6 +12,28 @@ describe('PICKER_RECIPES', () => {
     expect(new Set(ids).size).toBe(74);
     expect(ids[0]).toBe('hammer');
     expect(PICKER_RECIPES.at(-1)!.biome).toBe('Plains');
+  });
+});
+
+describe('knownRecipes', () => {
+  it('offers only recipes whose every ingredient someone has found', () => {
+    // GIVEN players found wood, stone and a deer hide, but no resin
+    const seenItems = ['Wood', 'Stone', 'DeerHide'];
+
+    // WHEN the known recipes are listed
+    const ids = knownRecipes(seenItems).map((recipe) => recipe.id);
+
+    // THEN the hammer and hoe are offered, and the torch, which needs resin, is not
+    expect(ids).toContain('hammer');
+    expect(ids).toContain('hoe');
+    expect(ids).not.toContain('torch');
+  });
+
+  it('offers nothing before anyone has found anything', () => {
+    // GIVEN no item found yet
+    // WHEN the known recipes are listed
+    // THEN there are none
+    expect(knownRecipes([])).toEqual([]);
   });
 });
 

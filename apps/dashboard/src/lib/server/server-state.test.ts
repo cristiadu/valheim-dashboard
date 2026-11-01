@@ -132,6 +132,25 @@ describe('server state', () => {
     expect(activities.map((activity) => activity.player)).toEqual(['Ragnar', 'Ragnar']);
   });
 
+  it('remembers every item players found, once each', () => {
+    // GIVEN Ragnar picks up wood twice, stores it, sees a chest with stone, wears an axe and eats meat
+    readLines(state, [
+      ...RUN_START,
+      logLine('03:00:00', 'Picked up: Wood x1 by Ragnar'),
+      logLine('03:00:01', 'Picked up again: Wood x1 by Ragnar'),
+      logLine('03:00:02', 'Stored: Wood x2 in piece_chest_wood by Ragnar'),
+      logLine('03:00:03', 'Chest: 1:10 piece_chest_wood at 12 18 built by Ragnar holds Wood x2, Stone x3'),
+      logLine('03:00:04', 'Gear: Ragnar AxeStone'),
+      logLine('03:00:05', 'Ate: Ragnar CookedMeat'),
+    ]);
+
+    // WHEN the found items are read
+    const { seenItems } = state.snapshot;
+
+    // THEN each item is there once, in the order it was first found
+    expect(seenItems).toEqual(['Wood', 'Stone', 'AxeStone', 'CookedMeat']);
+  });
+
   it('keeps explored squares, last positions, chests and what a player carried at death', () => {
     // GIVEN Ragnar walks three spots, two in one 32 m square, two chests are listed and one goes, then he dies
     readLines(state, [

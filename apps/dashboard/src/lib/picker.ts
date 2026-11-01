@@ -1,8 +1,18 @@
 import { RECIPE_BIOMES, type Recipe } from '#/lib/models';
 import { RECIPES } from '#/lib/recipes';
+import { recipeItemName } from '#/lib/stock';
 
 /** Every recipe in the order the picker lists them: by biome, then as typed in [RECIPES]. */
 export const PICKER_RECIPES: readonly Recipe[] = RECIPE_BIOMES.flatMap((biome) => RECIPES.filter((recipe) => recipe.biome === biome));
+
+/**
+ * Returns the recipes, in picker order, whose every ingredient is among [seenItems], the game item names players
+ * have found. Like the game, nobody sees a recipe before they have found what it takes.
+ */
+export const knownRecipes = (seenItems: string[]): Recipe[] => {
+  const seen = new Set(seenItems.map(recipeItemName));
+  return PICKER_RECIPES.filter((recipe) => recipe.ingredients.every(({ item }) => seen.has(item)));
+};
 
 /**
  * Returns where the highlight moves in a list of [count] options when [key] is pressed at [index],

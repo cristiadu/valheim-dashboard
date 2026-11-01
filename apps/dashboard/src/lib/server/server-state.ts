@@ -92,6 +92,23 @@ const addNew = (lists: Record<string, string[]>, key: string, value: string): bo
   return true;
 };
 
+/** Game item names [event] shows a player has found, such as what they picked up, stored, wore or ate. */
+const itemsSeenIn = (event: LogEvent): string[] => {
+  switch (event.type) {
+    case 'itemPickedUp':
+    case 'chestChanged':
+    case 'gearSeen':
+    case 'ate':
+    case 'smelting':
+      return [event.item];
+    case 'chestContents':
+    case 'tombstoneContents':
+      return Object.keys(event.items);
+    default:
+      return [];
+  }
+};
+
 /**
  * Returns true when [event] belongs in the story. An area is news on a first visit or a trip into a dungeon,
  * gear when it is new, and a global key when it is a boss defeat.
@@ -196,6 +213,7 @@ export const createServerState = (serverUtcOffsetMinutes: number): ServerState =
       positions: {},
       chests: {},
       deathItems: {},
+      seenItems: [],
       terrain: {},
     },
   };
@@ -265,6 +283,11 @@ export const readLogLine = (state: ServerState, line: string): void => {
     pushCapped(snapshot.events, { ...event, line } as StoryEvent, MAX_EVENTS);
   }
   addActivityOf(snapshot, event, line);
+  for (const item of itemsSeenIn(event)) {
+    if (!snapshot.seenItems.includes(item)) {
+      snapshot.seenItems.push(item);
+    }
+  }
   switch (event.type) {
     case 'worldLoaded':
       snapshot.world = event.world;

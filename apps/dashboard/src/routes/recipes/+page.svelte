@@ -6,11 +6,12 @@
   import RecipePicker from '#/lib/components/RecipePicker';
   import { live, useSnapshot } from '#/lib/live.svelte';
   import { MAX_CRAFTS, RECIPE_ICON_PX, type Plan } from '#/lib/models';
+  import { knownRecipes } from '#/lib/picker';
   import { planPill } from '#/lib/pills';
   import { clampCrafts, newPlan, planItems, stillNeeded, withHave } from '#/lib/planner';
   import { playersOf } from '#/lib/players';
   import { loadPlans, planner, savePlans } from '#/lib/plans.svelte';
-  import { RECIPES, madeAt, recipeById } from '#/lib/recipes';
+  import { madeAt, recipeById } from '#/lib/recipes';
   import { builderNames, chestStock, craftables } from '#/lib/stock';
 
   onMount(loadPlans);
@@ -36,14 +37,17 @@
   /** Recipes the picked chests have enough for. */
   const canMake = $derived(craftables(stock));
 
-  /** Recipe picked in the new plan form. */
-  let pickedId = $state(RECIPES[0]!.id);
+  /** Recipes whose every ingredient someone has found, so nobody sees what is still ahead of them. */
+  const known = $derived(knownRecipes(snapshot.seenItems));
+
+  /** Recipe chosen in the new plan form, if any yet. */
+  let chosenId = $state<string | null>(null);
+
+  /** Recipe picked in the new plan form: the chosen one while it is known, else the first known one. */
+  const picked = $derived(known.find((recipe) => recipe.id === chosenId) ?? known[0] ?? null);
 
   /** How many crafts the new plan form asks for. */
   let pickedCrafts = $state(1);
-
-  /** Full recipe for [pickedId]. */
-  const picked = $derived(recipeById(pickedId)!);
 
   /** Items still missing across every plan. */
   const needed = $derived(stillNeeded(planner.plans));
@@ -51,7 +55,7 @@
   /** Adds a plan for the picked recipe. */
   const addPlan = (event: SubmitEvent): void => {
     event.preventDefault();
-    savePlans([...planner.plans, newPlan(planner.plans, pickedId, pickedCrafts)]);
+    savePlans([...planner.plans, newPlan(planner.plans, picked!.id, pickedCrafts)]);
   };
 
   /** Replaces [plan] with [changed]. */
@@ -68,27 +72,35 @@
 <div class="recipes">
   <section class="panel" aria-labelledby="new-title">
     <h2 id="new-title" class="panel-title">START A PLAN</h2>
-    <form onsubmit={addPlan}>
-      <RecipePicker bind:value={pickedId} label="What do you want to make?" />
-      <label>
-        <span class="muted">{picked.yields > 1 ? 'How many batches?' : 'How many?'}</span>
-        <input type="number" min="1" max={MAX_CRAFTS} bind:value={pickedCrafts} />
-      </label>
-      <button type="submit">Start tracking</button>
-    </form>
-    <div class="preview">
-      <ItemIcon item={picked.name} size={RECIPE_ICON_PX} />
-      <div>
-        <p class="muted">
-          {madeAt(picked.station)} {picked.yields > 1 ? `Each batch makes ${picked.yields} and takes:` : 'Takes:'}
-        </p>
-        <ul class="items">
-          {#each picked.ingredients as line (line.item)}
-            <li><ItemIcon item={line.item} /><span class="amount">{line.amount}</span>{line.item}</li>
-          {/each}
-        </ul>
+    {#if picked === null}
+      <p class="muted">No recipes yet. They show up once someone has found everything a recipe takes.</p>
+    {:else}
+      <form onsubmit={addPlan}>
+        <RecipePicker
+          bind:value={() => picked.id, (id) => (chosenId = id)}
+          label="What do you want to make?"
+          recipes={known}
+        />
+        <label>
+          <span class="muted">{picked.yields > 1 ? 'How many batches?' : 'How many?'}</span>
+          <input type="number" min="1" max={MAX_CRAFTS} bind:value={pickedCrafts} />
+        </label>
+        <button type="submit">Start tracking</button>
+      </form>
+      <div class="preview">
+        <ItemIcon item={picked.name} size={RECIPE_ICON_PX} />
+        <div>
+          <p class="muted">
+            {madeAt(picked.station)} {picked.yields > 1 ? `Each batch makes ${picked.yields} and takes:` : 'Takes:'}
+          </p>
+          <ul class="items">
+            {#each picked.ingredients as line (line.item)}
+              <li><ItemIcon item={line.item} /><span class="amount">{line.amount}</span>{line.item}</li>
+            {/each}
+          </ul>
+        </div>
       </div>
-    </div>
+    {/if}
   </section>
 
   <section class="panel" aria-labelledby="chests-title">
