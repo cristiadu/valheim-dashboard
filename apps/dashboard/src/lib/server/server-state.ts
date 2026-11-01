@@ -24,6 +24,7 @@ import {
   MAX_RUNS,
   MAX_SAVES,
   type ServerState,
+  type Terrain,
 } from '#/lib/server/models';
 
 /** Adds [item] to the end of [list] and drops the oldest items past [max]. */
@@ -51,6 +52,29 @@ const addActivity = (
     return;
   }
   pushCapped(activities, { player, kind, startUtc: timeUtc, endUtc: timeUtc, things: { [thing]: count } }, MAX_ACTIVITIES);
+};
+
+/** Returns the terrain letter of the square with [key], such as `3,-11`, or null when [terrain] has none there. */
+const terrainLetter = (terrain: Terrain, key: string): string | null => {
+  const [column, row] = key.split(',').map(Number);
+  const letter = terrain.rows[-terrain.first - 1 - row!]?.[column! - terrain.first];
+  return letter === undefined ? null : letter;
+};
+
+/** Adds the terrain letter of the explored square [key] to [snapshot], when [terrain] is known and has one. */
+const addTerrainOf = (snapshot: Snapshot, terrain: Terrain | null, key: string): void => {
+  const letter = terrain === null ? null : terrainLetter(terrain, key);
+  if (letter !== null) {
+    snapshot.terrain[key] = letter;
+  }
+};
+
+/** Keeps [terrain] in [state] and adds its letter for every square explored so far. */
+export const setTerrain = (state: ServerState, terrain: Terrain): void => {
+  state.terrain = terrain;
+  for (const key of new Set(Object.values(state.snapshot.explored).flat())) {
+    addTerrainOf(state.snapshot, terrain, key);
+  }
 };
 
 /** Adds [value] to the list of [key] in [lists] and returns true when it was not there yet. */
@@ -130,6 +154,7 @@ export const createServerState = (serverUtcOffsetMinutes: number): ServerState =
     reader: createLogReader(serverUtcOffsetMinutes),
     sessionState,
     pendingSaveNumber: null,
+    terrain: null,
     snapshot: {
       serverUtcOffsetMinutes,
       world: null,
@@ -158,6 +183,7 @@ export const createServerState = (serverUtcOffsetMinutes: number): ServerState =
       positions: {},
       chests: {},
       deathItems: {},
+      terrain: {},
     },
   };
 };
@@ -278,7 +304,9 @@ export const readLogLine = (state: ServerState, line: string): void => {
     case 'position': {
       const { character, x, z, timeUtc } = event;
       snapshot.positions[character] = { x, z, timeUtc };
-      addNew(snapshot.explored, character, `${Math.floor(x / MAP_SQUARE_METERS)},${Math.floor(z / MAP_SQUARE_METERS)}`);
+      const key = `${Math.floor(x / MAP_SQUARE_METERS)},${Math.floor(z / MAP_SQUARE_METERS)}`;
+      addNew(snapshot.explored, character, key);
+      addTerrainOf(snapshot, state.terrain, key);
       break;
     }
     case 'chestContents': {

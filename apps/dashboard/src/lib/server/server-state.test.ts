@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import { logLine, readLines, RUN_START, TEST_OFFSET_MINUTES } from '#/lib/test-common';
 import type { ServerState } from '#/lib/server/models';
-import { addSavedBosses, createServerState, startNewLog } from '#/lib/server/server-state';
+import { addSavedBosses, createServerState, setTerrain, startNewLog } from '#/lib/server/server-state';
 
 describe('server state', () => {
   let state: ServerState;
@@ -137,6 +137,18 @@ describe('server state', () => {
     expect(deathItems).toEqual({
       Ragnar: { x: 70, z: 20, items: { SwordBronze: 1, Coins: 55 }, timeUtc: '2026-10-29T10:03:00.000Z' },
     });
+  });
+
+  it('adds the terrain of squares explored before and after the terrain file was read', () => {
+    // GIVEN Ragnar explored square 0,0, then the terrain of four squares around the center is read
+    readLines(state, [...RUN_START, logLine('03:00:00', 'Position: Ragnar 10 20')]);
+    setTerrain(state, { first: -1, rows: ['MB', '~S'] });
+
+    // WHEN he walks into square -1,-1
+    readLines(state, [logLine('03:00:05', 'Position: Ragnar -10 -20')]);
+
+    // THEN both squares have their letter: 0,0 is northeast, -1,-1 southwest
+    expect(state.snapshot.terrain).toEqual({ '0,0': 'B', '-1,-1': '~' });
   });
 
   it("forgets the old run's chests when a new log starts, since their IDs change", () => {

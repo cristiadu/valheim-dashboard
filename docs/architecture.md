@@ -258,10 +258,12 @@ flowchart LR
   chest["Chest: 5273:1203 piece_chest_wood at 118 -336 ... holds Wood x20"] --> chests[Chest by ID]
   removed["Chest removed: 5273:1203"] --> chests
   tomb["Tombstone: Ragnar at 410 -77 holds ..."] --> death[Ragnar's last death]
+  terrain["terrain-Cotil.txt, once per world"] --> land[Terrain color of each explored square]
 ```
 
 A position marks its whole 32 m square as explored. Chest IDs last until the server stops, and every run lists
-all chests again, so a new run starts the chest list over.
+all chests again, so a new run starts the chest list over. The plugin writes the terrain file once per world
+from the game's own world generator, and the map colors only squares someone walked.
 
 BepInEx's own log file is turned off, so its messages land in
 `logs.txt` too. Every line is listed in [log-events.md](log-events.md).
@@ -345,6 +347,7 @@ Every log lives in `C:\Valheim Server`.
 | `updater.log` | The update script: what it updated, skipped or is waiting for |
 | `updater-state.json` | The update script: commits of the running dashboard and the installed plugin |
 | `ngrok.log` | ngrok, warnings and errors only |
+| `terrain-<world>.txt` | The event log plugin, once per world: the land type of every 32 m square |
 
 The dashboard also reads the world save, `worlds_local\Cotil\_main.<save number>.db2`, and never writes to it.
 

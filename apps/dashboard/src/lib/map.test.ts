@@ -16,8 +16,8 @@ describe('mapOf', () => {
     expect(map).toBeNull();
   });
 
-  it('draws squares, chests, the online player and a death with north up, fitted with a margin', () => {
-    // GIVEN Ragnar is online and explored two squares, with a chest and his last death nearby
+  it('draws land, trails, chests, the online player and a death with north up, fitted with a margin', () => {
+    // GIVEN Ragnar is online and explored two squares, one of known Meadows terrain, with a chest and his last death nearby
     const snapshot = snapshotWith({
       lastLineUtc: '2026-10-29T11:59:00.000Z',
       sessions: [sessionWith({})],
@@ -27,6 +27,7 @@ describe('mapOf', () => {
         '1:10': { chest: 'piece_chest_wood', x: 12, z: 18, builder: 'Ragnar', items: {}, timeUtc: '2026-10-29T11:00:00.000Z' },
       },
       deathItems: { Ragnar: { x: 50, z: -20, items: { Coins: 5 }, timeUtc: '2026-10-29T11:30:00.000Z' } },
+      terrain: { '0,0': 'M' },
     });
 
     // WHEN the map is made
@@ -35,9 +36,13 @@ describe('mapOf', () => {
     // THEN each thing sits at its spot with z turned into y, in Ragnar's color
     expect(map).toEqual({
       viewBox: '-64 -96 192 192',
-      squares: [
-        { key: 'Ragnar:0,0', x: 0, y: -32, color: 'var(--gold)' },
-        { key: 'Ragnar:1,-1', x: 32, y: 0, color: 'var(--gold)' },
+      land: [
+        { key: '0,0', x: 0, y: -32, color: '#5f7a3a' },
+        { key: '1,-1', x: 32, y: 0, color: 'var(--line)' },
+      ],
+      trails: [
+        { key: 'Ragnar:0,0', x: 10, y: -22, color: 'var(--gold)' },
+        { key: 'Ragnar:1,-1', x: 42, y: 10, color: 'var(--gold)' },
       ],
       chests: [{ id: '1:10', x: 12, y: -18, record: snapshot.chests['1:10'] }],
       marks: [

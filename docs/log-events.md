@@ -197,6 +197,7 @@ when the plugin does not know who it was.
 | What a chest, cart or ship holds | `Chest: 52731986:1203 piece_chest_wood at 118 -336 built by Ragnar holds Wood x20, Stone x3` | `^Chest: (?<id>\S+) (?<chest>\S+) at (?<x>-?\d+) (?<z>-?\d+) built by (?<builder>.+?) holds (?<items>.+)$` |
 | Chest, cart or ship destroyed | `Chest removed: 52731986:1203` | `^Chest removed: (?<id>\S+)$` |
 | What a player carried when they died | `Tombstone: Ragnar at 410 -77 holds SwordBronze x1, Coins x55` | `^Tombstone: (?<owner>.+?) at (?<x>-?\d+) (?<z>-?\d+) holds (?<items>.+)$` |
+| Terrain file written | `Terrain written: C:\Valheim Server\terrain-Cotil.txt` | `^Terrain written: (?<path>.+)$` |
 | Tombstone emptied | `Tombstone emptied: Ragnar by Bjorn` | `^Tombstone emptied: (?<owner>.+?) by (?<player>.+)$` |
 
 - **Chat** only reaches the server when another player is online to receive it. `said` is normal
@@ -230,6 +231,9 @@ when the plugin does not know who it was.
   changes. `holds nothing` is an empty one. The ID stays the same until the server stops. `built by` is the
   character name, or the Steam name when the builder has not been online since the server started.
 - **Tombstone** is logged when a player dies, with everything they carried.
+- **Terrain written** is logged once per world, when the plugin writes the land type of every 32 m square
+  next to `logs.txt`. Rows go north to south; each letter is a biome (`M` Meadows, `B` Black Forest, `S` Swamp,
+  `O` Mountain, `P` Plains, `I` Mistlands, `A` Ashlands, `N` Deep North), `~` is water and `.` is outside the world.
 - **Gear** is logged the first time a player wears or holds an item since the server started.
 
 To build it, install the .NET SDK and BepInExPack_Valheim on the server, run `dotnet build -c Release`

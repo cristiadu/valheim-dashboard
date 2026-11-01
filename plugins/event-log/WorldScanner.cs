@@ -72,6 +72,7 @@ namespace ValheimDashboard.EventLog
             NewObjects.Clear();
             hasSeenWorld = true;
             PlayerTracker.AfterScan();
+            TerrainMap.WriteOnce();
             CombatTracker.ForgetOldMoves();
             WorkTracker.ForgetOldRequests();
             LogNewDay();
