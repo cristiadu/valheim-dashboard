@@ -1,7 +1,8 @@
 import { mkdir, readdir, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 
-import { iconFileName, recipeItems } from '#/lib/recipes';
+import { iconItems } from '#/lib/gear';
+import { iconFileName } from '#/lib/recipes';
 import { readConfig } from '#/lib/server/config';
 import { logger } from '#/lib/server/logger';
 import { ICON_FOLDER_NAME, WIKI_API_URL, WIKI_ICON_FILES, WIKI_TITLES_PER_REQUEST, type WikiImageResponse } from '#/lib/server/models';
@@ -39,11 +40,11 @@ const imageUrls = async (items: string[]): Promise<Map<string, string>> => {
 /** Returns the folder the item icons are kept in, next to the server's log. */
 export const iconFolder = (): string => join(dirname(readConfig(process.env).logFile), ICON_FOLDER_NAME);
 
-/** Downloads from the wiki the icon of every recipe item that [folder] does not have yet. */
+/** Downloads from the wiki the icon of every recipe item and known piece of gear that [folder] does not have yet. */
 export const downloadMissingIcons = async (folder: string): Promise<void> => {
   await mkdir(folder, { recursive: true });
   const present = new Set(await readdir(folder));
-  const missing = recipeItems().filter((item) => !present.has(iconFileName(item)));
+  const missing = iconItems().filter((item) => !present.has(iconFileName(item)));
   for (let start = 0; start < missing.length; start += WIKI_TITLES_PER_REQUEST) {
     const batch = missing.slice(start, start + WIKI_TITLES_PER_REQUEST);
     const urls = await imageUrls(batch);
