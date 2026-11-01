@@ -344,6 +344,30 @@ describe('parseMessage', () => {
     ]);
   });
 
+  it('reads planting, eating, smelting, trees and rocks from the event log plugin', () => {
+    // GIVEN one line of each kind
+    const messages = [
+      'Planted: sapling_carrot by Ragnar',
+      'Ate: Ragnar CookedMeat',
+      'Smelting: CopperOre x3 in smelter by Bjorn',
+      'Tree cut: Beech1 by Ragnar',
+      'Rock mined: rock4_copper by an unknown player',
+    ];
+
+    // WHEN each message is read
+    const events = messages.map((message) => parseMessage(message, '2026-01-01T00:00:00.000Z'));
+
+    // THEN each line gives its event and values
+    const timeUtc = '2026-01-01T00:00:00.000Z';
+    expect(events).toEqual([
+      { type: 'planted', timeUtc, plant: 'sapling_carrot', player: 'Ragnar' },
+      { type: 'ate', timeUtc, character: 'Ragnar', item: 'CookedMeat' },
+      { type: 'smelting', timeUtc, item: 'CopperOre', count: 3, station: 'smelter', player: 'Bjorn' },
+      { type: 'depleted', timeUtc, kind: 'tree', thing: 'Beech1', player: 'Ragnar' },
+      { type: 'depleted', timeUtc, kind: 'rock', thing: 'rock4_copper', player: null },
+    ]);
+  });
+
   it('reads chat as chat even when its text looks like another line', () => {
     // GIVEN chat that holds text other patterns look for
     const messages = ['Chat: Ragnar said: the server is full', 'Chat: Ragnar said: day:3 OnApplicationQuit'];

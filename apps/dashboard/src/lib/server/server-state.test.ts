@@ -88,6 +88,30 @@ describe('server state', () => {
     expect(kinds).toEqual([['Ragnar', 'gathered', { Dandelion: 1 }]]);
   });
 
+  it('keeps planting, eating, smelting, trees and rocks as activities per player', () => {
+    // GIVEN Ragnar plants, eats, fills a smelter, cuts a tree and mines a rock
+    readLines(state, [
+      ...RUN_START,
+      logLine('03:00:00', 'Planted: sapling_carrot by Ragnar'),
+      logLine('03:01:00', 'Ate: Ragnar CookedMeat'),
+      logLine('03:02:00', 'Smelting: CopperOre x3 in smelter by Ragnar'),
+      logLine('03:03:00', 'Tree cut: Beech1 by Ragnar'),
+      logLine('03:04:00', 'Rock mined: rock4_copper by Ragnar'),
+    ]);
+
+    // WHEN the activities are listed
+    const kinds = state.snapshot.activities.map((activity) => [activity.player, activity.kind, activity.things]);
+
+    // THEN each has its own kind
+    expect(kinds).toEqual([
+      ['Ragnar', 'planted', { sapling_carrot: 1 }],
+      ['Ragnar', 'ate', { CookedMeat: 1 }],
+      ['Ragnar', 'smelted', { CopperOre: 3 }],
+      ['Ragnar', 'cut', { Beech1: 1 }],
+      ['Ragnar', 'mined', { rock4_copper: 1 }],
+    ]);
+  });
+
   it('keeps explored squares, last positions, chests and what a player carried at death', () => {
     // GIVEN Ragnar walks three spots, two in one 32 m square, two chests are listed and one goes, then he dies
     readLines(state, [

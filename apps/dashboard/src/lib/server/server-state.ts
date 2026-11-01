@@ -106,6 +106,18 @@ const addActivityOf = (activities: ActivityRecord[], event: LogEvent): void => {
     case 'chestChanged':
       addActivity(activities, timeUtc, event.player, event.isStored ? 'stored' : 'taken', event.item, event.count);
       break;
+    case 'planted':
+      addActivity(activities, timeUtc, event.player, 'planted', event.plant, 1);
+      break;
+    case 'ate':
+      addActivity(activities, timeUtc, event.character, 'ate', event.item, 1);
+      break;
+    case 'smelting':
+      addActivity(activities, timeUtc, event.player, 'smelted', event.item, event.count);
+      break;
+    case 'depleted':
+      addActivity(activities, timeUtc, event.player, event.kind === 'tree' ? 'cut' : 'mined', event.thing, 1);
+      break;
     default:
       break;
   }

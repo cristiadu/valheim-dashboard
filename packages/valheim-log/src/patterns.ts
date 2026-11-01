@@ -128,6 +128,18 @@ export const CHEST_PATTERN =
 /** A player harvested a plant, such as berries or a crop. Written by the event log plugin. */
 export const HARVESTED_PATTERN = /^Harvested: (?<plant>\S+) by (?<player>.+)$/;
 
+/** A player planted a crop or a sapling. Written by the event log plugin. */
+export const PLANTED_PATTERN = /^Planted: (?<plant>\S+) by (?<player>.+)$/;
+
+/** A player ate a food or drank a mead, read from what their character held. Written by the event log plugin. */
+export const ATE_PATTERN = /^Ate: (?<character>.+) (?<item>\S+)$/;
+
+/** A player put items into a smelter, kiln or another station that turns them into something else. */
+export const SMELTING_PATTERN = /^Smelting: (?<item>\S+) x(?<count>\d+) in (?<station>\S+) by (?<player>.+)$/;
+
+/** A player cut down a tree or mined out a rock. Written by the event log plugin. */
+export const DEPLETED_PATTERN = /^(?<kind>Tree cut|Rock mined): (?<thing>\S+) by (?<player>.+)$/;
+
 /** Where a player stands, in whole meters east and north of the world's center. Written by the event log plugin. */
 export const POSITION_PATTERN = /^Position: (?<character>.+) (?<x>-?\d+) (?<z>-?\d+)$/;
 

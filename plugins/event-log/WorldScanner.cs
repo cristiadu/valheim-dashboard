@@ -59,6 +59,7 @@ namespace ValheimDashboard.EventLog
                 CreatureTracker.See(zdo, isNew);
                 PlacedItemTracker.See(zdo, isNew);
                 ItemTracker.See(zdo, isNew);
+                WorkTracker.See(zdo);
                 if (isNew)
                 {
                     NewObjects.Add(zdo);
@@ -72,10 +73,14 @@ namespace ValheimDashboard.EventLog
             hasSeenWorld = true;
             PlayerTracker.AfterScan();
             CombatTracker.ForgetOldMoves();
+            WorkTracker.ForgetOldRequests();
             LogNewDay();
         }
 
-        /// <summary>Logs a built piece or a creature just before the server forgets it.</summary>
+        /// <summary>
+        /// Logs a built piece or a creature just before the server forgets it. A plant is skipped, since it is
+        /// replaced when it grows.
+        /// </summary>
         [HarmonyPrefix]
         [HarmonyPatch(typeof(ZDOMan), "HandleDestroyedZDO")]
         private static void BeforeDestroyed(ZDOMan __instance, ZDOID uid)
@@ -90,14 +95,15 @@ namespace ValheimDashboard.EventLog
             }
             CreatureTracker.Destroyed(zdo);
             ItemTracker.Destroyed(zdo);
-            if (zdo.GetLong(ZDOVars.s_creator, 0L) != 0L)
+            WorkTracker.Destroyed(zdo);
+            if (zdo.GetLong(ZDOVars.s_creator, 0L) != 0L && !Names.Has<Plant>(zdo))
             {
                 GameEventLog.Write($"Piece destroyed: {Names.PrefabName(zdo)} built by {Names.Character(zdo.GetLong(ZDOVars.s_creator, 0L))}");
             }
         }
 
         /// <summary>
-        /// Logs a new object worth a line: a piece with its builder, or a boss with the player who summoned it,
+        /// Logs a new object worth a line: a piece or a plant with its builder, or a boss with the player who summoned it,
         /// whose game made the boss and so owns it.
         /// </summary>
         private static void LogNewObject(ZDO zdo)
@@ -105,7 +111,8 @@ namespace ValheimDashboard.EventLog
             long creator = zdo.GetLong(ZDOVars.s_creator, 0L);
             if (creator != 0L)
             {
-                GameEventLog.Write($"Piece built: {Names.PrefabName(zdo)} by {Names.Character(creator)}");
+                string built = Names.Has<Plant>(zdo) ? "Planted" : "Piece built";
+                GameEventLog.Write($"{built}: {Names.PrefabName(zdo)} by {Names.Character(creator)}");
                 return;
             }
             Character character = Names.Prefab(zdo)?.GetComponent<Character>();

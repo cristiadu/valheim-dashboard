@@ -216,8 +216,8 @@ flowchart LR
 
 | Source | What it finds |
 | --- | --- |
-| World scan | New objects (pieces, summoned bosses), the in-game day, each player's position, area, portal trips, death, PvP, bed and gear, what each chest, cart, ship and new tombstone holds, tames, signs, item stands, chests and harvested plants, and objects destroyed, such as creatures with every player who hit them, items picked up and emptied tombstones |
-| Calls through the server | Chat and map pings, which the server passes from one player to the others, creature attack moves, to say what a player was fighting when they died, and who asked to harvest a plant |
+| World scan | New objects (pieces, plants, summoned bosses), items put into smelters, the in-game day, each player's position, area, portal trips, death, PvP, bed and gear, what each chest, cart, ship and new tombstone holds, tames, signs, item stands, chests and harvested plants, and objects destroyed, such as creatures with every player who hit them, trees cut down, rocks mined out, items picked up and emptied tombstones |
+| Calls through the server | Chat and map pings, which the server passes from one player to the others, creature attack moves, to say what a player was fighting when they died, the eat animation, to read the food in hand, and who asked to harvest a plant, hit a tree or rock, or fill a smelter |
 | Game hooks | Global keys, such as a boss defeat, and the end of a raid |
 
 Each line names a player only when the game data says who did it.
@@ -231,7 +231,7 @@ On the dashboard, plugin lines become:
 
 | Kept as | Lines | Shown as |
 | --- | --- | --- |
-| Activities | Pieces built or destroyed, kills, items gathered, chests | One Saga line per player and kind, until a 10 minute pause, naming every thing |
+| Activities | Pieces built or destroyed, kills, items gathered, chests, planting, eating, smelting, trees and rocks | One Saga line per player and kind, until a 10 minute pause, naming every thing |
 | Story events | Deaths, bosses, raids, portals, tames, signs, item stands, tombstones | One Saga line each |
 | News only | Areas, gear, global keys | A Saga line for a first visit or a dungeon trip, new gear, or a boss defeat |
 | Stats | Areas, kills, the day, boss keys | Where each player is now and their kills, areas and gear on Vikings, the day and bosses on World |

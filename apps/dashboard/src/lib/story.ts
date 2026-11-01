@@ -59,7 +59,7 @@ const activityItem = (activity: ActivityRecord): StoryItem => {
     return { timeUtc, kind: 'wrecked', text: `${whose} ${total === 1 ? 'was' : 'were'} destroyed: ${thingList(activity.things)}` };
   }
   const words = ACTIVITY_WORDS[activity.kind];
-  const kind = activity.kind === 'built' ? 'built' : activity.kind === 'killed' ? 'fight' : 'items';
+  const kind = activity.kind === 'built' || activity.kind === 'planted' ? 'built' : activity.kind === 'killed' ? 'fight' : 'items';
   const text = `${activity.player ?? 'Someone'} ${words.verb} ${count(total, words.one, words.many)}${words.ending}: ${thingList(activity.things)}`;
   return { timeUtc, kind, text };
 };

@@ -311,9 +311,21 @@ export type MapView = {
 
 /**
  * What a stretch of activity is: pieces built, a builder's pieces destroyed, creatures killed, items gathered
- * from the world, or items stored in or taken from chests.
+ * from the world, items stored in or taken from chests, crops planted, food eaten, items put into smelters, trees
+ * cut down or rocks mined out.
  */
-export type ActivityKind = 'built' | 'destroyed' | 'killed' | 'gathered' | 'stored' | 'taken';
+export type ActivityKind =
+  | 'built'
+  | 'destroyed'
+  | 'killed'
+  | 'gathered'
+  | 'stored'
+  | 'taken'
+  | 'planted'
+  | 'ate'
+  | 'smelted'
+  | 'cut'
+  | 'mined';
 
 /** One player's activity of one kind, with pauses under a few minutes, told as one story line. */
 export type ActivityRecord = {
@@ -339,6 +351,11 @@ export const ACTIVITY_WORDS: Record<Exclude<ActivityKind, 'destroyed'>, { verb: 
   gathered: { verb: 'gathered', one: 'item', many: 'items', ending: '' },
   stored: { verb: 'stored', one: 'item', many: 'items', ending: ' in chests' },
   taken: { verb: 'took', one: 'item', many: 'items', ending: ' from chests' },
+  planted: { verb: 'planted', one: 'plant', many: 'plants', ending: '' },
+  ate: { verb: 'ate or drank', one: 'thing', many: 'things', ending: '' },
+  smelted: { verb: 'put', one: 'item', many: 'items', ending: ' into smelters and kilns' },
+  cut: { verb: 'cut down', one: 'tree', many: 'trees', ending: '' },
+  mined: { verb: 'mined out', one: 'rock', many: 'rocks', ending: '' },
 };
 
 /** One chat message or map ping. */

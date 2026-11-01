@@ -190,13 +190,16 @@ namespace ValheimDashboard.EventLog
             }
         }
 
-        /// <summary>Logs each piece of gear [name] wears or holds for the first time since the server started.</summary>
+        /// <summary>
+        /// Logs each piece of gear [name] wears or holds for the first time since the server started. Food shows in
+        /// the hand while eating, so it is not gear.
+        /// </summary>
         private static void LogNewGear(ZDO player, string name)
         {
             foreach ((int itemVar, int qualityVar) in GearSlots)
             {
                 int item = player.GetInt(itemVar);
-                if (item == 0)
+                if (item == 0 || EatTracker.IsConsumable(item))
                 {
                     continue;
                 }
