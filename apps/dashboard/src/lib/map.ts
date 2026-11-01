@@ -23,19 +23,21 @@ const builderOf = (players: Player[], builder: string | null): string | null =>
 /** Returns the `x,z` square number that the spot [x], [z] falls in, as explored squares are keyed. */
 const squareKeyOf = (x: number, z: number): string => `${Math.floor(x / MAP_SQUARE_METERS)},${Math.floor(z / MAP_SQUARE_METERS)}`;
 
+/** Returns true when [chest] is in or next to one of the [explored] squares. */
+const isNearExplored = (chest: ChestRecord, explored: Set<string>): boolean =>
+  [-1, 0, 1].some((east) =>
+    [-1, 0, 1].some((north) =>
+      explored.has(squareKeyOf(chest.x + east * MAP_SQUARE_METERS, chest.z + north * MAP_SQUARE_METERS)),
+    ),
+  );
+
 /**
  * Returns the chests, carts and ships of [snapshot] that players have found, by ID: the ones a player built, and
  * the ones in or next to a square someone walked. Chests the world came with stay hidden until then.
  */
 export const foundChests = (snapshot: Snapshot): [string, ChestRecord][] => {
   const explored = new Set(Object.values(snapshot.explored).flat());
-  const isNearExplored = (chest: ChestRecord): boolean =>
-    [-1, 0, 1].some((east) =>
-      [-1, 0, 1].some((north) =>
-        explored.has(squareKeyOf(chest.x + east * MAP_SQUARE_METERS, chest.z + north * MAP_SQUARE_METERS)),
-      ),
-    );
-  return Object.entries(snapshot.chests).filter(([, chest]) => chest.builder !== null || isNearExplored(chest));
+  return Object.entries(snapshot.chests).filter(([, chest]) => chest.builder !== null || isNearExplored(chest, explored));
 };
 
 /**
