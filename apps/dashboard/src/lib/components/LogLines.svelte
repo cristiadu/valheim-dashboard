@@ -6,8 +6,13 @@
   import { type SourceLines, STORY_STYLES } from '#/lib/models';
   import { viewerTimeZone, whenLabel } from '#/lib/status';
 
-  /** What the lines are about, the lines, and what to show as the button that opens them. */
-  let { title, source, children }: { title: string; source: SourceLines; children: Snippet } = $props();
+  /** What the lines are about, the lines, what to say when there are none, and what to show as the button that opens them. */
+  let {
+    title,
+    source,
+    emptyText = 'No log lines for this yet.',
+    children,
+  }: { title: string; source: SourceLines; emptyText?: string; children: Snippet } = $props();
 
   /** Whether the list of lines is open. */
   let isOpen = $state(false);
@@ -34,7 +39,7 @@
       <form method="dialog"><button type="submit" class="close">Close</button></form>
     </div>
     {#if newestFirst.length === 0}
-      <p class="muted">No log lines for this yet.</p>
+      <p class="muted">{emptyText}</p>
     {:else}
       <p class="muted">
         {source.total === 1 ? 'From this line of the server log:' : `From these ${source.total} lines of the server log, newest first:`}
@@ -77,7 +82,7 @@
     outline-offset: 2px;
   }
 
-  /* List of lines in a panel over the page */
+  /* List of lines in a panel over the page, in body text whatever it was opened from */
   dialog {
     width: min(760px, calc(100vw - 32px));
     max-height: 80vh;
@@ -86,6 +91,11 @@
     border: 1px solid var(--line);
     background: var(--panel);
     color: var(--text);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.45;
+    letter-spacing: normal;
+    text-transform: none;
   }
 
   /* Page dimmed behind the panel */

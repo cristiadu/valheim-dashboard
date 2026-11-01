@@ -1,4 +1,5 @@
 <script lang="ts">
+  import LogLines from '#/lib/components/LogLines';
   import NoData from '#/lib/components/NoData';
   import Pill from '#/lib/components/Pill';
   import StatGrid from '#/lib/components/StatGrid';
@@ -7,6 +8,8 @@
   import { gigabytesLabel, serverWarnings, upStretches } from '#/lib/health';
   import { DAY_MS } from '#/lib/models';
   import { serverPill, steamPill, warningPill } from '#/lib/pills';
+  import { playersOf } from '#/lib/players';
+  import { linesAt, mergedSource, playerSource, serverSource } from '#/lib/sources';
   import { clockTime, durationLabel, isServerOnline, onlinePlayers, viewerTimeZone, whenLabel } from '#/lib/status';
 
   /** Getter for the snapshot the layout shares. */
@@ -31,14 +34,30 @@
   <div class="server">
     <StatGrid
       stats={[
-        { label: 'Status', value: serverPill(isUp) },
-        { label: 'Up for', value: isUp && snapshot.startedUtc ? durationLabel(nowMs - Date.parse(snapshot.startedUtc)) : '–' },
-        { label: 'Players online', value: String(onlinePlayers(snapshot, nowMs).length) },
-        { label: 'Last log line', value: whenLabel(snapshot.lastLineUtc, timeZone, nowMs) },
-        { label: 'Last save', value: lastSave ? `${whenLabel(lastSave.timeUtc, timeZone, nowMs)} · ${lastSave.durationMs} ms` : '–' },
-        { label: 'Disk free', value: snapshot.diskSpace ? gigabytesLabel(snapshot.diskSpace.availableBytes) : '–' },
-        { label: 'Game version', value: snapshot.version ?? '–' },
-        { label: 'Steam', value: steamPill(snapshot.isGameServerConnected) },
+        { label: 'Status', value: serverPill(isUp), source: mergedSource([serverSource(snapshot, 'runs'), serverSource(snapshot, 'latest')]) },
+        {
+          label: 'Up for',
+          value: isUp && snapshot.startedUtc ? durationLabel(nowMs - Date.parse(snapshot.startedUtc)) : '–',
+          source: serverSource(snapshot, 'runs'),
+        },
+        {
+          label: 'Players online',
+          value: String(onlinePlayers(snapshot, nowMs).length),
+          source: mergedSource(
+            playersOf(snapshot, nowMs)
+              .filter((player) => player.isOnline)
+              .map((player) => playerSource(snapshot, player, 'visits')),
+          ),
+        },
+        { label: 'Last log line', value: whenLabel(snapshot.lastLineUtc, timeZone, nowMs), source: serverSource(snapshot, 'latest') },
+        {
+          label: 'Last save',
+          value: lastSave ? `${whenLabel(lastSave.timeUtc, timeZone, nowMs)} · ${lastSave.durationMs} ms` : '–',
+          source: lastSave ? linesAt(serverSource(snapshot, 'saves').lines, lastSave.timeUtc) : undefined,
+        },
+        { label: 'Disk free', value: snapshot.diskSpace ? gigabytesLabel(snapshot.diskSpace.availableBytes) : '–', source: serverSource(snapshot, 'disk') },
+        { label: 'Game version', value: snapshot.version ?? '–', source: serverSource(snapshot, 'version') },
+        { label: 'Steam', value: steamPill(snapshot.isGameServerConnected), source: serverSource(snapshot, 'steam') },
       ]}
     />
 
@@ -59,11 +78,13 @@
     <section class="panel" aria-labelledby="warnings-title">
       <h2 id="warnings-title" class="panel-title">WARNINGS</h2>
       {#each warnings as warning (warning.timeUtc + warning.text)}
-        <div class="line">
-          <span class="mono muted">{whenLabel(warning.timeUtc, timeZone, nowMs)}</span>
-          <span><Pill pill={warningPill(warning.kind)} /></span>
-          <span>{warning.text}</span>
-        </div>
+        <LogLines title={warning.text} source={warning.source}>
+          <span class="line">
+            <span class="mono muted">{whenLabel(warning.timeUtc, timeZone, nowMs)}</span>
+            <span><Pill pill={warningPill(warning.kind)} /></span>
+            <span>{warning.text}</span>
+          </span>
+        </LogLines>
       {:else}
         <p class="muted">No warnings.</p>
       {/each}

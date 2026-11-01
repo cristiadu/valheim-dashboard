@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { areaLabel, daySummary, storyOf } from '#/lib/story';
+import { areaLabel, daySummaryParts, storyOf } from '#/lib/story';
 import { NO_LINES, sessionWith, snapshotWith } from '#/lib/test-common';
 
 describe('storyOf', () => {
@@ -134,7 +134,7 @@ describe('storyOf', () => {
   });
 });
 
-describe('daySummary', () => {
+describe('daySummaryParts', () => {
   it('counts players, deaths and raids in the last 24 hours only', () => {
     // GIVEN one player today, one two days ago, a death today and an old raid
     const snapshot = snapshotWith({
@@ -143,16 +143,23 @@ describe('daySummary', () => {
         sessionWith({ character: 'Astrid', startUtc: '2026-10-27T09:00:00.000Z', endUtc: '2026-10-27T10:00:00.000Z' }),
       ],
       events: [
-        { type: 'playerDied', timeUtc: '2026-10-29T10:10:00.000Z', character: 'Ragnar', line: 'test line' },
-        { type: 'raidStarted', timeUtc: '2026-10-27T09:30:00.000Z', raid: 'army_eikthyr', line: 'test line' },
+        { type: 'playerDied', timeUtc: '2026-10-29T10:10:00.000Z', character: 'Ragnar', line: 'death line' },
+        { type: 'raidStarted', timeUtc: '2026-10-27T09:30:00.000Z', raid: 'army_eikthyr', line: 'raid line' },
       ],
+      sources: {
+        'visits:Ragnar': { total: 1, lines: [{ timeUtc: '2026-10-29T09:43:13.000Z', line: 'join line', kind: 'joined' }] },
+      },
     });
 
     // WHEN the summary is made at noon
-    const summary = daySummary(snapshot, Date.parse('2026-10-29T12:00:00.000Z'));
+    const parts = daySummaryParts(snapshot, Date.parse('2026-10-29T12:00:00.000Z'));
 
-    // THEN only today counts
-    expect(summary).toBe('1 player in the last 24 hours · 1 death · 0 raids');
+    // THEN only today counts, each part with its lines
+    expect(parts.map((part) => [part.text, part.source.lines.map((record) => record.line)])).toEqual([
+      ['1 player in the last 24 hours', ['join line']],
+      ['1 death', ['death line']],
+      ['0 raids', []],
+    ]);
   });
 
   it('adds the pieces built in the last 24 hours when there are any', () => {
@@ -180,16 +187,16 @@ describe('daySummary', () => {
     });
 
     // WHEN the summary is made at noon
-    const summary = daySummary(snapshot, Date.parse('2026-10-29T12:00:00.000Z'));
+    const parts = daySummaryParts(snapshot, Date.parse('2026-10-29T12:00:00.000Z'));
 
     // THEN only built pieces count
-    expect(summary).toBe('1 player in the last 24 hours · 0 deaths · 0 raids · 3 pieces built');
+    expect(parts.map((part) => part.text)).toEqual(['1 player in the last 24 hours', '0 deaths', '0 raids', '3 pieces built']);
   });
 
-  it('says when nobody played', () => {
+  it('has no parts when nobody played', () => {
     // GIVEN no sessions
-    // WHEN / THEN the summary says so
-    expect(daySummary(snapshotWith({}), 0)).toBe('Nobody played in the last 24 hours');
+    // WHEN / THEN there is nothing to count
+    expect(daySummaryParts(snapshotWith({}), 0)).toEqual([]);
   });
 });
 

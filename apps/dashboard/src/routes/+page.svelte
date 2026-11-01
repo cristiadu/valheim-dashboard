@@ -11,7 +11,7 @@
   import { playerSource } from '#/lib/sources';
   import { clockTime, durationLabel, isServerOnline, viewerTimeZone, whenLabel } from '#/lib/status';
   import { gigabytesLabel } from '#/lib/health';
-  import { areaLabel, daySummary, storyOf } from '#/lib/story';
+  import { areaLabel, daySummaryParts, storyOf } from '#/lib/story';
 
   /** Getter for the snapshot the layout shares. */
   const getSnapshot = useSnapshot();
@@ -53,7 +53,14 @@
 {:else if live.nowMs !== null}
   {@const nowMs = live.nowMs}
   <div class="hall">
-    <p class="summary">{daySummary(snapshot, nowMs)}</p>
+    <p class="summary">
+      {#each daySummaryParts(snapshot, nowMs) as part, i (part.text)}
+        {#if i > 0}<span class="muted" aria-hidden="true">&nbsp;·&nbsp;</span>{/if}
+        <span class="part"><LogLines title={part.text} source={part.source}>{part.text}</LogLines></span>
+      {:else}
+        Nobody played in the last 24 hours
+      {/each}
+    </p>
 
     <div class="grid">
       <section class="panel" aria-labelledby="wheel-title">
@@ -128,6 +135,11 @@
     font-family: var(--font-heading);
     font-size: 22px;
     line-height: 1.35;
+  }
+
+  /* Each part of the summary opens its own lines, so it sits inline */
+  .part {
+    display: inline-block;
   }
 
   /* Wheel beside the lists; stacks on narrow screens */

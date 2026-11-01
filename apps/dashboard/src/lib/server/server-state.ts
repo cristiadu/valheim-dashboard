@@ -15,7 +15,7 @@ import {
   STORY_EVENT_TYPES,
   type StoryEvent,
 } from '#/lib/models';
-import { addSourceLine, keepSourceLines } from '#/lib/server/log-sources';
+import { addSourceLine, keepServerLine, keepSourceLines } from '#/lib/server/log-sources';
 import {
   ACTIVITY_GAP_MS,
   MAX_ACTIVITIES,
@@ -27,6 +27,7 @@ import {
   type ServerState,
   type Terrain,
 } from '#/lib/server/models';
+import { sourceKey } from '#/lib/sources';
 
 /** Adds [item] to the end of [list] and drops the oldest items past [max]. */
 const pushCapped = <T>(list: T[], item: T, max: number): void => {
@@ -210,6 +211,10 @@ export const startNewLog = (state: ServerState): void => {
   const run = snapshot.runs.at(-1);
   if (run && run.endReason === null) {
     run.endReason = 'crashed';
+    const latest = snapshot.sources[sourceKey('latest')]?.lines[0];
+    if (latest) {
+      keepServerLine(snapshot, latest.line, latest.timeUtc, 'stopped', 'crashes');
+    }
   }
   if (snapshot.lastLineUtc !== null && onlineSessions(state.sessionState).length > 0) {
     endAllSessions(state.sessionState, snapshot.lastLineUtc, 'serverCrashed');

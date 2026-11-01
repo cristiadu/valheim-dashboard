@@ -249,6 +249,14 @@ export type Snapshot = {
  */
 export type SourceKind = 'visits' | 'deaths' | 'kills' | 'killed' | 'area' | 'gear';
 
+/**
+ * What a group of server log lines counts: `runs` are starts and clean stops, `version` the game version,
+ * `day` new in-game days, `saves` finished saves, `backups` auto backups, `disk` free disk space, `steam` the
+ * Steam connection going up or down, `boss` one boss defeated, `latest` the newest line, and `crashes` the last
+ * line before each crash.
+ */
+export type ServerSourceKind = 'runs' | 'version' | 'day' | 'saves' | 'backups' | 'disk' | 'steam' | 'boss' | 'latest' | 'crashes';
+
 /** One line of `logs.txt`, as written. */
 export type LogLineRecord = {
   /** When it was written, as a UTC ISO string. */
@@ -721,6 +729,8 @@ export type ServerWarning = {
   timeUtc: string;
   /** Plain sentence, for example `Server went down without a clean stop`. */
   text: string;
+  /** Log lines that show it. */
+  source: SourceLines;
 };
 
 /**
