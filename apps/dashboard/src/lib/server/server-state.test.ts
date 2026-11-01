@@ -112,6 +112,23 @@ describe('server state', () => {
     ]);
   });
 
+  it('names builders the plugin gave by Steam name by their character instead', () => {
+    // GIVEN Tony Example plays Ragnar, and the plugin names a chest and pieces by his Steam name
+    readLines(state, [
+      ...RUN_START,
+      logLine('03:00:00', 'Chest: 1:10 piece_chest_wood at 12 18 built by Tony Example holds Wood x20'),
+      logLine('03:01:00', 'Piece built: wood_floor_1x1 by Tony Example'),
+      logLine('03:02:00', 'Piece destroyed: wood_fence built by Tony Example'),
+    ]);
+
+    // WHEN the snapshot is read
+    const { chests, activities } = state.snapshot;
+
+    // THEN the chest and both activities belong to Ragnar
+    expect(chests['1:10']?.builder).toBe('Ragnar');
+    expect(activities.map((activity) => activity.player)).toEqual(['Ragnar', 'Ragnar']);
+  });
+
   it('keeps explored squares, last positions, chests and what a player carried at death', () => {
     // GIVEN Ragnar walks three spots, two in one 32 m square, two chests are listed and one goes, then he dies
     readLines(state, [

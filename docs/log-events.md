@@ -229,7 +229,8 @@ when the plugin does not know who it was.
   meters east and `z` meters north of the world's center.
 - **Chest** is logged for every chest, cart and ship when the server starts, and again each time what it holds
   changes. `holds nothing` is an empty one. The ID stays the same until the server stops. `built by` is the
-  character name, or the Steam name when the builder has not been online since the server started.
+  character name, or the Steam name when the builder has not been online since the server started. The dashboard
+  shows that Steam name as the player's character.
 - **Tombstone** is logged when a player dies, with everything they carried.
 - **Terrain written** is logged once per world, when the plugin writes the land type of every 32 m square
   next to `logs.txt`. Rows go north to south; each letter is a biome (`M` Meadows, `B` Black Forest, `S` Swamp,

@@ -105,17 +105,25 @@ const isStoryNews = (snapshot: Snapshot, event: LogEvent): boolean => {
 };
 
 /**
+ * Returns the character of the player whose Steam name is [name], since the plugin names a builder by Steam name
+ * when they have not been online since the server started. Any other name is returned as it is.
+ */
+const characterOf = (snapshot: Snapshot, name: string | null): string | null =>
+  snapshot.sessions.findLast((session) => session.steamName !== null && session.steamName === name)?.character ?? name;
+
+/**
  * Adds the activity [event] stands for, such as a piece built or a creature killed, to [activities]. An item
  * counts as gathered only the first time anyone picks it up.
  */
-const addActivityOf = (activities: ActivityRecord[], event: LogEvent): void => {
+const addActivityOf = (snapshot: Snapshot, event: LogEvent): void => {
+  const { activities } = snapshot;
   const { timeUtc } = event;
   switch (event.type) {
     case 'pieceBuilt':
-      addActivity(activities, timeUtc, event.builder, 'built', event.piece, 1);
+      addActivity(activities, timeUtc, characterOf(snapshot, event.builder), 'built', event.piece, 1);
       break;
     case 'pieceDestroyed':
-      addActivity(activities, timeUtc, event.builder, 'destroyed', event.piece, 1);
+      addActivity(activities, timeUtc, characterOf(snapshot, event.builder), 'destroyed', event.piece, 1);
       break;
     case 'creatureKilled':
       for (const attacker of event.attackers) {
@@ -247,7 +255,7 @@ export const readLogLine = (state: ServerState, line: string): void => {
   if (isStoryNews(snapshot, event)) {
     pushCapped(snapshot.events, event as StoryEvent, MAX_EVENTS);
   }
-  addActivityOf(snapshot.activities, event);
+  addActivityOf(snapshot, event);
   switch (event.type) {
     case 'worldLoaded':
       snapshot.world = event.world;
@@ -311,7 +319,7 @@ export const readLogLine = (state: ServerState, line: string): void => {
     }
     case 'chestContents': {
       const { id, chest, x, z, builder, items, timeUtc } = event;
-      snapshot.chests[id] = { chest, x, z, builder, items, timeUtc };
+      snapshot.chests[id] = { chest, x, z, builder: characterOf(snapshot, builder), items, timeUtc };
       break;
     }
     case 'chestRemoved':
