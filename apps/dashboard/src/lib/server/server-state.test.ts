@@ -23,9 +23,9 @@ describe('server state', () => {
     ]);
 
     // WHEN the activities are listed
-    const { activities } = state.snapshot;
+    const activities = state.snapshot.activities.map(({ source, ...activity }) => ({ ...activity, lines: source.lines.length }));
 
-    // THEN pieces within 10 minutes share a stretch and the late chest starts a new one
+    // THEN pieces within 10 minutes share a stretch and the late chest starts a new one, each with its log lines
     expect(activities).toEqual([
       {
         player: 'Ragnar',
@@ -33,6 +33,7 @@ describe('server state', () => {
         startUtc: '2026-10-29T10:00:00.000Z',
         endUtc: '2026-10-29T10:05:00.000Z',
         things: { wood_floor_1x1: 2, wood_fence: 1 },
+        lines: 3,
       },
       {
         player: 'Ragnar',
@@ -40,6 +41,7 @@ describe('server state', () => {
         startUtc: '2026-10-29T10:06:00.000Z',
         endUtc: '2026-10-29T10:06:00.000Z',
         things: { wood_fence: 1 },
+        lines: 1,
       },
       {
         player: 'Ragnar',
@@ -47,6 +49,7 @@ describe('server state', () => {
         startUtc: '2026-10-29T10:25:00.000Z',
         endUtc: '2026-10-29T10:25:00.000Z',
         things: { piece_chest_wood: 1 },
+        lines: 1,
       },
     ]);
   });
@@ -201,8 +204,14 @@ describe('server state', () => {
 
     // WHEN / THEN both are in the chat list
     expect(state.snapshot.chat).toEqual([
-      { timeUtc: '2026-10-29T10:00:00.000Z', character: 'Ragnar', kind: 'shouted', text: 'Troll!' },
-      { timeUtc: '2026-10-29T10:00:05.000Z', character: 'Ragnar', kind: 'ping', text: '' },
+      {
+        timeUtc: '2026-10-29T10:00:00.000Z',
+        character: 'Ragnar',
+        kind: 'shouted',
+        text: 'Troll!',
+        line: '10/29/2026 03:00:00: Chat: Ragnar shouted: Troll!',
+      },
+      { timeUtc: '2026-10-29T10:00:05.000Z', character: 'Ragnar', kind: 'ping', text: '', line: '10/29/2026 03:00:05: Ping: Ragnar at 1 2' },
     ]);
   });
 

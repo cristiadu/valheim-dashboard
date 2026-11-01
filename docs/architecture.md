@@ -198,6 +198,11 @@ newest first. Only the latest 50 lines per number are kept, but all of them are 
 | An area | Area entered |
 | A piece of gear | Gear first seen, at each level |
 
+Each Saga and Hall event keeps its lines too: a game event, chat message or ping has its own line, a death
+has the game's line and the plugin's details, a join or leave has its line from the table above, and a
+stretch of building, kills or items keeps its latest 50 lines. Every line in the list shows the rune, color
+and label of its Saga kind.
+
 ## Event log plugin
 
 The game logs joins, deaths and saves, but not building, chat or boss progress. The plugin watches what

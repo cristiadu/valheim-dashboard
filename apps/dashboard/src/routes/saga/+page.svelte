@@ -1,4 +1,5 @@
 <script lang="ts">
+  import LogLines from '#/lib/components/LogLines';
   import NoData from '#/lib/components/NoData';
   import { live, useSnapshot } from '#/lib/live.svelte';
   import { SAGA_FILTERS, STORY_STYLES } from '#/lib/models';
@@ -39,8 +40,12 @@
       {#each shown as item, i (i)}
         <li>
           <span class="rune" aria-hidden="true" style:color={STORY_STYLES[item.kind].color} style:border-color={STORY_STYLES[item.kind].color}>{STORY_STYLES[item.kind].rune}</span>
-          <span class="mono muted">{whenLabel(item.timeUtc, timeZone, nowMs)}</span>
-          <span>{item.text}</span>
+          <LogLines title={item.text} source={item.source}>
+            <span class="row">
+              <span class="mono muted">{whenLabel(item.timeUtc, timeZone, nowMs)}</span>
+              <span>{item.text}</span>
+            </span>
+          </LogLines>
         </li>
       {:else}
         <li class="muted">Nothing of this kind yet.</li>
@@ -91,14 +96,18 @@
     border-left: 1px solid var(--line);
   }
 
-  /* One event: rune on the line, time, sentence */
+  /* One event, with its rune on the line */
   li {
     position: relative;
+    padding: 12px 0 12px 24px;
+  }
+
+  /* Time, then the sentence */
+  .row {
     display: grid;
     grid-template-columns: 110px minmax(0, 1fr);
     gap: 12px;
     align-items: baseline;
-    padding: 12px 0 12px 24px;
   }
 
   /* Rune box sitting on the line */

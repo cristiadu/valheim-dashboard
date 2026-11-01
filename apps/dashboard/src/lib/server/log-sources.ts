@@ -1,13 +1,17 @@
 import type { LogEvent, PlayerSession } from 'valheim-log';
 
-import type { Snapshot, SourceKind, StoryKind } from '#/lib/models';
+import type { Snapshot, SourceKind, SourceLines, StoryKind } from '#/lib/models';
 import { MAX_SOURCE_LINES } from '#/lib/server/models';
 import { sourceKey } from '#/lib/sources';
 
-/**
- * Keeps [line], written at [timeUtc] about [lineKind], behind the number of [kind] for [character], and drops the
- * oldest past the limit.
- */
+/** Adds [line], written at [timeUtc] about [kind], to [source], and drops the oldest lines past the limit. */
+export const addSourceLine = (source: SourceLines, timeUtc: string, line: string, kind: StoryKind): void => {
+  source.total += 1;
+  source.lines.push({ timeUtc, line, kind });
+  source.lines.splice(0, Math.max(0, source.lines.length - MAX_SOURCE_LINES));
+};
+
+/** Keeps [line], written at [timeUtc] about [lineKind], behind the number of [kind] for [character]. */
 const keepLine = (
   snapshot: Snapshot,
   line: string,
@@ -17,11 +21,7 @@ const keepLine = (
   character: string,
   thing?: string,
 ): void => {
-  const key = sourceKey(kind, character, thing);
-  const source = (snapshot.sources[key] ??= { total: 0, lines: [] });
-  source.total += 1;
-  source.lines.push({ timeUtc, line, kind: lineKind });
-  source.lines.splice(0, Math.max(0, source.lines.length - MAX_SOURCE_LINES));
+  addSourceLine((snapshot.sources[sourceKey(kind, character, thing)] ??= { total: 0, lines: [] }), timeUtc, line, lineKind);
 };
 
 /**
