@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 
-import type { PlayerSession } from '#/models';
+import type { LogEvent, PlayerSession } from '#/models';
 import { applyEvent, buildSessions, createSessionState, endAllSessions, onlineSessions } from '#/sessions';
 import { CROSSPLAY_LOG, parseSample, STEAM_ONLY_LOG } from '#test/common';
 
@@ -28,6 +28,49 @@ describe('buildSessions', () => {
         endReason: 'left',
         deaths: 1,
       },
+    ]);
+  });
+
+  it('matches overlapping handshakes to character spawns in log order', () => {
+    // GIVEN two linked crossplay connections that handshake before either character spawns
+    const events: LogEvent[] = [
+      {
+        type: 'knownPlayer',
+        steamName: 'Inge Dragonchow',
+        steamId: 'Steam_76561198007191322',
+        timeUtc: '2026-11-01T18:00:00.000Z',
+      },
+      {
+        type: 'knownPlayer',
+        steamName: 'YanFlandre',
+        steamId: 'Steam_76561198025323876',
+        timeUtc: '2026-11-01T18:00:01.000Z',
+      },
+      {
+        type: 'steamLinked',
+        playFabId: 'INGE',
+        steamId: 'Steam_76561198007191322',
+        timeUtc: '2026-11-01T18:00:02.000Z',
+      },
+      {
+        type: 'steamLinked',
+        playFabId: 'YAN',
+        steamId: 'Steam_76561198025323876',
+        timeUtc: '2026-11-01T18:00:03.000Z',
+      },
+      { type: 'handshake', connectionId: 'INGE', timeUtc: '2026-11-01T18:00:04.000Z' },
+      { type: 'handshake', connectionId: 'YAN', timeUtc: '2026-11-01T18:00:05.000Z' },
+      { type: 'characterSpawned', character: 'Inge Dragonchow', peerId: '1', timeUtc: '2026-11-01T18:00:06.000Z' },
+      { type: 'characterSpawned', character: 'Yan', peerId: '2', timeUtc: '2026-11-01T18:00:07.000Z' },
+    ];
+
+    // WHEN sessions are built
+    const sessions = buildSessions(events);
+
+    // THEN each character keeps the Steam account linked to its handshake
+    expect(sessions.map(({ character, steamName, steamId }) => ({ character, steamName, steamId }))).toEqual([
+      { character: 'Inge Dragonchow', steamName: 'Inge Dragonchow', steamId: 'Steam_76561198007191322' },
+      { character: 'Yan', steamName: 'YanFlandre', steamId: 'Steam_76561198025323876' },
     ]);
   });
 
