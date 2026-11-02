@@ -39,6 +39,26 @@
       (first, second) => Object.keys(second.record.items).length - Object.keys(first.record.items).length,
     ),
   );
+
+  /** Total each item across all known chest, cart and ship snapshots. */
+  const stockRows = $derived.by(() => {
+    const totals = new Map<string, { count: number; containers: number }>();
+    for (const chest of Object.values(snapshot.chests)) {
+      for (const [item, count] of Object.entries(chest.items)) {
+        const total = totals.get(item) ?? { count: 0, containers: 0 };
+        total.count += count;
+        total.containers += 1;
+        totals.set(item, total);
+      }
+    }
+    return [...totals].map(([item, total]) => ({ item, ...total })).sort((first, second) => second.count - first.count);
+  });
+
+  /** Number of item instances in all known storage. */
+  const storedItemCount = $derived(stockRows.reduce((sum, row) => sum + row.count, 0));
+
+  /** Most recent container contents snapshot. */
+  const latestStockUtc = $derived(Object.values(snapshot.chests).map((chest) => chest.timeUtc).toSorted().at(-1) ?? null);
 </script>
 
 {#if map === null}
@@ -112,6 +132,23 @@
         </div>
       {:else}
         <p class="muted">No chest seen since the server started.</p>
+      {/each}
+    </section>
+
+    <section class="panel" aria-labelledby="stock-title">
+      <h2 id="stock-title" class="panel-title">STORED STOCK</h2>
+      <p class="muted">
+        {Object.keys(snapshot.chests).length} containers · {stockRows.length} item types · {storedItemCount.toLocaleString()} items
+        {#if latestStockUtc}· scanned {whenLabel(latestStockUtc, timeZone, nowMs)}{/if}
+      </p>
+      {#each stockRows as row (row.item)}
+        <div class="line stock-line">
+          <strong>{thingName(row.item)}</strong>
+          <span class="mono">{row.count.toLocaleString()}</span>
+          <span class="muted">in {row.containers} {row.containers === 1 ? 'container' : 'containers'}</span>
+        </div>
+      {:else}
+        <p class="muted">No stored items have been seen this run.</p>
       {/each}
     </section>
   </div>
@@ -219,4 +256,21 @@
     padding: 9px 0;
     border-top: 1px solid var(--line-soft);
   }
+
+  /* One item total and the number of containers that currently hold it. */
+  .stock-line {
+    display: grid;
+    grid-template-columns: minmax(140px, 1fr) auto minmax(120px, auto);
+  }
+
+  @media (max-width: 600px) {
+    .stock-line {
+      grid-template-columns: 1fr auto;
+    }
+
+    .stock-line > :last-child {
+      grid-column: 1 / -1;
+    }
+  }
 </style>
+
