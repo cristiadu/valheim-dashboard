@@ -672,6 +672,8 @@ export type StoryItem = {
   kind: StoryKind;
   /** Plain sentence, for example `Ragnar died`. */
   text: string;
+  /** Item counts behind an item activity, so views can show their icons. */
+  things?: Record<string, number>;
   /** Log lines it was told from. */
   source: SourceLines;
 };
@@ -826,3 +828,4 @@ export type LiveConnection = {
   /** Timer that moves the page clock. */
   clock: ReturnType<typeof setInterval>;
 };
+
