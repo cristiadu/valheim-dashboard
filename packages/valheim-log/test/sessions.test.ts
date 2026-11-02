@@ -31,7 +31,6 @@ describe('buildSessions', () => {
     ]);
   });
 
-
   it('matches overlapping handshakes to character spawns in log order', () => {
     // GIVEN two linked crossplay connections that handshake before either character spawns
     const events: LogEvent[] = [
@@ -74,6 +73,7 @@ describe('buildSessions', () => {
       { character: 'Yan', steamName: 'YanFlandre', steamId: 'Steam_76561198025323876' },
     ]);
   });
+
   it('ends a Steam-only session at the socket close after a timeout', () => {
     // THEN the refused attempt opens no session and the timeout is the end reason
     expect(steamOnlySessions).toEqual([
