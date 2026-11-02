@@ -216,7 +216,7 @@ export const startNewLog = (state: ServerState): void => {
       keepServerLine(snapshot, latest.line, latest.timeUtc, 'stopped', 'crashes');
     }
   }
-  if (snapshot.lastLineUtc !== null && onlineSessions(state.sessionState).length > 0) {
+  if (snapshot.lastLineUtc !== null) {
     endAllSessions(state.sessionState, snapshot.lastLineUtc, 'serverCrashed');
   }
   state.reader = createLogReader(snapshot.serverUtcOffsetMinutes);
@@ -352,3 +352,4 @@ export const readLogLine = (state: ServerState, line: string): void => {
       break;
   }
 };
+
