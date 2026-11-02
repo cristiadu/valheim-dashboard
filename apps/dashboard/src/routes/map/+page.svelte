@@ -1,4 +1,6 @@
 <script lang="ts">
+  import ItemIcon from '#/lib/components/ItemIcon';
+  import ItemList from '#/lib/components/ItemList';
   import { SvelteMap } from 'svelte/reactivity';
   import NoData from '#/lib/components/NoData';
   import { live, useSnapshot } from '#/lib/live.svelte';
@@ -6,7 +8,7 @@
   import { MAP_CHEST_METERS, MAP_SQUARE_METERS, MAP_TRAIL_METERS, TERRAIN_STYLES } from '#/lib/models';
   import { playersOf } from '#/lib/players';
   import { viewerTimeZone, whenLabel } from '#/lib/status';
-  import { thingList, thingName } from '#/lib/story';
+  import { thingName } from '#/lib/story';
 
   /** Getter for the snapshot the layout shares. */
   const getSnapshot = useSnapshot();
@@ -16,6 +18,9 @@
 
   /** Viewer's time zone from the browser. */
   const timeZone = viewerTimeZone();
+
+  /** Text used to narrow stored items by name or the container that holds them. */
+  let stockQuery = $state('');
 
   /** Players at the page clock. */
   const players = $derived(live.nowMs === null ? [] : playersOf(snapshot, live.nowMs));
@@ -43,17 +48,27 @@
 
   /** Total each item across all known chest, cart and ship snapshots. */
   const stockRows = $derived.by(() => {
-    const totals = new SvelteMap<string, { count: number; containers: number }>();
-    for (const chest of Object.values(snapshot.chests)) {
+    const totals = new SvelteMap<string, {
+      count: number;
+      containers: { id: string; name: string; builder: string | null; x: number; z: number; count: number }[];
+    }>();
+    for (const [id, chest] of Object.entries(snapshot.chests)) {
       for (const [item, count] of Object.entries(chest.items)) {
-        const total = totals.get(item) ?? { count: 0, containers: 0 };
+        const total = totals.get(item) ?? { count: 0, containers: [] };
         total.count += count;
-        total.containers += 1;
+        total.containers.push({ id, name: chest.chest, builder: chest.builder, x: chest.x, z: chest.z, count });
         totals.set(item, total);
       }
     }
-    return [...totals].map(([item, total]) => ({ item, ...total })).sort((first, second) => second.count - first.count);
+    return [...totals].map(([item, total]) => ({ item, ...total }))
+      .sort((first, second) => second.count - first.count || first.item.localeCompare(second.item));
   });
+
+  /** Stock rows matching the item's name or a container name. */
+  const visibleStockRows = $derived(stockRows.filter((row) =>
+    `${row.item} ${row.containers.map((container) => container.name).join(' ')}`
+      .toLowerCase().includes(stockQuery.trim().toLowerCase()),
+  ));
 
   /** Number of item instances in all known storage. */
   const storedItemCount = $derived(stockRows.reduce((sum, row) => sum + row.count, 0));
@@ -119,7 +134,7 @@
         <div class="picked-chest">
           <strong>{thingName(picked.record.chest)}</strong>
           <span class="muted">built by {picked.record.builder ?? 'someone'} · {whenLabel(picked.record.timeUtc, timeZone, nowMs)}</span>
-          <p>{Object.keys(picked.record.items).length === 0 ? 'Empty' : thingList(picked.record.items)}</p>
+          {#if Object.keys(picked.record.items).length === 0}<p>Empty</p>{:else}<ItemList items={picked.record.items} size={16} />{/if}
         </div>
       {/if}
     </section>
@@ -129,7 +144,7 @@
       {#each chestList as chest (chest.id)}
         <div class="line">
           <span><strong>{thingName(chest.record.chest)}</strong> <span class="muted">by {chest.record.builder ?? 'someone'}</span></span>
-          <span>{Object.keys(chest.record.items).length === 0 ? 'Empty' : thingList(chest.record.items)}</span>
+          {#if Object.keys(chest.record.items).length === 0}<span>Empty</span>{:else}<div class="chest-items"><ItemList items={chest.record.items} size={16} /></div>{/if}
         </div>
       {:else}
         <p class="muted">No chest seen since the server started.</p>
@@ -139,17 +154,32 @@
     <section class="panel" aria-labelledby="stock-title">
       <h2 id="stock-title" class="panel-title">STORED STOCK</h2>
       <p class="muted">
-        {Object.keys(snapshot.chests).length} containers · {stockRows.length} item types · {storedItemCount.toLocaleString()} items
+        Current known contents · {Object.keys(snapshot.chests).length} containers · {stockRows.length} item types · {storedItemCount.toLocaleString()} items
         {#if latestStockUtc}· scanned {whenLabel(latestStockUtc, timeZone, nowMs)}{/if}
       </p>
-      {#each stockRows as row (row.item)}
-        <div class="line stock-line">
-          <strong>{thingName(row.item)}</strong>
-          <span class="mono">{row.count.toLocaleString()}</span>
-          <span class="muted">in {row.containers} {row.containers === 1 ? 'container' : 'containers'}</span>
-        </div>
+      <label class="stock-search">
+        <span class="muted">Find an item or container</span>
+        <input bind:value={stockQuery} type="search" placeholder="Wood, chest, cart…" />
+      </label>
+      {#each visibleStockRows as row (row.item)}
+        <details class="stock-row">
+          <summary>
+            <strong class="stock-item"><ItemIcon item={row.item} size={20} />{thingName(row.item)}</strong>
+            <span class="mono">{row.count.toLocaleString()}</span>
+            <span class="muted">{row.containers.length} {row.containers.length === 1 ? 'container' : 'containers'}</span>
+          </summary>
+          <ul>
+            {#each row.containers.toSorted((first, second) => second.count - first.count) as container (`${container.id}:${container.name}`)}
+              <li>
+                <strong class="mono">{container.count.toLocaleString()}</strong>
+                {thingName(container.name)}
+                <span class="muted">by {container.builder ?? 'unknown'} · {container.x}, {container.z}</span>
+              </li>
+            {/each}
+          </ul>
+        </details>
       {:else}
-        <p class="muted">No stored items have been seen this run.</p>
+        <p class="muted">{stockRows.length === 0 ? 'No stored items have been seen this run.' : 'No items or containers match that search.'}</p>
       {/each}
     </section>
   </div>
@@ -259,17 +289,64 @@
   }
 
   /* One item total and the number of containers that currently hold it. */
-  .stock-line {
+  .stock-row {
+    border-top: 1px solid var(--line-soft);
+    padding: 9px 0;
+  }
+
+  .stock-row summary {
     display: grid;
     grid-template-columns: minmax(140px, 1fr) auto minmax(120px, auto);
+    align-items: baseline;
+    gap: 12px;
+    cursor: pointer;
+  }
+
+  .stock-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .chest-items {
+    max-width: 520px;
+  }
+
+  .stock-row ul {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 10px 0 0 20px;
+  }
+
+  .stock-row li {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 10px;
+  }
+
+  .stock-search {
+    display: grid;
+    gap: 6px;
+    max-width: 420px;
+    margin: 14px 0 4px;
+  }
+
+  .stock-search input {
+    min-height: 38px;
+    padding: 8px 10px;
+    color: inherit;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 4px;
   }
 
   @media (max-width: 600px) {
-    .stock-line {
+    .stock-row summary {
       grid-template-columns: 1fr auto;
     }
 
-    .stock-line > :last-child {
+    .stock-row summary > :last-child {
       grid-column: 1 / -1;
     }
   }
