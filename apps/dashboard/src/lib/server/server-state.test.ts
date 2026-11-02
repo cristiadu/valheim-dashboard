@@ -349,4 +349,41 @@ describe('server state', () => {
     expect(state.snapshot.runs.map((run) => run.endReason)).toEqual(['crashed', null]);
     expect(state.snapshot.events.map((event) => event.type)).toEqual(['worldLoaded']);
   });
+
+  it('drops a handshake without a character spawn when a new log starts', () => {
+    // GIVEN a prior run that ended after a handshake but before its character spawned
+    readLines(state, [
+      logLine('02:42:15', 'Valheim version: 1.0.21 (network version 41)'),
+      logLine('02:42:18', 'ZNet.LoadWorld: Cotil (Cotil), save number 1183'),
+      logLine('02:42:19', 'Player history entry with index 0:  Old Player (Steam_76561198000000001, 3C9D07E1B2A4F856)'),
+      logLine('02:42:45', 'PlayFab listen socket child connected to remote player A1B2C3D4E5F60718'),
+      logLine(
+        '02:42:45',
+        'PlayFab socket with remote ID playfab/A1B2C3D4E5F60718 received local Platform ID Steam_76561198000000001',
+      ),
+      logLine('02:42:45', 'Got handshake from client playfab/A1B2C3D4E5F60718'),
+    ]);
+
+    // WHEN a new run starts and a different player connects and spawns
+    startNewLog(state);
+    readLines(state, [
+      logLine('05:00:00', 'Valheim version: 1.0.21 (network version 41)'),
+      logLine('05:00:01', 'Player history entry with index 0:  New Player (Steam_76561198000000002, 3C9D07E1B2A4F857)'),
+      logLine('05:00:02', 'PlayFab listen socket child connected to remote player B1B2C3D4E5F60718'),
+      logLine(
+        '05:00:03',
+        'PlayFab socket with remote ID playfab/B1B2C3D4E5F60718 received local Platform ID Steam_76561198000000002',
+      ),
+      logLine('05:00:04', 'Got handshake from client playfab/B1B2C3D4E5F60718'),
+      logLine('05:00:10', 'Got character ZDOID from New Player : 123:1'),
+    ]);
+
+    // THEN the new character uses the Steam ID linked in the new run
+    expect(state.snapshot.sessions.at(-1)).toMatchObject({
+      character: 'New Player',
+      steamId: 'Steam_76561198000000002',
+      steamName: 'New Player',
+    });
+  });
 });
+
