@@ -33,12 +33,11 @@ const takeLeaveReason = (state: SessionState): SessionEndReason => {
   return reason;
 };
 
-/**
- * Ends every online session at [timeUtc] for [reason]. The server starts a new `logs.txt` on every run;
- * when a new one starts while sessions are open, call this with the old log's last time and `serverCrashed`.
- */
-export const endAllSessions = (state: SessionState, timeUtc: string, reason: SessionEndReason): void =>
+/** Ends every online session and clears handshakes that cannot spawn into a later log run. */
+export const endAllSessions = (state: SessionState, timeUtc: string, reason: SessionEndReason): void => {
   endSessions(state, () => true, timeUtc, reason);
+  state.pendingHandshakeConnectionIds = [];
+};
 
 /**
  * Updates [state] with one [event], in log order. A session starts at a character's first spawn after a
@@ -109,3 +108,4 @@ export const buildSessions = (events: readonly LogEvent[]): PlayerSession[] => {
   }
   return state.sessions;
 };
+
