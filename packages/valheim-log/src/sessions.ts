@@ -5,7 +5,7 @@ export const createSessionState = (): SessionState => ({
   sessions: [],
   steamNames: new Map(),
   connectionSteamIds: new Map(),
-  lastHandshakeConnectionId: null,
+  pendingHandshakeConnectionIds: [],
   isTimeoutPending: false,
 });
 
@@ -59,13 +59,14 @@ export const applyEvent = (state: SessionState, event: LogEvent): void => {
       state.connectionSteamIds.set(event.playFabId, event.steamId);
       break;
     case 'handshake':
-      state.lastHandshakeConnectionId = event.connectionId;
+      state.pendingHandshakeConnectionIds.push(event.connectionId);
       break;
     case 'characterSpawned': {
       if (onlineSessions(state).some((session) => session.peerId === event.peerId)) {
         break;
       }
-      const steamId = state.connectionSteamIds.get(state.lastHandshakeConnectionId ?? '') ?? null;
+      const connectionId = state.pendingHandshakeConnectionIds.shift() ?? '';
+      const steamId = state.connectionSteamIds.get(connectionId) ?? null;
       state.sessions.push({
         character: event.character,
         peerId: event.peerId,
@@ -76,7 +77,6 @@ export const applyEvent = (state: SessionState, event: LogEvent): void => {
         endReason: null,
         deaths: 0,
       });
-      state.lastHandshakeConnectionId = null;
       break;
     }
     case 'playerDied':

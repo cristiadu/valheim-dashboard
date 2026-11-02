@@ -134,8 +134,8 @@ export type SessionState = {
   steamNames: Map<string, string>;
   /** Steam ID by connection ID. */
   connectionSteamIds: Map<string, string>;
-  /** Connection of the last handshake. The next character spawn belongs to it. */
-  lastHandshakeConnectionId: string | null;
+  /** Handshaken connections awaiting their character spawn, in log order. */
+  pendingHandshakeConnectionIds: string[];
   /** True after a timeout line, until the leave it explains. */
   isTimeoutPending: boolean;
 };
