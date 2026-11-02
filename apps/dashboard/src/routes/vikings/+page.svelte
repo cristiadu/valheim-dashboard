@@ -86,12 +86,11 @@
               <p><span class="muted">Most killed:</span> {thingName(player.topKill)}</p>
             </LogLines>
           {/if}
-          {@const itemMovements = itemMovementsOf(player)}
-          {#if itemMovements.length > 0}
+          {#if itemMovementsOf(player).length > 0}
             <div>
               <p class="muted">Recent item movements</p>
               <ul class="item-movements">
-                {#each itemMovements as activity (`${activity.kind}:${activity.endUtc}`)}
+                {#each itemMovementsOf(player) as activity (`${activity.kind}:${activity.endUtc}`)}
                   <li>
                     <span class="muted">{activity.kind} · {clockTime(activity.endUtc, timeZone)}:</span>
                     {thingList(activity.things)}
