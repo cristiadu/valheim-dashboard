@@ -17,7 +17,7 @@
   {#if fallback}
     {@render fallback()}
   {:else}
-    <span class="fallback" style={`--icon-size: ${size}px`} aria-hidden="true">{item.slice(0, 2).toUpperCase()}</span>
+    <span class="fallback" style:--icon-size="{size}px" aria-hidden="true">{item.slice(0, 2).toUpperCase()}</span>
   {/if}
 {/if}
 
@@ -33,8 +33,8 @@
     display: inline-grid;
     flex: none;
     place-items: center;
-    width: var(--icon-size, {ITEM_ICON_PX}px);
-    height: var(--icon-size, {ITEM_ICON_PX}px);
+    width: var(--icon-size, 28px);
+    height: var(--icon-size, 28px);
     border: 1px solid var(--line);
     border-radius: 3px;
     color: var(--muted);
