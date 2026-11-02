@@ -1,4 +1,5 @@
 <script lang="ts">
+  import ItemList from '#/lib/components/ItemList';
   import GearSheet from '#/lib/components/GearSheet';
   import LogLines from '#/lib/components/LogLines';
   import NoData from '#/lib/components/NoData';
@@ -10,7 +11,7 @@
   import { playersOf } from '#/lib/players';
   import { playerSource } from '#/lib/sources';
   import { clockTime, durationLabel, viewerTimeZone } from '#/lib/status';
-  import { areaLabel, thingList, thingName } from '#/lib/story';
+  import { areaLabel, thingName } from '#/lib/story';
 
   /** Getter for the snapshot the layout shares. */
   const getSnapshot = useSnapshot();
@@ -21,8 +22,22 @@
   /** Viewer's time zone from the browser. */
   const timeZone = viewerTimeZone();
 
+  /** Activity types that move items through a character's observed inventory. */
+  const ITEM_ACTIVITY_KINDS = new Set<string>(['gathered', 'taken', 'stored', 'ate', 'smelted']);
+
   /** Players at the page clock. */
   const players = $derived(live.nowMs === null ? [] : playersOf(snapshot, live.nowMs));
+
+  /** Item movements the plugin attributed to a player's latest character. */
+  const itemMovementsOf = (player: Player) =>
+    snapshot.activities
+      .filter(
+        (activity) =>
+          activity.player === player.character &&
+          ITEM_ACTIVITY_KINDS.has(activity.kind),
+      )
+      .toReversed()
+      .slice(0, 5);
 
   /** Numbers on a player's card, each with the rune of the story kind it counts and the log lines behind it. */
   const statsOf = (player: Player): { label: string; value: string; kind: StoryKind; source: SourceKind }[] => [
@@ -72,6 +87,19 @@
               <p><span class="muted">Most killed:</span> {thingName(player.topKill)}</p>
             </LogLines>
           {/if}
+          {#if itemMovementsOf(player).length > 0}
+            <div>
+              <p class="muted">Item events attributed to this character</p>
+              <ul class="item-movements">
+                {#each itemMovementsOf(player) as activity (`${activity.kind}:${activity.endUtc}`)}
+                  <li>
+                    <span class="muted">{activity.kind} · {clockTime(activity.endUtc, timeZone)}:</span>
+                    <ItemList items={activity.things} size={16} />
+                  </li>
+                {/each}
+              </ul>
+            </div>
+          {/if}
           {#if player.areas.length > 0}
             <div>
               <p class="muted">Been to</p>
@@ -90,8 +118,9 @@
             {@const death = snapshot.deathItems[player.character]!}
             <p>
               <span class="muted">Carried at last death, {clockTime(death.timeUtc, timeZone)}:</span>
-              {Object.keys(death.items).length === 0 ? 'nothing' : thingList(death.items)}
+              {Object.keys(death.items).length === 0 ? 'nothing' : ''}
             </p>
+            {#if Object.keys(death.items).length > 0}<ItemList items={death.items} size={16} />{/if}
           {/if}
         </article>
       {/each}
@@ -219,6 +248,15 @@
     border-color: var(--frost);
   }
 
+  /* Latest item events the plugin attributed to this character. */
+  .item-movements {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 4px;
+    font-size: 13px;
+  }
+
   /* Travel rune before an area name */
   .area-rune {
     margin-right: 5px;
@@ -226,3 +264,4 @@
     color: var(--frost);
   }
 </style>
+

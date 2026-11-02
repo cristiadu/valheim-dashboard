@@ -1,4 +1,5 @@
 <script lang="ts">
+  import ItemList from '#/lib/components/ItemList';
   import LogLines from '#/lib/components/LogLines';
   import NoData from '#/lib/components/NoData';
   import { live, useSnapshot } from '#/lib/live.svelte';
@@ -44,6 +45,7 @@
             <span class="row">
               <span class="mono muted">{whenLabel(item.timeUtc, timeZone, nowMs)}</span>
               <span>{item.text}</span>
+              {#if item.things}<ItemList items={item.things} size={16} />{/if}
             </span>
           </LogLines>
         </li>
@@ -125,3 +127,4 @@
     font-size: 13px;
   }
 </style>
+

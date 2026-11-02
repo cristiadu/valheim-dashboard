@@ -1,4 +1,5 @@
 <script lang="ts">
+  import ItemList from '#/lib/components/ItemList';
   import { resolve } from '$app/paths';
   import DayWheel from '#/lib/components/DayWheel';
   import LogLines from '#/lib/components/LogLines';
@@ -98,6 +99,7 @@
                 <span class="mono muted">{whenLabel(item.timeUtc, timeZone, nowMs)}</span>
                 <span class="rune" aria-hidden="true" style:color={STORY_STYLES[item.kind].color}>{STORY_STYLES[item.kind].rune}</span>
                 <span>{item.text}</span>
+                {#if item.things}<ItemList items={item.things} size={16} />{/if}
               </span>
             </LogLines>
           {:else}
@@ -227,3 +229,4 @@
     color: var(--ember);
   }
 </style>
+

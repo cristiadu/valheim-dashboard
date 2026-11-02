@@ -66,7 +66,7 @@ const activityItem = (activity: ActivityRecord): StoryText => {
   const words = ACTIVITY_WORDS[activity.kind];
   const kind = ACTIVITY_STORY_KINDS[activity.kind];
   const text = `${activity.player ?? 'Someone'} ${words.verb} ${count(total, words.one, words.many)}${words.ending}: ${thingList(activity.things)}`;
-  return { timeUtc, kind, text };
+  return { timeUtc, kind, text, ...(kind === 'items' ? { things: activity.things } : {}) };
 };
 
 /** Story line for one chat message or ping. */
@@ -266,3 +266,4 @@ export const daySummaryParts = (snapshot: Snapshot, nowMs: number): { text: stri
       : []),
   ];
 };
+
