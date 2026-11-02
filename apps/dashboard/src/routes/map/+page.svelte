@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { SvelteMap } from 'svelte/reactivity';
   import NoData from '#/lib/components/NoData';
   import { live, useSnapshot } from '#/lib/live.svelte';
   import { mapOf } from '#/lib/map';
@@ -42,7 +43,7 @@
 
   /** Total each item across all known chest, cart and ship snapshots. */
   const stockRows = $derived.by(() => {
-    const totals = new Map<string, { count: number; containers: number }>();
+    const totals = new SvelteMap<string, { count: number; containers: number }>();
     for (const chest of Object.values(snapshot.chests)) {
       for (const [item, count] of Object.entries(chest.items)) {
         const total = totals.get(item) ?? { count: 0, containers: 0 };
