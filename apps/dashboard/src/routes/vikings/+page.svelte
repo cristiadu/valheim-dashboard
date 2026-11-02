@@ -21,8 +21,22 @@
   /** Viewer's time zone from the browser. */
   const timeZone = viewerTimeZone();
 
+  /** Activity types that move items through a character's observed inventory. */
+  const ITEM_ACTIVITY_KINDS = new Set<string>(['gathered', 'taken', 'stored', 'ate', 'smelted']);
+
   /** Players at the page clock. */
   const players = $derived(live.nowMs === null ? [] : playersOf(snapshot, live.nowMs));
+
+  /** Item movements the plugin attributed to a player's latest character. */
+  const itemMovementsOf = (player: Player) =>
+    snapshot.activities
+      .filter(
+        (activity) =>
+          activity.player === player.character &&
+          ITEM_ACTIVITY_KINDS.has(activity.kind),
+      )
+      .toReversed()
+      .slice(0, 5);
 
   /** Numbers on a player's card, each with the rune of the story kind it counts and the log lines behind it. */
   const statsOf = (player: Player): { label: string; value: string; kind: StoryKind; source: SourceKind }[] => [
@@ -71,6 +85,20 @@
             <LogLines title="{player.character} killed {thingName(player.topKill)}" source={playerSource(snapshot, player, 'killed', player.topKill)}>
               <p><span class="muted">Most killed:</span> {thingName(player.topKill)}</p>
             </LogLines>
+          {/if}
+          {@const itemMovements = itemMovementsOf(player)}
+          {#if itemMovements.length > 0}
+            <div>
+              <p class="muted">Recent item movements</p>
+              <ul class="item-movements">
+                {#each itemMovements as activity (`${activity.kind}:${activity.endUtc}`)}
+                  <li>
+                    <span class="muted">{activity.kind} · {clockTime(activity.endUtc, timeZone)}:</span>
+                    {thingList(activity.things)}
+                  </li>
+                {/each}
+              </ul>
+            </div>
           {/if}
           {#if player.areas.length > 0}
             <div>
@@ -219,6 +247,15 @@
     border-color: var(--frost);
   }
 
+  /* Latest item events the plugin attributed to this character. */
+  .item-movements {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 4px;
+    font-size: 13px;
+  }
+
   /* Travel rune before an area name */
   .area-rune {
     margin-right: 5px;
@@ -226,3 +263,4 @@
     color: var(--frost);
   }
 </style>
+
