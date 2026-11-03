@@ -59,6 +59,8 @@
 
     <div class="cards">
       {#each players as player (player.key)}
+        {@const itemMovements = itemMovementsOf(player)}
+        {@const death = snapshot.deathItems[player.character]}
         <article class="panel card">
           <div class="name">
             <h3><span class="diamond" aria-hidden="true" style:background={player.color}></span>{player.character}</h3>
@@ -87,18 +89,33 @@
               <p><span class="muted">Most killed:</span> {thingName(player.topKill)}</p>
             </LogLines>
           {/if}
-          {#if itemMovementsOf(player).length > 0}
-            <div>
-              <p class="muted">Item events attributed to this character</p>
-              <ul class="item-movements">
-                {#each itemMovementsOf(player) as activity (`${activity.kind}:${activity.endUtc}`)}
-                  <li>
-                    <span class="muted">{activity.kind} · {clockTime(activity.endUtc, timeZone)}:</span>
-                    <ItemList items={activity.things} size={16} />
-                  </li>
-                {/each}
-              </ul>
-            </div>
+          {#if itemMovements.length > 0 || death}
+            <details class="item-inventory">
+              <summary>
+                <strong>Item history</strong>
+                <span class="muted">{itemMovements.length} recent events{death ? ' · inventory at last death' : ''}</span>
+              </summary>
+              {#if death}
+                <div class="inventory-group">
+                  <p class="muted">Carried at last death · {clockTime(death.timeUtc, timeZone)}</p>
+                  {#if Object.keys(death.items).length === 0}<p>Nothing carried</p>{:else}<ItemList items={death.items} size={16} />{/if}
+                </div>
+              {/if}
+              {#if itemMovements.length > 0}
+                <div class="inventory-group">
+                  <p class="muted">Latest item events attributed to this character</p>
+                  <ul class="item-movements">
+                    {#each itemMovements as activity (`${activity.kind}:${activity.endUtc}`)}
+                      <li>
+                        <span class="activity-time">{clockTime(activity.endUtc, timeZone)}</span>
+                        <span class="activity-kind">{activity.kind}</span>
+                        <ItemList items={activity.things} size={16} />
+                      </li>
+                    {/each}
+                  </ul>
+                </div>
+              {/if}
+            </details>
           {/if}
           {#if player.areas.length > 0}
             <div>
@@ -113,14 +130,6 @@
                 {/each}
               </ul>
             </div>
-          {/if}
-          {#if snapshot.deathItems[player.character]}
-            {@const death = snapshot.deathItems[player.character]!}
-            <p>
-              <span class="muted">Carried at last death, {clockTime(death.timeUtc, timeZone)}:</span>
-              {Object.keys(death.items).length === 0 ? 'nothing' : ''}
-            </p>
-            {#if Object.keys(death.items).length > 0}<ItemList items={death.items} size={16} />{/if}
           {/if}
         </article>
       {/each}
@@ -248,13 +257,53 @@
     border-color: var(--frost);
   }
 
-  /* Latest item events the plugin attributed to this character. */
+  /* Item history stays collapsed until a player profile is opened. */
+  .item-inventory {
+    border-top: 1px solid var(--line-soft);
+    padding-top: 8px;
+  }
+
+  .item-inventory summary {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 4px 10px;
+    cursor: pointer;
+  }
+
+  .inventory-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 12px;
+  }
+
+  .inventory-group > p {
+    margin: 0;
+  }
+
   .item-movements {
     display: flex;
     flex-direction: column;
-    gap: 4px;
-    margin-top: 4px;
+    gap: 8px;
+    margin: 0;
     font-size: 13px;
+  }
+
+  .item-movements li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 2px 8px;
+    align-items: center;
+  }
+
+  .activity-time,
+  .activity-kind {
+    color: var(--muted);
+  }
+
+  .item-movements li :global(.items) {
+    grid-column: 1 / -1;
   }
 
   /* Travel rune before an area name */

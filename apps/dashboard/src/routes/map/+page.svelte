@@ -22,6 +22,9 @@
   /** Text used to narrow stored items by name or the container that holds them. */
   let stockQuery = $state('');
 
+  /** Whether to browse observed storage by container or by item. */
+  let inventoryView = $state<'container' | 'item'>('container');
+
   /** Players at the page clock. */
   const players = $derived(live.nowMs === null ? [] : playersOf(snapshot, live.nowMs));
 
@@ -139,48 +142,60 @@
       {/if}
     </section>
 
-    <section class="panel" aria-labelledby="chests-title">
-      <h2 id="chests-title" class="panel-title">CHESTS</h2>
-      {#each chestList as chest (chest.id)}
-        <div class="line">
-          <span><strong>{thingName(chest.record.chest)}</strong> <span class="muted">by {chest.record.builder ?? 'someone'}</span></span>
-          {#if Object.keys(chest.record.items).length === 0}<span>Empty</span>{:else}<div class="chest-items"><ItemList items={chest.record.items} size={16} /></div>{/if}
+    <section class="panel" aria-labelledby="inventory-title">
+      <div class="inventory-heading">
+        <div>
+      <h2 id="inventory-title" class="panel-title">STORAGE INVENTORY</h2>
+          <p class="muted">
+            {Object.keys(snapshot.chests).length} observed containers · {stockRows.length} item types · {storedItemCount.toLocaleString()} items
+            {#if latestStockUtc}· scanned {whenLabel(latestStockUtc, timeZone, nowMs)}{/if}
+          </p>
+        </div>
+        <div class="view-switch" role="group" aria-label="Inventory view">
+          <button type="button" aria-pressed={inventoryView === 'container'} onclick={() => (inventoryView = 'container')}>By container</button>
+          <button type="button" aria-pressed={inventoryView === 'item'} onclick={() => (inventoryView = 'item')}>By item</button>
+        </div>
+      </div>
+
+      {#if inventoryView === 'container'}
+        <div class="container-list">
+          {#each chestList as chest (chest.id)}
+            <div class="line">
+              <span><strong>{thingName(chest.record.chest)}</strong> <span class="muted">by {chest.record.builder ?? 'someone'}</span></span>
+              {#if Object.keys(chest.record.items).length === 0}<span>Empty</span>{:else}<div class="chest-items"><ItemList items={chest.record.items} size={16} /></div>{/if}
+            </div>
+          {:else}
+            <p class="muted">No container seen since the server started.</p>
+          {/each}
         </div>
       {:else}
-        <p class="muted">No chest seen since the server started.</p>
-      {/each}
-    </section>
-
-    <section class="panel" aria-labelledby="stock-title">
-      <h2 id="stock-title" class="panel-title">STORED STOCK</h2>
-      <p class="muted">
-        Current known contents · {Object.keys(snapshot.chests).length} containers · {stockRows.length} item types · {storedItemCount.toLocaleString()} items
-        {#if latestStockUtc}· scanned {whenLabel(latestStockUtc, timeZone, nowMs)}{/if}
-      </p>
-      <label class="stock-search">
-        <span class="muted">Find an item or container</span>
-        <input bind:value={stockQuery} type="search" placeholder="Wood, chest, cart…" />
-      </label>
-      {#each visibleStockRows as row (row.item)}
-        <details class="stock-row">
-          <summary>
-            <strong class="stock-item"><ItemIcon item={row.item} size={20} />{thingName(row.item)}</strong>
-            <span class="mono">{row.count.toLocaleString()}</span>
-            <span class="muted">{row.containers.length} {row.containers.length === 1 ? 'container' : 'containers'}</span>
-          </summary>
-          <ul>
-            {#each row.containers.toSorted((first, second) => second.count - first.count) as container (`${container.id}:${container.name}`)}
-              <li>
-                <strong class="mono">{container.count.toLocaleString()}</strong>
-                {thingName(container.name)}
-                <span class="muted">by {container.builder ?? 'unknown'} · {container.x}, {container.z}</span>
-              </li>
-            {/each}
-          </ul>
-        </details>
-      {:else}
-        <p class="muted">{stockRows.length === 0 ? 'No stored items have been seen this run.' : 'No items or containers match that search.'}</p>
-      {/each}
+        <label class="stock-search">
+          <span class="visually-hidden">Find an item or container</span>
+          <input bind:value={stockQuery} type="search" placeholder="Find an item…" />
+        </label>
+        <div class="stock-list">
+          {#each visibleStockRows as row (row.item)}
+            <details class="stock-row">
+              <summary>
+                <strong class="stock-item"><ItemIcon item={row.item} size={20} />{thingName(row.item)}</strong>
+                <span class="mono">{row.count.toLocaleString()}</span>
+                <span class="muted">{row.containers.length} {row.containers.length === 1 ? 'container' : 'containers'}</span>
+              </summary>
+              <ul>
+                {#each row.containers.toSorted((first, second) => second.count - first.count) as container (`${container.id}:${container.name}`)}
+                  <li>
+                    <strong class="mono">{container.count.toLocaleString()}</strong>
+                    {thingName(container.name)}
+                    <span class="muted">by {container.builder ?? 'unknown'} · {container.x}, {container.z}</span>
+                  </li>
+                {/each}
+              </ul>
+            </details>
+          {:else}
+            <p class="muted">{stockRows.length === 0 ? 'No stored items have been seen this run.' : 'No items match that search.'}</p>
+          {/each}
+        </div>
+      {/if}
     </section>
   </div>
 {/if}
@@ -288,7 +303,55 @@
     border-top: 1px solid var(--line-soft);
   }
 
+  .inventory-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 20px;
+    margin-bottom: 12px;
+  }
+
+  .inventory-heading .panel-title,
+  .inventory-heading p {
+    margin: 0;
+  }
+
+  .view-switch {
+    display: inline-flex;
+    padding: 3px;
+    border: 1px solid var(--line);
+    gap: 2px;
+  }
+
+  .view-switch button {
+    min-height: 34px;
+    padding: 0 12px;
+    border: 0;
+    background: transparent;
+    color: var(--muted);
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .view-switch button[aria-pressed='true'] {
+    background: var(--selected);
+    color: var(--text);
+  }
+
   /* One item total and the number of containers that currently hold it. */
+  .stock-list {
+    max-height: 540px;
+    overflow: auto;
+    padding-right: 6px;
+  }
+
+  .container-list {
+    max-height: 540px;
+    overflow: auto;
+    padding-right: 6px;
+  }
+
   .stock-row {
     border-top: 1px solid var(--line-soft);
     padding: 9px 0;
@@ -326,10 +389,9 @@
   }
 
   .stock-search {
-    display: grid;
-    gap: 6px;
-    max-width: 420px;
-    margin: 14px 0 4px;
+    display: block;
+    max-width: 360px;
+    margin: 0 0 10px;
   }
 
   .stock-search input {
@@ -339,6 +401,15 @@
     background: var(--panel);
     border: 1px solid var(--line);
     border-radius: 4px;
+  }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
   }
 
   @media (max-width: 600px) {
