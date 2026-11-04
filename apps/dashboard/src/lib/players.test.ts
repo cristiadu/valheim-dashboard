@@ -32,7 +32,7 @@ describe('playersOf', () => {
   });
 
   it('adds what the plugin knows of all the player\'s characters', () => {
-    // GIVEN one Steam account with two characters, their kills, areas and gear
+    // GIVEN one Steam account with two characters, their kills, areas, gear, activities and explored squares
     const snapshot = snapshotWith({
       lastLineUtc: '2026-10-29T11:59:00.000Z',
       sessions: [
@@ -43,18 +43,22 @@ describe('playersOf', () => {
       visitedAreas: { Tony: ['Meadows'], wynnyarD: ['Meadows', 'Swamp'] },
       currentAreas: { Tony: 'Meadows', wynnyarD: 'Swamp' },
       gear: { Tony: ['Club'], wynnyarD: ['AxeBronze', 'SwordIron quality 2'] },
+      activityTotals: { Tony: { built: 5 }, wynnyarD: { built: 2, mined: 3 } },
+      explored: { Tony: ['0,0', '0,1'], wynnyarD: ['0,1', '1,1'] },
     });
 
     // WHEN players are made at noon
     const [player] = playersOf(snapshot, TEST_NOON_MS);
 
-    // THEN kills and areas cover both characters, and area and gear are the latest character's
+    // THEN kills, areas, activities and squares cover both characters, and area and gear are the latest character's
     expect(player).toMatchObject({
       area: 'Swamp',
       kills: 6,
       topKill: 'Greydwarf',
       areas: ['Meadows', 'Swamp'],
       gear: ['SwordIron quality 2', 'AxeBronze'],
+      activityTotals: { built: 7, mined: 3 },
+      exploredSquares: 3,
     });
   });
 

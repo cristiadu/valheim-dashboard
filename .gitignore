@@ -23,3 +23,7 @@ build/
 .vscode/
 .DS_Store
 Thumbs.db
+
+# Screenshots belong in PR descriptions, not the repo. Only the README one is kept.
+/docs/screenshots/*
+!/docs/screenshots/hall.png

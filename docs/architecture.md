@@ -167,7 +167,7 @@ the page gives nothing away.
 | Tab | Shows | Data from |
 | --- | --- | --- |
 | Hall | Who is online and where, the last 24 hours on a day wheel, the latest events | Snapshot |
-| Vikings | Each player, when they were online, kills, areas visited, and gear laid out like a character sheet | Snapshot |
+| Vikings | Each player now: when they were online, their numbers, areas visited, gear laid out like a character sheet, and what is probably in their bag | Snapshot |
 | Saga | Every game event and chat, with filters | Snapshot |
 | World | The in-game day, bosses defeated, saves, backups, disk space | Snapshot |
 | Map | Land each player walked, chests with what they hold, who is where, last deaths | Snapshot |
@@ -176,7 +176,7 @@ the page gives nothing away.
 
 Recipe plans are saved in each viewer's browser (`localStorage`). The server stores nothing for them. Chest items are matched to recipe items through `itemName`, so `RoundLog` counts as `Core wood`. Only chests someone has found count.
 
-Recipes can also count one character's bag. The server never gets a player's inventory, so the bag is a guess
+Recipes can also count one character's bag, and Vikings shows it. The server never gets a player's inventory, so the bag is a guess
 kept in the snapshot:
 
 ```mermaid
@@ -221,6 +221,7 @@ newest first. Only the latest 50 lines per number are kept, but all of them are 
 | Kills, most killed | Creature killed |
 | An area | Area entered |
 | A piece of gear | Gear first seen, at each level |
+| Pieces built, items gathered and the other activity numbers | Each plugin line of that activity |
 
 Each Saga and Hall event keeps its lines too: a game event, chat message or ping has its own line, a death
 has the game's line and the plugin's details, a join or leave has its line from the table above, and a
@@ -276,12 +277,12 @@ On the dashboard, plugin lines become:
 
 | Kept as | Lines | Shown as |
 | --- | --- | --- |
-| Activities | Pieces built or destroyed, kills, items gathered, chests, planting, eating, smelting, cooking, brewing, steering ships, trees and rocks | One Saga line per player and kind, until a 10 minute pause, naming every thing |
+| Activities | Pieces built or destroyed, kills, items gathered, chests, planting, eating, smelting, cooking, brewing, steering ships, trees and rocks | One Saga line per player and kind, until a 10 minute pause, naming every thing, and a running total per player and kind for the Vikings numbers |
 | Story events | Deaths, bosses, raids, portals, tames, signs, item stands, tombstones | One Saga line each |
 | News only | Areas, gear, global keys | A Saga line for a first visit or a dungeon trip, new gear, or a boss defeat |
 | Stats | Areas, kills, the day, boss keys | Where each player is now and their kills, areas and gear on Vikings, the day and bosses on World |
 | Chat | Chat and pings | The Saga's "Chat and signs" filter, kept apart so it never pushes out events |
-| Map | Positions, chests, tombstones | Explored squares, chests and last deaths on Map, and what each player carried at their last death on Vikings |
+| Map | Positions, chests, tombstones | Explored squares, chests and last deaths on Map, and the land each player explored on Vikings |
 
 ### Gathering
 
@@ -309,8 +310,9 @@ flowchart LR
 A position marks its whole 32 m square as explored. Chest IDs last until the server stops, and every run lists
 all chests again, so a new run starts the chest list over. The plugin writes the terrain file once per world
 from the game's own world generator, and the map colors only squares someone walked.
-Nothing nobody has seen shows: a chest the world came with appears once someone walks next to it.
-Every chest has its own mark. Chests that would cover each other sit side by side. Tapping one opens it as the
+Nothing nobody has seen shows: a chest appears only on a square someone walked.
+Every chest has its own mark, and marks keep their size on screen when the map zooms in. Chests that would
+cover each other sit side by side. Tapping one opens it as the
 game's slot grid, and pointing at a slot shows the item's name and count. Item names and icons come from the item's prefab, through
 `GEAR_NAMES` and `ITEM_NAMES`, and every name listed there gets its icon downloaded. An item the wiki has no icon
 for shows a plain sack.

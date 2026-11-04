@@ -227,6 +227,8 @@ export type Snapshot = {
   currentAreas: Record<string, string>;
   /** Creatures each character helped kill, by character name, then how many of each creature. */
   kills: Record<string, Record<string, number>>;
+  /** How much each character did of each activity kind since the dashboard started, by character name, for example `{ built: 120 }`. */
+  activityTotals: Record<string, Partial<Record<ActivityKind, number>>>;
   /** In-game day, as the game shows it, when the plugin has logged one. */
   day: number | null;
   /** Bosses defeated, by the name the game shows, in the order of their first defeat. */
@@ -254,10 +256,10 @@ export type Snapshot = {
 
 /**
  * What a group of log lines counts, for a character: `visits` are joins and leaves, `deaths` are deaths,
- * `kills` are all kills, `killed` are kills of one creature, `area` is going into one area, and `gear` is one
- * piece of gear first seen, at each level.
+ * `kills` are all kills, `killed` are kills of one creature, `area` is going into one area, `gear` is one
+ * piece of gear first seen, at each level, and `activity` is one activity kind, such as `built`.
  */
-export type SourceKind = 'visits' | 'deaths' | 'kills' | 'killed' | 'area' | 'gear';
+export type SourceKind = 'visits' | 'deaths' | 'kills' | 'killed' | 'area' | 'gear' | 'activity';
 
 /**
  * What a group of server log lines counts: `runs` are starts and clean stops, `version` the game version,
@@ -345,6 +347,21 @@ export const MAP_CHESTS_ACROSS = 40;
 /** Distance between chests placed side by side on the map, in chest marks, so a mark grown on hover still shows its neighbors. */
 export const MAP_CHEST_STEP = 1.15;
 
+/** How far the map can zoom in, as times the whole map. */
+export const MAP_MAX_ZOOM = 16;
+
+/** How much one zoom step or wheel notch zooms the map in or out. */
+export const MAP_ZOOM_STEP = 1.5;
+
+/** How far a pointer must move before a press on the map counts as a drag and not a tap, in pixels. */
+export const MAP_DRAG_PX = 4;
+
+/** Size of a player mark on the map at the whole-map zoom, in meters. */
+export const MAP_PLAYER_METERS = 16;
+
+/** Size of a death mark on the map at the whole-map zoom, in meters. */
+export const MAP_DEATH_METERS = 24;
+
 /**
  * Names the game shows for chests, carts and ships, by the prefab the plugin logs. Chests the world came with,
  * such as `TreasureChest_meadows`, start with [TREASURE_CHEST_PREFIX].
@@ -374,6 +391,7 @@ export const CONTAINER_SIZES: Record<string, ContainerSize> = {
   Cart: { columns: 6, rows: 3 },
   Karve: { columns: 2, rows: 2 },
   VikingShip: { columns: 6, rows: 3 },
+  Player: { columns: 8, rows: 4 },
 };
 
 /** Slot grid of a container missing above. Rows are added whenever the items need more slots. */
@@ -387,8 +405,8 @@ export const CHEST_SLOT_ICON_PX = 44;
 
 /** What the map draws, in map units: meters east as `x` and meters south as `y`, so north is up. */
 export type MapView = {
-  /** SVG view box that fits everything, with a margin. */
-  viewBox: string;
+  /** Part of the map that fits everything, with a margin. */
+  box: MapBox;
   /** Size of a chest mark, in meters. */
   chestMeters: number;
   /** Explored squares, once each, in their terrain color, or the line color before the terrain is known. */
@@ -397,14 +415,15 @@ export type MapView = {
   trails: { key: string; x: number; y: number; color: string }[];
   /** Chests, carts and ships, by their ID. */
   chests: { id: string; x: number; y: number; record: ChestRecord }[];
-  /** Where each chest's mark sits, moved apart from chests it would cover. */
-  chestSpots: MapChestSpot[];
   /** Where each online player stands and where each character last died. */
   marks: { key: string; kind: 'player' | 'death'; label: string; x: number; y: number; color: string }[];
 };
 
 /** A chest, cart or ship on the map, by its ID, with `y` meters south so north is up. */
 export type MapChest = MapView['chests'][number];
+
+/** A part of the map, in map units: its top left corner, width and height. */
+export type MapBox = { x: number; y: number; width: number; height: number };
 
 /** Where one chest's mark sits on the map, by the chest's ID. */
 export type MapChestSpot = { id: string; x: number; y: number };
@@ -495,6 +514,26 @@ export const ACTIVITY_WORDS: Record<Exclude<ActivityKind, 'destroyed'>, { verb: 
   cut: { verb: 'cut down', one: 'tree', many: 'trees', ending: '' },
   mined: { verb: 'mined out', one: 'rock', many: 'rocks', ending: '' },
 };
+
+/** Activity totals on a player's card, in this order, with the label under each number. Kills have their own number. */
+export const PLAYER_ACTIVITY_STATS: { kind: ActivityKind; label: string }[] = [
+  { kind: 'built', label: 'Pieces built' },
+  { kind: 'gathered', label: 'Items gathered' },
+  { kind: 'cut', label: 'Trees cut' },
+  { kind: 'mined', label: 'Rocks mined' },
+  { kind: 'planted', label: 'Crops planted' },
+  { kind: 'ate', label: 'Meals eaten' },
+  { kind: 'smelted', label: 'Ores smelted' },
+  { kind: 'cooked', label: 'Food cooked' },
+  { kind: 'brewed', label: 'Meads brewed' },
+  { kind: 'sailed', label: 'Times at the helm' },
+];
+
+/** Prefab of the player, whose bag grid is in [CONTAINER_SIZES]. */
+export const PLAYER_PREFAB = 'Player';
+
+/** Square meters in one square kilometer, for the land a player explored. */
+export const SQUARE_METERS_PER_KM2 = 1_000_000;
 
 /** One chat message or map ping. */
 export type ChatRecord = {
@@ -806,6 +845,10 @@ export type Player = {
   areas: string[];
   /** Gear the latest character was seen with, newest first. */
   gear: string[];
+  /** How much all of the player's characters did of each activity kind, for example `{ built: 120 }`. */
+  activityTotals: Partial<Record<ActivityKind, number>>;
+  /** Map squares any of the player's characters walked through. */
+  exploredSquares: number;
 };
 
 /** What kind of thing happened, which picks its rune and color. */

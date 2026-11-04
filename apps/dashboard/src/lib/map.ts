@@ -28,28 +28,20 @@ const builderOf = (players: Player[], builder: string | null): string | null =>
 /** Returns the `x,z` square number that the spot [x], [z] falls in, as explored squares are keyed. */
 const squareKeyOf = (x: number, z: number): string => `${Math.floor(x / MAP_SQUARE_METERS)},${Math.floor(z / MAP_SQUARE_METERS)}`;
 
-/** Returns true when [chest] is in or next to one of the [explored] squares. */
-const isNearExplored = (chest: ChestRecord, explored: Set<string>): boolean =>
-  [-1, 0, 1].some((east) =>
-    [-1, 0, 1].some((north) =>
-      explored.has(squareKeyOf(chest.x + east * MAP_SQUARE_METERS, chest.z + north * MAP_SQUARE_METERS)),
-    ),
-  );
-
 /**
- * Returns the chests, carts and ships of [snapshot] that players have found, by ID: the ones a player built, and
- * the ones in or next to a square someone walked. Chests the world came with stay hidden until then.
+ * Returns the chests, carts and ships of [snapshot] that sit on a square someone walked, by ID. Chests anywhere
+ * else stay hidden, even ones a player built, so the map only shows land players have been through.
  */
 export const foundChests = (snapshot: Snapshot): [string, ChestRecord][] => {
   const explored = new Set(Object.values(snapshot.explored).flat());
-  return Object.entries(snapshot.chests).filter(([, chest]) => chest.builder !== null || isNearExplored(chest, explored));
+  return Object.entries(snapshot.chests).filter(([, chest]) => explored.has(squareKeyOf(chest.x, chest.z)));
 };
 
 /**
  * Places each of [chests] on the map. Chests that share a square [chestMeters] wide would cover each other, so they
  * sit side by side in a small grid around their middle, and each one can still be pointed at and tapped on its own.
  */
-const chestSpotsOf = (chests: MapChest[], chestMeters: number): MapChestSpot[] => {
+export const chestSpotsOf = (chests: MapChest[], chestMeters: number): MapChestSpot[] => {
   const cells = new Map<string, MapChest[]>();
   for (const chest of chests) {
     const key = `${Math.floor(chest.x / chestMeters)},${Math.floor(chest.y / chestMeters)}`;
@@ -142,12 +134,11 @@ export const mapOf = (snapshot: Snapshot, players: Player[]): MapView | null => 
   const height = Math.max(...ys) + MAP_MARGIN_METERS - top;
   const chestMeters = Math.max(MAP_CHEST_METERS, Math.round(width / MAP_CHESTS_ACROSS));
   return {
-    viewBox: `${left} ${top} ${width} ${height}`,
+    box: { x: left, y: top, width, height },
     chestMeters,
     land,
     trails,
     chests,
-    chestSpots: chestSpotsOf(chests, chestMeters),
     marks,
   };
 };

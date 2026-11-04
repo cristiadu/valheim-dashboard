@@ -65,9 +65,10 @@ describe('itemSlots', () => {
 
 describe('stockOf', () => {
   it('adds each item up across the chests and lists the chests that hold most first', () => {
-    // GIVEN two chests with wood and one with stone
+    // GIVEN a chest and a cart on a square Ragnar walked, both with wood and the cart with stone
     const timeUtc = '2026-10-29T11:00:00.000Z';
     const snapshot = snapshotWith({
+      explored: { Ragnar: ['0,0'] },
       chests: {
         '1:1': { chest: 'piece_chest_wood', x: 0, z: 0, builder: 'Ragnar', items: { Wood: 5 }, timeUtc },
         '1:2': { chest: 'Cart', x: 10, z: 0, builder: 'Ragnar', items: { Wood: 30, Stone: 4 }, timeUtc },
