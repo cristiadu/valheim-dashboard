@@ -184,7 +184,7 @@ kept in the snapshot:
 ```mermaid
 flowchart LR
   in["Picked up (first time), taken from a chest, tombstone emptied, gear seen worn"] --> bag[Bag per character]
-  bag --> out["Stored, smelted, eaten"]
+  bag --> out["Stored, smelted, cooked, put in a fermenter, eaten"]
   death["Tombstone made"] -->|empties| bag
 ```
 
