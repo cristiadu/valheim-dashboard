@@ -172,6 +172,12 @@ const eventItem = (event: StoryEvent, players: Set<string>): StoryText => {
             ? `${event.player ?? 'Someone'} got their things back from their tombstone`
             : `${event.player ?? 'Someone'} emptied ${event.owner ?? 'someone'}'s tombstone`,
       };
+    case 'bedClaimed':
+      return { timeUtc, kind: 'night', text: `${event.character} claimed a bed` };
+    case 'portalNamed':
+      return { timeUtc, kind: 'travel', text: `${event.player ?? 'Someone'} named a portal "${event.portal}"` };
+    case 'wardChanged':
+      return { timeUtc, kind: 'built', text: `${event.builder ?? 'Someone'} turned their ward ${event.isOn ? 'on' : 'off'}` };
     case 'tameChanged':
       return { timeUtc, kind: 'tame', text: tameText(event) };
     case 'petNamed':

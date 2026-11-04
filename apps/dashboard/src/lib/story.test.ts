@@ -108,6 +108,27 @@ describe('storyOf', () => {
     ]);
   });
 
+  it('tells beds, portals and wards in plain sentences', () => {
+    // GIVEN Inge Dragonchow claims a bed, names a portal and turns her ward off
+    const snapshot = snapshotWith({
+      events: [
+        { type: 'bedClaimed', timeUtc: '2026-10-29T10:01:00.000Z', character: 'Inge Dragonchow', line: 'test line' },
+        { type: 'portalNamed', timeUtc: '2026-10-29T10:02:00.000Z', portal: 'Swamp camp', player: 'Inge Dragonchow', line: 'test line' },
+        { type: 'wardChanged', timeUtc: '2026-10-29T10:03:00.000Z', ward: 'guard_stone', builder: 'Inge Dragonchow', isOn: false, line: 'test line' },
+      ],
+    });
+
+    // WHEN the story is made
+    const story = storyOf(snapshot);
+
+    // THEN each reads as a sentence, newest first
+    expect(story.map((item) => [item.kind, item.text])).toEqual([
+      ['built', 'Inge Dragonchow turned their ward off'],
+      ['travel', 'Inge Dragonchow named a portal "Swamp camp"'],
+      ['night', 'Inge Dragonchow claimed a bed'],
+    ]);
+  });
+
   it('tells kills and items in one line per stretch', () => {
     // GIVEN Ragnar killed creatures, moved items, cooked, brewed and steered a ship
     const snapshot = snapshotWith({

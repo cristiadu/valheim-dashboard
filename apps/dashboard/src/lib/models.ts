@@ -137,6 +137,9 @@ export const STORY_EVENT_TYPES = [
   'signWritten',
   'itemHung',
   'tombstoneEmptied',
+  'bedClaimed',
+  'portalNamed',
+  'wardChanged',
 ] as const;
 
 /** A game event friends see, such as a death or a raid. */
@@ -447,7 +450,8 @@ export type StockRow = {
 /**
  * What a stretch of activity is: pieces built, a builder's pieces destroyed, creatures killed, items gathered
  * from the world, items stored in or taken from chests, crops planted, food eaten, items put into smelters, food
- * put on to cook, mead bases put into fermenters, ships steered, trees cut down or rocks mined out.
+ * put on to cook, mead bases put into fermenters, ships steered, crafting stations opened, emotes, trees cut down
+ * or rocks mined out.
  */
 export type ActivityKind =
   | 'built'
@@ -462,6 +466,8 @@ export type ActivityKind =
   | 'cooked'
   | 'brewed'
   | 'sailed'
+  | 'crafted'
+  | 'emoted'
   | 'cut'
   | 'mined';
 
@@ -495,6 +501,8 @@ export const ACTIVITY_STORY_KINDS: Record<ActivityKind, StoryKind> = {
   cooked: 'items',
   brewed: 'items',
   sailed: 'travel',
+  crafted: 'built',
+  emoted: 'chat',
   cut: 'items',
   mined: 'items',
 };
@@ -515,6 +523,8 @@ export const ACTIVITY_WORDS: Record<Exclude<ActivityKind, 'destroyed'>, { verb: 
   cooked: { verb: 'started cooking', one: 'thing', many: 'things', ending: '' },
   brewed: { verb: 'started brewing', one: 'mead', many: 'meads', ending: '' },
   sailed: { verb: 'steered', one: 'ship', many: 'ships', ending: '' },
+  crafted: { verb: 'worked at', one: 'crafting station', many: 'crafting stations', ending: '' },
+  emoted: { verb: 'did', one: 'emote', many: 'emotes', ending: '' },
   cut: { verb: 'cut down', one: 'tree', many: 'trees', ending: '' },
   mined: { verb: 'mined out', one: 'rock', many: 'rocks', ending: '' },
 };
@@ -531,6 +541,8 @@ export const PLAYER_ACTIVITY_STATS: { kind: ActivityKind; label: string }[] = [
   { kind: 'cooked', label: 'Food cooked' },
   { kind: 'brewed', label: 'Meads brewed' },
   { kind: 'sailed', label: 'Times at the helm' },
+  { kind: 'crafted', label: 'Crafting visits' },
+  { kind: 'emoted', label: 'Emotes' },
 ];
 
 /** Prefab of the player, whose bag grid is in [CONTAINER_SIZES]. */

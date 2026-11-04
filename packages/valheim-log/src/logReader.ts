@@ -3,6 +3,7 @@ import {
   AREA_ENTERED_PATTERN,
   ATE_PATTERN,
   BACKUP_PATTERN,
+  BED_CLAIMED_PATTERN,
   BED_PATTERN,
   BOSS_SUMMONED_PATTERN,
   CHAT_PATTERN,
@@ -14,8 +15,10 @@ import {
   DEATH_DETAILS_PATTERN,
   DEPLETED_PATTERN,
   CHARACTER_PATTERN,
+  CRAFTING_PATTERN,
   DISCONNECT_PATTERN,
   DISK_SPACE_PATTERN,
+  EMOTE_PATTERN,
   FOOD_STARTED_PATTERN,
   GAME_SERVER_PATTERN,
   GEAR_PATTERN,
@@ -41,6 +44,7 @@ import {
   POSITION_PATTERN,
   PVP_PATTERN,
   POSSIBLE_RAIDS_PATTERN,
+  PORTAL_NAMED_PATTERN,
   RAID_ENDED_PATTERN,
   RAID_PATTERN,
   REFUSED_JOIN_PATTERN,
@@ -59,6 +63,7 @@ import {
   TIMESTAMP_PATTERN,
   TOMBSTONE_EMPTIED_PATTERN,
   TOMBSTONE_PATTERN,
+  WARD_PATTERN,
   UNKNOWN_PLAYER,
   UNNAMED_PORTAL,
   VERSION_PATTERN,
@@ -352,6 +357,32 @@ const MATCHERS: readonly Matcher[] = [
   {
     pattern: SAILING_PATTERN,
     toEvent: (groups, timeUtc) => ({ type: 'sailing', timeUtc, character: groups.character!, ship: groups.ship! }),
+  },
+  {
+    pattern: CRAFTING_PATTERN,
+    toEvent: (groups, timeUtc) => ({ type: 'crafting', timeUtc, character: groups.character!, station: groups.station! }),
+  },
+  {
+    pattern: EMOTE_PATTERN,
+    toEvent: (groups, timeUtc) => ({ type: 'emote', timeUtc, character: groups.character!, emote: groups.emote! }),
+  },
+  {
+    pattern: BED_CLAIMED_PATTERN,
+    toEvent: (groups, timeUtc) => ({ type: 'bedClaimed', timeUtc, character: groups.character! }),
+  },
+  {
+    pattern: PORTAL_NAMED_PATTERN,
+    toEvent: (groups, timeUtc) => ({ type: 'portalNamed', timeUtc, portal: groups.portal!, player: playerOf(groups.player) }),
+  },
+  {
+    pattern: WARD_PATTERN,
+    toEvent: (groups, timeUtc) => ({
+      type: 'wardChanged',
+      timeUtc,
+      ward: groups.ward!,
+      builder: playerOf(groups.builder),
+      isOn: groups.state === 'on',
+    }),
   },
   {
     pattern: DEPLETED_PATTERN,

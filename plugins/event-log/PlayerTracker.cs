@@ -209,7 +209,7 @@ namespace ValheimDashboard.EventLog
             foreach ((int itemVar, int qualityVar) in GearSlots)
             {
                 int item = player.GetInt(itemVar);
-                if (item == 0 || EatTracker.IsConsumable(item))
+                if (item == 0 || ActionTracker.IsConsumable(item))
                 {
                     continue;
                 }
@@ -233,7 +233,7 @@ namespace ValheimDashboard.EventLog
             foreach ((int itemVar, int _) in GearSlots)
             {
                 int item = player.GetInt(itemVar);
-                if (item != 0 && !EatTracker.IsConsumable(item))
+                if (item != 0 && !ActionTracker.IsConsumable(item))
                 {
                     pieces.Add(Names.Item(item));
                 }

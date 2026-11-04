@@ -146,6 +146,21 @@ export const FOOD_STARTED_PATTERN = /^(?<kind>Cooking|Fermenting): (?<item>\S+) 
 /** A player took the helm of a raft or a ship. Written by the event log plugin. */
 export const SAILING_PATTERN = /^Sailing: (?<character>.+) on (?<ship>\S+)$/;
 
+/** A player opened a crafting station, such as a forge, or one of several stations that share an animation. */
+export const CRAFTING_PATTERN = /^Crafting: (?<character>.+?) at (?<station>\S+)$/;
+
+/** A player did an emote, such as wave. Written by the event log plugin. */
+export const EMOTE_PATTERN = /^Emote: (?<character>.+) (?<emote>\S+)$/;
+
+/** A player claimed a bed, where they come back after dying. Written by the event log plugin. */
+export const BED_CLAIMED_PATTERN = /^Bed claimed: (?<character>.+)$/;
+
+/** A player wrote a name on a portal. Written by the event log plugin. */
+export const PORTAL_NAMED_PATTERN = /^Portal named: (?<portal>.+) by (?<player>.+)$/;
+
+/** The player who built a ward turned it on or off. Written by the event log plugin. */
+export const WARD_PATTERN = /^Ward turned (?<state>on|off): (?<ward>\S+) by (?<builder>.+)$/;
+
 /** A player cut down a tree or mined out a rock. Written by the event log plugin. */
 export const DEPLETED_PATTERN = /^(?<kind>Tree cut|Rock mined): (?<thing>\S+) by (?<player>.+)$/;
 

@@ -19,6 +19,9 @@ namespace ValheimDashboard.EventLog
         /// <summary>Hash of the call a player sends to put a mead base into a fermenter.</summary>
         private static readonly int AddItemHash = "RPC_AddItem".GetStableHashCode();
 
+        /// <summary>Hash of the call a player sends to write a name on a portal.</summary>
+        private static readonly int SetTagHash = "RPC_SetTag".GetStableHashCode();
+
         /// <summary>
         /// Seconds a player who asked through the server counts as the one who did it. Longer than a scan, since
         /// stations are read once per scan.
@@ -31,10 +34,11 @@ namespace ValheimDashboard.EventLog
         /// <summary>Items queued in each station at the last scan, by object ID.</summary>
         private static readonly Dictionary<ZDOID, List<string>> Queues = new Dictionary<ZDOID, List<string>>();
 
-        /// <summary>Remembers who asked when [data] is a hit or an item put into a station or a fermenter.</summary>
+        /// <summary>Remembers who asked when [data] is a hit, an item put into a station or a fermenter, or a portal name.</summary>
         public static void Read(ZRoutedRpc.RoutedRPCData data)
         {
-            if (data.m_methodHash == DamageHash || data.m_methodHash == AddOreHash || data.m_methodHash == AddItemHash)
+            if (data.m_methodHash == DamageHash || data.m_methodHash == AddOreHash || data.m_methodHash == AddItemHash
+                || data.m_methodHash == SetTagHash)
             {
                 AskedBy[data.m_targetZDO] = (data.m_senderPeerID, Time.time);
             }

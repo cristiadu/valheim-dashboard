@@ -153,6 +153,26 @@ describe('server state', () => {
     ]);
   });
 
+  it('keeps crafting station visits and emotes as activities per player', () => {
+    // GIVEN Yan opens the forge and the workbench, and waves twice
+    readLines(state, [
+      ...RUN_START,
+      logLine('03:00:00', 'Crafting: Yan at forge'),
+      logLine('03:00:30', 'Crafting: Yan at piece_workbench'),
+      logLine('03:01:00', 'Emote: Yan wave'),
+      logLine('03:01:10', 'Emote: Yan wave'),
+    ]);
+
+    // WHEN the activities are listed
+    const kinds = state.snapshot.activities.map((activity) => [activity.player, activity.kind, activity.things]);
+
+    // THEN each kind is one stretch
+    expect(kinds).toEqual([
+      ['Yan', 'crafted', { forge: 1, piece_workbench: 1 }],
+      ['Yan', 'emoted', { wave: 2 }],
+    ]);
+  });
+
   it('names builders the plugin gave by Steam name by their character instead', () => {
     // GIVEN Tony Example plays Ragnar, and the plugin names a chest and pieces by his Steam name
     readLines(state, [
