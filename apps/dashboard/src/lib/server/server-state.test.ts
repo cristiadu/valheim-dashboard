@@ -75,6 +75,23 @@ describe('server state', () => {
     ]);
   });
 
+  it('keeps each player\'s activity totals and their log lines, past the stretches kept', () => {
+    // GIVEN Ragnar builds twice an hour apart and picks up wood
+    readLines(state, [
+      ...RUN_START,
+      logLine('03:00:00', 'Piece built: wood_floor_1x1 by Ragnar'),
+      logLine('04:00:00', 'Piece built: wood_fence by Ragnar'),
+      logLine('04:01:00', 'Picked up: Wood x20 by Ragnar'),
+    ]);
+
+    // WHEN the totals and the building lines are read
+    const { activityTotals, sources } = state.snapshot;
+
+    // THEN both stretches count, items count by amount, and each built line is behind the number
+    expect(activityTotals).toEqual({ Ragnar: { built: 2, gathered: 20 } });
+    expect(sources['activity:Ragnar:built']?.total).toBe(2);
+  });
+
   it('counts an item as gathered only the first time anyone picks it up', () => {
     // GIVEN Ragnar harvests a dandelion and picks it up, then drops wood he carried and picks it up again
     readLines(state, [

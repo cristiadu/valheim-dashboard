@@ -1,12 +1,24 @@
 <script lang="ts">
-  import ItemList from '#/lib/components/ItemList';
+  import { resolve } from '$app/paths';
+
+  import ChestContents from '#/lib/components/ChestContents';
   import GearSheet from '#/lib/components/GearSheet';
   import LogLines from '#/lib/components/LogLines';
   import NoData from '#/lib/components/NoData';
   import Pill from '#/lib/components/Pill';
   import TimeLanes from '#/lib/components/TimeLanes';
   import { live, useSnapshot } from '#/lib/live.svelte';
-  import { type Player, type SourceKind, STORY_STYLES, type StoryKind } from '#/lib/models';
+  import {
+    ACTIVITY_STORY_KINDS,
+    MAP_SQUARE_METERS,
+    type Player,
+    PLAYER_ACTIVITY_STATS,
+    PLAYER_PREFAB,
+    type SourceLines,
+    SQUARE_METERS_PER_KM2,
+    STORY_STYLES,
+    type StoryKind,
+  } from '#/lib/models';
   import { playerPill } from '#/lib/pills';
   import { playersOf } from '#/lib/players';
   import { playerSource } from '#/lib/sources';
@@ -22,31 +34,40 @@
   /** Viewer's time zone from the browser. */
   const timeZone = viewerTimeZone();
 
-  /** Activity types that move items through a character's observed inventory. */
-  const ITEM_ACTIVITY_KINDS = new Set<string>(['gathered', 'taken', 'stored', 'ate', 'smelted', 'cooked', 'brewed']);
-
   /** Players at the page clock. */
   const players = $derived(live.nowMs === null ? [] : playersOf(snapshot, live.nowMs));
 
-  /** Item movements the plugin attributed to a player's latest character. */
-  const itemMovementsOf = (player: Player) =>
-    snapshot.activities
-      .filter(
-        (activity) =>
-          activity.player === player.character &&
-          ITEM_ACTIVITY_KINDS.has(activity.kind),
-      )
-      .toReversed()
-      .slice(0, 5);
-
-  /** Numbers on a player's card, each with the rune of the story kind it counts and the log lines behind it. */
-  const statsOf = (player: Player): { label: string; value: string; kind: StoryKind; source: SourceKind }[] => [
-    { label: 'Time played', value: durationLabel(player.totalMs), kind: 'night', source: 'visits' },
-    { label: 'Visits', value: String(player.sessions.length), kind: 'joined', source: 'visits' },
-    { label: 'Deaths', value: String(player.deaths), kind: 'died', source: 'deaths' },
-    { label: 'Kills', value: String(player.kills), kind: 'fight', source: 'kills' },
+  /**
+   * Numbers on a player's card, each with the rune of the story kind it counts and the log lines behind it.
+   * Activities nobody did yet are left out. Land explored has no lines and links to the Map tab instead.
+   */
+  const statsOf = (player: Player): { label: string; value: string; kind: StoryKind; source: SourceLines | null }[] => [
+    { label: 'Time played', value: durationLabel(player.totalMs), kind: 'night', source: playerSource(snapshot, player, 'visits') },
+    { label: 'Visits', value: String(player.sessions.length), kind: 'joined', source: playerSource(snapshot, player, 'visits') },
+    { label: 'Deaths', value: String(player.deaths), kind: 'died', source: playerSource(snapshot, player, 'deaths') },
+    { label: 'Kills', value: String(player.kills), kind: 'fight', source: playerSource(snapshot, player, 'kills') },
+    ...PLAYER_ACTIVITY_STATS.filter(({ kind }) => (player.activityTotals[kind] ?? 0) > 0).map(({ kind, label }) => ({
+      label,
+      value: player.activityTotals[kind]!.toLocaleString(),
+      kind: ACTIVITY_STORY_KINDS[kind],
+      source: playerSource(snapshot, player, 'activity', kind),
+    })),
+    {
+      label: 'Land explored',
+      value: `${((player.exploredSquares * MAP_SQUARE_METERS ** 2) / SQUARE_METERS_PER_KM2).toFixed(2)} km²`,
+      kind: 'travel',
+      source: null,
+    },
   ];
 </script>
+
+{#snippet statBody(stat: { label: string; value: string; kind: StoryKind })}
+  <span class="stat">
+    <span class="rune" aria-hidden="true" style:color={STORY_STYLES[stat.kind].color} style:border-color={STORY_STYLES[stat.kind].color}>{STORY_STYLES[stat.kind].rune}</span>
+    <span class="value mono">{stat.value}</span>
+    <span class="label muted">{stat.label}</span>
+  </span>
+{/snippet}
 
 {#if snapshot.sessions.length === 0}
   <NoData />
@@ -57,53 +78,36 @@
       <TimeLanes {players} {snapshot} nowMs={live.nowMs} {timeZone} />
     </section>
 
-    <div class="cards">
-      {#each players as player (player.key)}
-        <article class="panel card">
-          <div class="name">
-            <h3><span class="diamond" aria-hidden="true" style:background={player.color}></span>{player.character}</h3>
-            <Pill pill={playerPill(player.isOnline)} />
-          </div>
-          <p class="muted">
-            {#if player.steamName}Steam: {player.steamName} ·{/if}
-            {player.isOnline ? `Since ${clockTime(player.sinceUtc!, timeZone)}` : `Last seen ${clockTime(player.lastSeenUtc!, timeZone)}`}
-          </p>
-          <ul class="stats">
-            {#each statsOf(player) as stat (stat.label)}
-              <li>
-                <LogLines title="{player.character}: {stat.label.toLowerCase()}" source={playerSource(snapshot, player, stat.source)}>
-                  <span class="stat">
-                    <span class="rune" aria-hidden="true" style:color={STORY_STYLES[stat.kind].color} style:border-color={STORY_STYLES[stat.kind].color}>{STORY_STYLES[stat.kind].rune}</span>
-                    <span class="value mono">{stat.value}</span>
-                    <span class="label muted">{stat.label}</span>
-                  </span>
-                </LogLines>
-              </li>
-            {/each}
-          </ul>
-          {#if player.gear.length > 0}<GearSheet gear={player.gear} sourceOf={(prefab) => playerSource(snapshot, player, 'gear', prefab)} />{/if}
-          {#if player.topKill}
-            <LogLines title="{player.character} killed {thingName(player.topKill)}" source={playerSource(snapshot, player, 'killed', player.topKill)}>
-              <p><span class="muted">Most killed:</span> {thingName(player.topKill)}</p>
-            </LogLines>
-          {/if}
-          {#if itemMovementsOf(player).length > 0}
-            <div>
-              <p class="muted">Item events attributed to this character</p>
-              <ul class="item-movements">
-                {#each itemMovementsOf(player) as activity (`${activity.kind}:${activity.endUtc}`)}
-                  <li>
-                    <span class="muted">{activity.kind} · {clockTime(activity.endUtc, timeZone)}:</span>
-                    <ItemList items={activity.things} size={16} />
-                  </li>
-                {/each}
-              </ul>
+    {#each players as player (player.key)}
+      <article class="panel card">
+        <div class="parts">
+          <div class="about">
+            <div class="name">
+              <h3><span class="diamond" aria-hidden="true" style:background={player.color}></span>{player.character}</h3>
+              <Pill pill={playerPill(player.isOnline)} />
             </div>
-          {/if}
-          {#if player.areas.length > 0}
-            <div>
-              <p class="muted">Been to</p>
-              <ul class="areas">
+            <p class="muted">
+              {#if player.steamName}Steam: {player.steamName} ·{/if}
+              {player.isOnline ? `Since ${clockTime(player.sinceUtc!, timeZone)}` : `Last seen ${clockTime(player.lastSeenUtc!, timeZone)}`}
+            </p>
+            <ul class="stats">
+              {#each statsOf(player) as stat (stat.label)}
+                <li>
+                  {#if stat.source}
+                    <LogLines title="{player.character}: {stat.label.toLowerCase()}" source={stat.source}>{@render statBody(stat)}</LogLines>
+                  {:else}
+                    <a class="plain" href={resolve('/map')} title="See it on the Map">{@render statBody(stat)}</a>
+                  {/if}
+                </li>
+              {/each}
+            </ul>
+            {#if player.topKill}
+              <LogLines title="{player.character} killed {thingName(player.topKill)}" source={playerSource(snapshot, player, 'killed', player.topKill)}>
+                <p><span class="muted">Most killed:</span> {thingName(player.topKill)}</p>
+              </LogLines>
+            {/if}
+            {#if player.areas.length > 0}
+              <ul class="areas" aria-label="Been to">
                 {#each player.areas as area (area)}
                   <li class:here={player.isOnline && player.area === area}>
                     <LogLines title="{player.character} in {areaLabel(area)}" source={playerSource(snapshot, player, 'area', area)}>
@@ -112,19 +116,25 @@
                   </li>
                 {/each}
               </ul>
-            </div>
-          {/if}
-          {#if snapshot.deathItems[player.character]}
-            {@const death = snapshot.deathItems[player.character]!}
-            <p>
-              <span class="muted">Carried at last death, {clockTime(death.timeUtc, timeZone)}:</span>
-              {Object.keys(death.items).length === 0 ? 'nothing' : ''}
-            </p>
-            {#if Object.keys(death.items).length > 0}<ItemList items={death.items} size={16} />{/if}
-          {/if}
-        </article>
-      {/each}
-    </div>
+            {/if}
+          </div>
+
+          <div class="gear">
+            <p class="muted part-title">Gear</p>
+            {#if player.gear.length > 0}
+              <GearSheet gear={player.gear} sourceOf={(prefab) => playerSource(snapshot, player, 'gear', prefab)} />
+            {:else}
+              <p class="muted">No gear seen yet.</p>
+            {/if}
+          </div>
+
+          <div class="bag">
+            <p class="muted part-title">In the bag now <span class="hint">(a guess from pickups, chests and meals)</span></p>
+            <ChestContents chest={PLAYER_PREFAB} items={snapshot.bags[player.character] ?? {}} />
+          </div>
+        </div>
+      </article>
+    {/each}
   </div>
 {/if}
 
@@ -137,18 +147,56 @@
     max-width: var(--page-width);
   }
 
-  /* As many cards per row as fit */
-  .cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
-    gap: 16px;
+  /* One wide card per player, sized by the page so its parts can sit side by side */
+  .card {
+    container-type: inline-size;
   }
 
-  /* Card content stacked */
-  .card {
+  /* About, gear and bag stacked on a narrow card */
+  .parts {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+  }
+
+  /* About, gear and bag side by side once the card is wide enough */
+  @container (min-width: 900px) {
+    .parts {
+      grid-template-columns: minmax(280px, 1fr) auto minmax(0, 1.4fr);
+      align-items: start;
+    }
+  }
+
+  /* Name, numbers and places stacked */
+  .about {
     display: flex;
     flex-direction: column;
     gap: 10px;
+  }
+
+  /* Gear and bag start under a small title */
+  .gear,
+  .bag {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  /* Carried gear wraps at six slots, so it stays a short block beside the numbers */
+  .gear {
+    max-width: calc(6 * 56px + 5 * 6px);
+  }
+
+  /* Small title over gear and bag */
+  .part-title {
+    font-size: 12px;
+    letter-spacing: 0.04em;
+  }
+
+  /* Why the bag is only a guess, quieter than the title */
+  .hint {
+    font-size: 11px;
+    opacity: 0.8;
   }
 
   /* Name on the left, online pill on the right */
@@ -189,11 +237,17 @@
     list-style: none;
   }
 
-  /* Numbers two by two, so they fit a narrow card */
+  /* Numbers in as many columns as fit, at least two */
   .stats {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
+    grid-template-columns: repeat(auto-fill, minmax(min(50% - 4px, 130px), 1fr));
+    gap: 10px 8px;
+  }
+
+  /* Land explored link looks like the other numbers */
+  .plain {
+    color: inherit;
+    text-decoration: none;
   }
 
   /* One number: rune on the left, value above its label */
@@ -233,7 +287,6 @@
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
-    margin-top: 4px;
   }
 
   /* One area tag */
@@ -248,15 +301,6 @@
     border-color: var(--frost);
   }
 
-  /* Latest item events the plugin attributed to this character. */
-  .item-movements {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    margin-top: 4px;
-    font-size: 13px;
-  }
-
   /* Travel rune before an area name */
   .area-rune {
     margin-right: 5px;
@@ -264,4 +308,3 @@
     color: var(--frost);
   }
 </style>
-
