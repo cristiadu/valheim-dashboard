@@ -180,7 +180,7 @@ when the plugin does not know who it was.
 | Came out of a portal | `Teleported: Ragnar to Home base` | `^Teleported: (?<character>.+?) to (?<portal>.+)$` |
 | PvP turned on or off | `PvP turned on: Ragnar` | `^PvP turned (?<state>on\|off): (?<character>.+)$` |
 | Went to bed | `Went to bed: Ragnar` | `^Went to bed: (?<character>.+)$` |
-| New gear | `Gear: Ragnar SwordIron quality 2` | `^Gear: (?<character>\S+) (?<item>\S+)(?: quality (?<quality>\d+))?$` |
+| New gear | `Gear: Ragnar SwordIron quality 2` | `^Gear: (?<character>.+?) (?<item>\S+)(?: quality (?<quality>\d+))?$` |
 | Creature killed | `Creature killed: Troll level 2 by Ragnar, Bjorn` | `^Creature killed: (?<creature>\S+) level (?<level>\d+) by (?<attackers>.+)$` |
 | Tame tamed, born, grown up or died | `Tame born: Wolf_cub` | `^(?<change>Tamed\|Tame born\|Tame grew up\|Tame died): (?<creature>\S+)(?: (?<name>.+))?$` |
 | Tame named | `Pet named: Wolf Fluffy` | `^Pet named: (?<creature>\S+) (?<name>.+)$` |
