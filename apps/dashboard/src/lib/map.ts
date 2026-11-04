@@ -1,8 +1,13 @@
 import {
+  MAP_CHEST_METERS,
+  MAP_CHEST_STEP,
+  MAP_CHESTS_ACROSS,
   MAP_MARGIN_METERS,
   MAP_SQUARE_METERS,
   MAP_TRAIL_METERS,
   type ChestRecord,
+  type MapChest,
+  type MapChestSpot,
   type MapView,
   OTHER_PLAYER_COLOR,
   type Player,
@@ -38,6 +43,30 @@ const isNearExplored = (chest: ChestRecord, explored: Set<string>): boolean =>
 export const foundChests = (snapshot: Snapshot): [string, ChestRecord][] => {
   const explored = new Set(Object.values(snapshot.explored).flat());
   return Object.entries(snapshot.chests).filter(([, chest]) => chest.builder !== null || isNearExplored(chest, explored));
+};
+
+/**
+ * Places each of [chests] on the map. Chests that share a square [chestMeters] wide would cover each other, so they
+ * sit side by side in a small grid around their middle, and each one can still be pointed at and tapped on its own.
+ */
+const chestSpotsOf = (chests: MapChest[], chestMeters: number): MapChestSpot[] => {
+  const cells = new Map<string, MapChest[]>();
+  for (const chest of chests) {
+    const key = `${Math.floor(chest.x / chestMeters)},${Math.floor(chest.y / chestMeters)}`;
+    cells.set(key, [...(cells.get(key) ?? []), chest]);
+  }
+  return [...cells.values()].flatMap((members) => {
+    const columns = Math.ceil(Math.sqrt(members.length));
+    const rows = Math.ceil(members.length / columns);
+    const step = chestMeters * MAP_CHEST_STEP;
+    const middleX = members.reduce((sum, chest) => sum + chest.x, 0) / members.length;
+    const middleY = members.reduce((sum, chest) => sum + chest.y, 0) / members.length;
+    return members.map((chest, index) => ({
+      id: chest.id,
+      x: middleX + ((index % columns) - (columns - 1) / 2) * step,
+      y: middleY + (Math.floor(index / columns) - (rows - 1) / 2) * step,
+    }));
+  });
 };
 
 /**
@@ -111,11 +140,14 @@ export const mapOf = (snapshot: Snapshot, players: Player[]): MapView | null => 
   const top = Math.min(...ys) - MAP_MARGIN_METERS;
   const width = Math.max(...xs) + MAP_MARGIN_METERS - left;
   const height = Math.max(...ys) + MAP_MARGIN_METERS - top;
+  const chestMeters = Math.max(MAP_CHEST_METERS, Math.round(width / MAP_CHESTS_ACROSS));
   return {
     viewBox: `${left} ${top} ${width} ${height}`,
+    chestMeters,
     land,
     trails,
     chests,
+    chestSpots: chestSpotsOf(chests, chestMeters),
     marks,
   };
 };

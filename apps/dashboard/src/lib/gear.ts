@@ -1,4 +1,4 @@
-import { GEAR_NAMES, GEAR_QUALITY_PATTERN, GEAR_SLOT_PATTERNS, type GearPiece, type GearSheet } from '#/lib/models';
+import { GEAR_NAMES, GEAR_QUALITY_PATTERN, GEAR_SLOT_PATTERNS, type GearPiece, type GearSheet, ITEM_NAMES } from '#/lib/models';
 import { recipeItems } from '#/lib/recipes';
 import { capitalized, thingName } from '#/lib/story';
 
@@ -36,8 +36,10 @@ export const gearSheet = (gear: string[]): GearSheet => {
   return sheet;
 };
 
-/** Returns every item the dashboard shows an icon for: recipe items and known gear, once each. */
-export const iconItems = (): string[] => [...new Set([...recipeItems(), ...Object.values(GEAR_NAMES)])];
+/** Returns every item the dashboard shows an icon for: recipe items, known gear and other known items, once each. */
+export const iconItems = (): string[] => [
+  ...new Set([...recipeItems(), ...Object.values(GEAR_NAMES), ...Object.values(ITEM_NAMES)]),
+];
 
 /** Name of [piece] with its level when upgraded, for example `Flint spear, level 4`. */
 export const gearLabel = (piece: GearPiece): string => (piece.quality > 1 ? `${piece.name}, level ${piece.quality}` : piece.name);

@@ -20,7 +20,7 @@ import {
 import { mergedSource, sourceKey } from '#/lib/sources';
 
 /** Returns `1 death` or `2 deaths` style text. */
-const count = (amount: number, one: string, many: string): string => `${amount} ${amount === 1 ? one : many}`;
+export const count = (amount: number, one: string, many: string): string => `${amount} ${amount === 1 ? one : many}`;
 
 /** Readable name of a prefab, for example `wood floor 1x1`, `sword iron`, `turnip` or `greydwarf elite`. */
 export const thingName = (prefab: string): string =>
