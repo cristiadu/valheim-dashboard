@@ -748,8 +748,8 @@ export const GEAR_NAMES: Record<string, string> = {
 
 /**
  * Names the game shows for items that are not gear, by the prefab the plugin logs, for example `Boar meat` for
- * `RawMeat`. The names also pick the icon, and every item listed here gets its icon downloaded, so it also lists
- * items whose prefab only needs spaces, such as `CopperOre`, when no recipe uses them.
+ * `RawMeat`. The names also pick the icon, and every item listed here gets its icon downloaded on start. Other
+ * items get theirs the first time a page shows them.
  */
 export const ITEM_NAMES: Record<string, string> = {
   RawMeat: 'Boar meat',
@@ -807,6 +807,25 @@ export const ITEM_NAMES: Record<string, string> = {
   PulledBear: 'Pulled bear',
   AxeHead2: 'Mysterious axe head',
   KnifeButcher: 'Butcher knife',
+  MinceMeatSauce: 'Minced meat sauce',
+  Acorn: 'Acorn',
+  PineCone: 'Pine cone',
+  Upgrader0Weapon: 'Wooden battle idol',
+  Upgrader0Armor: 'Wooden protection idol',
+  Upgrader1Weapon: 'Bronze battle idol',
+  Upgrader1Armor: 'Bronze protection idol',
+  Upgrader2Weapon: 'Iron battle idol',
+  Upgrader2Armor: 'Iron protection idol',
+  Upgrader3Weapon: 'Silver battle idol',
+  Upgrader3Armor: 'Silver protection idol',
+  Upgrader4Weapon: 'Black metal battle idol',
+  Upgrader4Armor: 'Black metal protection idol',
+  Upgrader5Weapon: 'Black marble battle idol',
+  Upgrader5Armor: 'Black marble protection idol',
+  Upgrader6Weapon: 'Flametal battle idol',
+  Upgrader6Armor: 'Flametal protection idol',
+  Upgrader7Weapon: 'Bloodgold battle idol',
+  Upgrader7Armor: 'Bloodgold protection idol',
 };
 
 /** Where a piece of gear goes on the character sheet: a slot, or `carried` for tools and spare gear. */
