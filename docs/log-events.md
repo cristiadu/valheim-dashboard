@@ -181,6 +181,7 @@ when the plugin does not know who it was.
 | PvP turned on or off | `PvP turned on: Ragnar` | `^PvP turned (?<state>on\|off): (?<character>.+)$` |
 | Went to bed | `Went to bed: Ragnar` | `^Went to bed: (?<character>.+)$` |
 | New gear | `Gear: Ragnar SwordIron quality 2` | `^Gear: (?<character>.+?) (?<item>\S+)(?: quality (?<quality>\d+))?$` |
+| What a player wears now | `Wearing: Ragnar has ArmorLeatherChest, SwordIron` | `^Wearing: (?<character>.+?) has (?<items>.+)$` |
 | Creature killed | `Creature killed: Troll level 2 by Ragnar, Bjorn` | `^Creature killed: (?<creature>\S+) level (?<level>\d+) by (?<attackers>.+)$` |
 | Tame tamed, born, grown up or died | `Tame born: Wolf_cub` | `^(?<change>Tamed\|Tame born\|Tame grew up\|Tame died): (?<creature>\S+)(?: (?<name>.+))?$` |
 | Tame named | `Pet named: Wolf Fluffy` | `^Pet named: (?<creature>\S+) (?<name>.+)$` |
@@ -200,6 +201,7 @@ when the plugin does not know who it was.
 | Chest, cart or ship destroyed | `Chest removed: 52731986:1203` | `^Chest removed: (?<id>\S+)$` |
 | What a player carried when they died | `Tombstone: Ragnar at 410 -77 holds SwordBronze x1, Coins x55` | `^Tombstone: (?<owner>.+?) at (?<x>-?\d+) (?<z>-?\d+) holds (?<items>.+)$` |
 | Terrain file written | `Terrain written: C:\Valheim Server\terrain-Cotil.txt` | `^Terrain written: (?<path>.+)$` |
+| Item stacks file written | `Item stacks written: C:\Valheim Server\item-stacks.txt` | `^Item stacks written: (?<path>.+)$` |
 | Tombstone emptied | `Tombstone emptied: Ragnar by Bjorn` | `^Tombstone emptied: (?<owner>.+?) by (?<player>.+)$` |
 
 - **Chat** only reaches the server when another player is online to receive it. `said` is normal
@@ -238,6 +240,11 @@ when the plugin does not know who it was.
   next to `logs.txt`. Rows go north to south; each letter is a biome (`M` Meadows, `B` Black Forest, `S` Swamp,
   `O` Mountain, `P` Plains, `I` Mistlands, `A` Ashlands, `N` Deep North), `~` is water and `.` is outside the world.
 - **Gear** is logged the first time a player wears or holds an item since the server started.
+- **Wearing** lists every piece a player wears, holds or carries on the back, by prefab and sorted, each time
+  that list changes and the first time the player is seen after a start. `has nothing` means nothing at all.
+  Levels are only in **Gear** lines.
+- **Item stacks written** is logged once per start, when the plugin writes how many of each item fit in one slot
+  next to `logs.txt`, one `Wood 50` line per item.
 
 To build it, install the .NET SDK and BepInExPack_Valheim on the server, run `dotnet build -c Release`
 in `plugins/event-log`, and copy `bin\Release\netstandard2.1\ValheimDashboard.EventLog.dll` to the

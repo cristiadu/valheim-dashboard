@@ -7,12 +7,14 @@ import { LogTail } from '#/lib/server/log-tail';
 import { logger } from '#/lib/server/logger';
 import {
   HISTORY_FOLDER_NAME,
+  ITEM_STACKS_FILE_NAME,
   POLL_INTERVAL_MS,
   TERRAIN_FILE_PREFIX,
   WORLDS_FOLDER_NAME,
   type Follower,
 } from '#/lib/server/models';
 import { addSavedBosses, createServerState, readLogLine, setTerrain, startNewLog } from '#/lib/server/server-state';
+import { readItemStacks } from '#/lib/server/item-stacks';
 import { readTerrain } from '#/lib/server/terrain';
 import { readSavedGlobalKeys } from '#/lib/server/world-save';
 import { changeBetween } from '#/lib/snapshot-change';
@@ -67,6 +69,28 @@ const readWorldTerrain = async (follower: Follower): Promise<void> => {
   }
 };
 
+/**
+ * Reads the item stacks file the plugin writes next to the log on each server start, once per run. A missing file
+ * is reported once, since the plugin writes it a few seconds after the start.
+ */
+const readStacks = async (follower: Follower): Promise<void> => {
+  const { startedUtc } = follower.state.snapshot;
+  if (startedUtc === null || startedUtc === follower.itemStacksRead) {
+    return;
+  }
+  const path = join(dirname(follower.logFile), ITEM_STACKS_FILE_NAME);
+  try {
+    follower.state.snapshot.itemStacks = await readItemStacks(path);
+    follower.itemStacksRead = startedUtc;
+    follower.hasNewLines = true;
+  } catch (error) {
+    if (follower.itemStacksRead !== `missing ${startedUtc}`) {
+      follower.itemStacksRead = `missing ${startedUtc}`;
+      logger.warn(`No item stacks in ${path} yet: ${String(error)}`);
+    }
+  }
+};
+
 /** Reads the new lines once and copies them to the history, then tells the listeners what changed if any arrived. */
 const poll = async (follower: Follower): Promise<void> => {
   try {
@@ -77,6 +101,7 @@ const poll = async (follower: Follower): Promise<void> => {
   }
   await readSavedBosses(follower);
   await readWorldTerrain(follower);
+  await readStacks(follower);
   if (follower.hasNewLines) {
     follower.hasNewLines = false;
     const { snapshot } = follower.state;
@@ -120,6 +145,7 @@ const start = async (): Promise<Follower> => {
     sentSnapshot: structuredClone(state.snapshot),
     worldSaveRead: null,
     terrainRead: null,
+    itemStacksRead: null,
     tail: new LogTail(config.logFile, {
       onLine: (line) => {
         readLogLine(state, line);

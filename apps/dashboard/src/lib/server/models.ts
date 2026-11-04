@@ -187,6 +187,12 @@ export const TERRAIN_FILE_PREFIX = 'terrain-';
 /** First line of the terrain file, with the number of the westmost and southmost square. */
 export const TERRAIN_HEADER_PATTERN = /^squareMeters (?<squareMeters>\d+) first (?<first>-?\d+)$/;
 
+/** Name of the plugin's file next to the log with how many of each item fit in one slot. */
+export const ITEM_STACKS_FILE_NAME = 'item-stacks.txt';
+
+/** One line of the item stacks file, for example `Wood 50`. */
+export const ITEM_STACK_LINE_PATTERN = /^(?<item>\S+) (?<stack>\d+)$/;
+
 /** A log being followed and what was read from it. */
 export type Follower = {
   /** Path of the log, for error messages. */
@@ -205,6 +211,8 @@ export type Follower = {
   worldSaveRead: string | null;
   /** World and run start whose terrain file was read or reported missing, for example `Cotil 2026-11-01T10:43:52.000Z`. */
   terrainRead: string | null;
+  /** Run start whose item stacks file was read or reported missing, for example `2026-11-01T10:43:52.000Z`. */
+  itemStacksRead: string | null;
 };
 
 /** Part of the wiki API's answer to an image address query, for example for `File:Deer_hide.png`. */

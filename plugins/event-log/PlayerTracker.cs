@@ -34,6 +34,12 @@ namespace ValheimDashboard.EventLog
             (ZDOVars.s_trinketItem, 0),
         };
 
+        /// <summary>Weapons and shields put away on the back, which leave the hands empty but stay worn.</summary>
+        private static readonly int[] BackSlots = { ZDOVars.s_rightBackItem, ZDOVars.s_leftBackItem };
+
+        /// <summary>Text logged for a character who wears and holds nothing.</summary>
+        private const string WearsNothing = "nothing";
+
         /// <summary>What was last seen of each player character, by object ID.</summary>
         private static readonly Dictionary<ZDOID, PlayerState> States = new Dictionary<ZDOID, PlayerState>();
 
@@ -48,6 +54,9 @@ namespace ValheimDashboard.EventLog
 
         /// <summary>Gear each character was seen with since the server started, so each piece is logged once.</summary>
         private static readonly HashSet<string> SeenGear = new HashSet<string>();
+
+        /// <summary>Gear each character was last logged wearing, by name, so only a change is logged.</summary>
+        private static readonly Dictionary<string, string> LoggedWearing = new Dictionary<string, string>();
 
         /// <summary>Portals found by the scan in progress.</summary>
         private static readonly List<ZDO> Portals = new List<ZDO>();
@@ -87,6 +96,7 @@ namespace ValheimDashboard.EventLog
                 LogPosition(name, now);
                 States[player.m_uid] = now;
                 LogNewGear(player, name);
+                LogWearing(player, name);
             }
             Players.Clear();
             Portals.Clear();
@@ -209,6 +219,38 @@ namespace ValheimDashboard.EventLog
                 {
                     GameEventLog.Write($"Gear: {name} {gear}");
                 }
+            }
+        }
+
+        /// <summary>
+        /// Logs every piece [name] wears, holds or carries on the back now, when it differs from the last line, for
+        /// example <c>Wearing: Ragnar has ArmorLeatherChest, SpearFlint</c>. Levels are in the gear lines. Pieces are
+        /// sorted, so swapping hands or putting a weapon away logs nothing new.
+        /// </summary>
+        private static void LogWearing(ZDO player, string name)
+        {
+            SortedSet<string> pieces = new SortedSet<string>(System.StringComparer.Ordinal);
+            foreach ((int itemVar, int _) in GearSlots)
+            {
+                int item = player.GetInt(itemVar);
+                if (item != 0 && !EatTracker.IsConsumable(item))
+                {
+                    pieces.Add(Names.Item(item));
+                }
+            }
+            foreach (int backVar in BackSlots)
+            {
+                int item = player.GetInt(backVar);
+                if (item != 0)
+                {
+                    pieces.Add(Names.Item(item));
+                }
+            }
+            string wearing = pieces.Count == 0 ? WearsNothing : string.Join(", ", pieces);
+            if (!LoggedWearing.TryGetValue(name, out string before) || before != wearing)
+            {
+                LoggedWearing[name] = wearing;
+                GameEventLog.Write($"Wearing: {name} has {wearing}");
             }
         }
     }

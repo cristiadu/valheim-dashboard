@@ -62,6 +62,7 @@ import {
   UNKNOWN_PLAYER,
   UNNAMED_PORTAL,
   VERSION_PATTERN,
+  WEARING_PATTERN,
   WORLD_LOADED_PATTERN,
   WORLD_SAVE_STEP_PATTERN,
 } from '#/patterns';
@@ -448,6 +449,15 @@ const MATCHERS: readonly Matcher[] = [
       character: groups.character!,
       item: groups.item!,
       quality: optionalNumber(groups.quality) ?? 1,
+    }),
+  },
+  {
+    pattern: WEARING_PATTERN,
+    toEvent: (groups, timeUtc) => ({
+      type: 'wearing',
+      timeUtc,
+      character: groups.character!,
+      items: groups.items === NOTHING_HELD ? [] : groups.items!.split(', '),
     }),
   },
   {

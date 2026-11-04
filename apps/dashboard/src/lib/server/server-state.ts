@@ -109,6 +109,8 @@ const itemsSeenIn = (event: LogEvent): string[] => {
       return [event.item];
     case 'tombstoneContents':
       return Object.keys(event.items);
+    case 'wearing':
+      return event.items;
     default:
       return [];
   }
@@ -214,6 +216,7 @@ export const createServerState = (serverUtcOffsetMinutes: number): ServerState =
       chat: [],
       visitedAreas: {},
       gear: {},
+      worn: {},
       currentAreas: {},
       kills: {},
       activityTotals: {},
@@ -226,6 +229,7 @@ export const createServerState = (serverUtcOffsetMinutes: number): ServerState =
       deathItems: {},
       seenItems: [],
       bags: {},
+      itemStacks: {},
       terrain: {},
     },
   };
@@ -334,6 +338,9 @@ export const readLogLine = (state: ServerState, line: string): void => {
     }
     case 'areaEntered':
       snapshot.currentAreas[event.character] = event.area;
+      break;
+    case 'wearing':
+      snapshot.worn[event.character] = event.items;
       break;
     case 'creatureKilled':
       for (const attacker of event.attackers) {

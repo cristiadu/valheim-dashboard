@@ -181,16 +181,30 @@ kept in the snapshot:
 
 ```mermaid
 flowchart LR
-  in["Picked up (first time), taken from a chest, tombstone emptied"] --> bag[Bag per character]
+  in["Picked up (first time), taken from a chest, tombstone emptied, gear seen worn"] --> bag[Bag per character]
   bag --> out["Stored, smelted, eaten"]
   death["Tombstone made"] -->|empties| bag
 ```
 
 Crafting, building and dropping are not in the log, so the guess can be off.
 
-The plugin logs gear the first time a player holds or wears it, not what they wear now. So the Vikings
-character sheet puts the newest piece of each kind in its slot, for example the newest helmet on the head.
-Tools, such as the hammer, and older pieces show under "Also carries".
+Every player's bag has the game's 8 by 4 grid, 32 slots, and worn gear takes a slot there too, as in the game.
+Megingjord adds carry weight, not slots. Items fill slots in stacks of the size the game gives each one:
+
+```mermaid
+flowchart LR
+  game[Game's item list] -->|on start| file["item-stacks.txt next to logs.txt: Wood 50"]
+  file --> stacks[Most per slot]
+  bag[Bag guess: Wood 120] --> slots["Slots: Wood 50, Wood 50, Wood 20"]
+  stacks --> slots
+```
+
+When the guess needs more than 32 slots, the card says some of it was probably used up crafting or building.
+
+The plugin logs everything a player wears, holds or carries on the back whenever it changes (`Wearing:`). The
+Vikings character sheet puts each of those pieces in its slot, at the newest level seen in the gear lines, and
+marks them in the bag. Pieces with no slot of their own, such as a torch or the hammer, show under "Also in
+hand". Until a character's first `Wearing:` line, the newest piece seen of each slot stands in.
 
 ```mermaid
 flowchart LR
@@ -220,7 +234,7 @@ newest first. Only the latest 50 lines per number are kept, but all of them are 
 | Deaths | The game's death line and the plugin's death details |
 | Kills, most killed | Creature killed |
 | An area | Area entered |
-| A piece of gear | Gear first seen, at each level |
+| A piece of gear | Gear first seen, at each level, and each change to what is worn |
 | Pieces built, items gathered and the other activity numbers | Each plugin line of that activity |
 
 Each Saga and Hall event keeps its lines too: a game event, chat message or ping has its own line, a death

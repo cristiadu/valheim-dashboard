@@ -4,11 +4,17 @@
   import { GEAR_ICON_PX, GEAR_SLOT_NAMES, GEAR_SLOTS, type GearPiece, type SourceLines } from '#/lib/models';
   import { gearLabel, gearSheet } from '#/lib/gear';
 
-  /** Gear a character was seen with, newest first, as the snapshot keeps it, and the log lines behind a piece by its prefab. */
-  let { gear, sourceOf }: { gear: string[]; sourceOf: (prefab: string) => SourceLines } = $props();
+  /**
+   * Gear a character was seen with, newest first, as the snapshot keeps it, what they wear now once the plugin logged
+   * it, and the log lines behind a piece by its prefab.
+   */
+  let { gear, worn, sourceOf }: { gear: string[]; worn: string[] | null; sourceOf: (prefab: string) => SourceLines } = $props();
 
-  /** Gear laid out in slots, plus what is carried. */
-  const sheet = $derived(gearSheet(gear));
+  /** Gear laid out in slots, plus what else is held. */
+  const sheet = $derived(gearSheet(gear, worn));
+
+  /** What an empty slot says: nothing is worn there, or nothing was seen there yet before the plugin logged it. */
+  const emptyText = $derived(worn === null ? 'nothing seen yet' : 'nothing worn');
 </script>
 
 {#snippet pieceSlot(piece: GearPiece, label: string)}
@@ -24,7 +30,7 @@
   <ul class="doll" aria-label="Gear worn">
     {#each GEAR_SLOTS as slot (slot)}
       {@const piece = sheet.worn[slot]}
-      {@const label = `${GEAR_SLOT_NAMES[slot]}: ${piece ? gearLabel(piece) : 'nothing seen yet'}`}
+      {@const label = `${GEAR_SLOT_NAMES[slot]}: ${piece ? gearLabel(piece) : emptyText}`}
       <li style:grid-area={slot}>
         {#if piece}
           {@render pieceSlot(piece, label)}
@@ -34,11 +40,11 @@
       </li>
     {/each}
   </ul>
-  {#if sheet.carried.length > 0}
+  {#if sheet.held.length > 0}
     <div>
-      <p class="muted carried-title">Also carries</p>
-      <ul class="carried">
-        {#each sheet.carried as piece (piece.prefab)}
+      <p class="muted held-title">Also in hand</p>
+      <ul class="held">
+        {#each sheet.held as piece (piece.prefab)}
           <li>{@render pieceSlot(piece, gearLabel(piece))}</li>
         {/each}
       </ul>
@@ -47,7 +53,7 @@
 </div>
 
 <style>
-  /* Worn gear on top, carried gear below */
+  /* Worn gear on top, other held gear below */
   .sheet {
     display: flex;
     flex-direction: column;
@@ -105,14 +111,14 @@
     color: var(--gold);
   }
 
-  /* Label above the carried row */
-  .carried-title {
+  /* Label above the held row */
+  .held-title {
     margin: 0 0 6px;
     font-size: 12px;
   }
 
-  /* Carried gear in a row that wraps */
-  .carried {
+  /* Held gear in a row that wraps */
+  .held {
     display: flex;
     flex-wrap: wrap;
     gap: 6px;

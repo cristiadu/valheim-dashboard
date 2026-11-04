@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { chestName, containerGrid, itemName, itemSlots, stockOf } from '#/lib/items';
+import { chestName, containerGrid, itemName, itemSlots, stackSlots, stockOf } from '#/lib/items';
 import { mapOf } from '#/lib/map';
 import { playersOf } from '#/lib/players';
 import { snapshotWith, TEST_NOON_MS } from '#/lib/test-common';
@@ -35,13 +35,15 @@ describe('containerGrid', () => {
   it("uses the game's grid, adds rows when the items need them, and has a grid for unknown containers", () => {
     // GIVEN a wood chest with 3 kinds, a cart with 20 kinds and an unknown container with 1 kind
     // WHEN their grids are made
-    const grids = [containerGrid('piece_chest_wood', 3), containerGrid('Cart', 20), containerGrid('piece_odd', 1)];
+    const grids = [containerGrid('piece_chest_wood', 3), containerGrid('Cart', 20), containerGrid('piece_odd', 1), containerGrid('Player', 3)];
 
-    // THEN the wood chest is 5 by 2, the cart grows a fourth row of 6, and the unknown one is 5 by 2
+    // THEN the wood chest is 5 by 2, the cart holds 18 but grows a fourth row of 6, the unknown one is 5 by 2, and a
+    // player's bag is 8 by 4
     expect(grids).toEqual([
-      { columns: 5, slots: 10 },
-      { columns: 6, slots: 24 },
-      { columns: 5, slots: 10 },
+      { columns: 5, capacity: 10, slots: 10 },
+      { columns: 6, capacity: 18, slots: 24 },
+      { columns: 5, capacity: 10, slots: 10 },
+      { columns: 8, capacity: 32, slots: 32 },
     ]);
   });
 });
@@ -60,6 +62,20 @@ describe('itemSlots', () => {
       { prefab: 'Wood', name: 'Wood', count: 20 },
       { prefab: 'TrophyDeer', name: 'Deer trophy', count: 2 },
     ]);
+  });
+});
+
+describe('stackSlots', () => {
+  it('splits each item into full stacks and the rest, and gives an item with no known stack one slot', () => {
+    // GIVEN 120 wood that stacks to 50, one spear that stacks to 1, and 7 resin with no known stack
+    const items = { Wood: 120, SpearFlint: 1, Resin: 7 };
+    const stacks = { Wood: 50, SpearFlint: 1 };
+
+    // WHEN its slots are listed
+    const slots = stackSlots(items, stacks);
+
+    // THEN wood takes three slots, then resin and the spear one each
+    expect(slots.map((slot) => `${slot.prefab} ${slot.count}`)).toEqual(['Wood 50', 'Wood 50', 'Wood 20', 'Resin 7', 'SpearFlint 1']);
   });
 });
 

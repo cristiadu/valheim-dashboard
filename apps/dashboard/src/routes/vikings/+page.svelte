@@ -122,15 +122,15 @@
           <div class="gear">
             <p class="muted part-title">Gear</p>
             {#if player.gear.length > 0}
-              <GearSheet gear={player.gear} sourceOf={(prefab) => playerSource(snapshot, player, 'gear', prefab)} />
+              <GearSheet gear={player.gear} worn={player.worn} sourceOf={(prefab) => playerSource(snapshot, player, 'gear', prefab)} />
             {:else}
               <p class="muted">No gear seen yet.</p>
             {/if}
           </div>
 
           <div class="bag">
-            <p class="muted part-title">In the bag now <span class="hint">(a guess from pickups, chests and meals)</span></p>
-            <ChestContents chest={PLAYER_PREFAB} items={snapshot.bags[player.character] ?? {}} />
+            <p class="muted part-title">In the bag now <span class="hint">(a guess from gear, pickups, chests and meals)</span></p>
+            <ChestContents chest={PLAYER_PREFAB} items={snapshot.bags[player.character] ?? {}} stacks={snapshot.itemStacks} equipped={player.worn ?? []} />
           </div>
         </div>
       </article>

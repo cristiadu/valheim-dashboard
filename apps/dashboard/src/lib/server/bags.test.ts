@@ -49,4 +49,20 @@ describe('updateBags', () => {
     expect(afterDeath).toEqual({});
     expect(afterTombstone).toEqual({ SwordBronze: 1, Coins: 55 });
   });
+
+  it('keeps gear seen worn or held in the bag, once, until it is stored', () => {
+    // GIVEN Ragnar is seen with a spear, then wears a helmet and the spear, then stores the helmet
+    readLines(state, [
+      ...RUN_START,
+      logLine('03:00:00', 'Gear: Ragnar SpearFlint quality 4'),
+      logLine('03:00:01', 'Wearing: Ragnar has HelmetLeather, SpearFlint'),
+      logLine('03:00:02', 'Stored: HelmetLeather x1 in piece_chest_wood by Ragnar'),
+    ]);
+
+    // WHEN his bag is read
+    const bag = state.snapshot.bags['Ragnar'];
+
+    // THEN only the spear is left, once
+    expect(bag).toEqual({ SpearFlint: 1 });
+  });
 });

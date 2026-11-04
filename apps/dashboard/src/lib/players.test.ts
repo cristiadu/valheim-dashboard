@@ -43,6 +43,7 @@ describe('playersOf', () => {
       visitedAreas: { Tony: ['Meadows'], wynnyarD: ['Meadows', 'Swamp'] },
       currentAreas: { Tony: 'Meadows', wynnyarD: 'Swamp' },
       gear: { Tony: ['Club'], wynnyarD: ['AxeBronze', 'SwordIron quality 2'] },
+      worn: { Tony: ['Club'], wynnyarD: ['SwordIron'] },
       activityTotals: { Tony: { built: 5 }, wynnyarD: { built: 2, mined: 3 } },
       explored: { Tony: ['0,0', '0,1'], wynnyarD: ['0,1', '1,1'] },
     });
@@ -57,6 +58,7 @@ describe('playersOf', () => {
       topKill: 'Greydwarf',
       areas: ['Meadows', 'Swamp'],
       gear: ['SwordIron quality 2', 'AxeBronze'],
+      worn: ['SwordIron'],
       activityTotals: { built: 7, mined: 3 },
       exploredSquares: 3,
     });
