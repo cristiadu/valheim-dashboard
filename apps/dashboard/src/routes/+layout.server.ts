@@ -4,8 +4,9 @@ import { createServerState } from '#/lib/server/server-state';
 
 /**
  * Gives every page the snapshot, so the first view has data before the live stream connects. The password
- * page gets an empty one, because whoever sees it has not typed the password yet.
+ * page gets an empty one, because whoever sees it has not typed the password yet. Runs once per page load, not on
+ * each tab change, since the live stream keeps the snapshot current after that.
  */
-export const load = async ({ url }: { url: URL }) => ({
-  snapshot: url.pathname === PASSWORD_PATH ? createServerState(0).snapshot : await currentSnapshot(),
+export const load = async ({ url, untrack }: { url: URL; untrack: <T>(read: () => T) => T }) => ({
+  snapshot: untrack(() => url.pathname) === PASSWORD_PATH ? createServerState(0).snapshot : await currentSnapshot(),
 });

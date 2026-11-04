@@ -81,6 +81,9 @@ export const WIKI_ICON_FILES: Record<string, string> = {
 /** How often the log file is checked for new lines. */
 export const POLL_INTERVAL_MS = 2_000;
 
+/** Start of the content types sent gzip-compressed: pages, and the data the page fetches on a tab change. */
+export const COMPRESSED_TYPES = ['text/html', 'application/json'] as const;
+
 /** How often an idle live stream sends a comment, so proxies keep it open. */
 export const KEEP_ALIVE_MS = 25_000;
 
@@ -196,6 +199,8 @@ export type Follower = {
   state: ServerState;
   /** True when lines arrived since the listeners were last told. */
   hasNewLines: boolean;
+  /** Copy of the snapshot as the listeners were last told, which a new live stream starts from. */
+  sentSnapshot: Snapshot;
   /** World and time of the save whose global keys were read last, for example `Cotil 2026-10-31T23:30:45.000Z`. */
   worldSaveRead: string | null;
   /** World and run start whose terrain file was read or reported missing, for example `Cotil 2026-11-01T10:43:52.000Z`. */
