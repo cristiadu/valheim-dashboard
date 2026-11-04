@@ -36,6 +36,7 @@ describe('mapOf', () => {
     // THEN each thing sits at its spot with z turned into y, in Ragnar's color
     expect(map).toEqual({
       viewBox: '-64 -96 192 192',
+      chestMeters: 16,
       land: [
         { key: '0,0', x: 0, y: -32, color: '#5f7a3a' },
         { key: '1,-1', x: 32, y: 0, color: 'var(--line)' },
@@ -45,6 +46,7 @@ describe('mapOf', () => {
         { key: 'Ragnar:1,-1', x: 42, y: 10, color: 'var(--gold)' },
       ],
       chests: [{ id: '1:10', x: 12, y: -18, record: snapshot.chests['1:10'] }],
+      chestGroups: [{ key: '0,-2', x: 12, y: -18, ids: ['1:10'] }],
       marks: [
         { key: 'player:Ragnar', kind: 'player', label: 'Ragnar', x: 40, y: 10, color: 'var(--gold)' },
         { key: 'death:Ragnar', kind: 'death', label: 'Ragnar died here', x: 50, y: 20, color: 'var(--gold)' },
@@ -68,6 +70,25 @@ describe('mapOf chest builders', () => {
 
     // THEN the chest is Ragnar's
     expect(map?.chests[0]?.record.builder).toBe('Ragnar');
+  });
+});
+
+describe('mapOf chest groups', () => {
+  it('puts chests that would cover each other under one mark, and keeps far ones apart', () => {
+    // GIVEN two of Ragnar's chests 4 m apart and a third 100 m away
+    const chest = { chest: 'piece_chest_wood', builder: 'Ragnar', items: {}, timeUtc: '2026-10-29T11:00:00.000Z' };
+    const snapshot = snapshotWith({
+      chests: { '1:1': { ...chest, x: 1, z: -1 }, '1:2': { ...chest, x: 5, z: -3 }, '1:3': { ...chest, x: 100, z: -1 } },
+    });
+
+    // WHEN the map is made
+    const map = mapOf(snapshot, playersOf(snapshot, TEST_NOON_MS));
+
+    // THEN the close chests share a mark in their middle and the far one has its own
+    expect(map?.chestGroups).toEqual([
+      { key: '0,0', x: 3, y: 2, ids: ['1:1', '1:2'] },
+      { key: '6,0', x: 100, y: 1, ids: ['1:3'] },
+    ]);
   });
 });
 

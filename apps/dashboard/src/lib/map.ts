@@ -1,8 +1,12 @@
 import {
+  MAP_CHEST_METERS,
+  MAP_CHESTS_ACROSS,
   MAP_MARGIN_METERS,
   MAP_SQUARE_METERS,
   MAP_TRAIL_METERS,
   type ChestRecord,
+  type MapChest,
+  type MapChestGroup,
   type MapView,
   OTHER_PLAYER_COLOR,
   type Player,
@@ -38,6 +42,24 @@ const isNearExplored = (chest: ChestRecord, explored: Set<string>): boolean =>
 export const foundChests = (snapshot: Snapshot): [string, ChestRecord][] => {
   const explored = new Set(Object.values(snapshot.explored).flat());
   return Object.entries(snapshot.chests).filter(([, chest]) => chest.builder !== null || isNearExplored(chest, explored));
+};
+
+/**
+ * Groups [chests] that share a square [chestMeters] wide, so marks never cover each other and each can be
+ * tapped. Each group sits at the middle of its chests, in the order the chests come.
+ */
+const chestGroupsOf = (chests: MapChest[], chestMeters: number): MapChestGroup[] => {
+  const groups = new Map<string, MapChest[]>();
+  for (const chest of chests) {
+    const key = `${Math.floor(chest.x / chestMeters)},${Math.floor(chest.y / chestMeters)}`;
+    groups.set(key, [...(groups.get(key) ?? []), chest]);
+  }
+  return [...groups].map(([key, members]) => ({
+    key,
+    x: members.reduce((sum, chest) => sum + chest.x, 0) / members.length,
+    y: members.reduce((sum, chest) => sum + chest.y, 0) / members.length,
+    ids: members.map((chest) => chest.id),
+  }));
 };
 
 /**
@@ -111,11 +133,14 @@ export const mapOf = (snapshot: Snapshot, players: Player[]): MapView | null => 
   const top = Math.min(...ys) - MAP_MARGIN_METERS;
   const width = Math.max(...xs) + MAP_MARGIN_METERS - left;
   const height = Math.max(...ys) + MAP_MARGIN_METERS - top;
+  const chestMeters = Math.max(MAP_CHEST_METERS, Math.round(width / MAP_CHESTS_ACROSS));
   return {
     viewBox: `${left} ${top} ${width} ${height}`,
+    chestMeters,
     land,
     trails,
     chests,
+    chestGroups: chestGroupsOf(chests, chestMeters),
     marks,
   };
 };

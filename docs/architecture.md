@@ -288,6 +288,9 @@ A position marks its whole 32 m square as explored. Chest IDs last until the ser
 all chests again, so a new run starts the chest list over. The plugin writes the terrain file once per world
 from the game's own world generator, and the map colors only squares someone walked.
 Nothing nobody has seen shows: a chest the world came with appears once someone walks next to it.
+Chests close together share one mark on the map. Tapping a mark opens each of its chests as slots, one per
+item, with the item's icon, count and name. Item names and icons come from the item's prefab, through
+`GEAR_NAMES` and `ITEM_NAMES`, and every name listed there gets its icon downloaded.
 
 BepInEx's own log file is turned off, so its messages land in
 `logs.txt` too. Every line is listed in [log-events.md](log-events.md).

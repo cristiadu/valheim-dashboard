@@ -326,21 +326,68 @@ export const MAP_SQUARE_METERS = 32;
 /** Space kept around everything the map shows, in meters. */
 export const MAP_MARGIN_METERS = 64;
 
-/** Size of a chest mark on the map, in meters. */
-export const MAP_CHEST_METERS = 12;
+/** Smallest size of a chest mark on the map, in meters. */
+export const MAP_CHEST_METERS = 16;
+
+/** How many chest marks fit across the map, so marks stay big enough to see and tap on a big map. */
+export const MAP_CHESTS_ACROSS = 40;
+
+/**
+ * Names the game shows for chests, carts and ships, by the prefab the plugin logs. Chests the world came with,
+ * such as `TreasureChest_meadows`, start with [TREASURE_CHEST_PREFIX].
+ */
+export const CHEST_NAMES: Record<string, string> = {
+  piece_chest_wood: 'Wood chest',
+  piece_chest: 'Reinforced chest',
+  piece_chest_private: 'Personal chest',
+  piece_chest_blackmetal: 'Black metal chest',
+  piece_chest_barrel: 'Barrel',
+  Cart: 'Cart',
+  Raft: 'Raft',
+  Karve: 'Karve',
+  VikingShip: 'Longship',
+};
+
+/** Start of the prefab of every chest the world came with, for example `TreasureChest_meadows`. */
+export const TREASURE_CHEST_PREFIX = 'TreasureChest';
+
+/** Size of an item icon in a chest's slots, in pixels. */
+export const CHEST_SLOT_ICON_PX = 40;
 
 /** What the map draws, in map units: meters east as `x` and meters south as `y`, so north is up. */
 export type MapView = {
   /** SVG view box that fits everything, with a margin. */
   viewBox: string;
+  /** Size of a chest mark, in meters. */
+  chestMeters: number;
   /** Explored squares, once each, in their terrain color, or the line color before the terrain is known. */
   land: { key: string; x: number; y: number; color: string }[];
   /** A small mark in the middle of each square a character walked, in that character's player color. */
   trails: { key: string; x: number; y: number; color: string }[];
   /** Chests, carts and ships, by their ID. */
   chests: { id: string; x: number; y: number; record: ChestRecord }[];
+  /** Chests close enough to share one mark, so each mark can be tapped. */
+  chestGroups: MapChestGroup[];
   /** Where each online player stands and where each character last died. */
   marks: { key: string; kind: 'player' | 'death'; label: string; x: number; y: number; color: string }[];
+};
+
+/** A chest, cart or ship on the map, by its ID, with `y` meters south so north is up. */
+export type MapChest = MapView['chests'][number];
+
+/** Chests that share one mark on the map: where the mark sits and the chests' IDs. */
+export type MapChestGroup = { key: string; x: number; y: number; ids: string[] };
+
+/** One item across every chest on the map: how many there are in all, and in which chests. */
+export type StockRow = {
+  /** Prefab the plugin logs, for example `CopperOre`. */
+  prefab: string;
+  /** Name the game shows, for example `Copper ore`. */
+  name: string;
+  /** How many in all the chests together. */
+  count: number;
+  /** Chests that hold some, most first. */
+  chests: { chest: MapChest; count: number }[];
 };
 
 /**
@@ -558,6 +605,70 @@ export const GEAR_NAMES: Record<string, string> = {
   CapeLinen: 'Linen cape',
   BeltStrength: 'Megingjord',
   Wishbone: 'Wishbone',
+  ShieldWoodTower: 'Wood tower shield',
+  ShieldBoneTower: 'Bone tower shield',
+  ShieldIronTower: 'Iron tower shield',
+  SledgeStagbreaker: 'Stagbreaker',
+  SpearElderbark: 'Ancient bark spear',
+  ArmorRagsChest: 'Rag tunic',
+  ArmorRagsLegs: 'Rag pants',
+};
+
+/**
+ * Names the game shows for items that are not gear, by the prefab the plugin logs, for example `Boar meat` for
+ * `RawMeat`. The names also pick the icon, and every item listed here gets its icon downloaded, so it also lists
+ * items whose prefab only needs spaces, such as `CopperOre`, when no recipe uses them.
+ */
+export const ITEM_NAMES: Record<string, string> = {
+  RawMeat: 'Boar meat',
+  CookedMeat: 'Cooked boar meat',
+  RoundLog: 'Core wood',
+  ElderBark: 'Ancient bark',
+  Raspberry: 'Raspberries',
+  MushroomYellow: 'Yellow mushroom',
+  QueensJam: "Queen's jam",
+  SerpentMeatCooked: 'Cooked serpent meat',
+  YmirRemains: 'Ymir flesh',
+  NeckTailGrilled: 'Grilled neck tail',
+  Fish1: 'Perch',
+  Fish2: 'Pike',
+  ArrowWood: 'Wood arrow',
+  ArrowFlint: 'Flint arrow',
+  ArrowFire: 'Fire arrow',
+  MeadBaseHealthMinor: 'Minor healing mead base',
+  MeadHealthMinor: 'Minor healing mead',
+  MeadBaseStaminaMinor: 'Minor stamina mead base',
+  MeadStaminaMinor: 'Minor stamina mead',
+  MeadBasePoisonResist: 'Poison resistance mead base',
+  MeadPoisonResist: 'Poison resistance mead',
+  MeadBaseFrostResist: 'Frost resistance mead base',
+  MeadFrostResist: 'Frost resistance mead',
+  CopperOre: 'Copper ore',
+  TinOre: 'Tin ore',
+  IronScrap: 'Scrap iron',
+  SilverOre: 'Silver ore',
+  Coins: 'Coins',
+  Amber: 'Amber',
+  AmberPearl: 'Amber pearl',
+  Ruby: 'Ruby',
+  SilverNecklace: 'Silver necklace',
+  TrophyDeer: 'Deer trophy',
+  TrophyBoar: 'Boar trophy',
+  TrophyNeck: 'Neck trophy',
+  TrophyEikthyr: 'Eikthyr trophy',
+  TrophyGreydwarf: 'Greydwarf trophy',
+  TrophyGreydwarfBrute: 'Greydwarf brute trophy',
+  TrophyGreydwarfShaman: 'Greydwarf shaman trophy',
+  TrophySkeleton: 'Skeleton trophy',
+  TrophyGhost: 'Ghost trophy',
+  TrophyFrostTroll: 'Troll trophy',
+  TrophyTheElder: 'The Elder trophy',
+  TrophyDraugr: 'Draugr trophy',
+  TrophyBlob: 'Blob trophy',
+  TrophyLeech: 'Leech trophy',
+  TrophySurtling: 'Surtling trophy',
+  TrophyWolf: 'Wolf trophy',
+  TrophyHatchling: 'Drake trophy',
 };
 
 /** Where a piece of gear goes on the character sheet: a slot, or `carried` for tools and spare gear. */

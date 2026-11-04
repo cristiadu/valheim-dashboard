@@ -29,6 +29,7 @@
     vertical-align: middle;
   }
 
+  /* Two letters in a box when an item has no icon */
   .fallback {
     display: inline-grid;
     flex: none;

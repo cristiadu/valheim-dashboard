@@ -1,17 +1,22 @@
 <script lang="ts">
   import ItemIcon from '#/lib/components/ItemIcon';
+  import { itemSlots } from '#/lib/items';
 
-  /** Item counts to show with their icons. */
+  /** How many of each thing, by the prefab the plugin logs, and the icon size in pixels. */
   let { items, size = 20 }: { items: Record<string, number>; size?: number } = $props();
+
+  /** One entry per thing, most first, with the name the game shows. */
+  const slots = $derived(itemSlots(items));
 </script>
 
 <ul class="items">
-  {#each Object.entries(items) as [item, count] (item)}
-    <li><ItemIcon {item} {size} /><span class="amount">{count.toLocaleString()}×</span>{item}</li>
+  {#each slots as slot (slot.prefab)}
+    <li><ItemIcon item={slot.name} {size} /><span class="amount">{slot.count.toLocaleString()}×</span>{slot.name}</li>
   {/each}
 </ul>
 
 <style>
+  /* Things in a wrapping row */
   .items {
     display: flex;
     flex-wrap: wrap;
@@ -21,6 +26,7 @@
     list-style: none;
   }
 
+  /* Icon, count and name of one thing in a row */
   li {
     display: inline-flex;
     align-items: center;
@@ -28,6 +34,7 @@
     min-height: 24px;
   }
 
+  /* Count before each name */
   .amount {
     font-variant-numeric: tabular-nums;
     color: var(--muted);
