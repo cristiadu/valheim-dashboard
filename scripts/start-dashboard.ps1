@@ -47,7 +47,7 @@ if (-not (Test-Path $LogFile)) {
 
 $env:LOG_FILE = $LogFile
 $env:PORT = "$Port"
-# Only this PC reaches the dashboard directly. Friends come in through the ngrok link.
+# Only this PC reaches the dashboard directly. Friends come in through the zrok link.
 $env:HOST = '127.0.0.1'
 $env:DASHBOARD_PASSWORD = Get-GameServerPassword $ServerDir
 if (-not $env:DASHBOARD_PASSWORD) {
