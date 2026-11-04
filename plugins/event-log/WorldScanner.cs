@@ -63,6 +63,7 @@ namespace ValheimDashboard.EventLog
                 KitchenTracker.See(zdo);
                 ShipTracker.See(zdo);
                 PieceStateTracker.See(zdo);
+                CraftedItemTracker.See(zdo);
                 if (isNew)
                 {
                     NewObjects.Add(zdo);
@@ -75,6 +76,7 @@ namespace ValheimDashboard.EventLog
             NewObjects.Clear();
             hasSeenWorld = true;
             PlayerTracker.AfterScan();
+            CraftedItemTracker.AfterScan();
             TerrainMap.WriteOnce();
             GameDataFiles.WriteOnce();
             CombatTracker.ForgetOldMoves();
@@ -97,6 +99,8 @@ namespace ValheimDashboard.EventLog
             ShipTracker.Forget(uid);
             PieceStateTracker.Forget(uid);
             ActionTracker.Forget(uid);
+            CraftedItemTracker.Forget(uid);
+            EffectTracker.Forget(uid);
             ZDO zdo = __instance.GetZDO(uid);
             if (zdo == null)
             {

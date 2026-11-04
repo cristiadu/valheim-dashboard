@@ -200,6 +200,10 @@ when the plugin does not know who it was.
 | Claimed a bed | `Bed claimed: Ragnar` | `^Bed claimed: (?<character>.+)$` |
 | Named a portal | `Portal named: Swamp camp by Ragnar` | `^Portal named: (?<portal>.+) by (?<player>.+)$` |
 | Ward turned on or off, which only its builder can do | `Ward turned off: guard_stone by Ragnar` | `^Ward turned (?<state>on\|off): (?<ward>\S+) by (?<builder>.+)$` |
+| Items a player made, once more of them sit in chests or on the ground than ever before. An item carried since before the server started counts when it first shows up | `Made: ArrowFlint x20 by Ragnar` | `^Made: (?<item>\S+) x(?<count>\d+) by (?<crafter>.+)$` |
+| An item a player made showed up at a higher level | `Upgraded: SwordBronze to level 2 by Ragnar` | `^Upgraded: (?<item>\S+) to level (?<level>\d+) by (?<crafter>.+)$` |
+| A skill went up a level, from the effect the game shares with other players. Which skill is never sent | `Skill up: Ragnar` | `^Skill up: (?<player>.+)$` |
+| Bought from or sold to a trader, from the trader's shared effect. What was traded is never sent | `Traded: Ragnar bought from Haldor` | `^Traded: (?<player>.+) (?<action>bought from\|sold to) (?<trader>\S+)$` |
 | Tree cut down or rock mined out | `Tree cut: Beech1 by Ragnar`, `Rock mined: rock4_copper by Ragnar` | `^(?<kind>Tree cut\|Rock mined): (?<thing>\S+) by (?<player>.+)$` |
 | Where a player stands | `Position: Ragnar 120 -340` | `^Position: (?<character>.+) (?<x>-?\d+) (?<z>-?\d+)$` |
 | What a chest, cart or ship holds | `Chest: 52731986:1203 piece_chest_wood at 118 -336 built by Ragnar holds Wood x20, Stone x3` | `^Chest: (?<id>\S+) (?<chest>\S+) at (?<x>-?\d+) (?<z>-?\d+) built by (?<builder>.+?) holds (?<items>.+)$` |

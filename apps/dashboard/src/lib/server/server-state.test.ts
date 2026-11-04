@@ -173,6 +173,28 @@ describe('server state', () => {
     ]);
   });
 
+  it('keeps items made, upgrades and skill levels as activities per player', () => {
+    // GIVEN Yan makes arrows twice, upgrades a sword and gains two skill levels
+    readLines(state, [
+      ...RUN_START,
+      logLine('03:00:00', 'Made: ArrowFlint x20 by Yan'),
+      logLine('03:00:30', 'Made: ArrowFlint x10 by Yan'),
+      logLine('03:01:00', 'Upgraded: SwordBronze to level 2 by Yan'),
+      logLine('03:01:10', 'Skill up: Yan'),
+      logLine('03:01:20', 'Skill up: Yan'),
+    ]);
+
+    // WHEN the activities are listed
+    const kinds = state.snapshot.activities.map((activity) => [activity.player, activity.kind, activity.things]);
+
+    // THEN each kind is one stretch
+    expect(kinds).toEqual([
+      ['Yan', 'made', { ArrowFlint: 30 }],
+      ['Yan', 'upgraded', { SwordBronze: 1 }],
+      ['Yan', 'leveled', { skill: 2 }],
+    ]);
+  });
+
   it('names builders the plugin gave by Steam name by their character instead', () => {
     // GIVEN Tony Example plays Ragnar, and the plugin names a chest and pieces by his Steam name
     readLines(state, [

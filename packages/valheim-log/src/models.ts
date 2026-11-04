@@ -72,6 +72,9 @@ export type LogEvent = { timeUtc: string } & (
   | { type: 'bedClaimed'; character: string }
   | { type: 'portalNamed'; portal: string; player: string | null }
   | { type: 'wardChanged'; ward: string; builder: string | null; isOn: boolean }
+  | { type: 'itemMade'; item: string; count: number; level: number; crafter: string }
+  | { type: 'skillUp'; player: string | null }
+  | { type: 'traded'; player: string | null; trader: string; isBuy: boolean }
   | { type: 'depleted'; kind: 'tree' | 'rock'; thing: string; player: string | null }
   | {
       type: 'chestContents';

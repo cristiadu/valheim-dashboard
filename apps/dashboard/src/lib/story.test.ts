@@ -129,6 +129,29 @@ describe('storyOf', () => {
     ]);
   });
 
+  it('tells trades and skill levels in plain sentences', () => {
+    // GIVEN Inge Dragonchow buys from Haldor, sells to him and gains two skill levels
+    const snapshot = snapshotWith({
+      events: [
+        { type: 'traded', timeUtc: '2026-10-29T10:01:00.000Z', player: 'Inge Dragonchow', trader: 'Haldor', isBuy: true, line: 'test line' },
+        { type: 'traded', timeUtc: '2026-10-29T10:02:00.000Z', player: 'Inge Dragonchow', trader: 'Haldor', isBuy: false, line: 'test line' },
+      ],
+      activities: [
+        { player: 'Inge Dragonchow', kind: 'leveled', startUtc: '2026-10-29T10:03:00.000Z', endUtc: '2026-10-29T10:03:00.000Z', things: { skill: 2 }, source: NO_LINES },
+      ],
+    });
+
+    // WHEN the story is made
+    const story = storyOf(snapshot);
+
+    // THEN each reads as a sentence with no list, newest first
+    expect(story.map((item) => [item.kind, item.text, item.things])).toEqual([
+      ['world', 'Inge Dragonchow gained 2 skill levels', undefined],
+      ['items', 'Inge Dragonchow sold something to Haldor', undefined],
+      ['items', 'Inge Dragonchow bought something from Haldor', undefined],
+    ]);
+  });
+
   it('tells kills and items in one line per stretch', () => {
     // GIVEN Ragnar killed creatures, moved items, cooked, brewed and steered a ship
     const snapshot = snapshotWith({
@@ -141,6 +164,7 @@ describe('storyOf', () => {
         { player: 'Ragnar', kind: 'cooked', startUtc: '2026-10-29T10:10:00.000Z', endUtc: '2026-10-29T10:10:00.000Z', things: { RawMeat: 2 }, source: NO_LINES },
         { player: 'Ragnar', kind: 'brewed', startUtc: '2026-10-29T10:11:00.000Z', endUtc: '2026-10-29T10:11:00.000Z', things: { MeadBaseTasty: 1 }, source: NO_LINES },
         { player: 'Ragnar', kind: 'sailed', startUtc: '2026-10-29T10:12:00.000Z', endUtc: '2026-10-29T10:12:00.000Z', things: { Karve: 1 }, source: NO_LINES },
+        { player: 'Ragnar', kind: 'made', startUtc: '2026-10-29T10:13:00.000Z', endUtc: '2026-10-29T10:13:00.000Z', things: { ArrowFlint: 20 }, source: NO_LINES },
       ],
     });
 
@@ -149,6 +173,7 @@ describe('storyOf', () => {
 
     // THEN each stretch reads plainly, and item lines leave the list to their item icons
     expect(story.map((item) => [item.kind, item.text, item.things])).toEqual([
+      ['items', 'Ragnar made 20 items', { ArrowFlint: 20 }],
       ['travel', 'Ragnar steered 1 ship: 1 karve', undefined],
       ['items', 'Ragnar started brewing 1 mead', { MeadBaseTasty: 1 }],
       ['items', 'Ragnar started cooking 2 things', { RawMeat: 2 }],

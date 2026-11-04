@@ -187,6 +187,12 @@ const addActivityOf = (snapshot: Snapshot, event: LogEvent, line: string): void 
     case 'emote':
       addActivity(snapshot, line, timeUtc, event.character, 'emoted', event.emote, 1);
       break;
+    case 'itemMade':
+      addActivity(snapshot, line, timeUtc, event.crafter, event.level === 1 ? 'made' : 'upgraded', event.item, event.count);
+      break;
+    case 'skillUp':
+      addActivity(snapshot, line, timeUtc, event.player, 'leveled', 'skill', 1);
+      break;
     case 'depleted':
       addActivity(snapshot, line, timeUtc, event.player, event.kind === 'tree' ? 'cut' : 'mined', event.thing, 1);
       break;

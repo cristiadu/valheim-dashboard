@@ -161,6 +161,18 @@ export const PORTAL_NAMED_PATTERN = /^Portal named: (?<portal>.+) by (?<player>.
 /** The player who built a ward turned it on or off. Written by the event log plugin. */
 export const WARD_PATTERN = /^Ward turned (?<state>on|off): (?<ward>\S+) by (?<builder>.+)$/;
 
+/** More of an item a player crafted is in chests or on the ground than ever before. Written by the event log plugin. */
+export const MADE_PATTERN = /^Made: (?<item>\S+) x(?<count>\d+) by (?<crafter>.+)$/;
+
+/** An item a player crafted showed up at a new level. Written by the event log plugin. */
+export const UPGRADED_PATTERN = /^Upgraded: (?<item>\S+) to level (?<level>\d+) by (?<crafter>.+)$/;
+
+/** A player's skill went up a level. Written by the event log plugin. */
+export const SKILL_UP_PATTERN = /^Skill up: (?<player>.+)$/;
+
+/** A player bought from or sold to a trader such as Haldor. Written by the event log plugin. */
+export const TRADED_PATTERN = /^Traded: (?<player>.+) (?<action>bought from|sold to) (?<trader>\S+)$/;
+
 /** A player cut down a tree or mined out a rock. Written by the event log plugin. */
 export const DEPLETED_PATTERN = /^(?<kind>Tree cut|Rock mined): (?<thing>\S+) by (?<player>.+)$/;
 
