@@ -98,7 +98,7 @@
     display: flex;
     flex-direction: column;
     gap: 22px;
-    max-width: 1000px;
+    max-width: var(--page-width);
   }
 
   /* Uptime track */
