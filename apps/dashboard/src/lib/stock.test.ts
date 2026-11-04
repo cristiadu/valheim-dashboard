@@ -32,11 +32,12 @@ describe('bagStock', () => {
 
 describe('chestStock', () => {
   it("adds up every chest, or only the ones a player's names built", () => {
-    // GIVEN Ragnar, known on Steam as Tony Example, built one chest by each name, Bjorn built another, and nobody
-    // has found a treasure chest yet
+    // GIVEN Ragnar, known on Steam as Tony Example, built one chest by each name on a square he walked, Bjorn built
+    // another there, and nobody has walked to a treasure chest yet
     const timeUtc = '2026-10-29T11:00:00.000Z';
     const snapshot = snapshotWith({
       sessions: [sessionWith({ steamId: 'Steam_1', steamName: 'Tony Example' })],
+      explored: { Ragnar: ['0,0'] },
       chests: {
         '1:1': { chest: 'piece_chest_wood', x: 0, z: 0, builder: 'Ragnar', items: { Wood: 10 }, timeUtc },
         '1:2': { chest: 'Cart', x: 5, z: 0, builder: 'Tony Example', items: { Wood: 4, DeerHide: 2 }, timeUtc },

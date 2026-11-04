@@ -342,6 +342,21 @@ export const MAP_CHESTS_ACROSS = 40;
 /** Distance between chests placed side by side on the map, in chest marks, so a mark grown on hover still shows its neighbors. */
 export const MAP_CHEST_STEP = 1.15;
 
+/** How far the map can zoom in, as times the whole map. */
+export const MAP_MAX_ZOOM = 16;
+
+/** How much one zoom step or wheel notch zooms the map in or out. */
+export const MAP_ZOOM_STEP = 1.5;
+
+/** How far a pointer must move before a press on the map counts as a drag and not a tap, in pixels. */
+export const MAP_DRAG_PX = 4;
+
+/** Size of a player mark on the map at the whole-map zoom, in meters. */
+export const MAP_PLAYER_METERS = 16;
+
+/** Size of a death mark on the map at the whole-map zoom, in meters. */
+export const MAP_DEATH_METERS = 24;
+
 /**
  * Names the game shows for chests, carts and ships, by the prefab the plugin logs. Chests the world came with,
  * such as `TreasureChest_meadows`, start with [TREASURE_CHEST_PREFIX].
@@ -384,8 +399,8 @@ export const CHEST_SLOT_ICON_PX = 44;
 
 /** What the map draws, in map units: meters east as `x` and meters south as `y`, so north is up. */
 export type MapView = {
-  /** SVG view box that fits everything, with a margin. */
-  viewBox: string;
+  /** Part of the map that fits everything, with a margin. */
+  box: MapBox;
   /** Size of a chest mark, in meters. */
   chestMeters: number;
   /** Explored squares, once each, in their terrain color, or the line color before the terrain is known. */
@@ -394,14 +409,15 @@ export type MapView = {
   trails: { key: string; x: number; y: number; color: string }[];
   /** Chests, carts and ships, by their ID. */
   chests: { id: string; x: number; y: number; record: ChestRecord }[];
-  /** Where each chest's mark sits, moved apart from chests it would cover. */
-  chestSpots: MapChestSpot[];
   /** Where each online player stands and where each character last died. */
   marks: { key: string; kind: 'player' | 'death'; label: string; x: number; y: number; color: string }[];
 };
 
 /** A chest, cart or ship on the map, by its ID, with `y` meters south so north is up. */
 export type MapChest = MapView['chests'][number];
+
+/** A part of the map, in map units: its top left corner, width and height. */
+export type MapBox = { x: number; y: number; width: number; height: number };
 
 /** Where one chest's mark sits on the map, by the chest's ID. */
 export type MapChestSpot = { id: string; x: number; y: number };

@@ -6,11 +6,21 @@
   import NoData from '#/lib/components/NoData';
   import { chestName, stockOf } from '#/lib/items';
   import { live, useSnapshot } from '#/lib/live.svelte';
-  import { mapOf } from '#/lib/map';
-  import { MAP_SQUARE_METERS, MAP_TRAIL_METERS, TERRAIN_STYLES } from '#/lib/models';
+  import { chestSpotsOf, mapOf } from '#/lib/map';
+  import {
+    MAP_DEATH_METERS,
+    MAP_DRAG_PX,
+    MAP_PLAYER_METERS,
+    MAP_SQUARE_METERS,
+    MAP_TRAIL_METERS,
+    MAP_ZOOM_STEP,
+    type MapBox,
+    TERRAIN_STYLES,
+  } from '#/lib/models';
   import { playersOf } from '#/lib/players';
   import { viewerTimeZone, whenLabel } from '#/lib/status';
   import { count } from '#/lib/story';
+  import { pannedBox, zoomedBox, zoomOf } from '#/lib/zoom';
 
   /** Getter for the snapshot the layout shares. */
   const getSnapshot = useSnapshot();
@@ -29,6 +39,73 @@
 
   /** What the map draws. */
   const map = $derived(mapOf(snapshot, players));
+
+  /** Part of the map in view after zooming, or null for the whole map. */
+  let zoomBox = $state<MapBox | null>(null);
+
+  /** Part of the map in view. */
+  const box = $derived(zoomBox ?? map?.box ?? { x: 0, y: 0, width: 1, height: 1 });
+
+  /** How many times the map is zoomed in, 1 for the whole map. */
+  const zoom = $derived(map === null ? 1 : zoomOf(box, map.box));
+
+  /** Where each chest's mark sits at this zoom: marks keep their size on screen, so they spread less when zoomed. */
+  const chestSpots = $derived(map === null ? [] : chestSpotsOf(map.chests, map.chestMeters / zoom));
+
+  /** The drawn map, to turn pointer spots into map spots. */
+  let mapSvg = $state<SVGSVGElement>();
+
+  /** Where a press on the map started, in pixels, and whether it has moved far enough to be a drag. */
+  let press: { x: number; y: number; isDrag: boolean } | null = null;
+
+  /** Returns the map spot under the pointer at [clientX], [clientY]. */
+  const mapSpotAt = (clientX: number, clientY: number): { x: number; y: number } => {
+    const point = new DOMPoint(clientX, clientY).matrixTransform(mapSvg!.getScreenCTM()!.inverse());
+    return { x: point.x, y: point.y };
+  };
+
+  /** Zooms the map [factor] times around the map spot [x], [y]. */
+  const zoomBy = (factor: number, x = box.x + box.width / 2, y = box.y + box.height / 2): void => {
+    zoomBox = zoomedBox(box, map!.box, factor, x, y);
+  };
+
+  /** Zooms in or out with the mouse wheel, around the spot under the pointer. */
+  const onWheel = (event: WheelEvent): void => {
+    event.preventDefault();
+    const spot = mapSpotAt(event.clientX, event.clientY);
+    zoomBy(event.deltaY < 0 ? MAP_ZOOM_STEP : 1 / MAP_ZOOM_STEP, spot.x, spot.y);
+  };
+
+  /** Zooms in on the spot that was double clicked or double tapped. */
+  const onDoubleClick = (event: MouseEvent): void => {
+    const spot = mapSpotAt(event.clientX, event.clientY);
+    zoomBy(MAP_ZOOM_STEP * MAP_ZOOM_STEP, spot.x, spot.y);
+  };
+
+  /** Starts a possible drag where the map was pressed. */
+  const onPointerDown = (event: PointerEvent): void => {
+    press = { x: event.clientX, y: event.clientY, isDrag: false };
+  };
+
+  /** Moves a zoomed map with the pointer, once the press has moved far enough to be a drag. */
+  const onPointerMove = (event: PointerEvent): void => {
+    if (press === null || zoom === 1) {
+      return;
+    }
+    if (!press.isDrag && Math.hypot(event.clientX - press.x, event.clientY - press.y) > MAP_DRAG_PX) {
+      press.isDrag = true;
+      mapSvg!.setPointerCapture(event.pointerId);
+    }
+    if (press.isDrag) {
+      const unitsPerPixel = box.width / mapSvg!.clientWidth;
+      zoomBox = pannedBox(box, map!.box, -event.movementX * unitsPerPixel, -event.movementY * unitsPerPixel);
+    }
+  };
+
+  /** Ends a press, so the next tap on a chest opens it. */
+  const onPointerUp = (): void => {
+    press = null;
+  };
 
   /** ID of the chest tapped on the map or picked in a list, or null when none is open. */
   let pickedId = $state<string | null>(null);
@@ -79,8 +156,8 @@
       <h2 id="map-title" class="panel-title">WHERE EVERYONE HAS BEEN</h2>
       <p class="muted">
         Each square is {MAP_SQUARE_METERS} m of land someone walked, in its terrain color, with a dot for each player who
-        was there. North is up. Point at a chest to make it bigger, and tap it to look inside. Chests built close
-        together sit side by side, so each one can be tapped.
+        was there. North is up. Point at a chest to make it bigger, and tap it to look inside. Zoom with the wheel, the
+        buttons or a double tap, and drag to move around once zoomed in. Chests only show on squares someone walked.
       </p>
       <div class="legend">
         {#each players as player (player.key)}
@@ -95,7 +172,25 @@
           <span><span class="swatch" style:background={style.color}></span>{style.name}</span>
         {/each}
       </div>
-      <svg class="map" viewBox={map.viewBox} role="img" aria-label="Map of explored land, chests and players">
+      <div class="zoom-tools">
+        <button type="button" onclick={() => zoomBy(MAP_ZOOM_STEP)} aria-label="Zoom in">+</button>
+        <button type="button" onclick={() => zoomBy(1 / MAP_ZOOM_STEP)} aria-label="Zoom out" disabled={zoom === 1}>−</button>
+        <button type="button" onclick={() => (zoomBox = null)} disabled={zoom === 1}>Whole map</button>
+      </div>
+      <svg
+        class="map"
+        class:zoomed={zoom > 1}
+        viewBox="{box.x} {box.y} {box.width} {box.height}"
+        role="img"
+        aria-label="Map of explored land, chests and players"
+        bind:this={mapSvg}
+        onwheel={onWheel}
+        ondblclick={onDoubleClick}
+        onpointerdown={onPointerDown}
+        onpointermove={onPointerMove}
+        onpointerup={onPointerUp}
+        onpointercancel={onPointerUp}
+      >
         <defs>
           <g id="chest-icon">
             <path class="chest-lid" d="M -0.46 -0.08 L -0.46 -0.22 Q -0.46 -0.42 -0.26 -0.42 L 0.26 -0.42 Q 0.46 -0.42 0.46 -0.22 L 0.46 -0.08 Z" />
@@ -108,14 +203,24 @@
           <rect x={square.x} y={square.y} width={MAP_SQUARE_METERS} height={MAP_SQUARE_METERS} fill={square.color} />
         {/each}
         {#each map.trails as trail (trail.key)}
-          <rect class="trail" x={trail.x} y={trail.y} width={MAP_TRAIL_METERS} height={MAP_TRAIL_METERS} fill={trail.color} />
+          {@const size = MAP_TRAIL_METERS / Math.sqrt(zoom)}
+          {@const inset = (MAP_TRAIL_METERS - size) / 2}
+          <rect
+            class="trail"
+            x={trail.x + inset}
+            y={trail.y + inset}
+            width={size}
+            height={size}
+            fill={trail.color}
+            stroke-width={2 / zoom}
+          />
         {/each}
-        {#each map.chestSpots as spot (spot.id)}
+        {#each chestSpots as spot (spot.id)}
           {@const label = chestName(map.chests.find((chest) => chest.id === spot.id)!.record.chest)}
           <g
             class="chest"
             class:picked={spot.id === pickedId}
-            transform="translate({spot.x} {spot.y}) scale({map.chestMeters})"
+            transform="translate({spot.x} {spot.y}) scale({map.chestMeters / zoom})"
             role="button"
             tabindex="0"
             aria-label={label}
@@ -129,11 +234,21 @@
         {/each}
         {#each map.marks as mark (mark.key)}
           {#if mark.kind === 'player'}
-            <rect class="player" x={mark.x - 8} y={mark.y - 8} width="16" height="16" fill={mark.color} transform={`rotate(45 ${mark.x} ${mark.y})`}>
+            {@const size = MAP_PLAYER_METERS / zoom}
+            <rect
+              class="player"
+              x={mark.x - size / 2}
+              y={mark.y - size / 2}
+              width={size}
+              height={size}
+              fill={mark.color}
+              stroke-width={3 / zoom}
+              transform={`rotate(45 ${mark.x} ${mark.y})`}
+            >
               <title>{mark.label}</title>
             </rect>
           {:else}
-            <text class="death" x={mark.x} y={mark.y} fill={mark.color}>✕<title>{mark.label}</title></text>
+            <text class="death" x={mark.x} y={mark.y} fill={mark.color} font-size={MAP_DEATH_METERS / zoom}>✕<title>{mark.label}</title></text>
           {/if}
         {/each}
       </svg>
@@ -256,12 +371,26 @@
     max-height: 70vh;
     background: var(--background);
     border: 1px solid var(--line);
+    touch-action: pan-y;
+    user-select: none;
+  }
+
+  /* A zoomed map moves with a drag, so the finger moves the map instead of the page */
+  .map.zoomed {
+    cursor: grab;
+    touch-action: none;
+  }
+
+  /* Zoom buttons in one row above the map */
+  .zoom-tools {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
   }
 
   /* Player dots sit on the terrain with a dark edge so they read on light land */
   .trail {
     stroke: var(--background);
-    stroke-width: 2;
   }
 
   /* Chest wood is brown, or gold on the picked chest */
@@ -313,12 +442,10 @@
   /* Online players as turned squares with a dark edge */
   .player {
     stroke: var(--background);
-    stroke-width: 3;
   }
 
   /* Death marks centered on the spot */
   .death {
-    font-size: 24px;
     text-anchor: middle;
     dominant-baseline: central;
   }
@@ -357,8 +484,16 @@
     cursor: pointer;
   }
 
-  /* Close button looks like the Saga filters */
-  .picked-head button {
+  /* A zoom button that can't zoom further is dimmed */
+  .zoom-tools button:disabled {
+    cursor: default;
+    opacity: 0.4;
+  }
+
+  /* Close and zoom buttons look like the Saga filters */
+  .picked-head button,
+  .zoom-tools button {
+    min-width: 36px;
     min-height: 36px;
     padding: 0 14px;
     border: 1px solid var(--line);
