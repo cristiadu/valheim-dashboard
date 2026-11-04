@@ -168,6 +168,8 @@ export type ServerState = {
   snapshot: Snapshot;
   /** The world's terrain from the plugin's terrain file, once read. */
   terrain: Terrain | null;
+  /** What building each piece takes, by piece prefab, from the plugin's piece costs file, for example `{ wood_floor: { Wood: 2 } }`. */
+  pieceCosts: Record<string, Record<string, number>>;
 };
 
 /**
@@ -193,6 +195,12 @@ export const ITEM_STACKS_FILE_NAME = 'item-stacks.txt';
 /** One line of the item stacks file, for example `Wood 50`. */
 export const ITEM_STACK_LINE_PATTERN = /^(?<item>\S+) (?<stack>\d+)$/;
 
+/** Name of the plugin's file next to the log with what each buildable piece costs. */
+export const PIECE_COSTS_FILE_NAME = 'piece-costs.txt';
+
+/** One line of the piece costs file, for example `wood_floor Wood x2`. */
+export const PIECE_COST_LINE_PATTERN = /^(?<piece>\S+) (?<items>.+)$/;
+
 /** A log being followed and what was read from it. */
 export type Follower = {
   /** Path of the log, for error messages. */
@@ -211,8 +219,8 @@ export type Follower = {
   worldSaveRead: string | null;
   /** World and run start whose terrain file was read or reported missing, for example `Cotil 2026-11-01T10:43:52.000Z`. */
   terrainRead: string | null;
-  /** Run start whose item stacks file was read or reported missing, for example `2026-11-01T10:43:52.000Z`. */
-  itemStacksRead: string | null;
+  /** Run start whose item stacks and piece costs files were read or reported missing, for example `2026-11-01T10:43:52.000Z`. */
+  gameDataRead: string | null;
 };
 
 /** Part of the wiki API's answer to an image address query, for example for `File:Deer_hide.png`. */

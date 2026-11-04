@@ -8,13 +8,15 @@ import { logger } from '#/lib/server/logger';
 import {
   HISTORY_FOLDER_NAME,
   ITEM_STACKS_FILE_NAME,
+  PIECE_COSTS_FILE_NAME,
+  type ServerState,
   POLL_INTERVAL_MS,
   TERRAIN_FILE_PREFIX,
   WORLDS_FOLDER_NAME,
   type Follower,
 } from '#/lib/server/models';
 import { addSavedBosses, createServerState, readLogLine, setTerrain, startNewLog } from '#/lib/server/server-state';
-import { readItemStacks } from '#/lib/server/item-stacks';
+import { readItemStacks, readPieceCosts } from '#/lib/server/game-data';
 import { readTerrain } from '#/lib/server/terrain';
 import { readSavedGlobalKeys } from '#/lib/server/world-save';
 import { changeBetween } from '#/lib/snapshot-change';
@@ -69,24 +71,30 @@ const readWorldTerrain = async (follower: Follower): Promise<void> => {
   }
 };
 
+/** Reads the item stacks and piece costs files the plugin writes next to the log in [folder] into [state]. */
+const loadGameData = async (state: ServerState, folder: string): Promise<void> => {
+  state.snapshot.itemStacks = await readItemStacks(join(folder, ITEM_STACKS_FILE_NAME));
+  state.pieceCosts = await readPieceCosts(join(folder, PIECE_COSTS_FILE_NAME));
+};
+
 /**
- * Reads the item stacks file the plugin writes next to the log on each server start, once per run. A missing file
- * is reported once, since the plugin writes it a few seconds after the start.
+ * Reads the item stacks and piece costs files the plugin writes next to the log on each server start, once per run.
+ * Missing files are reported once, since the plugin writes them a few seconds after the start.
  */
-const readStacks = async (follower: Follower): Promise<void> => {
+const readGameData = async (follower: Follower): Promise<void> => {
   const { startedUtc } = follower.state.snapshot;
-  if (startedUtc === null || startedUtc === follower.itemStacksRead) {
+  if (startedUtc === null || startedUtc === follower.gameDataRead) {
     return;
   }
-  const path = join(dirname(follower.logFile), ITEM_STACKS_FILE_NAME);
+  const folder = dirname(follower.logFile);
   try {
-    follower.state.snapshot.itemStacks = await readItemStacks(path);
-    follower.itemStacksRead = startedUtc;
+    await loadGameData(follower.state, folder);
+    follower.gameDataRead = startedUtc;
     follower.hasNewLines = true;
   } catch (error) {
-    if (follower.itemStacksRead !== `missing ${startedUtc}`) {
-      follower.itemStacksRead = `missing ${startedUtc}`;
-      logger.warn(`No item stacks in ${path} yet: ${String(error)}`);
+    if (follower.gameDataRead !== `missing ${startedUtc}`) {
+      follower.gameDataRead = `missing ${startedUtc}`;
+      logger.warn(`No item stacks or piece costs in ${folder} yet: ${String(error)}`);
     }
   }
 };
@@ -101,7 +109,7 @@ const poll = async (follower: Follower): Promise<void> => {
   }
   await readSavedBosses(follower);
   await readWorldTerrain(follower);
-  await readStacks(follower);
+  await readGameData(follower);
   if (follower.hasNewLines) {
     follower.hasNewLines = false;
     const { snapshot } = follower.state;
@@ -129,6 +137,11 @@ const start = async (): Promise<Follower> => {
   const config = readConfig(process.env);
   const state = createServerState(config.serverUtcOffsetMinutes);
   const historyFolder = join(dirname(config.logFile), HISTORY_FOLDER_NAME);
+  try {
+    await loadGameData(state, dirname(config.logFile));
+  } catch {
+    // The first poll reports missing files, once the run start is known.
+  }
   await readHistory(historyFolder, await firstRunKey(config.logFile), {
     onLine: (line) => readLogLine(state, line),
     onNewFile: () => startNewLog(state),
@@ -145,7 +158,7 @@ const start = async (): Promise<Follower> => {
     sentSnapshot: structuredClone(state.snapshot),
     worldSaveRead: null,
     terrainRead: null,
-    itemStacksRead: null,
+    gameDataRead: null,
     tail: new LogTail(config.logFile, {
       onLine: (line) => {
         readLogLine(state, line);

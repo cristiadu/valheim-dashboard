@@ -184,11 +184,13 @@ kept in the snapshot:
 ```mermaid
 flowchart LR
   in["Picked up (first time), taken from a chest, tombstone emptied, gear seen worn"] --> bag[Bag per character]
-  bag --> out["Stored, smelted, eaten"]
+  bag --> out["Stored, smelted, cooked, eaten, hung on a stand, built with, planted"]
   death["Tombstone made"] -->|empties| bag
 ```
 
-Crafting, building and dropping are not in the log, so the guess can be off.
+Building and planting take out what the piece costs, from `piece-costs.txt`, which the plugin writes next to
+`logs.txt` on each start from the game's pieces (`wood_floor Wood x2`). Crafting and dropping are not in the log,
+so the guess can be off.
 
 Every player's bag has the game's 8 by 4 grid, 32 slots, and worn gear takes a slot there too, as in the game.
 Megingjord adds carry weight, not slots. Items fill slots in stacks of the size the game gives each one:
@@ -201,7 +203,8 @@ flowchart LR
   stacks --> slots
 ```
 
-When the guess needs more than 32 slots, the card says some of it was probably used up crafting or building.
+The guess never needs more than 32 slots. When it would, the item touched longest ago is taken out, as it was
+most likely used for crafting or dropped. What a player wears now is never taken out.
 
 The plugin logs everything a player wears, holds or carries on the back whenever it changes (`Wearing:`). The
 Vikings character sheet puts each of those pieces in its slot, at the newest level seen in the gear lines, and

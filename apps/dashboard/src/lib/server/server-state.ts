@@ -197,6 +197,7 @@ export const createServerState = (serverUtcOffsetMinutes: number): ServerState =
     sessionState,
     pendingSaveNumber: null,
     terrain: null,
+    pieceCosts: {},
     snapshot: {
       serverUtcOffsetMinutes,
       world: null,
@@ -299,7 +300,7 @@ export const readLogLine = (state: ServerState, line: string): void => {
     pushCapped(snapshot.events, { ...event, line } as StoryEvent, MAX_EVENTS);
   }
   addActivityOf(snapshot, event, line);
-  updateBags(snapshot, event);
+  updateBags(state, event);
   for (const item of itemsSeenIn(event)) {
     if (!snapshot.seenItems.includes(item)) {
       snapshot.seenItems.push(item);
