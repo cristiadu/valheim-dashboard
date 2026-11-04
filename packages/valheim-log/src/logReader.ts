@@ -76,7 +76,7 @@ import {
 const optionalNumber = (value: string | undefined): number | null => (value === undefined ? null : Number(value));
 
 /** Reads a held items list, such as `Wood x20, Stone x3` or `nothing`, into counts by item name. */
-const heldItemsOf = (text: string): Record<string, number> => {
+export const heldItemsOf = (text: string): Record<string, number> => {
   const items: Record<string, number> = {};
   if (text === NOTHING_HELD) {
     return items;

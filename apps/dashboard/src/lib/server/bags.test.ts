@@ -83,4 +83,47 @@ describe('updateBags', () => {
     // THEN only the spear is left, once
     expect(bag).toEqual({ SpearFlint: 1 });
   });
+
+  it('takes what building and planting cost out of the bag', () => {
+    // GIVEN a floor costs 2 wood and a carrot costs one seed, and Ragnar picks up wood and seeds, then builds and plants
+    state.pieceCosts = { wood_floor: { Wood: 2 }, sapling_carrot: { CarrotSeeds: 1 } };
+    readLines(state, [
+      ...RUN_START,
+      logLine('03:00:00', 'Picked up: Wood x10 by Ragnar'),
+      logLine('03:00:01', 'Picked up: CarrotSeeds x3 by Ragnar'),
+      logLine('03:00:02', 'Piece built: wood_floor by Ragnar'),
+      logLine('03:00:03', 'Piece built: wood_floor by Ragnar'),
+      logLine('03:00:04', 'Planted: sapling_carrot by Ragnar'),
+    ]);
+
+    // WHEN his bag is read
+    const bag = state.snapshot.bags['Ragnar'];
+
+    // THEN 4 wood and one seed were used
+    expect(bag).toEqual({ Wood: 6, CarrotSeeds: 2 });
+  });
+
+  it('keeps the bag within 32 slots by taking out the oldest materials first, never gear or what is worn', () => {
+    // GIVEN wood stacks to 50 and a hammer to 1, Ragnar wears a spear and was seen with a hammer, picks up 30 kinds of
+    // trophies, then 150 wood
+    state.snapshot.itemStacks = { Wood: 50, Hammer: 1 };
+    readLines(state, [
+      ...RUN_START,
+      logLine('02:58:00', 'Gear: Ragnar Hammer quality 3'),
+      logLine('02:59:00', 'Wearing: Ragnar has SpearFlint'),
+      ...Array.from({ length: 30 }, (_, index) => logLine('03:00:00', `Picked up: Trophy${index} x1 by Ragnar`)),
+      logLine('03:01:00', 'Picked up: Wood x150 by Ragnar'),
+    ]);
+
+    // WHEN his bag is read
+    const bag = state.snapshot.bags['Ragnar']!;
+
+    // THEN the hammer, the spear and the wood stay, and the three oldest trophies are gone to make room
+    expect(Object.keys(bag)).toHaveLength(30);
+    expect(bag['Hammer']).toBe(1);
+    expect(bag['SpearFlint']).toBe(1);
+    expect(bag['Wood']).toBe(150);
+    expect(bag['Trophy2']).toBeUndefined();
+    expect(bag['Trophy3']).toBe(1);
+  });
 });

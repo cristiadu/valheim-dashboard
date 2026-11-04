@@ -207,6 +207,7 @@ when the plugin does not know who it was.
 | What a player carried when they died | `Tombstone: Ragnar at 410 -77 holds SwordBronze x1, Coins x55` | `^Tombstone: (?<owner>.+?) at (?<x>-?\d+) (?<z>-?\d+) holds (?<items>.+)$` |
 | Terrain file written | `Terrain written: C:\Valheim Server\terrain-Cotil.txt` | `^Terrain written: (?<path>.+)$` |
 | Item stacks file written | `Item stacks written: C:\Valheim Server\item-stacks.txt` | `^Item stacks written: (?<path>.+)$` |
+| Piece costs file written | `Piece costs written: C:\Valheim Server\piece-costs.txt` | `^Piece costs written: (?<path>.+)$` |
 | Tombstone emptied | `Tombstone emptied: Ragnar by Bjorn` | `^Tombstone emptied: (?<owner>.+?) by (?<player>.+)$` |
 
 - **Chat** only reaches the server when another player is online to receive it. `said` is normal
@@ -250,6 +251,8 @@ when the plugin does not know who it was.
   Levels are only in **Gear** lines.
 - **Item stacks written** is logged once per start, when the plugin writes how many of each item fit in one slot
   next to `logs.txt`, one `Wood 50` line per item.
+- **Piece costs written** follows it, when the plugin writes what building each piece takes next to `logs.txt`,
+  one `wood_floor Wood x2` line per piece, crops and saplings included.
 
 To build it, install the .NET SDK and BepInExPack_Valheim on the server, run `dotnet build -c Release`
 in `plugins/event-log`, and copy `bin\Release\netstandard2.1\ValheimDashboard.EventLog.dll` to the
