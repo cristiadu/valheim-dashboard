@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-  Starts the dashboard at Windows logon, and updates this PC from main every few minutes, with no windows.
+  Starts the dashboard at Windows logon, and updates this PC from main every few minutes, each in a window you can see.
   Run it once. Pass -Remove to stop both.
 
 .EXAMPLE
@@ -47,16 +47,16 @@ if ((Get-InstalledPnpmVersion) -ne $pnpmVersion) {
 }
 
 $startScript = Join-Path $PSScriptRoot 'start-dashboard.ps1'
-$arguments = "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$startScript`" -LogFile `"$LogFile`" -Port $Port"
+$arguments = "-NoProfile -ExecutionPolicy Bypass -File `"$startScript`" -LogFile `"$LogFile`" -Port $Port"
 $action = New-ScheduledTaskAction -Execute 'powershell.exe' -Argument $arguments
 $trigger = New-ScheduledTaskTrigger -AtLogOn -User $env:USERNAME
 $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit ([TimeSpan]::Zero)
 Register-ScheduledTask -TaskName $TaskName -Action $action -Trigger $trigger -Settings $settings -Force | Out-Null
 
-# conhost --headless gives PowerShell a console with no window, so a run never flashes or takes focus.
+# Each run opens its own window, which closes when the run ends.
 $updateScript = Join-Path $PSScriptRoot 'update-from-main.ps1'
-$updateArguments = "--headless powershell.exe -NoProfile -ExecutionPolicy Bypass -File `"$updateScript`" -LogFile `"$LogFile`" -Port $Port"
-$updateAction = New-ScheduledTaskAction -Execute 'conhost.exe' -Argument $updateArguments
+$updateArguments = "-NoProfile -ExecutionPolicy Bypass -File `"$updateScript`" -LogFile `"$LogFile`" -Port $Port"
+$updateAction = New-ScheduledTaskAction -Execute 'powershell.exe' -Argument $updateArguments
 $updateTrigger = New-ScheduledTaskTrigger -Once -At (Get-Date) -RepetitionInterval (New-TimeSpan -Minutes $UpdateIntervalMinutes)
 $updateSettings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable `
   -MultipleInstances IgnoreNew -ExecutionTimeLimit (New-TimeSpan -Minutes $UpdateTimeLimitMinutes)

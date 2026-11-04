@@ -20,9 +20,9 @@ It reads `C:\Valheim Server\logs.txt` and writes its own output to `C:\Valheim S
 stops, it starts again after 5 seconds.
 
 To start it every time you log on to Windows, double-click `scripts\install-startup.cmd` once. It runs
-hidden, with no window. It also checks `main` every 5 minutes: it pulls, rebuilds and restarts the
+in its own window. It also checks `main` every 5 minutes: it pulls, rebuilds and restarts the
 dashboard, and installs a changed event log plugin when nobody is online. It only takes a commit once CI
-passed on it. It writes what it did to `C:\Valheim Server\updater.log`. When `package.json` moves to a new
+passed on it. Each check opens a window that closes when it is done, and writes what it did to `C:\Valheim Server\updater.log`. When `package.json` moves to a new
 pnpm version, run `install-startup.cmd` again.
 
 ## Share it with friends
