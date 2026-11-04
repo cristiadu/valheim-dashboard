@@ -201,6 +201,15 @@ export const PIECE_COSTS_FILE_NAME = 'piece-costs.txt';
 /** One line of the piece costs file, for example `wood_floor Wood x2`. */
 export const PIECE_COST_LINE_PATTERN = /^(?<piece>\S+) (?<items>.+)$/;
 
+/** Name of the plugin's file next to the log with each player's health, stamina and eitr now. */
+export const PLAYER_VITALS_FILE_NAME = 'player-vitals.txt';
+
+/** One line of the player vitals file, tab separated, for example `Ragnar\t45\t110\t60\t0`. */
+export const PLAYER_VITALS_LINE_PATTERN = /^(?<character>[^\t]+)\t(?<health>\d+)\t(?<maxHealth>\d+)\t(?<stamina>\d+)\t(?<eitr>\d+)$/;
+
+/** File change time kept for a file that was missing, so it is reported once. No real file has it. */
+export const MISSING_FILE_MS = -1;
+
 /** A log being followed and what was read from it. */
 export type Follower = {
   /** Path of the log, for error messages. */
@@ -221,6 +230,8 @@ export type Follower = {
   terrainRead: string | null;
   /** Run start whose item stacks and piece costs files were read or reported missing, for example `2026-11-01T10:43:52.000Z`. */
   gameDataRead: string | null;
+  /** Time the player vitals file was last changed when it was read, in milliseconds, [MISSING_FILE_MS] while it is missing, or null before the first read. */
+  vitalsChangedMs: number | null;
 };
 
 /** Part of the wiki API's answer to an image address query, for example for `File:Deer_hide.png`. */

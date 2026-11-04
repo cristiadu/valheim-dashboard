@@ -244,6 +244,7 @@ export const createServerState = (serverUtcOffsetMinutes: number): ServerState =
       bags: {},
       itemStacks: {},
       terrain: {},
+      vitals: {},
     },
   };
 };
