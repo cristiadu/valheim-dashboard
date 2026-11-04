@@ -21,8 +21,8 @@ const keepInBag = (snapshot: Snapshot, character: string, item: string): void =>
 
 /**
  * Updates the guess of what each character carries in [snapshot] from [event]. Items come in when picked up for the
- * first time, taken from a chest or a tombstone, or seen worn or held, and go out when stored, put in a smelter or
- * eaten. A death empties the bag into the tombstone. Crafting, building and dropping are not in the log, so the bag is only a guess.
+ * first time, taken from a chest or a tombstone, or seen worn or held, and go out when stored, put in a smelter,
+ * put on to cook, put in a fermenter or eaten. A death empties the bag into the tombstone. Crafting, building and dropping are not in the log, so the bag is only a guess.
  */
 export const updateBags = (snapshot: Snapshot, event: LogEvent): void => {
   switch (event.type) {
@@ -39,6 +39,11 @@ export const updateBags = (snapshot: Snapshot, event: LogEvent): void => {
     case 'smelting':
       if (event.player !== null) {
         addToBag(snapshot, event.player, event.item, -event.count);
+      }
+      break;
+    case 'foodStarted':
+      if (event.player !== null) {
+        addToBag(snapshot, event.player, event.item, -1);
       }
       break;
     case 'ate':
