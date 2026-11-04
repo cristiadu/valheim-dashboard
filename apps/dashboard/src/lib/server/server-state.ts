@@ -5,7 +5,6 @@ import type { LogEvent } from 'valheim-log';
 import {
   ACTIVITY_STORY_KINDS,
   type ActivityKind,
-  type ActivityRecord,
   BOSS_NAMES,
   BOSS_ORDER,
   DEFEATED_KEY_PREFIX,
@@ -37,11 +36,11 @@ const pushCapped = <T>(list: T[], item: T, max: number): void => {
 };
 
 /**
- * Adds [count] of [thing] and its log [line] to the player's latest stretch of the same [kind], or starts a new
- * stretch when the player paused longer than [ACTIVITY_GAP_MS].
+ * Adds [count] of [thing] and its log [line] to the player's latest stretch of the same [kind] in [snapshot], or
+ * starts a new stretch when the player paused longer than [ACTIVITY_GAP_MS]. Also adds them to the player's totals.
  */
 const addActivity = (
-  activities: ActivityRecord[],
+  snapshot: Snapshot,
   line: string,
   timeUtc: string,
   player: string | null,
@@ -49,6 +48,12 @@ const addActivity = (
   thing: string,
   count: number,
 ): void => {
+  if (player !== null) {
+    const totals = (snapshot.activityTotals[player] ??= {});
+    totals[kind] = (totals[kind] ?? 0) + count;
+    addSourceLine((snapshot.sources[sourceKey('activity', player, kind)] ??= { total: 0, lines: [] }), timeUtc, line, ACTIVITY_STORY_KINDS[kind]);
+  }
+  const { activities } = snapshot;
   const stretch = activities.findLast((activity) => activity.player === player && activity.kind === kind);
   if (stretch && Date.parse(timeUtc) - Date.parse(stretch.endUtc) <= ACTIVITY_GAP_MS) {
     stretch.endUtc = timeUtc;
@@ -138,45 +143,44 @@ const characterOf = (snapshot: Snapshot, name: string | null): string | null =>
  * activities of [snapshot]. An item counts as gathered only the first time anyone picks it up.
  */
 const addActivityOf = (snapshot: Snapshot, event: LogEvent, line: string): void => {
-  const { activities } = snapshot;
   const { timeUtc } = event;
   switch (event.type) {
     case 'pieceBuilt':
-      addActivity(activities, line, timeUtc, characterOf(snapshot, event.builder), 'built', event.piece, 1);
+      addActivity(snapshot, line, timeUtc, characterOf(snapshot, event.builder), 'built', event.piece, 1);
       break;
     case 'pieceDestroyed':
-      addActivity(activities, line, timeUtc, characterOf(snapshot, event.builder), 'destroyed', event.piece, 1);
+      addActivity(snapshot, line, timeUtc, characterOf(snapshot, event.builder), 'destroyed', event.piece, 1);
       break;
     case 'creatureKilled':
       for (const attacker of event.attackers) {
-        addActivity(activities, line, timeUtc, attacker, 'killed', event.creature, 1);
+        addActivity(snapshot, line, timeUtc, attacker, 'killed', event.creature, 1);
       }
       break;
     case 'itemPickedUp':
       if (event.isFirstPickup) {
-        addActivity(activities, line, timeUtc, event.player, 'gathered', event.item, event.count);
+        addActivity(snapshot, line, timeUtc, event.player, 'gathered', event.item, event.count);
       }
       break;
     case 'chestChanged':
-      addActivity(activities, line, timeUtc, event.player, event.isStored ? 'stored' : 'taken', event.item, event.count);
+      addActivity(snapshot, line, timeUtc, event.player, event.isStored ? 'stored' : 'taken', event.item, event.count);
       break;
     case 'planted':
-      addActivity(activities, line, timeUtc, event.player, 'planted', event.plant, 1);
+      addActivity(snapshot, line, timeUtc, event.player, 'planted', event.plant, 1);
       break;
     case 'ate':
-      addActivity(activities, line, timeUtc, event.character, 'ate', event.item, 1);
+      addActivity(snapshot, line, timeUtc, event.character, 'ate', event.item, 1);
       break;
     case 'smelting':
-      addActivity(activities, line, timeUtc, event.player, 'smelted', event.item, event.count);
+      addActivity(snapshot, line, timeUtc, event.player, 'smelted', event.item, event.count);
       break;
     case 'foodStarted':
-      addActivity(activities, line, timeUtc, event.player, event.kind === 'cooking' ? 'cooked' : 'brewed', event.item, 1);
+      addActivity(snapshot, line, timeUtc, event.player, event.kind === 'cooking' ? 'cooked' : 'brewed', event.item, 1);
       break;
     case 'sailing':
-      addActivity(activities, line, timeUtc, event.character, 'sailed', event.ship, 1);
+      addActivity(snapshot, line, timeUtc, event.character, 'sailed', event.ship, 1);
       break;
     case 'depleted':
-      addActivity(activities, line, timeUtc, event.player, event.kind === 'tree' ? 'cut' : 'mined', event.thing, 1);
+      addActivity(snapshot, line, timeUtc, event.player, event.kind === 'tree' ? 'cut' : 'mined', event.thing, 1);
       break;
     default:
       break;
@@ -212,6 +216,7 @@ export const createServerState = (serverUtcOffsetMinutes: number): ServerState =
       gear: {},
       currentAreas: {},
       kills: {},
+      activityTotals: {},
       day: null,
       defeatedBosses: [],
       sources: {},

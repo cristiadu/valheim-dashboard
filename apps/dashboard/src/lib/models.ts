@@ -224,6 +224,8 @@ export type Snapshot = {
   currentAreas: Record<string, string>;
   /** Creatures each character helped kill, by character name, then how many of each creature. */
   kills: Record<string, Record<string, number>>;
+  /** How much each character did of each activity kind since the dashboard started, by character name, for example `{ built: 120 }`. */
+  activityTotals: Record<string, Partial<Record<ActivityKind, number>>>;
   /** In-game day, as the game shows it, when the plugin has logged one. */
   day: number | null;
   /** Bosses defeated, by the name the game shows, in the order of their first defeat. */
@@ -251,10 +253,10 @@ export type Snapshot = {
 
 /**
  * What a group of log lines counts, for a character: `visits` are joins and leaves, `deaths` are deaths,
- * `kills` are all kills, `killed` are kills of one creature, `area` is going into one area, and `gear` is one
- * piece of gear first seen, at each level.
+ * `kills` are all kills, `killed` are kills of one creature, `area` is going into one area, `gear` is one
+ * piece of gear first seen, at each level, and `activity` is one activity kind, such as `built`.
  */
-export type SourceKind = 'visits' | 'deaths' | 'kills' | 'killed' | 'area' | 'gear';
+export type SourceKind = 'visits' | 'deaths' | 'kills' | 'killed' | 'area' | 'gear' | 'activity';
 
 /**
  * What a group of server log lines counts: `runs` are starts and clean stops, `version` the game version,
@@ -386,6 +388,7 @@ export const CONTAINER_SIZES: Record<string, ContainerSize> = {
   Cart: { columns: 6, rows: 3 },
   Karve: { columns: 2, rows: 2 },
   VikingShip: { columns: 6, rows: 3 },
+  Player: { columns: 8, rows: 4 },
 };
 
 /** Slot grid of a container missing above. Rows are added whenever the items need more slots. */
@@ -508,6 +511,26 @@ export const ACTIVITY_WORDS: Record<Exclude<ActivityKind, 'destroyed'>, { verb: 
   cut: { verb: 'cut down', one: 'tree', many: 'trees', ending: '' },
   mined: { verb: 'mined out', one: 'rock', many: 'rocks', ending: '' },
 };
+
+/** Activity totals on a player's card, in this order, with the label under each number. Kills have their own number. */
+export const PLAYER_ACTIVITY_STATS: { kind: ActivityKind; label: string }[] = [
+  { kind: 'built', label: 'Pieces built' },
+  { kind: 'gathered', label: 'Items gathered' },
+  { kind: 'cut', label: 'Trees cut' },
+  { kind: 'mined', label: 'Rocks mined' },
+  { kind: 'planted', label: 'Crops planted' },
+  { kind: 'ate', label: 'Meals eaten' },
+  { kind: 'smelted', label: 'Ores smelted' },
+  { kind: 'cooked', label: 'Food cooked' },
+  { kind: 'brewed', label: 'Meads brewed' },
+  { kind: 'sailed', label: 'Times at the helm' },
+];
+
+/** Prefab of the player, whose bag grid is in [CONTAINER_SIZES]. */
+export const PLAYER_PREFAB = 'Player';
+
+/** Square meters in one square kilometer, for the land a player explored. */
+export const SQUARE_METERS_PER_KM2 = 1_000_000;
 
 /** One chat message or map ping. */
 export type ChatRecord = {
@@ -819,6 +842,10 @@ export type Player = {
   areas: string[];
   /** Gear the latest character was seen with, newest first. */
   gear: string[];
+  /** How much all of the player's characters did of each activity kind, for example `{ built: 120 }`. */
+  activityTotals: Partial<Record<ActivityKind, number>>;
+  /** Map squares any of the player's characters walked through. */
+  exploredSquares: number;
 };
 
 /** What kind of thing happened, which picks its rune and color. */

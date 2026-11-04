@@ -1,6 +1,6 @@
 import type { PlayerSession } from 'valheim-log';
 
-import { OTHER_PLAYER_COLOR, PLAYER_COLORS, type Player, type Snapshot } from '#/lib/models';
+import { type ActivityKind, OTHER_PLAYER_COLOR, PLAYER_COLORS, type Player, type Snapshot } from '#/lib/models';
 import { isServerOnline } from '#/lib/status';
 
 /**
@@ -14,16 +14,25 @@ export const sessionEndMs = (session: PlayerSession, snapshot: Snapshot, nowMs: 
   return isServerOnline(snapshot, nowMs) ? nowMs : Date.parse(snapshot.lastLineUtc ?? session.startUtc);
 };
 
-/** What the event log plugin knows of a player: where [latest] is, and kills and areas of all [characters]. */
+/**
+ * What the event log plugin knows of a player: where [latest] is and what they wear, and the kills, areas,
+ * activity totals and explored squares of all [characters].
+ */
 const pluginStatsOf = (
   snapshot: Snapshot,
   latest: string,
   characters: Set<string>,
-): Pick<Player, 'area' | 'kills' | 'topKill' | 'areas' | 'gear'> => {
+): Pick<Player, 'area' | 'kills' | 'topKill' | 'areas' | 'gear' | 'activityTotals' | 'exploredSquares'> => {
   const killsByCreature = new Map<string, number>();
   for (const character of characters) {
     for (const [creature, amount] of Object.entries(snapshot.kills[character] ?? {})) {
       killsByCreature.set(creature, (killsByCreature.get(creature) ?? 0) + amount);
+    }
+  }
+  const activityTotals: Player['activityTotals'] = {};
+  for (const character of characters) {
+    for (const [kind, amount] of Object.entries(snapshot.activityTotals[character] ?? {}) as [ActivityKind, number][]) {
+      activityTotals[kind] = (activityTotals[kind] ?? 0) + amount;
     }
   }
   const byMostKills = [...killsByCreature].sort(([, firstAmount], [, secondAmount]) => secondAmount - firstAmount);
@@ -33,6 +42,8 @@ const pluginStatsOf = (
     topKill: byMostKills[0]?.[0] ?? null,
     areas: [...new Set([...characters].flatMap((character) => snapshot.visitedAreas[character] ?? []))],
     gear: (snapshot.gear[latest] ?? []).toReversed(),
+    activityTotals,
+    exploredSquares: new Set([...characters].flatMap((character) => snapshot.explored[character] ?? [])).size,
   };
 };
 
