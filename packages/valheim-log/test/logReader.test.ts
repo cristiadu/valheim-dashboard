@@ -222,7 +222,7 @@ describe('parseMessage', () => {
   });
 
   it('reads player lines from the event log plugin', () => {
-    // GIVEN one line of each player event, with and without optional parts
+    // GIVEN one line of each player event, with and without optional parts, and a name with a space
     const messages = [
       'Player died: Ragnar in BlackForest while fighting Troll, Greydwarf',
       'Player died: Ragnar in Ocean',
@@ -233,6 +233,8 @@ describe('parseMessage', () => {
       'Went to bed: Ragnar',
       'Gear: Ragnar SwordIron quality 2',
       'Gear: Ragnar ArmorBronzeChest',
+      'Gear: Inge Dragonchow MaceIron quality 2',
+      'Gear: Inge Dragonchow Torch',
     ];
 
     // WHEN each message is read
@@ -250,6 +252,8 @@ describe('parseMessage', () => {
       { type: 'wentToBed', timeUtc, character: 'Ragnar' },
       { type: 'gearSeen', timeUtc, character: 'Ragnar', item: 'SwordIron', quality: 2 },
       { type: 'gearSeen', timeUtc, character: 'Ragnar', item: 'ArmorBronzeChest', quality: 1 },
+      { type: 'gearSeen', timeUtc, character: 'Inge Dragonchow', item: 'MaceIron', quality: 2 },
+      { type: 'gearSeen', timeUtc, character: 'Inge Dragonchow', item: 'Torch', quality: 1 },
     ]);
   });
 
