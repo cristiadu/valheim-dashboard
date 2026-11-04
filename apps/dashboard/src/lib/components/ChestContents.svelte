@@ -90,6 +90,18 @@
     .slots {
       grid-template-columns: repeat(var(--columns), minmax(0, 60px));
     }
+
+    /* Icons shrink with their slot instead of spilling over its edge */
+    .slot :global(img),
+    .slot :global(svg) {
+      width: 75%;
+      height: auto;
+    }
+
+    /* A smaller count, so it fits a small slot */
+    .count {
+      font-size: 10px;
+    }
   }
 
   /* One slot: a square with the item's picture in the middle */
