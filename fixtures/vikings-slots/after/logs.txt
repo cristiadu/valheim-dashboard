@@ -1,0 +1,68 @@
+11/04/2026 10:00:00: Valheim version: 1.0.21 (network version 41)
+11/04/2026 10:00:03: ZNet.LoadWorld: Cotil (Cotil), save number 1300
+11/04/2026 10:00:05: Game server connected
+11/04/2026 10:01:00: PlayFab listen socket child connected to remote player A100000000000000
+11/04/2026 10:01:00: PlayFab socket with remote ID playfab/A100000000000000 received local Platform ID Steam_76561198000000001
+11/04/2026 10:01:00: Got handshake from client playfab/A100000000000000
+11/04/2026 10:01:00: Got character ZDOID from wynnyarD : 549297300:1
+11/04/2026 10:02:00: PlayFab listen socket child connected to remote player B200000000000000
+11/04/2026 10:02:00: PlayFab socket with remote ID playfab/B200000000000000 received local Platform ID Steam_76561198000000002
+11/04/2026 10:02:00: Got handshake from client playfab/B200000000000000
+11/04/2026 10:02:00: Got character ZDOID from Yan : 549297301:1
+11/04/2026 10:03:00: PlayFab listen socket child connected to remote player C300000000000000
+11/04/2026 10:03:00: PlayFab socket with remote ID playfab/C300000000000000 received local Platform ID Steam_76561198000000003
+11/04/2026 10:03:00: Got handshake from client playfab/C300000000000000
+11/04/2026 10:03:00: Got character ZDOID from Inge Dragonchow : 549297302:1
+11/04/2026 10:05:00: Gear: wynnyarD ArmorLeatherChest
+11/04/2026 10:05:00: Gear: wynnyarD ArmorLeatherLegs
+11/04/2026 10:05:00: Gear: wynnyarD AxeFlint quality 4
+11/04/2026 10:05:00: Gear: wynnyarD BowFineWood
+11/04/2026 10:05:00: Gear: wynnyarD CapeDeerHide quality 3
+11/04/2026 10:05:00: Gear: wynnyarD Hammer quality 3
+11/04/2026 10:05:00: Gear: wynnyarD HelmetLeather
+11/04/2026 10:05:00: Gear: wynnyarD SpearFlint quality 4
+11/04/2026 10:05:00: Gear: wynnyarD Torch
+11/04/2026 10:05:00: Gear: wynnyarD ArmorTrollLeatherChest
+11/04/2026 10:05:00: Gear: wynnyarD ArmorTrollLeatherLegs
+11/04/2026 10:05:00: Gear: wynnyarD HelmetTrollLeather
+11/04/2026 10:05:00: Gear: wynnyarD CapeTrollHide
+11/04/2026 10:05:00: Gear: wynnyarD ShieldBoneTower quality 2
+11/04/2026 10:05:00: Gear: wynnyarD SledgeStagbreaker quality 2
+11/04/2026 10:05:00: Gear: Yan CapeDeerHide
+11/04/2026 10:05:00: Gear: Yan ArmorTrollLeatherChest
+11/04/2026 10:05:00: Gear: Yan ArmorTrollLeatherLegs
+11/04/2026 10:05:00: Gear: Yan HelmetTrollLeather
+11/04/2026 10:05:00: Gear: Yan Hammer quality 3
+11/04/2026 10:05:00: Gear: Yan FistBjornClaw
+11/04/2026 10:05:00: Gear: Yan MaceBronze
+11/04/2026 10:05:00: Gear: Yan ShieldBronzeBuckler
+11/04/2026 10:05:00: Gear: Yan BowFineWood quality 4
+11/04/2026 10:05:00: Gear: Yan CapeTrollHide
+11/04/2026 10:05:00: Gear: Yan Hoe quality 3
+11/04/2026 10:05:00: Gear: Yan AxeBronze
+11/04/2026 10:05:00: Gear: Inge Dragonchow CapeTrollHide quality 3
+11/04/2026 10:05:00: Gear: Inge Dragonchow ArmorIronChest
+11/04/2026 10:05:00: Gear: Inge Dragonchow ArmorIronLegs
+11/04/2026 10:05:00: Gear: Inge Dragonchow HelmetIron
+11/04/2026 10:05:00: Gear: Inge Dragonchow BeltStrength
+11/04/2026 10:05:00: Gear: Inge Dragonchow MaceIron quality 2
+11/04/2026 10:05:00: Gear: Inge Dragonchow ShieldIronTower quality 2
+11/04/2026 10:05:00: Gear: Inge Dragonchow BowHuntsman quality 2
+11/04/2026 10:05:00: Gear: Inge Dragonchow Hammer quality 3
+11/04/2026 10:05:00: Gear: Inge Dragonchow Torch
+11/04/2026 10:05:00: Gear: Inge Dragonchow AxeIron quality 2
+11/04/2026 10:05:00: Gear: Inge Dragonchow PickaxeIron quality 3
+11/04/2026 10:10:00: Tombstone: Yan at -126 -756 holds Hammer x1, ArmorTrollLeatherChest x1, Torch x2, ArmorTrollLeatherLegs x1, FistBjornClaw x1, MushroomYellow x28, ArrowFlint x62, BowFineWood x1, MaceBronze x1, BoarJerky x5, ShieldBronzeBuckler x1, HelmetTrollLeather x1, Raspberry x23, NeckTailGrilled x3, ArrowWood x25, AxeBronze x1, PickaxeAntler x1, Hoe x1, PulledBear x2, Mushroom x5, CapeTrollHide x1, CookedDeerMeat x1, QueensJam x1, LeatherScraps x2, RawMeat x2, BoneFragments x3, Wood x4, Stone x22
+11/04/2026 10:10:30: Tombstone: Inge Dragonchow at -131 -757 holds CapeTrollHide x1, ArrowFire x77, BeltStrength x1, BowHuntsman x1, ShieldIronTower x1, MaceIron x1, ArmorIronChest x1, ArmorIronLegs x1, HelmetIron x1, Hoe x1, PickaxeIron x1, AxeIron x1, Hammer x1, Torch x1, CookedDeerMeat x5, CookedMeat x8, Stone x35, SpearElderbark x1, ArrowFlint x92, Wood x30, Resin x17, Honey x34, BoarJerky x5, CarrotSeeds x9, Blueberries x2, Thistle x3, FirCone x1, Feathers x3, GreydwarfEye x1, BoneFragments x2
+11/04/2026 10:11:00: Tombstone emptied: Yan by Yan
+11/04/2026 10:11:10: Tombstone emptied: Inge Dragonchow by Inge Dragonchow
+11/04/2026 10:20:00: Picked up: Wood x70 by Inge Dragonchow
+11/04/2026 10:20:05: Picked up: Stone x15 by Inge Dragonchow
+11/04/2026 10:20:10: Picked up: Wood x46 by Yan
+11/04/2026 10:21:00: Picked up: Raspberry x24 by wynnyarD
+11/04/2026 10:21:05: Picked up: Coins x99 by wynnyarD
+11/04/2026 10:21:10: Taken: TrollHide x20 from piece_chest_wood by wynnyarD
+11/04/2026 10:30:00: Wearing: wynnyarD has ArmorLeatherChest, ArmorLeatherLegs, CapeDeerHide, HelmetLeather, SpearFlint, Torch
+11/04/2026 10:30:00: Wearing: Yan has ArmorTrollLeatherChest, ArmorTrollLeatherLegs, CapeTrollHide, FistBjornClaw, HelmetTrollLeather
+11/04/2026 10:30:00: Wearing: Inge Dragonchow has ArmorIronChest, ArmorIronLegs, BeltStrength, CapeTrollHide, HelmetIron, MaceIron, ShieldIronTower
+11/04/2026 12:20:00: Day started: 120
