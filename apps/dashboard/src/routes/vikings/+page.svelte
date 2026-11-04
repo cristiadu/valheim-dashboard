@@ -23,7 +23,7 @@
   const timeZone = viewerTimeZone();
 
   /** Activity types that move items through a character's observed inventory. */
-  const ITEM_ACTIVITY_KINDS = new Set<string>(['gathered', 'taken', 'stored', 'ate', 'smelted']);
+  const ITEM_ACTIVITY_KINDS = new Set<string>(['gathered', 'taken', 'stored', 'ate', 'smelted', 'cooked', 'brewed']);
 
   /** Players at the page clock. */
   const players = $derived(live.nowMs === null ? [] : playersOf(snapshot, live.nowMs));

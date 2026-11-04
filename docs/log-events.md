@@ -192,6 +192,8 @@ when the plugin does not know who it was.
 | Crop or sapling planted | `Planted: sapling_carrot by Ragnar` | `^Planted: (?<plant>\S+) by (?<player>.+)$` |
 | Food eaten or mead drunk | `Ate: Ragnar CookedMeat` | `^Ate: (?<character>.+) (?<item>\S+)$` |
 | Items put into a smelter, kiln or similar | `Smelting: CopperOre x3 in smelter by Ragnar` | `^Smelting: (?<item>\S+) x(?<count>\d+) in (?<station>\S+) by (?<player>.+)$` |
+| Raw food put on a cooking station, or a mead base into a fermenter | `Cooking: RawMeat on piece_cookingstation by Ragnar`, `Fermenting: MeadBaseTasty in fermenter by Ragnar` | `^(?<kind>Cooking\|Fermenting): (?<item>\S+) (?:on\|in) (?<station>\S+) by (?<player>.+)$` |
+| Took the helm of a raft or ship | `Sailing: Ragnar on Karve` | `^Sailing: (?<character>.+) on (?<ship>\S+)$` |
 | Tree cut down or rock mined out | `Tree cut: Beech1 by Ragnar`, `Rock mined: rock4_copper by Ragnar` | `^(?<kind>Tree cut\|Rock mined): (?<thing>\S+) by (?<player>.+)$` |
 | Where a player stands | `Position: Ragnar 120 -340` | `^Position: (?<character>.+) (?<x>-?\d+) (?<z>-?\d+)$` |
 | What a chest, cart or ship holds | `Chest: 52731986:1203 piece_chest_wood at 118 -336 built by Ragnar holds Wood x20, Stone x3` | `^Chest: (?<id>\S+) (?<chest>\S+) at (?<x>-?\d+) (?<z>-?\d+) built by (?<builder>.+?) holds (?<items>.+)$` |

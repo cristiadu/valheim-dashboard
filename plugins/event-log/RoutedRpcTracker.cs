@@ -3,7 +3,7 @@ using HarmonyLib;
 namespace ValheimDashboard.EventLog
 {
     /// <summary>
-    /// Reads each call a player's game sends through the server, such as chat or an animation, once, and hands
+    /// Reads each call a player's game sends through the server, such as chat or an attack move, once, and hands
     /// it to the trackers that look for calls.
     /// </summary>
     [HarmonyPatch]
@@ -24,7 +24,6 @@ namespace ValheimDashboard.EventLog
             CombatTracker.Read(data);
             ItemTracker.Read(data);
             WorkTracker.Read(data);
-            EatTracker.Read(data);
         }
     }
 }

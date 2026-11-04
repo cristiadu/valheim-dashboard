@@ -5,41 +5,14 @@ using UnityEngine;
 namespace ValheimDashboard.EventLog
 {
     /// <summary>
-    /// Logs what each player eats or drinks. A player's game plays the eat animation on every game through the
-    /// server, then shows the food in the player's hand for a moment by writing it into the character's data.
+    /// Logs what each player eats or drinks. While a player eats, their game shows the food in their right hand
+    /// for a moment by writing it into the character's data, and food is never held in the hand otherwise.
     /// </summary>
     [HarmonyPatch]
     internal static class EatTracker
     {
-        /// <summary>Hash of the call that plays an animation on every player's game.</summary>
-        private static readonly int SetTriggerHash = "SetTrigger".GetStableHashCode();
-
-        /// <summary>Animation a player's game plays when they eat or drink.</summary>
-        private const string EatAnimation = "eat";
-
-        /// <summary>Seconds to wait for the food to show in the player's hand after the eat animation.</summary>
-        private const float HandWaitSeconds = 3f;
-
-        /// <summary>Characters that just played the eat animation, with the game time it reached the server.</summary>
-        private static readonly Dictionary<ZDOID, float> Eating = new Dictionary<ZDOID, float>();
-
-        /// <summary>Characters whose wait is over, gathered before they are removed.</summary>
-        private static readonly List<ZDOID> Done = new List<ZDOID>();
-
-        /// <summary>Remembers a player character that played the eat animation.</summary>
-        public static void Read(ZRoutedRpc.RoutedRPCData data)
-        {
-            if (data.m_methodHash != SetTriggerHash)
-            {
-                return;
-            }
-            ZPackage parameters = new ZPackage(data.m_parameters.GetArray());
-            ZDO zdo = ZDOMan.instance.GetZDO(data.m_targetZDO);
-            if (zdo != null && Names.Has<Player>(zdo) && parameters.ReadString() == EatAnimation)
-            {
-                Eating[data.m_targetZDO] = Time.time;
-            }
-        }
+        /// <summary>Item each online character held in their right hand on the last frame, by character.</summary>
+        private static readonly Dictionary<ZDOID, int> HandItems = new Dictionary<ZDOID, int>();
 
         /// <summary>Returns true when item prefab [hash] is food or a drink.</summary>
         public static bool IsConsumable(int hash)
@@ -49,34 +22,39 @@ namespace ValheimDashboard.EventLog
             return item != null && item.m_itemData.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Consumable;
         }
 
-        /// <summary>Logs the food each eating character holds, every frame, on the server only.</summary>
+        /// <summary>
+        /// Logs food that just showed up in an online player's hand, every frame, on the server only. The food
+        /// shows for about a second, longer than the server's five-second world scan could catch.
+        /// </summary>
         [HarmonyPostfix]
         [HarmonyPatch(typeof(ZDOMan), nameof(ZDOMan.Update))]
         private static void AfterUpdate()
         {
-            if (Eating.Count == 0)
+            if (ZNet.instance == null || !ZNet.instance.IsServer())
             {
                 return;
             }
-            foreach (KeyValuePair<ZDOID, float> entry in Eating)
+            foreach (ZNetPeer peer in ZNet.instance.GetConnectedPeers())
             {
-                ZDO player = ZDOMan.instance.GetZDO(entry.Key);
-                int hand = player == null ? 0 : player.GetInt(ZDOVars.s_rightItem);
-                if (hand != 0 && IsConsumable(hand))
+                ZDO player = ZDOMan.instance.GetZDO(peer.m_characterID);
+                if (player == null)
+                {
+                    continue;
+                }
+                int hand = player.GetInt(ZDOVars.s_rightItem);
+                bool isNewHandItem = !HandItems.TryGetValue(peer.m_characterID, out int before) || before != hand;
+                HandItems[peer.m_characterID] = hand;
+                if (isNewHandItem && hand != 0 && IsConsumable(hand))
                 {
                     GameEventLog.Write($"Ate: {player.GetString(ZDOVars.s_playerName, Names.UnknownPlayer)} {Names.Item(hand)}");
-                    Done.Add(entry.Key);
-                }
-                else if (Time.time - entry.Value > HandWaitSeconds)
-                {
-                    Done.Add(entry.Key);
                 }
             }
-            foreach (ZDOID uid in Done)
-            {
-                Eating.Remove(uid);
-            }
-            Done.Clear();
+        }
+
+        /// <summary>Forgets the hand of character [uid] when the server destroys it.</summary>
+        public static void Forget(ZDOID uid)
+        {
+            HandItems.Remove(uid);
         }
     }
 }
