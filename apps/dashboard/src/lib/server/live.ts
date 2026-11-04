@@ -8,25 +8,18 @@ import { logger } from '#/lib/server/logger';
 import {
   HISTORY_FOLDER_NAME,
   ITEM_STACKS_FILE_NAME,
-<<<<<<< HEAD
   MISSING_FILE_MS,
   PLAYER_VITALS_FILE_NAME,
-=======
   PIECE_COSTS_FILE_NAME,
   type ServerState,
->>>>>>> origin/main
   POLL_INTERVAL_MS,
   TERRAIN_FILE_PREFIX,
   WORLDS_FOLDER_NAME,
   type Follower,
 } from '#/lib/server/models';
 import { addSavedBosses, createServerState, readLogLine, setTerrain, startNewLog } from '#/lib/server/server-state';
-<<<<<<< HEAD
-import { readItemStacks } from '#/lib/server/item-stacks';
-import { readVitals } from '#/lib/server/player-vitals';
-=======
 import { readItemStacks, readPieceCosts } from '#/lib/server/game-data';
->>>>>>> origin/main
+import { readVitals } from '#/lib/server/player-vitals';
 import { readTerrain } from '#/lib/server/terrain';
 import { readSavedGlobalKeys } from '#/lib/server/world-save';
 import { changeBetween } from '#/lib/snapshot-change';
@@ -140,12 +133,8 @@ const poll = async (follower: Follower): Promise<void> => {
   }
   await readSavedBosses(follower);
   await readWorldTerrain(follower);
-<<<<<<< HEAD
-  await readStacks(follower);
-  await readPlayerVitals(follower);
-=======
   await readGameData(follower);
->>>>>>> origin/main
+  await readPlayerVitals(follower);
   if (follower.hasNewLines) {
     follower.hasNewLines = false;
     const { snapshot } = follower.state;
@@ -194,12 +183,8 @@ const start = async (): Promise<Follower> => {
     sentSnapshot: structuredClone(state.snapshot),
     worldSaveRead: null,
     terrainRead: null,
-<<<<<<< HEAD
-    itemStacksRead: null,
-    vitalsChangedMs: null,
-=======
     gameDataRead: null,
->>>>>>> origin/main
+    vitalsChangedMs: null,
     tail: new LogTail(config.logFile, {
       onLine: (line) => {
         readLogLine(state, line);
