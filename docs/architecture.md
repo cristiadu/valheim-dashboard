@@ -276,14 +276,16 @@ flowchart LR
   scan -->|"Piece built: wood_floor_1x1 by Ragnar"| log[logs.txt]
   rpc -->|"Chat: Ragnar shouted: Troll!"| log
   hooks -->|"Global key set: defeated_eikthyr"| log
+  fx[Effects players' games share] -->|"Skill up: Ragnar"| log
   bep[BepInEx messages] --> log
 ```
 
 | Source | What it finds |
 | --- | --- |
-| World scan | New objects (pieces, plants, summoned bosses), items put into smelters, food put on cooking stations, mead bases put into fermenters, who takes the helm of each ship, the in-game day, each player's position, area, portal trips, death, PvP, bed and gear, what each chest, cart, ship and new tombstone holds, tames, signs, item stands, chests and harvested plants, and objects destroyed, such as creatures with every player who hit them, trees cut down, rocks mined out, items picked up and emptied tombstones |
-| Calls through the server | Chat and map pings, which the server passes from one player to the others, creature attack moves, to say what a player was fighting when they died, and who asked to harvest a plant, hit a tree or rock, or fill a smelter or fermenter |
-| Every frame | Food shown in an online player's hand, which only happens while they eat or drink, and lasts about a second |
+| World scan | New objects (pieces, plants, summoned bosses), items put into smelters, food put on cooking stations, mead bases put into fermenters, who takes the helm of each ship, beds claimed, portal names, wards turned on or off, the in-game day, each player's position, area, portal trips, death, PvP, bed and gear, what each chest, cart, ship and new tombstone holds, items players made or upgraded (each crafted item keeps its maker's name and level), tames, signs, item stands, chests and harvested plants, and objects destroyed, such as creatures with every player who hit them, trees cut down, rocks mined out, items picked up and emptied tombstones |
+| Calls through the server | Chat and map pings, which the server passes from one player to the others, creature attack moves, to say what a player was fighting when they died, and who asked to harvest a plant, hit a tree or rock, fill a smelter or fermenter, or name a portal |
+| Shared effects | Effects a player's game shares with the others, which reach the server as new objects: a skill going up and a trade with a trader |
+| Every frame | For each online player: food shown in their hand, which only happens while they eat or drink and lasts about a second, the crafting station kind they opened, and each emote |
 | Game hooks | Global keys, such as a boss defeat, and the end of a raid |
 
 Each line names a player only when the game data says who did it.
@@ -297,8 +299,8 @@ On the dashboard, plugin lines become:
 
 | Kept as | Lines | Shown as |
 | --- | --- | --- |
-| Activities | Pieces built or destroyed, kills, items gathered, chests, planting, eating, smelting, cooking, brewing, steering ships, trees and rocks | One Saga line per player and kind, until a 10 minute pause, naming every thing, and a running total per player and kind for the Vikings numbers |
-| Story events | Deaths, bosses, raids, portals, tames, signs, item stands, tombstones | One Saga line each |
+| Activities | Pieces built or destroyed, kills, items gathered, chests, planting, eating, smelting, cooking, brewing, steering ships, crafting station visits, emotes, items made or upgraded, skill levels, trees and rocks | One Saga line per player and kind, until a 10 minute pause, naming every thing, and a running total per player and kind for the Vikings numbers |
+| Story events | Deaths, bosses, raids, portals, tames, signs, item stands, tombstones, beds claimed, portals named, wards turned on or off, trades | One Saga line each |
 | News only | Areas, gear, global keys | A Saga line for a first visit or a dungeon trip, new gear, or a boss defeat |
 | Stats | Areas, kills, the day, boss keys | Where each player is now and their kills, areas and gear on Vikings, the day and bosses on World |
 | Chat | Chat and pings | The Saga's "Chat and signs" filter, kept apart so it never pushes out events |

@@ -54,7 +54,10 @@ export const thingList = (things: Record<string, number>): string =>
     .map(([thing, amount]) => `${amount} ${thingName(thing)}`)
     .join(', ');
 
-/** Story line for one stretch of activity, such as building or kills. */
+/**
+ * Story line for one stretch of activity, such as building or kills. Skill levels have no list, since the server
+ * never learns which skill.
+ */
 const activityItem = (activity: ActivityRecord): StoryText => {
   const total = activityTotal(activity);
   const timeUtc = activity.endUtc;
@@ -68,6 +71,9 @@ const activityItem = (activity: ActivityRecord): StoryText => {
   const sentence = `${activity.player ?? 'Someone'} ${words.verb} ${count(total, words.one, words.many)}${words.ending}`;
   if (kind === 'items') {
     return { timeUtc, kind, text: sentence, things: activity.things };
+  }
+  if (activity.kind === 'leveled') {
+    return { timeUtc, kind, text: sentence };
   }
   return { timeUtc, kind, text: `${sentence}: ${thingList(activity.things)}` };
 };
@@ -172,6 +178,18 @@ const eventItem = (event: StoryEvent, players: Set<string>): StoryText => {
             ? `${event.player ?? 'Someone'} got their things back from their tombstone`
             : `${event.player ?? 'Someone'} emptied ${event.owner ?? 'someone'}'s tombstone`,
       };
+    case 'bedClaimed':
+      return { timeUtc, kind: 'night', text: `${event.character} claimed a bed` };
+    case 'portalNamed':
+      return { timeUtc, kind: 'travel', text: `${event.player ?? 'Someone'} named a portal "${event.portal}"` };
+    case 'traded':
+      return {
+        timeUtc,
+        kind: 'items',
+        text: `${event.player ?? 'Someone'} ${event.isBuy ? 'bought something from' : 'sold something to'} ${event.trader}`,
+      };
+    case 'wardChanged':
+      return { timeUtc, kind: 'built', text: `${event.builder ?? 'Someone'} turned their ward ${event.isOn ? 'on' : 'off'}` };
     case 'tameChanged':
       return { timeUtc, kind: 'tame', text: tameText(event) };
     case 'petNamed':

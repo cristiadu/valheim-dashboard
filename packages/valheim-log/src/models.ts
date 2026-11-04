@@ -67,6 +67,14 @@ export type LogEvent = { timeUtc: string } & (
   | { type: 'smelting'; item: string; count: number; station: string; player: string | null }
   | { type: 'foodStarted'; kind: 'cooking' | 'fermenting'; item: string; station: string; player: string | null }
   | { type: 'sailing'; character: string; ship: string }
+  | { type: 'crafting'; character: string; station: string }
+  | { type: 'emote'; character: string; emote: string }
+  | { type: 'bedClaimed'; character: string }
+  | { type: 'portalNamed'; portal: string; player: string | null }
+  | { type: 'wardChanged'; ward: string; builder: string | null; isOn: boolean }
+  | { type: 'itemMade'; item: string; count: number; level: number; crafter: string }
+  | { type: 'skillUp'; player: string | null }
+  | { type: 'traded'; player: string | null; trader: string; isBuy: boolean }
   | { type: 'depleted'; kind: 'tree' | 'rock'; thing: string; player: string | null }
   | {
       type: 'chestContents';
