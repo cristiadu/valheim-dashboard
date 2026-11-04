@@ -20,9 +20,9 @@ It reads `C:\Valheim Server\logs.txt` and writes its own output to `C:\Valheim S
 stops, it starts again after 5 seconds.
 
 To start it every time you log on to Windows, double-click `scripts\install-startup.cmd` once. It runs
-hidden, with no window. It also checks `main` every 5 minutes: it pulls, rebuilds and restarts the
+in its own window. It also checks `main` every 5 minutes: it pulls, rebuilds and restarts the
 dashboard, and installs a changed event log plugin when nobody is online. It only takes a commit once CI
-passed on it. It writes what it did to `C:\Valheim Server\updater.log`. When `package.json` moves to a new
+passed on it. Each check opens a window that closes when it is done, and writes what it did to `C:\Valheim Server\updater.log`. When `package.json` moves to a new
 pnpm version, run `install-startup.cmd` again.
 
 ## Share it with friends
@@ -39,7 +39,7 @@ Friends open one link and type a password. They install nothing.
 Friends open `https://cotil-longhouse.share.zrok.io`, click past zrok's notice the first time, and type the
 Valheim server's password on the dashboard's password page. The dashboard reads it from
 `start_headless_server.bat`, so change it there and restart the dashboard. The page remembers them for 30
-days. The link starts hidden each time you log on. `share-dashboard.ps1 -Remove` stops sharing.
+days. The link starts in its own window, titled `Valheim dashboard link (zrok)`, each time you log on. Closing that window stops the link. `share-dashboard.ps1 -Remove` stops sharing.
 
 After a manual `git pull`, start it with `scripts\start-dashboard.cmd -Rebuild`. Other settings are in
 [apps/dashboard/README.md](apps/dashboard/README.md).

@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-  Gives friends a link to the dashboard through zrok, started at Windows logon with no window. Run it once.
+  Gives friends a link to the dashboard through zrok, started at Windows logon in its own window. Run it once.
   Pass -Remove to stop sharing.
 
 .EXAMPLE
@@ -35,6 +35,9 @@ $ZrokFolder = Join-Path $env:LOCALAPPDATA 'zrok2'
 
 # Domain of zrok's free public links.
 $PublicDomain = 'share.zrok.io'
+
+# Title of the window zrok runs in.
+$WindowTitle = 'Valheim dashboard link (zrok)'
 
 if ($Remove) {
   Unregister-ScheduledTask -TaskName $TaskName -Confirm:$false
@@ -75,10 +78,13 @@ if ($names -notmatch [regex]::Escape($Name)) {
 }
 
 $zrokLog = Join-Path (Split-Path -Parent $LogFile) 'zrok.log'
-$share = "`"$zrok`" share public http://127.0.0.1:$Port --name-selection public:$Name --open --headless"
-# conhost --headless gives zrok a console with no window, so it never flashes or takes focus. cmd writes its output to the log.
-$arguments = "--headless cmd.exe /c `"$share >> `"$zrokLog`" 2>&1`""
-$action = New-ScheduledTaskAction -Execute 'conhost.exe' -Argument $arguments
+# zrok runs in a normal window you can see, titled below. Its --headless flag only swaps its full-screen view for
+# plain lines, which the window shows and the log keeps.
+$command = "`$Host.UI.RawUI.WindowTitle = '$WindowTitle'; " +
+  "& '$zrok' share public http://127.0.0.1:$Port --name-selection public:$Name --open --headless 2>&1 | " +
+  "ForEach-Object { `$_; Add-Content -LiteralPath '$zrokLog' -Value `$_ -Encoding UTF8 }"
+$arguments = "-NoProfile -ExecutionPolicy Bypass -NoExit -Command `"$command`""
+$action = New-ScheduledTaskAction -Execute 'powershell.exe' -Argument $arguments
 $trigger = New-ScheduledTaskTrigger -AtLogOn -User $env:USERNAME
 $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit ([TimeSpan]::Zero) `
   -RestartCount 999 -RestartInterval (New-TimeSpan -Minutes 1)
