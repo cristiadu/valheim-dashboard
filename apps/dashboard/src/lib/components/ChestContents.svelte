@@ -1,7 +1,7 @@
 <script lang="ts">
   import ItemIcon from '#/lib/components/ItemIcon';
   import { containerGrid, itemSlots } from '#/lib/items';
-  import { CHEST_LIST_ICON_PX, CHEST_SLOT_ICON_PX } from '#/lib/models';
+  import { CHEST_SLOT_ICON_PX } from '#/lib/models';
 
   /** Prefab of the chest, cart or ship, which picks its slot grid, and how many of each item it holds. */
   let { chest, items }: { chest: string; items: Record<string, number> } = $props();
@@ -17,9 +17,6 @@
 
   /** All the items in the chest, added up. */
   const total = $derived(slots.reduce((sum, slot) => sum + slot.count, 0));
-
-  /** The biggest pile, so each list row's bar shows its pile next to it. */
-  const biggest = $derived(slots[0]?.count ?? 1);
 </script>
 
 {#if slots.length === 0}
@@ -27,31 +24,21 @@
 {:else}
   <p class="facts">
     <span><strong>{total.toLocaleString()}</strong> {total === 1 ? 'item' : 'items'}</span>
-    <span><strong>{slots.length}</strong> {slots.length === 1 ? 'kind' : 'kinds'}</span>
     <span><strong>{slots.length}</strong> of {grid.slots} slots used</span>
   </p>
-  <div class="contents">
-    <ul class="slots" style:--columns={grid.columns} aria-label="Slots as the game shows them">
-      {#each slots as slot (slot.prefab)}
-        <li class="slot" title="{slot.count.toLocaleString()} {slot.name}">
-          <ItemIcon item={slot.name} size={CHEST_SLOT_ICON_PX} />
-          <span class="count">{slot.count.toLocaleString()}</span>
-        </li>
-      {/each}
-      {#each emptySlots as index (index)}
-        <li class="slot empty" aria-hidden="true"></li>
-      {/each}
-    </ul>
-    <ol class="list" aria-label="What is inside, most first">
-      {#each slots as slot (slot.prefab)}
-        <li style:--share="{(slot.count / biggest) * 100}%">
-          <ItemIcon item={slot.name} size={CHEST_LIST_ICON_PX} />
-          <span class="name">{slot.name}</span>
-          <span class="amount">{slot.count.toLocaleString()}</span>
-        </li>
-      {/each}
-    </ol>
-  </div>
+  <ul class="slots" style:--columns={grid.columns} aria-label="What is inside, most first">
+    {#each slots as slot (slot.prefab)}
+      <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+      <li class="slot" tabindex="0" aria-label="{slot.count.toLocaleString()} {slot.name}">
+        <ItemIcon item={slot.name} size={CHEST_SLOT_ICON_PX} />
+        <span class="count" aria-hidden="true">{slot.count.toLocaleString()}</span>
+        <span class="tip" aria-hidden="true">{slot.name} <strong>{slot.count.toLocaleString()}</strong></span>
+      </li>
+    {/each}
+    {#each emptySlots as index (index)}
+      <li class="slot empty" aria-hidden="true"></li>
+    {/each}
+  </ul>
 {/if}
 
 <style>
@@ -71,26 +58,13 @@
     color: var(--gold);
   }
 
-  /* The game's grid on the left and the readable list on the right, stacked on a phone */
-  .contents {
-    display: grid;
-    grid-template-columns: auto minmax(220px, 1fr);
-    align-items: start;
-    gap: 20px;
-  }
-
-  /* On a phone the list goes under the slots */
-  @media (max-width: 720px) {
-    .contents {
-      grid-template-columns: minmax(0, 1fr);
-    }
-  }
-
   /* Slots in the game's grid for this chest, on a dark wood backing like the game's chest window */
   .slots {
     display: grid;
     grid-template-columns: repeat(var(--columns), 60px);
     gap: 4px;
+    width: fit-content;
+    max-width: 100%;
     margin: 0;
     padding: 8px;
     list-style: none;
@@ -137,35 +111,38 @@
       0 0 2px #000;
   }
 
-  /* Every item with its name and count, most first */
-  .list {
-    display: flex;
-    flex-direction: column;
-    margin: 0;
-    padding: 0;
-    list-style: none;
+  /* Pointing at or tapping a slot lights its edge */
+  .slot:hover,
+  .slot:focus-visible {
+    border-color: var(--gold);
+    outline: none;
   }
 
-  /* One item: icon, name and count, with a faint bar behind that shows its pile next to the biggest one */
-  .list li {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 10px;
-    padding: 5px 8px;
-    border-top: 1px solid var(--line-soft);
-    background: linear-gradient(to right, rgb(216 178 76 / 12%) var(--share), transparent var(--share));
-  }
-
-  /* Long item names stay on one line */
-  .name {
-    overflow: hidden;
-    text-overflow: ellipsis;
+  /* Item name and count in a small box above the slot, shown only while pointed at or tapped */
+  .tip {
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    z-index: 1;
+    display: none;
+    padding: 4px 8px;
     white-space: nowrap;
+    background: var(--panel);
+    border: 1px solid var(--gold);
+    border-radius: 3px;
+    transform: translateX(-50%);
+    pointer-events: none;
   }
 
-  /* Count in the heading font and accent color */
-  .amount {
+  /* The box appears on hover or focus */
+  .slot:hover .tip,
+  .slot:focus .tip {
+    display: block;
+  }
+
+  /* Count in the box stands out */
+  .tip strong {
+    margin-left: 6px;
     font-family: var(--font-heading);
     color: var(--ember);
   }

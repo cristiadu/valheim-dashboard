@@ -289,7 +289,7 @@ all chests again, so a new run starts the chest list over. The plugin writes the
 from the game's own world generator, and the map colors only squares someone walked.
 Nothing nobody has seen shows: a chest the world came with appears once someone walks next to it.
 Every chest has its own mark. Chests that would cover each other sit side by side. Tapping one opens it as the
-game's slot grid, with a list of every item, most first. Item names and icons come from the item's prefab, through
+game's slot grid, and pointing at a slot shows the item's name and count. Item names and icons come from the item's prefab, through
 `GEAR_NAMES` and `ITEM_NAMES`, and every name listed there gets its icon downloaded. An item the wiki has no icon
 for shows a plain sack.
 

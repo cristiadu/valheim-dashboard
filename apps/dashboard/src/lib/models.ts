@@ -375,9 +375,6 @@ export const TREASURE_CHEST_PREFIX = 'TreasureChest';
 /** Size of an item icon in a chest's slots, in pixels. */
 export const CHEST_SLOT_ICON_PX = 44;
 
-/** Size of an item icon in the list beside a chest's slots, in pixels. */
-export const CHEST_LIST_ICON_PX = 24;
-
 /** What the map draws, in map units: meters east as `x` and meters south as `y`, so north is up. */
 export type MapView = {
   /** SVG view box that fits everything, with a margin. */
