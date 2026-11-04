@@ -74,9 +74,6 @@ if ($names -notmatch [regex]::Escape($Name)) {
   throw "zrok could not keep the name $Name. Someone else may have it; try another -Name."
 }
 
-# Stops ngrok if this PC shared through it before.
-Stop-Process -Name 'ngrok' -ErrorAction SilentlyContinue
-
 $zrokLog = Join-Path (Split-Path -Parent $LogFile) 'zrok.log'
 $share = "`"$zrok`" share public http://127.0.0.1:$Port --name-selection public:$Name --open --headless"
 # conhost --headless gives zrok a console with no window, so it never flashes or takes focus. cmd writes its output to the log.
