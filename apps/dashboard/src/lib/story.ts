@@ -65,8 +65,11 @@ const activityItem = (activity: ActivityRecord): StoryText => {
   }
   const words = ACTIVITY_WORDS[activity.kind];
   const kind = ACTIVITY_STORY_KINDS[activity.kind];
-  const text = `${activity.player ?? 'Someone'} ${words.verb} ${count(total, words.one, words.many)}${words.ending}: ${thingList(activity.things)}`;
-  return { timeUtc, kind, text, ...(kind === 'items' ? { things: activity.things } : {}) };
+  const sentence = `${activity.player ?? 'Someone'} ${words.verb} ${count(total, words.one, words.many)}${words.ending}`;
+  if (kind === 'items') {
+    return { timeUtc, kind, text: sentence, things: activity.things };
+  }
+  return { timeUtc, kind, text: `${sentence}: ${thingList(activity.things)}` };
 };
 
 /** Story line for one chat message or ping. */

@@ -234,7 +234,7 @@
     display: flex;
     flex-direction: column;
     gap: 22px;
-    max-width: 900px;
+    max-width: var(--page-width);
   }
 
   /* Text under a panel title */

@@ -98,8 +98,7 @@
               <span class="line event">
                 <span class="mono muted">{whenLabel(item.timeUtc, timeZone, nowMs)}</span>
                 <span class="rune" aria-hidden="true" style:color={STORY_STYLES[item.kind].color}>{STORY_STYLES[item.kind].rune}</span>
-                <span>{item.text}</span>
-                {#if item.things}<ItemList items={item.things} size={16} />{/if}
+                <span class="what">{item.text}{#if item.things}<ItemList items={item.things} size={16} />{/if}</span>
               </span>
             </LogLines>
           {:else}
@@ -128,7 +127,7 @@
     display: flex;
     flex-direction: column;
     gap: 22px;
-    max-width: 1120px;
+    max-width: var(--page-width);
   }
 
   /* The one line about the last 24 hours */
@@ -148,6 +147,7 @@
   .grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+    align-items: start;
     gap: 22px;
   }
 
@@ -180,6 +180,13 @@
     display: grid;
     grid-template-columns: auto 22px minmax(0, 1fr);
     align-items: baseline;
+  }
+
+  /* Sentence with its items under it, both in the text column */
+  .what {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
   }
 
   /* Name takes the free space */

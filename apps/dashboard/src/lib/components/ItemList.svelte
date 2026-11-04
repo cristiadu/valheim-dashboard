@@ -16,10 +16,10 @@
 </ul>
 
 <style>
-  /* Things in a wrapping row */
+  /* Things in rows of at most five, fewer when the space is narrow */
   .items {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(max(110px, calc((100% - 4 * 12px) / 5)), 1fr));
     gap: 6px 12px;
     margin: 0;
     padding: 0;
@@ -28,7 +28,7 @@
 
   /* Icon, count and name of one thing in a row */
   li {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     gap: 5px;
     min-height: 24px;

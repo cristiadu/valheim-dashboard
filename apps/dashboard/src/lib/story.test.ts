@@ -123,13 +123,13 @@ describe('storyOf', () => {
     // WHEN the story is made
     const story = storyOf(snapshot);
 
-    // THEN each stretch reads plainly
-    expect(story.map((item) => [item.kind, item.text])).toEqual([
-      ['built', 'Ragnar planted 3 plants: 3 sapling carrot'],
-      ['items', 'Ragnar ate or drank 1 thing: 1 cooked meat'],
-      ['items', 'Ragnar gathered 2 items: 2 turnip'],
-      ['items', 'Ragnar took 20 items from chests: 20 wood'],
-      ['fight', 'Ragnar killed 4 creatures: 3 greydwarf, 1 troll'],
+    // THEN each stretch reads plainly, and item lines leave the list to their item icons
+    expect(story.map((item) => [item.kind, item.text, item.things])).toEqual([
+      ['built', 'Ragnar planted 3 plants: 3 sapling carrot', undefined],
+      ['items', 'Ragnar ate or drank 1 thing', { CookedMeat: 1 }],
+      ['items', 'Ragnar gathered 2 items', { Turnip: 2 }],
+      ['items', 'Ragnar took 20 items from chests', { Wood: 20 }],
+      ['fight', 'Ragnar killed 4 creatures: 3 greydwarf, 1 troll', undefined],
     ]);
   });
 });

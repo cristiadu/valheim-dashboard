@@ -16,6 +16,7 @@
   --font-body: 'Barlow', system-ui, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
   --font-rune: 'Noto Sans Runic', 'Segoe UI Historic', serif;
+  --page-width: 1600px;
   color-scheme: dark;
 }
 
