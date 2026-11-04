@@ -327,7 +327,7 @@ BepInEx's own log file is turned off, so its messages land in
 ```mermaid
 flowchart TD
   click[Double-click start-dashboard.cmd] --> ps[start-dashboard.ps1]
-  task[Windows logon task, hidden window] --> ps
+  task[Windows logon task, visible window] --> ps
   ps --> built{Build exists?}
   built -->|no| build[pnpm install and build]
   built -->|yes| run[node apps/dashboard/build]
@@ -336,12 +336,11 @@ flowchart TD
 ```
 
 `install-startup.cmd` adds the logon task and the update task once. `share-dashboard.ps1` adds one more
-that starts zrok with no window. Every window stays hidden when it
-starts at logon.
+that starts zrok. Each one runs in its own window you can see.
 
 ## Updates from main
 
-The update task runs `update-from-main.ps1` every 5 minutes in a console with no window.
+The update task runs `update-from-main.ps1` every 5 minutes, each run in its own window that closes when it ends.
 
 ```mermaid
 flowchart TD
