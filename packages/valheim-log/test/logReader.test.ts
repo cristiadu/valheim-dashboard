@@ -396,6 +396,54 @@ describe('parseMessage', () => {
     ]);
   });
 
+  it('reads items made, upgrades, skill-ups and trades from the event log plugin', () => {
+    // GIVEN one line of each kind, from a player whose name has a space
+    const messages = [
+      'Made: ArrowFlint x20 by Inge Dragonchow',
+      'Upgraded: SwordBronze to level 2 by Inge Dragonchow',
+      'Skill up: Inge Dragonchow',
+      'Traded: Inge Dragonchow bought from Haldor',
+      'Traded: an unknown player sold to Haldor',
+    ];
+
+    // WHEN each message is read
+    const events = messages.map((message) => parseMessage(message, '2026-01-01T00:00:00.000Z'));
+
+    // THEN each line gives its event and values
+    const timeUtc = '2026-01-01T00:00:00.000Z';
+    expect(events).toEqual([
+      { type: 'itemMade', timeUtc, item: 'ArrowFlint', count: 20, level: 1, crafter: 'Inge Dragonchow' },
+      { type: 'itemMade', timeUtc, item: 'SwordBronze', count: 1, level: 2, crafter: 'Inge Dragonchow' },
+      { type: 'skillUp', timeUtc, player: 'Inge Dragonchow' },
+      { type: 'traded', timeUtc, player: 'Inge Dragonchow', trader: 'Haldor', isBuy: true },
+      { type: 'traded', timeUtc, player: null, trader: 'Haldor', isBuy: false },
+    ]);
+  });
+
+  it('reads crafting, emotes, beds, portals and wards from the event log plugin', () => {
+    // GIVEN one line of each kind, from a player whose name has a space
+    const messages = [
+      'Crafting: Inge Dragonchow at forge',
+      'Emote: Inge Dragonchow wave',
+      'Bed claimed: Inge Dragonchow',
+      'Portal named: Swamp camp by Inge Dragonchow',
+      'Ward turned off: guard_stone by an unknown player',
+    ];
+
+    // WHEN each message is read
+    const events = messages.map((message) => parseMessage(message, '2026-01-01T00:00:00.000Z'));
+
+    // THEN each line gives its event and values
+    const timeUtc = '2026-01-01T00:00:00.000Z';
+    expect(events).toEqual([
+      { type: 'crafting', timeUtc, character: 'Inge Dragonchow', station: 'forge' },
+      { type: 'emote', timeUtc, character: 'Inge Dragonchow', emote: 'wave' },
+      { type: 'bedClaimed', timeUtc, character: 'Inge Dragonchow' },
+      { type: 'portalNamed', timeUtc, portal: 'Swamp camp', player: 'Inge Dragonchow' },
+      { type: 'wardChanged', timeUtc, ward: 'guard_stone', builder: null, isOn: false },
+    ]);
+  });
+
   it('reads chat as chat even when its text looks like another line', () => {
     // GIVEN chat that holds text other patterns look for
     const messages = ['Chat: Ragnar said: the server is full', 'Chat: Ragnar said: day:3 OnApplicationQuit'];

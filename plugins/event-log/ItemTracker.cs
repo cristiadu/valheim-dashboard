@@ -175,13 +175,19 @@ namespace ValheimDashboard.EventLog
             GameEventLog.Write($"Chest: {chest.m_uid} {Names.PrefabName(chest)} at {Names.MapPosition(chest.GetPosition())} built by {Names.Builder(chest)} holds {holds}");
         }
 
-        /// <summary>Returns how many of each item the chest contents in [data] hold, by item name.</summary>
-        private static Dictionary<string, int> CountItems(byte[] data)
+        /// <summary>Returns the items in chest contents [data].</summary>
+        public static List<ItemDrop.ItemData> LoadItems(byte[] data)
         {
             Inventory inventory = new Inventory(string.Empty, null, ChestReadSize, ChestReadSize);
             inventory.Load(new ZPackage(data));
+            return inventory.GetAllItems();
+        }
+
+        /// <summary>Returns how many of each item the chest contents in [data] hold, by item name.</summary>
+        private static Dictionary<string, int> CountItems(byte[] data)
+        {
             Dictionary<string, int> counts = new Dictionary<string, int>();
-            foreach (ItemDrop.ItemData item in inventory.GetAllItems())
+            foreach (ItemDrop.ItemData item in LoadItems(data))
             {
                 string name = item.m_dropPrefab == null ? item.m_shared.m_name : item.m_dropPrefab.name;
                 counts.TryGetValue(name, out int count);
