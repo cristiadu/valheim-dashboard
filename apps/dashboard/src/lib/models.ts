@@ -420,8 +420,8 @@ export type StockRow = {
 
 /**
  * What a stretch of activity is: pieces built, a builder's pieces destroyed, creatures killed, items gathered
- * from the world, items stored in or taken from chests, crops planted, food eaten, items put into smelters, trees
- * cut down or rocks mined out.
+ * from the world, items stored in or taken from chests, crops planted, food eaten, items put into smelters, food
+ * put on to cook, mead bases put into fermenters, ships steered, trees cut down or rocks mined out.
  */
 export type ActivityKind =
   | 'built'
@@ -433,6 +433,9 @@ export type ActivityKind =
   | 'planted'
   | 'ate'
   | 'smelted'
+  | 'cooked'
+  | 'brewed'
+  | 'sailed'
   | 'cut'
   | 'mined';
 
@@ -463,6 +466,9 @@ export const ACTIVITY_STORY_KINDS: Record<ActivityKind, StoryKind> = {
   planted: 'built',
   ate: 'items',
   smelted: 'items',
+  cooked: 'items',
+  brewed: 'items',
+  sailed: 'travel',
   cut: 'items',
   mined: 'items',
 };
@@ -480,6 +486,9 @@ export const ACTIVITY_WORDS: Record<Exclude<ActivityKind, 'destroyed'>, { verb: 
   planted: { verb: 'planted', one: 'plant', many: 'plants', ending: '' },
   ate: { verb: 'ate or drank', one: 'thing', many: 'things', ending: '' },
   smelted: { verb: 'put', one: 'item', many: 'items', ending: ' into smelters and kilns' },
+  cooked: { verb: 'started cooking', one: 'thing', many: 'things', ending: '' },
+  brewed: { verb: 'started brewing', one: 'mead', many: 'meads', ending: '' },
+  sailed: { verb: 'steered', one: 'ship', many: 'ships', ending: '' },
   cut: { verb: 'cut down', one: 'tree', many: 'trees', ending: '' },
   mined: { verb: 'mined out', one: 'rock', many: 'rocks', ending: '' },
 };

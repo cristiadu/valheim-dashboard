@@ -169,6 +169,12 @@ const addActivityOf = (snapshot: Snapshot, event: LogEvent, line: string): void 
     case 'smelting':
       addActivity(activities, line, timeUtc, event.player, 'smelted', event.item, event.count);
       break;
+    case 'foodStarted':
+      addActivity(activities, line, timeUtc, event.player, event.kind === 'cooking' ? 'cooked' : 'brewed', event.item, 1);
+      break;
+    case 'sailing':
+      addActivity(activities, line, timeUtc, event.character, 'sailed', event.ship, 1);
+      break;
     case 'depleted':
       addActivity(activities, line, timeUtc, event.player, event.kind === 'tree' ? 'cut' : 'mined', event.thing, 1);
       break;

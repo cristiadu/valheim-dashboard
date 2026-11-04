@@ -16,6 +16,9 @@ namespace ValheimDashboard.EventLog
         /// <summary>Hash of the call a player sends to put an item into a smelter, kiln or similar station.</summary>
         private static readonly int AddOreHash = "RPC_AddOre".GetStableHashCode();
 
+        /// <summary>Hash of the call a player sends to put a mead base into a fermenter.</summary>
+        private static readonly int AddItemHash = "RPC_AddItem".GetStableHashCode();
+
         /// <summary>
         /// Seconds a player who asked through the server counts as the one who did it. Longer than a scan, since
         /// stations are read once per scan.
@@ -28,10 +31,10 @@ namespace ValheimDashboard.EventLog
         /// <summary>Items queued in each station at the last scan, by object ID.</summary>
         private static readonly Dictionary<ZDOID, List<string>> Queues = new Dictionary<ZDOID, List<string>>();
 
-        /// <summary>Remembers who asked when [data] is a hit or an item put into a station.</summary>
+        /// <summary>Remembers who asked when [data] is a hit or an item put into a station or a fermenter.</summary>
         public static void Read(ZRoutedRpc.RoutedRPCData data)
         {
-            if (data.m_methodHash == DamageHash || data.m_methodHash == AddOreHash)
+            if (data.m_methodHash == DamageHash || data.m_methodHash == AddOreHash || data.m_methodHash == AddItemHash)
             {
                 AskedBy[data.m_targetZDO] = (data.m_senderPeerID, Time.time);
             }
@@ -130,7 +133,7 @@ namespace ValheimDashboard.EventLog
         }
 
         /// <summary>Returns the player who asked to hit or fill [zdo] just now, or else the player whose game owns it.</summary>
-        private static string Doer(ZDO zdo)
+        public static string Doer(ZDO zdo)
         {
             bool isAsked = AskedBy.TryGetValue(zdo.m_uid, out (long Peer, float Time) asked) && Time.time - asked.Time <= AskedSeconds;
             return Names.Peer(isAsked ? asked.Peer : zdo.GetOwner());

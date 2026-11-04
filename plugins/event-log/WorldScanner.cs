@@ -60,6 +60,8 @@ namespace ValheimDashboard.EventLog
                 PlacedItemTracker.See(zdo, isNew);
                 ItemTracker.See(zdo, isNew);
                 WorkTracker.See(zdo);
+                KitchenTracker.See(zdo);
+                ShipTracker.See(zdo);
                 if (isNew)
                 {
                     NewObjects.Add(zdo);
@@ -89,6 +91,9 @@ namespace ValheimDashboard.EventLog
             SeenObjects.Remove(uid);
             PlayerTracker.Forget(uid);
             PlacedItemTracker.Destroyed(uid);
+            KitchenTracker.Forget(uid);
+            ShipTracker.Forget(uid);
+            EatTracker.Forget(uid);
             ZDO zdo = __instance.GetZDO(uid);
             if (zdo == null)
             {
