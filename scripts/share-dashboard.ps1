@@ -8,7 +8,7 @@
   .\scripts\share-dashboard.ps1 -Remove
 #>
 param(
-  # Name in the link, for example cotil-longhouse for https://cotil-longhouse.share.zrok.io. Lowercase letters,
+  # Name in the link, for example cotil-longhouse for https://cotil-longhouse.shares.zrok.io. Lowercase letters,
   # digits and dashes. zrok keeps it for this account, so the link stays the same.
   [string]$Name,
   # Account token from https://myzrok.io. Needed the first time only. Saved in zrok's own settings, never in this repo.
@@ -32,9 +32,6 @@ $ZrokSha256 = '2780e799269d92e64da5c5bfda48e76d4464925bdfcb7a11deafb40c6f25ad84'
 
 # Folder zrok2.exe is installed in.
 $ZrokFolder = Join-Path $env:LOCALAPPDATA 'zrok2'
-
-# Domain of zrok's free public links.
-$PublicDomain = 'share.zrok.io'
 
 # Title of the window zrok runs in.
 $WindowTitle = 'Valheim dashboard link (zrok)'
@@ -91,4 +88,7 @@ $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoi
 Register-ScheduledTask -TaskName $TaskName -Action $action -Trigger $trigger -Settings $settings -Force | Out-Null
 Start-ScheduledTask -TaskName $TaskName
 
-Write-Host "Friends can open https://$Name.$PublicDomain. It starts again each time $env:USERNAME logs on."
+# zrok's list shows the full address of the name, so the link printed is the one friends really open.
+$link = [regex]::Match($names, "[a-z0-9.-]*$([regex]::Escape($Name))\.[a-z0-9.-]+").Value
+if (-not $link) { $link = "$Name (run '$zrok list names' for the full address)" }
+Write-Host "Friends can open https://$link. It starts again each time $env:USERNAME logs on."

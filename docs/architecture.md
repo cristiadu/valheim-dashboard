@@ -120,7 +120,7 @@ and a tab change reuses the snapshot the page already has.
 
 The dashboard listens only on the server PC (`127.0.0.1`). zrok connects out from the PC and passes the
 shared link's requests in, so no router port is open.
-The link keeps its name, such as `https://cotil-longhouse.share.zrok.io`. The first time, zrok shows the friend a
+The link keeps its name, such as `https://cotil-longhouse.shares.zrok.io`. The first time, zrok shows the friend a
 notice page with a button to go on.
 
 ```mermaid
@@ -128,7 +128,7 @@ sequenceDiagram
   participant F as Friend's browser
   participant Z as zrok
   participant D as Dashboard
-  F->>Z: https://cotil-longhouse.share.zrok.io
+  F->>Z: https://cotil-longhouse.shares.zrok.io
   Z->>D: Same request and host, with X-Forwarded-For
   D-->>F: No cookie: go to /password
   F->>D: Types the password (through zrok)
