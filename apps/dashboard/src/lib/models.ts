@@ -68,6 +68,9 @@ export const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', '
 /** How often the page clock moves, so ages like "up 3h 12m" stay current. */
 export const CLOCK_TICK_MS = 30_000;
 
+/** Name of the live stream event that carries a [SnapshotChange] instead of a whole snapshot. */
+export const CHANGE_EVENT = 'change';
+
 /** Context key for the snapshot getter that the layout shares with the pages. */
 export const SNAPSHOT_KEY = Symbol('snapshot');
 
@@ -1045,3 +1048,17 @@ export type LiveConnection = {
   clock: ReturnType<typeof setInterval>;
 };
 
+
+/** Any value that JSON can hold, such as the snapshot or one of its parts. */
+export type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
+
+/**
+ * How one value in the snapshot changed since the stream last sent it:
+ * - `value`: the new value, sent whole.
+ * - `dropped`, `kept`, `added`: a list that lost its first `dropped` items, kept the next `kept`, then got `added` at the end.
+ * - `fields`, `removed`: an object whose `fields` changed as described, and whose `removed` keys are gone.
+ */
+export type SnapshotChange =
+  | { value: JsonValue }
+  | { dropped: number; kept: number; added: JsonValue[] }
+  | { fields: Record<string, SnapshotChange>; removed: string[] };

@@ -99,13 +99,22 @@ sequenceDiagram
   participant A as /api/stream
   participant S as Server state
   B->>A: Open the stream
-  A-->>B: Snapshot now
+  A-->>B: Whole snapshot
   S-->>A: New lines arrived
-  A-->>B: New snapshot
+  A-->>B: Only what changed
   A-->>B: Keep-alive every 25 s
 ```
 
 A snapshot is everything the page shows, as JSON. `/api/status` returns the same snapshot once.
+
+The browser applies each change to its last snapshot. The stream and the pages are sent gzip-compressed,
+and a tab change reuses the snapshot the page already has.
+
+| A change says | Example |
+| --- | --- |
+| A new value | `day` went from 11 to 12 |
+| A list lost items at the front and got new ones at the end | the oldest event dropped, one new death added |
+| An object's keys changed, are new, or are gone | Ragnar moved on the map |
 
 ## Sharing with friends
 

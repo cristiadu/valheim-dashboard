@@ -1,6 +1,6 @@
 import { dirname, join } from 'node:path';
 
-import type { Snapshot } from '#/lib/models';
+import type { Snapshot, SnapshotChange } from '#/lib/models';
 import { readConfig } from '#/lib/server/config';
 import { firstRunKey, LogHistory, readHistory } from '#/lib/server/log-history';
 import { LogTail } from '#/lib/server/log-tail';
@@ -11,17 +11,17 @@ import {
   TERRAIN_FILE_PREFIX,
   WORLDS_FOLDER_NAME,
   type Follower,
-  type ServerState,
 } from '#/lib/server/models';
 import { addSavedBosses, createServerState, readLogLine, setTerrain, startNewLog } from '#/lib/server/server-state';
 import { readTerrain } from '#/lib/server/terrain';
 import { readSavedGlobalKeys } from '#/lib/server/world-save';
+import { changeBetween } from '#/lib/snapshot-change';
 
-/** Functions to call with the snapshot after new log lines. */
-const listeners = new Set<(snapshot: Snapshot) => void>();
+/** Functions to call with what changed in the snapshot after new log lines. */
+const listeners = new Set<(change: SnapshotChange) => void>();
 
-/** Resolves with the state once the log was read the first time. Null until the first request. */
-let started: Promise<ServerState> | null = null;
+/** Resolves with the follower once the log was read the first time. Null until the first request. */
+let started: Promise<Follower> | null = null;
 
 /**
  * Reads the bosses defeated from the world's newest save once the world is known and after each save, so
@@ -67,7 +67,7 @@ const readWorldTerrain = async (follower: Follower): Promise<void> => {
   }
 };
 
-/** Reads the new lines once and copies them to the history, then gives the listeners the snapshot if any arrived. */
+/** Reads the new lines once and copies them to the history, then tells the listeners what changed if any arrived. */
 const poll = async (follower: Follower): Promise<void> => {
   try {
     await follower.tail.poll();
@@ -79,7 +79,12 @@ const poll = async (follower: Follower): Promise<void> => {
   await readWorldTerrain(follower);
   if (follower.hasNewLines) {
     follower.hasNewLines = false;
-    listeners.forEach((listener) => listener(follower.state.snapshot));
+    const { snapshot } = follower.state;
+    const change = changeBetween(follower.sentSnapshot, snapshot);
+    follower.sentSnapshot = structuredClone(snapshot);
+    if (change !== null) {
+      listeners.forEach((listener) => listener(change));
+    }
   }
 };
 
@@ -95,7 +100,7 @@ const pollLater = (follower: Follower): void => {
  * Starts following the log: reads the past runs in the history folder, then the live log once, then checks
  * it for new lines every few seconds.
  */
-const start = async (): Promise<ServerState> => {
+const start = async (): Promise<Follower> => {
   const config = readConfig(process.env);
   const state = createServerState(config.serverUtcOffsetMinutes);
   const historyFolder = join(dirname(config.logFile), HISTORY_FOLDER_NAME);
@@ -112,6 +117,7 @@ const start = async (): Promise<ServerState> => {
     state,
     history,
     hasNewLines: false,
+    sentSnapshot: structuredClone(state.snapshot),
     worldSaveRead: null,
     terrainRead: null,
     tail: new LogTail(config.logFile, {
@@ -128,17 +134,23 @@ const start = async (): Promise<ServerState> => {
   };
   await poll(follower);
   pollLater(follower);
-  return state;
+  return follower;
 };
 
 /** Returns what the server knows now. The first call starts following the log. */
 export const currentSnapshot = async (): Promise<Snapshot> => {
   started ??= start();
-  return (await started).snapshot;
+  return (await started).state.snapshot;
 };
 
-/** Calls [listener] with the snapshot after each batch of new log lines. Returns a function that stops it. */
-export const subscribe = (listener: (snapshot: Snapshot) => void): (() => void) => {
+/** Returns the snapshot as the live stream last sent it, which a new stream starts from before any change. */
+export const sentSnapshot = async (): Promise<Snapshot> => {
+  started ??= start();
+  return (await started).sentSnapshot;
+};
+
+/** Calls [listener] with what changed in the snapshot after each batch of new log lines. Returns a function that stops it. */
+export const subscribe = (listener: (change: SnapshotChange) => void): (() => void) => {
   listeners.add(listener);
   return () => listeners.delete(listener);
 };
