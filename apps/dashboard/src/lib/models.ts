@@ -549,6 +549,9 @@ export const PLAYER_ACTIVITY_STATS: { kind: ActivityKind; label: string }[] = [
   { kind: 'sailed', label: 'Times at the helm' },
 ];
 
+/** Fewest items one slot holds for an item to count as a stackable material, not a tool or piece of gear. */
+export const MIN_STACKABLE = 2;
+
 /** Prefab of the player, whose bag grid is in [CONTAINER_SIZES]. */
 export const PLAYER_PREFAB = 'Player';
 

@@ -168,6 +168,8 @@ export type ServerState = {
   snapshot: Snapshot;
   /** The world's terrain from the plugin's terrain file, once read. */
   terrain: Terrain | null;
+  /** What building each piece takes, by piece prefab, from the plugin's piece costs file, for example `{ wood_floor: { Wood: 2 } }`. */
+  pieceCosts: Record<string, Record<string, number>>;
 };
 
 /**
@@ -193,6 +195,7 @@ export const ITEM_STACKS_FILE_NAME = 'item-stacks.txt';
 /** One line of the item stacks file, for example `Wood 50`. */
 export const ITEM_STACK_LINE_PATTERN = /^(?<item>\S+) (?<stack>\d+)$/;
 
+<<<<<<< HEAD
 /** Name of the plugin's file next to the log with each player's health, stamina and eitr now. */
 export const PLAYER_VITALS_FILE_NAME = 'player-vitals.txt';
 
@@ -201,6 +204,13 @@ export const PLAYER_VITALS_LINE_PATTERN = /^(?<character>[^\t]+)\t(?<health>\d+)
 
 /** File change time kept for a file that was missing, so it is reported once. No real file has it. */
 export const MISSING_FILE_MS = -1;
+=======
+/** Name of the plugin's file next to the log with what each buildable piece costs. */
+export const PIECE_COSTS_FILE_NAME = 'piece-costs.txt';
+
+/** One line of the piece costs file, for example `wood_floor Wood x2`. */
+export const PIECE_COST_LINE_PATTERN = /^(?<piece>\S+) (?<items>.+)$/;
+>>>>>>> origin/main
 
 /** A log being followed and what was read from it. */
 export type Follower = {
@@ -220,10 +230,15 @@ export type Follower = {
   worldSaveRead: string | null;
   /** World and run start whose terrain file was read or reported missing, for example `Cotil 2026-11-01T10:43:52.000Z`. */
   terrainRead: string | null;
+<<<<<<< HEAD
   /** Run start whose item stacks file was read or reported missing, for example `2026-11-01T10:43:52.000Z`. */
   itemStacksRead: string | null;
   /** Time the player vitals file was last changed when it was read, in milliseconds, [MISSING_FILE_MS] while it is missing, or null before the first read. */
   vitalsChangedMs: number | null;
+=======
+  /** Run start whose item stacks and piece costs files were read or reported missing, for example `2026-11-01T10:43:52.000Z`. */
+  gameDataRead: string | null;
+>>>>>>> origin/main
 };
 
 /** Part of the wiki API's answer to an image address query, for example for `File:Deer_hide.png`. */
