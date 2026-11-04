@@ -1,7 +1,8 @@
 import type { LogEvent } from 'valheim-log';
 
+import { gearPiece } from '#/lib/gear';
 import { containerGrid, slotsUsed } from '#/lib/items';
-import { PLAYER_PREFAB, type Snapshot } from '#/lib/models';
+import { MIN_STACKABLE, PLAYER_PREFAB, type Snapshot } from '#/lib/models';
 import type { ServerState } from '#/lib/server/models';
 
 /**
@@ -35,7 +36,8 @@ const payFor = (state: ServerState, character: string, piece: string): void => {
 
 /**
  * Keeps [character]'s bag in [snapshot] within the slots a player has. Crafting and dropping are not in the log, so
- * while the guess needs more slots, the item touched longest ago is taken out, never what is worn now.
+ * while the guess needs more slots, an item is taken out: first the stackable material touched longest ago, as it
+ * most likely went into crafting, then the oldest piece of gear or tool. What is worn now is never taken out.
  */
 const fitBag = (snapshot: Snapshot, character: string): void => {
   const bag = snapshot.bags[character];
@@ -44,8 +46,11 @@ const fitBag = (snapshot: Snapshot, character: string): void => {
   }
   const { capacity } = containerGrid(PLAYER_PREFAB, 0);
   const worn = snapshot.worn[character] ?? [];
+  const gear = new Set((snapshot.gear[character] ?? []).map((entry) => gearPiece(entry).prefab));
   while (slotsUsed(bag, snapshot.itemStacks) > capacity) {
-    const oldest = Object.keys(bag).find((item) => !worn.includes(item));
+    const items = Object.keys(bag).filter((item) => !worn.includes(item));
+    const oldest =
+      items.find((item) => !gear.has(item) && (snapshot.itemStacks[item] ?? MIN_STACKABLE) >= MIN_STACKABLE) ?? items[0];
     if (oldest === undefined) {
       return;
     }

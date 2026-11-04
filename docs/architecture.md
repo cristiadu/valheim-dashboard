@@ -203,8 +203,9 @@ flowchart LR
   stacks --> slots
 ```
 
-The guess never needs more than 32 slots. When it would, the item touched longest ago is taken out, as it was
-most likely used for crafting or dropped. What a player wears now is never taken out.
+The guess never needs more than 32 slots. When it would, the stackable material touched longest ago is taken out,
+as it most likely went into crafting. Gear and tools go only when no material is left, and what a player wears
+now never does.
 
 The plugin logs everything a player wears, holds or carries on the back whenever it changes (`Wearing:`). The
 Vikings character sheet puts each of those pieces in its slot, at the newest level seen in the gear lines, and

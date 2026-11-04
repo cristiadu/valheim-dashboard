@@ -85,11 +85,13 @@ describe('updateBags', () => {
     expect(bag).toEqual({ Wood: 6, CarrotSeeds: 2 });
   });
 
-  it('keeps the bag within 32 slots by taking out what was touched longest ago, never what is worn', () => {
-    // GIVEN wood stacks to 50, Ragnar wears a spear, picks up 30 kinds of trophies, then 150 wood
-    state.snapshot.itemStacks = { Wood: 50 };
+  it('keeps the bag within 32 slots by taking out the oldest materials first, never gear or what is worn', () => {
+    // GIVEN wood stacks to 50 and a hammer to 1, Ragnar wears a spear and was seen with a hammer, picks up 30 kinds of
+    // trophies, then 150 wood
+    state.snapshot.itemStacks = { Wood: 50, Hammer: 1 };
     readLines(state, [
       ...RUN_START,
+      logLine('02:58:00', 'Gear: Ragnar Hammer quality 3'),
       logLine('02:59:00', 'Wearing: Ragnar has SpearFlint'),
       ...Array.from({ length: 30 }, (_, index) => logLine('03:00:00', `Picked up: Trophy${index} x1 by Ragnar`)),
       logLine('03:01:00', 'Picked up: Wood x150 by Ragnar'),
@@ -98,12 +100,12 @@ describe('updateBags', () => {
     // WHEN his bag is read
     const bag = state.snapshot.bags['Ragnar']!;
 
-    // THEN the spear and the wood stay, and the two oldest trophies are gone to make room
+    // THEN the hammer, the spear and the wood stay, and the three oldest trophies are gone to make room
     expect(Object.keys(bag)).toHaveLength(30);
+    expect(bag['Hammer']).toBe(1);
     expect(bag['SpearFlint']).toBe(1);
     expect(bag['Wood']).toBe(150);
-    expect(bag['Trophy0']).toBeUndefined();
-    expect(bag['Trophy1']).toBeUndefined();
-    expect(bag['Trophy2']).toBe(1);
+    expect(bag['Trophy2']).toBeUndefined();
+    expect(bag['Trophy3']).toBe(1);
   });
 });

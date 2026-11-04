@@ -94,7 +94,7 @@ const readGameData = async (follower: Follower): Promise<void> => {
   } catch (error) {
     if (follower.gameDataRead !== `missing ${startedUtc}`) {
       follower.gameDataRead = `missing ${startedUtc}`;
-      logger.warn(`No item stacks or piece costs in ${folder} yet: ${String(error)}`);
+      logger.warn(`Not all game data files are in ${folder} yet: ${String(error)}`);
     }
   }
 };
