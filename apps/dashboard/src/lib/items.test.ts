@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { chestName, containerGrid, itemName, itemSlots, stackSlots, stockOf } from '#/lib/items';
+import { chestName, containerGrid, itemName, itemSlots, slotsUsed, stackSlots, stockOf } from '#/lib/items';
 import { mapOf } from '#/lib/map';
 import { playersOf } from '#/lib/players';
 import { snapshotWith, TEST_NOON_MS } from '#/lib/test-common';
@@ -76,6 +76,16 @@ describe('stackSlots', () => {
 
     // THEN wood takes three slots, then resin and the spear one each
     expect(slots.map((slot) => `${slot.prefab} ${slot.count}`)).toEqual(['Wood 50', 'Wood 50', 'Wood 20', 'Resin 7', 'SpearFlint 1']);
+  });
+});
+
+describe('slotsUsed', () => {
+  it('counts full and part stacks, and one slot for an item with no known stack', () => {
+    // WHEN 120 wood that stacks to 50 and 7 resin with no known stack are counted
+    const slots = slotsUsed({ Wood: 120, Resin: 7 }, { Wood: 50 });
+
+    // THEN wood takes 3 slots and resin 1
+    expect(slots).toBe(4);
   });
 });
 

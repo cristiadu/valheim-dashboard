@@ -34,9 +34,6 @@
     <span><strong>{total.toLocaleString()}</strong> {total === 1 ? 'item' : 'items'}</span>
     <span><strong>{slots.length}</strong> of {grid.capacity} slots used</span>
   </p>
-  {#if slots.length > grid.capacity}
-    <p class="muted over">More than fits in {grid.capacity} slots, so some of it was probably used up crafting or building.</p>
-  {/if}
   <ul class="slots" style:--columns={grid.columns} aria-label="What is inside, most first">
     {#each slots as slot, index (index)}
       {@const isEquipped = equipped.includes(slot.prefab)}
@@ -119,12 +116,6 @@
   .slot.equipped {
     background: radial-gradient(circle, #2c4a63 0%, #1c2f40 75%);
     border-color: #4f7ea3;
-  }
-
-  /* Why the bag shows more slots than it has, under the totals */
-  .over {
-    margin: -6px 0 12px;
-    font-size: 12px;
   }
 
   /* An empty slot is darker and plain, so filled slots stand out */

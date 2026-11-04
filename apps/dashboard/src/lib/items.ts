@@ -53,6 +53,10 @@ export const stackSlots = (
     ];
   });
 
+/** Returns how many slots [items] fill in stacks of the most one slot holds in [stacks]. An unknown stack is one slot. */
+export const slotsUsed = (items: Record<string, number>, stacks: Record<string, number>): number =>
+  Object.entries(items).reduce((sum, [item, count]) => sum + Math.ceil(count / (stacks[item] ?? count)), 0);
+
 /** Returns every item in [chests] once, with how many there are in all and in which chests, most first. */
 export const stockOf = (chests: MapChest[]): StockRow[] => {
   const rows = new Map<string, StockRow>();
