@@ -299,8 +299,9 @@ flowchart LR
 A position marks its whole 32 m square as explored. Chest IDs last until the server stops, and every run lists
 all chests again, so a new run starts the chest list over. The plugin writes the terrain file once per world
 from the game's own world generator, and the map colors only squares someone walked.
-Nothing nobody has seen shows: a chest the world came with appears once someone walks next to it.
-Every chest has its own mark. Chests that would cover each other sit side by side. Tapping one opens it as the
+Nothing nobody has seen shows: a chest appears only on a square someone walked.
+Every chest has its own mark, and marks keep their size on screen when the map zooms in. Chests that would
+cover each other sit side by side. Tapping one opens it as the
 game's slot grid, and pointing at a slot shows the item's name and count. Item names and icons come from the item's prefab, through
 `GEAR_NAMES` and `ITEM_NAMES`, and every name listed there gets its icon downloaded. An item the wiki has no icon
 for shows a plain sack.
