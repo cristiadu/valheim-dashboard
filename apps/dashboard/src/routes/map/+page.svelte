@@ -158,7 +158,7 @@
             <p class="muted">
               Built by {chest.record.builder ?? 'someone'} · last looked at {whenLabel(chest.record.timeUtc, timeZone, nowMs)}
             </p>
-            <ChestContents items={chest.record.items} />
+            <ChestContents chest={chest.record.chest} items={chest.record.items} />
           </div>
         {/each}
       </section>

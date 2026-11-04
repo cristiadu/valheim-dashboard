@@ -346,7 +346,25 @@ export const CHEST_NAMES: Record<string, string> = {
   Raft: 'Raft',
   Karve: 'Karve',
   VikingShip: 'Longship',
+  shipwreck_karve_chest: 'Shipwreck chest',
 };
+
+/** Slots in one row and rows of slots of a container, as its window shows them in the game. */
+export type ContainerSize = { columns: number; rows: number };
+
+/** Slot grid of each container the game builds, by prefab. */
+export const CONTAINER_SIZES: Record<string, ContainerSize> = {
+  piece_chest_wood: { columns: 5, rows: 2 },
+  piece_chest: { columns: 6, rows: 4 },
+  piece_chest_private: { columns: 3, rows: 2 },
+  piece_chest_blackmetal: { columns: 8, rows: 4 },
+  Cart: { columns: 6, rows: 3 },
+  Karve: { columns: 2, rows: 2 },
+  VikingShip: { columns: 6, rows: 3 },
+};
+
+/** Slot grid of a container missing above. Rows are added whenever the items need more slots. */
+export const DEFAULT_CONTAINER_SIZE: ContainerSize = { columns: 5, rows: 2 };
 
 /** Start of the prefab of every chest the world came with, for example `TreasureChest_meadows`. */
 export const TREASURE_CHEST_PREFIX = 'TreasureChest';
@@ -573,7 +591,7 @@ export const GEAR_NAMES: Record<string, string> = {
   AtgeirBronze: 'Bronze atgeir',
   SledgeIron: 'Iron sledge',
   Bow: 'Crude bow',
-  BowFineWood: 'Fine bow',
+  BowFineWood: 'Finewood bow',
   BowHuntsman: 'Huntsman bow',
   BowDraugrFang: 'Draugr fang',
   ShieldWood: 'Wood shield',
@@ -669,6 +687,10 @@ export const ITEM_NAMES: Record<string, string> = {
   TrophySurtling: 'Surtling trophy',
   TrophyWolf: 'Wolf trophy',
   TrophyHatchling: 'Drake trophy',
+  TrophyBjorn: 'Bjørn trophy',
+  BjornHide: 'Bjørn hide',
+  BjornPaw: 'Bjørn paw',
+  KnifeButcher: 'Butcher knife',
 };
 
 /** Where a piece of gear goes on the character sheet: a slot, or `carried` for tools and spare gear. */

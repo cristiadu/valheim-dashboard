@@ -31,7 +31,7 @@ describe('gearSheet', () => {
       head: 'Leather helmet',
       cape: 'Deer hide cape',
     });
-    expect(sheet.carried.map((piece) => piece.name)).toEqual(['Fine bow', 'Flint spear', 'Torch']);
+    expect(sheet.carried.map((piece) => piece.name)).toEqual(['Finewood bow', 'Flint spear', 'Torch']);
   });
 
   it('shows an upgraded piece once, at its newest level', () => {
@@ -58,7 +58,7 @@ describe('iconItems', () => {
     const items = iconItems();
 
     // THEN gear and recipe items are both there, with no repeats
-    expect(items).toContain('Fine bow');
+    expect(items).toContain('Finewood bow');
     expect(items).toContain('Deer hide');
     expect(items.filter((item) => item === 'Hammer')).toEqual(['Hammer']);
   });
