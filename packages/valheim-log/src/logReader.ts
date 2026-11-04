@@ -16,6 +16,7 @@ import {
   CHARACTER_PATTERN,
   DISCONNECT_PATTERN,
   DISK_SPACE_PATTERN,
+  FOOD_STARTED_PATTERN,
   GAME_SERVER_PATTERN,
   GEAR_PATTERN,
   GLOBAL_KEY_PATTERN,
@@ -43,6 +44,7 @@ import {
   RAID_ENDED_PATTERN,
   RAID_PATTERN,
   REFUSED_JOIN_PATTERN,
+  SAILING_PATTERN,
   REFUSED_JOIN_REASONS,
   SERVER_STOPPED_PATTERN,
   SIGN_PATTERN,
@@ -334,6 +336,21 @@ const MATCHERS: readonly Matcher[] = [
       station: groups.station!,
       player: playerOf(groups.player),
     }),
+  },
+  {
+    pattern: FOOD_STARTED_PATTERN,
+    toEvent: (groups, timeUtc) => ({
+      type: 'foodStarted',
+      timeUtc,
+      kind: groups.kind === 'Cooking' ? 'cooking' : 'fermenting',
+      item: groups.item!,
+      station: groups.station!,
+      player: playerOf(groups.player),
+    }),
+  },
+  {
+    pattern: SAILING_PATTERN,
+    toEvent: (groups, timeUtc) => ({ type: 'sailing', timeUtc, character: groups.character!, ship: groups.ship! }),
   },
   {
     pattern: DEPLETED_PATTERN,

@@ -368,6 +368,26 @@ describe('parseMessage', () => {
     ]);
   });
 
+  it('reads cooking, fermenting and sailing from the event log plugin', () => {
+    // GIVEN one line of each kind, from players whose names have spaces
+    const messages = [
+      'Cooking: RawMeat on piece_cookingstation by Inge Dragonchow',
+      'Fermenting: MeadBaseTasty in fermenter by an unknown player',
+      'Sailing: Inge Dragonchow on Karve',
+    ];
+
+    // WHEN each message is read
+    const events = messages.map((message) => parseMessage(message, '2026-01-01T00:00:00.000Z'));
+
+    // THEN each line gives its event and values
+    const timeUtc = '2026-01-01T00:00:00.000Z';
+    expect(events).toEqual([
+      { type: 'foodStarted', timeUtc, kind: 'cooking', item: 'RawMeat', station: 'piece_cookingstation', player: 'Inge Dragonchow' },
+      { type: 'foodStarted', timeUtc, kind: 'fermenting', item: 'MeadBaseTasty', station: 'fermenter', player: null },
+      { type: 'sailing', timeUtc, character: 'Inge Dragonchow', ship: 'Karve' },
+    ]);
+  });
+
   it('reads chat as chat even when its text looks like another line', () => {
     // GIVEN chat that holds text other patterns look for
     const messages = ['Chat: Ragnar said: the server is full', 'Chat: Ragnar said: day:3 OnApplicationQuit'];

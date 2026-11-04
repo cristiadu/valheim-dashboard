@@ -115,6 +115,27 @@ describe('server state', () => {
     ]);
   });
 
+  it('keeps cooking, brewing and steering ships as activities per player', () => {
+    // GIVEN Inge Dragonchow cooks twice, starts a mead and takes the helm of a karve
+    readLines(state, [
+      ...RUN_START,
+      logLine('03:00:00', 'Cooking: RawMeat on piece_cookingstation by Inge Dragonchow'),
+      logLine('03:00:30', 'Cooking: RawMeat on piece_cookingstation by Inge Dragonchow'),
+      logLine('03:01:00', 'Fermenting: MeadBaseTasty in fermenter by Inge Dragonchow'),
+      logLine('03:02:00', 'Sailing: Inge Dragonchow on Karve'),
+    ]);
+
+    // WHEN the activities are listed
+    const kinds = state.snapshot.activities.map((activity) => [activity.player, activity.kind, activity.things]);
+
+    // THEN each has its own kind, and the two cooking lines count as one stretch
+    expect(kinds).toEqual([
+      ['Inge Dragonchow', 'cooked', { RawMeat: 2 }],
+      ['Inge Dragonchow', 'brewed', { MeadBaseTasty: 1 }],
+      ['Inge Dragonchow', 'sailed', { Karve: 1 }],
+    ]);
+  });
+
   it('names builders the plugin gave by Steam name by their character instead', () => {
     // GIVEN Tony Example plays Ragnar, and the plugin names a chest and pieces by his Steam name
     readLines(state, [
