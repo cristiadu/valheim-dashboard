@@ -174,10 +174,14 @@ Tools, such as the hammer, and older pieces show under "Also carries".
 ```mermaid
 flowchart LR
   wiki[Valheim wiki] -->|on start, missing icons only| icons["item-icons folder next to logs.txt"]
-  icons -->|/icons/flint-spear.png| pages[Recipes and Vikings tabs]
+  prefab["MushroomYellow in a log line"] -->|item name| name["Yellow mushroom"] -->|file name| file["yellow-mushroom.png"]
+  icons -->|/icons/yellow-mushroom.png| pages[Every tab that shows items]
 ```
 
-Icons are downloaded for every recipe item and every piece of gear the dashboard knows by name.
+The plugin logs items by their code (prefab), but icons are saved under the name the game shows. So each
+code is turned into its game name first: from the gear and item name lists, or by splitting the code into
+words (`NeckTail` becomes `Neck tail`). Icons are downloaded for every recipe item and every named item.
+An item with no icon shows its first two letters.
 
 ## Where a number comes from
 
@@ -288,6 +292,10 @@ A position marks its whole 32 m square as explored. Chest IDs last until the ser
 all chests again, so a new run starts the chest list over. The plugin writes the terrain file once per world
 from the game's own world generator, and the map colors only squares someone walked.
 Nothing nobody has seen shows: a chest the world came with appears once someone walks next to it.
+
+Chests close together share one chest icon with a count, so a base full of chests stays readable. The icon is
+a fixed share of the map's size, grows when pointed at, and opens a window per chest, laid out like the game's:
+a wood chest has 5 by 2 slots, a cart 6 by 3. Each kind of item takes one slot with its total.
 
 BepInEx's own log file is turned off, so its messages land in
 `logs.txt` too. Every line is listed in [log-events.md](log-events.md).

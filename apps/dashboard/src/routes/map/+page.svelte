@@ -1,14 +1,15 @@
 <script lang="ts">
-  import ItemIcon from '#/lib/components/ItemIcon';
-  import ItemList from '#/lib/components/ItemList';
   import { SvelteMap } from 'svelte/reactivity';
+
+  import ChestView from '#/lib/components/ChestView';
+  import ItemIcon from '#/lib/components/ItemIcon';
   import NoData from '#/lib/components/NoData';
+  import { itemName } from '#/lib/gear';
   import { live, useSnapshot } from '#/lib/live.svelte';
-  import { mapOf } from '#/lib/map';
-  import { MAP_CHEST_METERS, MAP_SQUARE_METERS, MAP_TRAIL_METERS, TERRAIN_STYLES } from '#/lib/models';
+  import { containerName, mapOf } from '#/lib/map';
+  import { MAP_SQUARE_METERS, MAP_TRAIL_METERS, type MapChest, TERRAIN_STYLES } from '#/lib/models';
   import { playersOf } from '#/lib/players';
   import { viewerTimeZone, whenLabel } from '#/lib/status';
-  import { thingName } from '#/lib/story';
 
   /** Getter for the snapshot the layout shares. */
   const getSnapshot = useSnapshot();
@@ -28,23 +29,23 @@
   /** What the map draws. */
   const map = $derived(mapOf(snapshot, players));
 
-  /** ID of the chest picked on the map, if any. */
-  let pickedId = $state<string | null>(null);
+  /** Square of the chest icon picked on the map, if any. */
+  let pickedKey = $state<string | null>(null);
 
-  /** Chest picked on the map, while it still exists. */
-  const picked = $derived(map?.chests.find((chest) => chest.id === pickedId) ?? null);
+  /** Chests under the icon picked on the map, while they still exist. */
+  const picked = $derived(map?.chestSpots.find((spot) => spot.key === pickedKey) ?? null);
 
   /** Terrain kinds on the explored squares, in legend order. */
   const terrainKinds = $derived(
     Object.entries(TERRAIN_STYLES).filter(([letter]) => Object.values(snapshot.terrain).includes(letter)),
   );
 
+  /** Orders chests with the most kinds of items first. */
+  const byMostItems = (first: MapChest, second: MapChest): number =>
+    Object.keys(second.record.items).length - Object.keys(first.record.items).length;
+
   /** Chests with the most items first. */
-  const chestList = $derived(
-    (map?.chests ?? []).toSorted(
-      (first, second) => Object.keys(second.record.items).length - Object.keys(first.record.items).length,
-    ),
-  );
+  const chestList = $derived((map?.chests ?? []).toSorted(byMostItems));
 
   /** Total each item across all known chest, cart and ship snapshots. */
   const stockRows = $derived.by(() => {
@@ -86,39 +87,52 @@
       <h2 id="map-title" class="panel-title">WHERE EVERYONE HAS BEEN</h2>
       <p class="muted">
         Each square is {MAP_SQUARE_METERS} m of land someone walked, in its terrain color, with a dot for each player who
-        was there. North is up. Tap a chest to see what it holds.
+        was there. North is up. Point at a chest to make it bigger, and tap it to open it. A number on a chest means that many chests stand close together.
       </p>
       <div class="legend">
         {#each players as player (player.key)}
           <span><span class="swatch" style:background={player.color}></span>{player.character}</span>
         {/each}
-        <span><span class="swatch chest-swatch"></span>Chest, cart or ship</span>
+        <span><svg class="chest-swatch" viewBox="0 0 24 24" aria-hidden="true"><use href="#chest-glyph" /></svg>Chests, carts and ships</span>
         <span><span class="death-swatch" aria-hidden="true">✕</span>Last death</span>
         {#each terrainKinds as [letter, style] (letter)}
           <span><span class="swatch" style:background={style.color}></span>{style.name}</span>
         {/each}
       </div>
       <svg viewBox={map.viewBox} role="img" aria-label="Map of explored land, chests and players">
+        <defs>
+          <symbol id="chest-glyph" viewBox="0 0 24 24">
+            <path class="chest-lid" d="M2 11V8a5 5 0 0 1 5-5h10a5 5 0 0 1 5 5v3z" />
+            <rect class="chest-body" x="2" y="11" width="20" height="10" rx="1" />
+            <rect class="chest-band" x="2" y="10" width="20" height="2.5" />
+            <rect class="chest-lock" x="10" y="9.5" width="4" height="5" rx="0.8" />
+          </symbol>
+        </defs>
         {#each map.land as square (square.key)}
           <rect x={square.x} y={square.y} width={MAP_SQUARE_METERS} height={MAP_SQUARE_METERS} fill={square.color} />
         {/each}
         {#each map.trails as trail (trail.key)}
           <rect class="trail" x={trail.x} y={trail.y} width={MAP_TRAIL_METERS} height={MAP_TRAIL_METERS} fill={trail.color} />
         {/each}
-        {#each map.chests as chest (chest.id)}
-          <rect
-            class="chest"
-            class:picked={chest.id === pickedId}
-            x={chest.x - MAP_CHEST_METERS / 2}
-            y={chest.y - MAP_CHEST_METERS / 2}
-            width={MAP_CHEST_METERS}
-            height={MAP_CHEST_METERS}
+        {#each map.chestSpots as spot (spot.key)}
+          {@const size = map.chestIconMeters}
+          {@const label = spot.chests.length === 1 ? containerName(spot.chests[0]!.record.chest) : `${spot.chests.length} chests`}
+          <g
+            class="chest-spot"
+            class:picked={spot.key === pickedKey}
             role="button"
             tabindex="0"
-            aria-label={`${thingName(chest.record.chest)} built by ${chest.record.builder ?? 'someone'}`}
-            onclick={() => (pickedId = chest.id)}
-            onkeydown={(event) => (event.key === 'Enter' ? (pickedId = chest.id) : undefined)}
-          />
+            aria-label="{label}. Show what is inside"
+            onclick={() => (pickedKey = spot.key)}
+            onkeydown={(event) => (event.key === 'Enter' || event.key === ' ' ? (pickedKey = spot.key) : undefined)}
+          >
+            <title>{label}</title>
+            <use href="#chest-glyph" x={spot.x - size / 2} y={spot.y - size / 2} width={size} height={size} />
+            {#if spot.chests.length > 1}
+              <circle class="count" cx={spot.x + size / 2} cy={spot.y - size / 2} r={size / 3} />
+              <text class="count-text" x={spot.x + size / 2} y={spot.y - size / 2} font-size={size / 2.4}>{spot.chests.length}</text>
+            {/if}
+          </g>
         {/each}
         {#each map.marks as mark (mark.key)}
           {#if mark.kind === 'player'}
@@ -131,24 +145,29 @@
         {/each}
       </svg>
       {#if picked}
-        <div class="picked-chest">
-          <strong>{thingName(picked.record.chest)}</strong>
-          <span class="muted">built by {picked.record.builder ?? 'someone'} · {whenLabel(picked.record.timeUtc, timeZone, nowMs)}</span>
-          {#if Object.keys(picked.record.items).length === 0}<p>Empty</p>{:else}<ItemList items={picked.record.items} size={16} />{/if}
+        <div class="picked-chests">
+          <div class="picked-head">
+            <strong>{picked.chests.length === 1 ? 'This chest holds' : `These ${picked.chests.length} chests hold`}</strong>
+            <button type="button" class="close" onclick={() => (pickedKey = null)}>Close</button>
+          </div>
+          <div class="chest-grid">
+            {#each picked.chests.toSorted(byMostItems) as chest (chest.id)}
+              <ChestView chest={chest.record} {nowMs} {timeZone} />
+            {/each}
+          </div>
         </div>
       {/if}
     </section>
 
     <section class="panel" aria-labelledby="chests-title">
       <h2 id="chests-title" class="panel-title">CHESTS</h2>
-      {#each chestList as chest (chest.id)}
-        <div class="line">
-          <span><strong>{thingName(chest.record.chest)}</strong> <span class="muted">by {chest.record.builder ?? 'someone'}</span></span>
-          {#if Object.keys(chest.record.items).length === 0}<span>Empty</span>{:else}<div class="chest-items"><ItemList items={chest.record.items} size={16} /></div>{/if}
-        </div>
-      {:else}
-        <p class="muted">No chest seen since the server started.</p>
-      {/each}
+      <div class="chest-grid">
+        {#each chestList as chest (chest.id)}
+          <ChestView chest={chest.record} {nowMs} {timeZone} />
+        {:else}
+          <p class="muted">No chest seen since the server started.</p>
+        {/each}
+      </div>
     </section>
 
     <section class="panel" aria-labelledby="stock-title">
@@ -164,7 +183,7 @@
       {#each visibleStockRows as row (row.item)}
         <details class="stock-row">
           <summary>
-            <strong class="stock-item"><ItemIcon item={row.item} size={20} />{thingName(row.item)}</strong>
+            <strong class="stock-item"><ItemIcon item={itemName(row.item)} size={20} />{itemName(row.item)}</strong>
             <span class="mono">{row.count.toLocaleString()}</span>
             <span class="muted">{row.containers.length} {row.containers.length === 1 ? 'container' : 'containers'}</span>
           </summary>
@@ -172,7 +191,7 @@
             {#each row.containers.toSorted((first, second) => second.count - first.count) as container (`${container.id}:${container.name}`)}
               <li>
                 <strong class="mono">{container.count.toLocaleString()}</strong>
-                {thingName(container.name)}
+                {containerName(container.name)}
                 <span class="muted">by {container.builder ?? 'unknown'} · {container.x}, {container.z}</span>
               </li>
             {/each}
@@ -216,9 +235,15 @@
     margin-right: 6px;
   }
 
-  /* Chest legend matches the chest marks */
+  /* Chest legend is the same little chest the map draws */
   .chest-swatch {
-    border: 1px solid var(--text);
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    margin-right: 6px;
+    vertical-align: -2px;
+    border: none;
+    background: none;
   }
 
   /* Death legend matches the death marks */
@@ -242,17 +267,55 @@
     stroke-width: 2;
   }
 
-  /* Chest marks stand out from the squares and look tappable */
-  .chest {
-    fill: var(--panel);
-    stroke: var(--text);
-    stroke-width: 2;
+  /* Chest icon grows from its middle when pointed at, focused or picked, so it is easy to aim at */
+  .chest-spot {
     cursor: pointer;
+    transform-box: fill-box;
+    transform-origin: center;
+    transition: transform 0.15s ease-out;
+    outline: none;
   }
 
-  /* The picked chest turns gold */
-  .chest.picked {
+  /* Bigger chest under the pointer or keyboard focus */
+  .chest-spot:hover,
+  .chest-spot:focus-visible,
+  .chest-spot.picked {
+    transform: scale(1.8);
+  }
+
+  /* Chest lid, a little lighter than the body */
+  .chest-lid {
+    fill: var(--wood);
+    stroke: var(--background);
+    stroke-width: 1;
+  }
+
+  /* Chest body */
+  .chest-body {
+    fill: var(--wood-dark);
+    stroke: var(--background);
+    stroke-width: 1;
+  }
+
+  /* Iron band and lock in gold, like the game's chests */
+  .chest-band,
+  .chest-lock {
     fill: var(--gold);
+  }
+
+  /* How many chests share one icon, in a dark dot on its corner */
+  .count {
+    fill: var(--background);
+    stroke: var(--gold);
+    stroke-width: 1;
+  }
+
+  /* Number inside the dot */
+  .count-text {
+    fill: var(--gold);
+    font-family: var(--font-mono);
+    text-anchor: middle;
+    dominant-baseline: central;
   }
 
   /* Online players as turned squares with a dark edge */
@@ -268,24 +331,41 @@
     dominant-baseline: central;
   }
 
-  /* Picked chest details under the map */
-  .picked-chest {
+  /* The picked chests' windows under the map */
+  .picked-chests {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 10px;
     margin-top: 12px;
     padding-top: 12px;
     border-top: 1px solid var(--line-soft);
   }
 
-  /* One chest: name on the left, contents on the right */
-  .line {
+  /* What the picked icon holds, with a way to close it */
+  .picked-head {
     display: flex;
-    flex-wrap: wrap;
+    align-items: center;
     justify-content: space-between;
-    gap: 4px 16px;
-    padding: 9px 0;
-    border-top: 1px solid var(--line-soft);
+    gap: 12px;
+  }
+
+  /* Close button, at least 44px tall for touch */
+  .close {
+    min-height: 44px;
+    padding: 0 14px;
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--text);
+    font: inherit;
+    cursor: pointer;
+  }
+
+  /* Chest windows side by side, one per row on a phone */
+  .chest-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+    gap: 12px;
+    align-items: start;
   }
 
   /* One item total and the number of containers that currently hold it. */
@@ -306,10 +386,6 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-  }
-
-  .chest-items {
-    max-width: 520px;
   }
 
   .stock-row ul {

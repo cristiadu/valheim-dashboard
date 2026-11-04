@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { gearLabel, gearPiece, gearSheet, iconItems } from '#/lib/gear';
+import { gearLabel, gearPiece, gearSheet, iconItems, itemName } from '#/lib/gear';
 
 describe('gearPiece', () => {
   it('reads the name, level and slot of a logged piece', () => {
@@ -31,7 +31,7 @@ describe('gearSheet', () => {
       head: 'Leather helmet',
       cape: 'Deer hide cape',
     });
-    expect(sheet.carried.map((piece) => piece.name)).toEqual(['Fine bow', 'Flint spear', 'Torch']);
+    expect(sheet.carried.map((piece) => piece.name)).toEqual(['Finewood bow', 'Flint spear', 'Torch']);
   });
 
   it('shows an upgraded piece once, at its newest level', () => {
@@ -53,13 +53,24 @@ describe('gearLabel', () => {
 });
 
 describe('iconItems', () => {
-  it('lists recipe items and known gear once each', () => {
+  it('lists recipe items, known gear and named items once each', () => {
     // WHEN
     const items = iconItems();
 
-    // THEN gear and recipe items are both there, with no repeats
-    expect(items).toContain('Fine bow');
+    // THEN gear, recipe items and items named apart from their prefab are all there, with no repeats
+    expect(items).toContain('Finewood bow');
+    expect(items).toContain('Yellow mushroom');
     expect(items).toContain('Deer hide');
     expect(items.filter((item) => item === 'Hammer')).toEqual(['Hammer']);
+  });
+});
+
+describe('itemName', () => {
+  it('names items the way the game does, so their icons are found', () => {
+    // WHEN / THEN gear, items named apart from their prefab, and plain prefabs all read as the game shows them
+    expect(itemName('BowFineWood')).toBe('Finewood bow');
+    expect(itemName('MushroomYellow')).toBe('Yellow mushroom');
+    expect(itemName('TrophyFrostTroll')).toBe('Troll trophy');
+    expect(itemName('NeckTail')).toBe('Neck tail');
   });
 });

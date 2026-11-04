@@ -326,8 +326,29 @@ export const MAP_SQUARE_METERS = 32;
 /** Space kept around everything the map shows, in meters. */
 export const MAP_MARGIN_METERS = 64;
 
-/** Size of a chest mark on the map, in meters. */
+/** Smallest size of a chest icon on the map, in meters. */
 export const MAP_CHEST_METERS = 12;
+
+/** A chest icon is this many times smaller than the map's longer side, so it stays easy to see and tap. */
+export const MAP_CHEST_ICON_SHARE = 45;
+
+/** Chests closer than this many icon widths share one icon, so icons do not pile on top of each other. */
+export const MAP_CHEST_REACH_ICONS = 2;
+
+/** One chest, cart or ship on the map, in map units, by its ID. */
+export type MapChest = { id: string; x: number; y: number; record: ChestRecord };
+
+/** Chests close together, drawn as one chest icon in the middle of them. */
+export type MapChestSpot = {
+  /** ID of the first chest in the group. */
+  key: string;
+  /** Middle of the chests, in meters east. */
+  x: number;
+  /** Middle of the chests, in meters south. */
+  y: number;
+  /** The chests in the square. */
+  chests: MapChest[];
+};
 
 /** What the map draws, in map units: meters east as `x` and meters south as `y`, so north is up. */
 export type MapView = {
@@ -338,7 +359,11 @@ export type MapView = {
   /** A small mark in the middle of each square a character walked, in that character's player color. */
   trails: { key: string; x: number; y: number; color: string }[];
   /** Chests, carts and ships, by their ID. */
-  chests: { id: string; x: number; y: number; record: ChestRecord }[];
+  chests: MapChest[];
+  /** Chests grouped with the ones close by, so a base full of chests shows as one icon. */
+  chestSpots: MapChestSpot[];
+  /** Size of a chest icon, in map units. */
+  chestIconMeters: number;
   /** Where each online player stands and where each character last died. */
   marks: { key: string; kind: 'player' | 'death'; label: string; x: number; y: number; color: string }[];
 };
@@ -526,7 +551,7 @@ export const GEAR_NAMES: Record<string, string> = {
   AtgeirBronze: 'Bronze atgeir',
   SledgeIron: 'Iron sledge',
   Bow: 'Crude bow',
-  BowFineWood: 'Fine bow',
+  BowFineWood: 'Finewood bow',
   BowHuntsman: 'Huntsman bow',
   BowDraugrFang: 'Draugr fang',
   ShieldWood: 'Wood shield',
@@ -558,6 +583,100 @@ export const GEAR_NAMES: Record<string, string> = {
   CapeLinen: 'Linen cape',
   BeltStrength: 'Megingjord',
   Wishbone: 'Wishbone',
+};
+
+/**
+ * Names as the game shows them for items whose prefab reads differently, by the prefab the plugin logs, for example
+ * `Yellow mushroom` for `MushroomYellow`. The names also pick the icon. Other items show their prefab in plain words.
+ */
+export const ITEM_NAMES: Record<string, string> = {
+  ArmorRagsChest: 'Rag tunic',
+  ArmorRagsLegs: 'Rag pants',
+  ArrowFire: 'Fire arrow',
+  ArrowFlint: 'Flint arrow',
+  ArrowWood: 'Wood arrow',
+  BjornHide: 'Bjørn hide',
+  BjornPaw: 'Bjørn paw',
+  CookedMeat: 'Cooked boar meat',
+  Fish1: 'Perch',
+  Fish2: 'Pike',
+  KnifeButcher: 'Butcher knife',
+  MeadBaseHealthMinor: 'Minor healing mead base',
+  MeadBaseStaminaMinor: 'Minor stamina mead base',
+  MeadHealthMinor: 'Minor healing mead',
+  MeadPoisonResist: 'Poison resistance mead',
+  MeadStaminaMinor: 'Minor stamina mead',
+  MushroomYellow: 'Yellow mushroom',
+  NeckTailGrilled: 'Grilled neck tail',
+  Raspberry: 'Raspberries',
+  RawMeat: 'Boar meat',
+  RoundLog: 'Core wood',
+  ShieldBoneTower: 'Bone tower shield',
+  ShieldIronTower: 'Iron tower shield',
+  ShieldWoodTower: 'Wood tower shield',
+  SledgeStagbreaker: 'Stagbreaker',
+  SpearElderbark: 'Ancient bark spear',
+  TrophyBjorn: 'Bjørn trophy',
+  TrophyBoar: 'Boar trophy',
+  TrophyDeer: 'Deer trophy',
+  TrophyEikthyr: 'Eikthyr trophy',
+  TrophyFrostTroll: 'Troll trophy',
+  TrophyGhost: 'Ghost trophy',
+  TrophyGreydwarf: 'Greydwarf trophy',
+  TrophyGreydwarfBrute: 'Greydwarf brute trophy',
+  TrophyGreydwarfShaman: 'Greydwarf shaman trophy',
+  TrophyNeck: 'Neck trophy',
+  TrophySkeleton: 'Skeleton trophy',
+};
+
+/** Container names as the game shows them, by the prefab the plugin logs. */
+export const CONTAINER_NAMES: Record<string, string> = {
+  piece_chest_wood: 'Wood chest',
+  piece_chest: 'Reinforced chest',
+  piece_chest_private: 'Personal chest',
+  piece_chest_blackmetal: 'Black metal chest',
+  Cart: 'Cart',
+  Karve: 'Karve',
+  VikingShip: 'Longship',
+  shipwreck_karve_chest: 'Shipwreck chest',
+};
+
+/** Start of the prefab of a chest the world came with, such as `TreasureChest_forestcrypt`. */
+export const TREASURE_CHEST_PREFIX = 'TreasureChest';
+
+/** Name shown for every chest the world came with. */
+export const TREASURE_CHEST_NAME = 'Treasure chest';
+
+/** Size of a container's grid of slots. */
+export type ContainerSize = {
+  /** Slots in one row. */
+  columns: number;
+  /** Rows of slots. */
+  rows: number;
+};
+
+/** Grid of slots of each container the game builds, by prefab, as its window shows it in the game. */
+export const CONTAINER_SIZES: Record<string, ContainerSize> = {
+  piece_chest_wood: { columns: 5, rows: 2 },
+  piece_chest: { columns: 6, rows: 4 },
+  piece_chest_blackmetal: { columns: 8, rows: 4 },
+  Cart: { columns: 6, rows: 3 },
+  Karve: { columns: 2, rows: 2 },
+  VikingShip: { columns: 6, rows: 3 },
+};
+
+/** Grid of slots for a container missing from the list above. More rows are added when its items need them. */
+export const DEFAULT_CONTAINER_SIZE: ContainerSize = { columns: 5, rows: 2 };
+
+/** Size of an item icon in a chest slot, in pixels. */
+export const CHEST_ICON_PX = 30;
+
+/** A container's grid: slots per row, and how many slots in all. */
+export type ContainerGrid = {
+  /** Slots in one row. */
+  columns: number;
+  /** Slots in all, filled first with items and then left empty. */
+  slots: number;
 };
 
 /** Where a piece of gear goes on the character sheet: a slot, or `carried` for tools and spare gear. */

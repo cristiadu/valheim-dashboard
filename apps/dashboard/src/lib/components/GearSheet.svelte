@@ -1,7 +1,7 @@
 <script lang="ts">
-  import ItemIcon from '#/lib/components/ItemIcon';
+  import ItemSlot from '#/lib/components/ItemSlot';
   import LogLines from '#/lib/components/LogLines';
-  import { GEAR_ICON_PX, GEAR_SLOT_NAMES, GEAR_SLOTS, type GearPiece, type SourceLines } from '#/lib/models';
+  import { GEAR_SLOT_NAMES, GEAR_SLOTS, type GearPiece, type SourceLines } from '#/lib/models';
   import { gearLabel, gearSheet } from '#/lib/gear';
 
   /** Gear a character was seen with, newest first, as the snapshot keeps it, and the log lines behind a piece by its prefab. */
@@ -13,12 +13,7 @@
 
 {#snippet pieceSlot(piece: GearPiece, label: string)}
   <LogLines title={gearLabel(piece)} source={sourceOf(piece.prefab)}>
-    <span class="slot" role="img" aria-label={label} title={label}>
-      <ItemIcon item={piece.name} size={GEAR_ICON_PX}>
-        {#snippet fallback()}<span class="initials" aria-hidden="true">{piece.name.slice(0, 2)}</span>{/snippet}
-      </ItemIcon>
-      {#if piece.quality > 1}<span class="level" aria-hidden="true">{piece.quality}</span>{/if}
-    </span>
+    <ItemSlot name={piece.name} badge={piece.quality > 1 ? String(piece.quality) : null} {label} />
   </LogLines>
 {/snippet}
 
@@ -31,7 +26,7 @@
         {#if piece}
           {@render pieceSlot(piece, label)}
         {:else}
-          <span class="slot empty" role="img" aria-label={label} title={label}><span class="slot-name" aria-hidden="true">{GEAR_SLOT_NAMES[slot]}</span></span>
+          <ItemSlot name={null} {label} emptyText={GEAR_SLOT_NAMES[slot]} />
         {/if}
       </li>
     {/each}
@@ -69,49 +64,6 @@
     margin: 0;
     padding: 0;
     list-style: none;
-  }
-
-  /* One square slot with a hairline frame, like an inventory cell */
-  .slot {
-    position: relative;
-    display: grid;
-    place-items: center;
-    width: 56px;
-    height: 56px;
-    box-sizing: border-box;
-    border: 1px solid var(--line);
-    background: var(--background);
-  }
-
-  /* Empty slot is dashed and quiet, so worn gear stands out */
-  .slot.empty {
-    border-style: dashed;
-    border-color: var(--line-soft);
-  }
-
-  /* Slot name in an empty slot */
-  .slot-name {
-    font-size: 10px;
-    letter-spacing: 0.06em;
-    color: var(--muted);
-    text-transform: uppercase;
-  }
-
-  /* First letters of an item when the wiki has no icon for it */
-  .initials {
-    font-family: var(--font-heading);
-    font-size: 16px;
-    color: var(--muted);
-  }
-
-  /* Upgrade level in the corner, like an item stack count */
-  .level {
-    position: absolute;
-    right: 3px;
-    bottom: 1px;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--gold);
   }
 
   /* Label above the carried row */

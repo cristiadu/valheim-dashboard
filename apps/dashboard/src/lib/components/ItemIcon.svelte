@@ -29,6 +29,7 @@
     vertical-align: middle;
   }
 
+  /* First letters in a small frame when the item has no icon */
   .fallback {
     display: inline-grid;
     flex: none;
@@ -42,4 +43,3 @@
     line-height: 1;
   }
 </style>
-

@@ -1,17 +1,20 @@
 <script lang="ts">
   import ItemIcon from '#/lib/components/ItemIcon';
+  import { itemName } from '#/lib/gear';
 
-  /** Item counts to show with their icons. */
+  /** Item counts by the prefab the plugin logs, to show with their icons and game names, and the icon size in pixels. */
   let { items, size = 20 }: { items: Record<string, number>; size?: number } = $props();
 </script>
 
 <ul class="items">
   {#each Object.entries(items) as [item, count] (item)}
-    <li><ItemIcon {item} {size} /><span class="amount">{count.toLocaleString()}×</span>{item}</li>
+    {@const name = itemName(item)}
+    <li><ItemIcon item={name} {size} /><span class="amount">{count.toLocaleString()}×</span>{name}</li>
   {/each}
 </ul>
 
 <style>
+  /* Items in a row that wraps */
   .items {
     display: flex;
     flex-wrap: wrap;
@@ -21,6 +24,7 @@
     list-style: none;
   }
 
+  /* One item: icon, amount, then name */
   li {
     display: inline-flex;
     align-items: center;
@@ -28,9 +32,9 @@
     min-height: 24px;
   }
 
+  /* Amount in quiet, even-width digits */
   .amount {
     font-variant-numeric: tabular-nums;
     color: var(--muted);
   }
 </style>
-
