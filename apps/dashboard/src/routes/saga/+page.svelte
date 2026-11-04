@@ -44,8 +44,7 @@
           <LogLines title={item.text} source={item.source}>
             <span class="row">
               <span class="mono muted">{whenLabel(item.timeUtc, timeZone, nowMs)}</span>
-              <span>{item.text}</span>
-              {#if item.things}<ItemList items={item.things} size={16} />{/if}
+              <span class="what">{item.text}{#if item.things}<ItemList items={item.things} size={16} />{/if}</span>
             </span>
           </LogLines>
         </li>
@@ -62,7 +61,7 @@
     display: flex;
     flex-direction: column;
     gap: 18px;
-    max-width: 900px;
+    max-width: var(--page-width);
   }
 
   /* Filter buttons wrap on narrow screens */
@@ -110,6 +109,13 @@
     grid-template-columns: 110px minmax(0, 1fr);
     gap: 12px;
     align-items: baseline;
+  }
+
+  /* Sentence with its items under it, both in the text column */
+  .what {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
   }
 
   /* Rune box sitting on the line */
