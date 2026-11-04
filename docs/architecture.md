@@ -13,9 +13,9 @@ flowchart LR
     hist -->|read on start| dash
     game -->|saves| save[World save]
     save -->|bosses defeated| dash
-    ngrok[ngrok] -->|forwards| dash
+    zrok[zrok] -->|forwards| dash
   end
-  friends[Friends' browsers] -->|shared link and password| ngrok
+  friends[Friends' browsers] -->|shared link and password| zrok
 ```
 
 ## Parts
@@ -25,7 +25,7 @@ flowchart LR
 | `packages/valheim-log` | Turns log lines into game events and player sessions. No files, no network. |
 | `apps/dashboard` | SvelteKit app on Node. Follows `logs.txt` and serves the page. |
 | `plugins/event-log` | BepInEx plugin on the server only. Logs what the game does not. Friends install nothing. |
-| `scripts` | Start the dashboard, keep it running and update it from `main` on Windows, and share it through ngrok. |
+| `scripts` | Start the dashboard, keep it running and update it from `main` on Windows, and share it through zrok. |
 | `docs/log-events.md` | Every log line the dashboard reads, with its regex. |
 
 ## Reading a log line
@@ -118,18 +118,20 @@ and a tab change reuses the snapshot the page already has.
 
 ## Sharing with friends
 
-The dashboard listens only on the server PC (`127.0.0.1`). ngrok connects out from the PC and passes the
+The dashboard listens only on the server PC (`127.0.0.1`). zrok connects out from the PC and passes the
 shared link's requests in, so no router port is open.
+The link keeps its name, such as `https://cotil-longhouse.share.zrok.io`. The first time, zrok shows the friend a
+notice page with a button to go on.
 
 ```mermaid
 sequenceDiagram
   participant F as Friend's browser
-  participant N as ngrok
+  participant Z as zrok
   participant D as Dashboard
-  F->>N: https://longhouse.ngrok-free.app
-  N->>D: Same request, with X-Forwarded-For
+  F->>Z: https://cotil-longhouse.share.zrok.io
+  Z->>D: Same request and host, with X-Forwarded-For
   D-->>F: No cookie: go to /password
-  F->>D: Types the password (through ngrok)
+  F->>D: Types the password (through zrok)
   D-->>F: Cookie, then back to the page they wanted
   F->>D: Page and live stream, with the cookie
 ```
@@ -137,9 +139,9 @@ sequenceDiagram
 | A request | Gets |
 | --- | --- |
 | Made on the PC (host `localhost` or `127.0.0.1`, no `X-Forwarded-For`), such as `/api/status` for the updater | Served, no password |
-| Through ngrok with the cookie | Served |
-| Through ngrok without it | Sent to `/password`; `/api/*` answers `401` |
-| Through ngrok when no password is set | Turned away (`403`) |
+| Through zrok with the cookie | Served |
+| Through zrok without it | Sent to `/password`; `/api/*` answers `401` |
+| Through zrok when no password is set | Turned away (`403`) |
 
 The password is the Valheim server's own, which the start script reads from `-password` in
 `start_headless_server.bat`. The cookie (`dashboard_pass`) lasts 30 days. It holds a hash made from the password, so changing the
@@ -348,7 +350,7 @@ flowchart TD
 ```
 
 `install-startup.cmd` adds the logon task and the update task once. `share-dashboard.ps1` adds one more
-that starts ngrok with no window. Every window stays hidden when it
+that starts zrok with no window. Every window stays hidden when it
 starts at logon.
 
 ## Updates from main
@@ -412,7 +414,7 @@ Every log lives in `C:\Valheim Server`.
 | `dashboard.log` | The start script, with the dashboard's output |
 | `updater.log` | The update script: what it updated, skipped or is waiting for |
 | `updater-state.json` | The update script: commits of the running dashboard and the installed plugin |
-| `ngrok.log` | ngrok, warnings and errors only |
+| `zrok.log` | zrok's output while it shares the link |
 | `terrain-<world>.txt` | The event log plugin, once per world: the land type of every 32 m square |
 
 The dashboard also reads the world save, `worlds_local\Cotil\_main.<save number>.db2`, and never writes to it.

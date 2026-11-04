@@ -114,7 +114,7 @@ export const MAX_CHAT = 300;
 /** Host names that mean a request came from this PC, not through the tunnel. */
 export const LOCAL_HOSTNAMES = ['localhost', '127.0.0.1', '[::1]'];
 
-/** Header a tunnel such as ngrok adds to every request it passes on. */
+/** Header a tunnel such as zrok adds to every request it passes on. */
 export const FORWARDED_HEADER = 'x-forwarded-for';
 
 /** Cookie that remembers a friend typed the right password. */
