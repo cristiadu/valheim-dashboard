@@ -21,12 +21,12 @@ export const chestName = (prefab: string): string =>
   CHEST_NAMES[prefab] ?? (prefab.startsWith(TREASURE_CHEST_PREFIX) ? 'Treasure chest' : itemName(prefab));
 
 /**
- * Returns the slot grid of the container [prefab] holding [kinds] kinds of items: its columns as in the game, and
- * how many slots in all, with rows added when the items need more slots than the game's grid has.
+ * Returns the slot grid of the container [prefab] filling [used] slots: its columns and how many slots it has in
+ * the game, and how many slots to draw, with rows added when the items need more slots than the game's grid has.
  */
-export const containerGrid = (prefab: string, kinds: number): { columns: number; slots: number } => {
+export const containerGrid = (prefab: string, used: number): { columns: number; capacity: number; slots: number } => {
   const { columns, rows } = CONTAINER_SIZES[prefab] ?? DEFAULT_CONTAINER_SIZE;
-  return { columns, slots: Math.max(rows, Math.ceil(kinds / columns)) * columns };
+  return { columns, capacity: rows * columns, slots: Math.max(rows, Math.ceil(used / columns)) * columns };
 };
 
 /** Returns [items] as one entry per item, most first, with the name the game shows. */
@@ -34,6 +34,24 @@ export const itemSlots = (items: Record<string, number>): { prefab: string; name
   Object.entries(items)
     .map(([prefab, count]) => ({ prefab, name: itemName(prefab), count }))
     .sort((first, second) => second.count - first.count || first.name.localeCompare(second.name));
+
+/**
+ * Returns [items] as the game's slots, most first: each item split into full stacks of the most one slot holds in
+ * [stacks], then the rest. An item missing from [stacks] takes one slot.
+ */
+export const stackSlots = (
+  items: Record<string, number>,
+  stacks: Record<string, number>,
+): { prefab: string; name: string; count: number }[] =>
+  itemSlots(items).flatMap((slot) => {
+    const stack = stacks[slot.prefab] ?? slot.count;
+    const fullStacks = Math.floor(slot.count / stack);
+    const rest = slot.count % stack;
+    return [
+      ...Array.from({ length: fullStacks }, () => ({ ...slot, count: stack })),
+      ...(rest > 0 ? [{ ...slot, count: rest }] : []),
+    ];
+  });
 
 /** Returns every item in [chests] once, with how many there are in all and in which chests, most first. */
 export const stockOf = (chests: MapChest[]): StockRow[] => {

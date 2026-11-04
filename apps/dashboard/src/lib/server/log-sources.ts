@@ -100,6 +100,11 @@ export const keepSourceLines = (snapshot: Snapshot, event: LogEvent, line: strin
     case 'gearSeen':
       keepLine(snapshot, line, timeUtc, 'items', 'gear', event.character, event.item);
       break;
+    case 'wearing':
+      for (const item of event.items) {
+        keepLine(snapshot, line, timeUtc, 'items', 'gear', event.character, item);
+      }
+      break;
     default:
       break;
   }

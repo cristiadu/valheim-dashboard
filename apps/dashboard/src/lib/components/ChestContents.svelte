@@ -1,13 +1,21 @@
 <script lang="ts">
   import ItemIcon from '#/lib/components/ItemIcon';
-  import { containerGrid, itemSlots } from '#/lib/items';
+  import { containerGrid, stackSlots } from '#/lib/items';
   import { CHEST_SLOT_ICON_PX } from '#/lib/models';
 
-  /** Prefab of the chest, cart or ship, which picks its slot grid, and how many of each item it holds. */
-  let { chest, items }: { chest: string; items: Record<string, number> } = $props();
+  /**
+   * Prefab of the chest, cart, ship or player, which picks its slot grid, how many of each item it holds, the most of
+   * each item one slot holds, and the prefabs worn now, which are marked as in the game.
+   */
+  let {
+    chest,
+    items,
+    stacks,
+    equipped = [],
+  }: { chest: string; items: Record<string, number>; stacks: Record<string, number>; equipped?: string[] } = $props();
 
-  /** One slot per item, most first. */
-  const slots = $derived(itemSlots(items));
+  /** One slot per stack, most first. */
+  const slots = $derived(stackSlots(items, stacks));
 
   /** The game's slot grid for this chest, grown when the items need more slots. */
   const grid = $derived(containerGrid(chest, slots.length));
@@ -24,12 +32,16 @@
 {:else}
   <p class="facts">
     <span><strong>{total.toLocaleString()}</strong> {total === 1 ? 'item' : 'items'}</span>
-    <span><strong>{slots.length}</strong> of {grid.slots} slots used</span>
+    <span><strong>{slots.length}</strong> of {grid.capacity} slots used</span>
   </p>
+  {#if slots.length > grid.capacity}
+    <p class="muted over">More than fits in {grid.capacity} slots, so some of it was probably used up crafting or building.</p>
+  {/if}
   <ul class="slots" style:--columns={grid.columns} aria-label="What is inside, most first">
-    {#each slots as slot (slot.prefab)}
+    {#each slots as slot, index (index)}
+      {@const isEquipped = equipped.includes(slot.prefab)}
       <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
-      <li class="slot" tabindex="0" aria-label="{slot.count.toLocaleString()} {slot.name}">
+      <li class="slot" class:equipped={isEquipped} tabindex="0" aria-label="{slot.count.toLocaleString()} {slot.name}{isEquipped ? ', worn' : ''}">
         <ItemIcon item={slot.name} size={CHEST_SLOT_ICON_PX} />
         <span class="count" aria-hidden="true">{slot.count.toLocaleString()}</span>
         <span class="tip" aria-hidden="true">{slot.name} <strong>{slot.count.toLocaleString()}</strong></span>
@@ -78,6 +90,18 @@
     .slots {
       grid-template-columns: repeat(var(--columns), minmax(0, 60px));
     }
+
+    /* Icons shrink with their slot instead of spilling over its edge */
+    .slot :global(img),
+    .slot :global(svg) {
+      width: 75%;
+      height: auto;
+    }
+
+    /* A smaller count, so it fits a small slot */
+    .count {
+      font-size: 10px;
+    }
   }
 
   /* One slot: a square with the item's picture in the middle */
@@ -89,6 +113,18 @@
     background: radial-gradient(circle, #3a3124 0%, #251f17 75%);
     border: 1px solid #4a3f2e;
     border-radius: 3px;
+  }
+
+  /* A worn piece gets a blue slot, as the game marks it */
+  .slot.equipped {
+    background: radial-gradient(circle, #2c4a63 0%, #1c2f40 75%);
+    border-color: #4f7ea3;
+  }
+
+  /* Why the bag shows more slots than it has, under the totals */
+  .over {
+    margin: -6px 0 12px;
+    font-size: 12px;
   }
 
   /* An empty slot is darker and plain, so filled slots stand out */

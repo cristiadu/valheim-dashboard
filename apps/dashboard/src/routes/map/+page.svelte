@@ -266,7 +266,7 @@
           </div>
           <button type="button" onclick={() => (pickedId = null)}>Close</button>
         </div>
-        <ChestContents chest={picked.record.chest} items={picked.record.items} />
+        <ChestContents chest={picked.record.chest} items={picked.record.items} stacks={snapshot.itemStacks} />
       </section>
     {/if}
 

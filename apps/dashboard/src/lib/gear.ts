@@ -16,21 +16,24 @@ export const gearPiece = (entry: string): GearPiece => {
 };
 
 /**
- * Lays out [gear], newest first, as a character sheet. The newest piece of each slot is worn and the rest is
- * carried. An upgraded piece shows once, at its newest level.
+ * Lays out what a character wears now as a character sheet. [worn] are the prefabs the plugin logged them wearing and
+ * holding now, each at its newest level in [gear], which is newest first. Pieces with no free slot are held. Before the
+ * plugin logged [worn], the newest piece of each slot in [gear] stands in for it.
  */
-export const gearSheet = (gear: string[]): GearSheet => {
-  const sheet: GearSheet = { worn: {}, carried: [] };
-  const seenPrefabs = new Set<string>();
+export const gearSheet = (gear: string[], worn: string[] | null): GearSheet => {
+  const sheet: GearSheet = { worn: {}, held: [] };
+  const newestPieces = new Map<string, GearPiece>();
   for (const piece of gear.map(gearPiece)) {
-    if (seenPrefabs.has(piece.prefab)) {
-      continue;
+    if (!newestPieces.has(piece.prefab)) {
+      newestPieces.set(piece.prefab, piece);
     }
-    seenPrefabs.add(piece.prefab);
+  }
+  const pieces = worn === null ? [...newestPieces.values()] : worn.map((prefab) => newestPieces.get(prefab) ?? gearPiece(prefab));
+  for (const piece of pieces) {
     if (piece.place !== 'carried' && sheet.worn[piece.place] === undefined) {
       sheet.worn[piece.place] = piece;
-    } else {
-      sheet.carried.push(piece);
+    } else if (worn !== null) {
+      sheet.held.push(piece);
     }
   }
   return sheet;

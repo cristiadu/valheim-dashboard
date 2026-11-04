@@ -235,6 +235,8 @@ describe('parseMessage', () => {
       'Gear: Ragnar ArmorBronzeChest',
       'Gear: Inge Dragonchow MaceIron quality 2',
       'Gear: Inge Dragonchow Torch',
+      'Wearing: Inge Dragonchow has ArmorIronChest, HelmetIron, MaceIron',
+      'Wearing: Ragnar has nothing',
     ];
 
     // WHEN each message is read
@@ -254,6 +256,8 @@ describe('parseMessage', () => {
       { type: 'gearSeen', timeUtc, character: 'Ragnar', item: 'ArmorBronzeChest', quality: 1 },
       { type: 'gearSeen', timeUtc, character: 'Inge Dragonchow', item: 'MaceIron', quality: 2 },
       { type: 'gearSeen', timeUtc, character: 'Inge Dragonchow', item: 'Torch', quality: 1 },
+      { type: 'wearing', timeUtc, character: 'Inge Dragonchow', items: ['ArmorIronChest', 'HelmetIron', 'MaceIron'] },
+      { type: 'wearing', timeUtc, character: 'Ragnar', items: [] },
     ]);
   });
 

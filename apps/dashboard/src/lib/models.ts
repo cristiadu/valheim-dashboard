@@ -223,6 +223,8 @@ export type Snapshot = {
   visitedAreas: Record<string, string[]>;
   /** Gear each character was seen with, by character name, for example `SwordIron quality 2`. */
   gear: Record<string, string[]>;
+  /** Prefabs each character wears, holds or carries on the back now, by character name, once the plugin logged it. */
+  worn: Record<string, string[]>;
   /** Area each character was last in, by character name, for example `Swamp`. */
   currentAreas: Record<string, string>;
   /** Creatures each character helped kill, by character name, then how many of each creature. */
@@ -250,6 +252,8 @@ export type Snapshot = {
    * eating and tombstones. Crafting, building and dropping are not in the log.
    */
   bags: Record<string, Record<string, number>>;
+  /** Most of each item that fits in one slot, by prefab, from the plugin's item stacks file, for example `{ Wood: 50 }`. */
+  itemStacks: Record<string, number>;
   /** Terrain letter of each explored square, by `x,z` square number, once the plugin's terrain file was read. */
   terrain: Record<string, string>;
 };
@@ -618,7 +622,7 @@ export const GEAR_SLOT_PATTERNS: readonly (readonly [RegExp, GearSlot])[] = [
   [/^Cape/, 'cape'],
   [/^Shield/, 'shield'],
   [/^(Belt|Wishbone|Demister)/, 'utility'],
-  [/^(Axe|Battleaxe|Sword|Mace|Club|Spear|Knife|Atgeir|Sledge|Bow|Crossbow|Staff)/, 'weapon'],
+  [/^(Axe|Battleaxe|Sword|Mace|Club|Spear|Knife|Atgeir|Sledge|Bow|Crossbow|Staff|Fist)/, 'weapon'],
 ];
 
 /**
@@ -778,10 +782,10 @@ export type GearPiece = {
 
 /** A character's gear laid out like a character sheet. */
 export type GearSheet = {
-  /** Newest piece seen in each slot. Empty slots are missing. */
+  /** Piece worn in each slot. Empty slots are missing. */
   worn: Partial<Record<GearSlot, GearPiece>>;
-  /** Tools, and older gear the newer pieces replaced, newest first. */
-  carried: GearPiece[];
+  /** Tools and spare pieces held now that have no slot of their own, such as a torch or the hammer. */
+  held: GearPiece[];
 };
 
 /** Size of a gear icon in its slot, in pixels. */
@@ -845,6 +849,8 @@ export type Player = {
   areas: string[];
   /** Gear the latest character was seen with, newest first. */
   gear: string[];
+  /** Prefabs the latest character wears and holds now, or null before the plugin logged it. */
+  worn: string[] | null;
   /** How much all of the player's characters did of each activity kind, for example `{ built: 120 }`. */
   activityTotals: Partial<Record<ActivityKind, number>>;
   /** Map squares any of the player's characters walked through. */

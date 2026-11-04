@@ -8,6 +8,7 @@ describe('gearPiece', () => {
     expect(gearPiece('SpearFlint quality 4')).toEqual({ prefab: 'SpearFlint', name: 'Flint spear', quality: 4, place: 'weapon' });
     expect(gearPiece('ArmorLeatherChest')).toEqual({ prefab: 'ArmorLeatherChest', name: 'Leather tunic', quality: 1, place: 'chest' });
     expect(gearPiece('Hammer quality 3')).toEqual({ prefab: 'Hammer', name: 'Hammer', quality: 3, place: 'carried' });
+    expect(gearPiece('FistBjornClaw')).toEqual({ prefab: 'FistBjornClaw', name: 'Paws of the Bear', quality: 1, place: 'weapon' });
   });
 
   it('puts unknown gear in a slot by its prefab and names it in plain words', () => {
@@ -18,29 +19,43 @@ describe('gearPiece', () => {
 });
 
 describe('gearSheet', () => {
-  it('wears the newest piece of each slot and carries the rest', () => {
-    // GIVEN gear newest first, as the player card keeps it
-    const gear = ['AxeFlint quality 4', 'BowFineWood', 'SpearFlint quality 4', 'HelmetLeather', 'Torch', 'CapeDeerHide quality 3'];
+  it('puts what is worn now in its slot at its newest level, and other held pieces under it', () => {
+    // GIVEN gear newest first, and the plugin saw the character wear the leather helmet, the spear and a torch
+    const gear = ['HelmetTrollLeather', 'AxeFlint quality 4', 'SpearFlint quality 4', 'HelmetLeather', 'Torch'];
+    const worn = ['HelmetLeather', 'SpearFlint', 'Torch'];
 
     // WHEN it is laid out
-    const sheet = gearSheet(gear);
+    const sheet = gearSheet(gear, worn);
 
-    // THEN the axe is the weapon, the older weapons and the torch are carried
+    // THEN the older helmet is on the head, the spear keeps its level, and the torch is held
+    expect(Object.fromEntries(Object.entries(sheet.worn).map(([slot, piece]) => [slot, `${piece.name} ${piece.quality}`]))).toEqual({
+      head: 'Leather helmet 1',
+      weapon: 'Flint spear 4',
+    });
+    expect(sheet.held.map((piece) => piece.name)).toEqual(['Torch']);
+  });
+
+  it('leaves a slot empty when nothing is worn there now', () => {
+    // WHEN the character was seen with a helmet but wears nothing now
+    const sheet = gearSheet(['HelmetLeather'], []);
+
+    // THEN no slot is filled
+    expect(sheet).toEqual({ worn: {}, held: [] });
+  });
+
+  it('uses the newest piece of each slot before the plugin logged what is worn', () => {
+    // GIVEN gear newest first, and the same spear at two levels
+    const gear = ['AxeFlint quality 4', 'SpearFlint quality 4', 'HelmetLeather', 'Torch', 'SpearFlint quality 2'];
+
+    // WHEN it is laid out with nothing known as worn
+    const sheet = gearSheet(gear, null);
+
+    // THEN the axe is the weapon, the helmet is on the head, and nothing else is shown as held
     expect(Object.fromEntries(Object.entries(sheet.worn).map(([slot, piece]) => [slot, piece.name]))).toEqual({
       weapon: 'Flint axe',
       head: 'Leather helmet',
-      cape: 'Deer hide cape',
     });
-    expect(sheet.carried.map((piece) => piece.name)).toEqual(['Finewood bow', 'Flint spear', 'Torch']);
-  });
-
-  it('shows an upgraded piece once, at its newest level', () => {
-    // WHEN the same spear was seen at level 4 and level 2
-    const sheet = gearSheet(['SpearFlint quality 4', 'SpearFlint quality 2']);
-
-    // THEN only level 4 is kept
-    expect(sheet.worn.weapon?.quality).toBe(4);
-    expect(sheet.carried).toEqual([]);
+    expect(sheet.held).toEqual([]);
   });
 });
 

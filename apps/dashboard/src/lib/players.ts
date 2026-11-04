@@ -22,7 +22,7 @@ const pluginStatsOf = (
   snapshot: Snapshot,
   latest: string,
   characters: Set<string>,
-): Pick<Player, 'area' | 'kills' | 'topKill' | 'areas' | 'gear' | 'activityTotals' | 'exploredSquares'> => {
+): Pick<Player, 'area' | 'kills' | 'topKill' | 'areas' | 'gear' | 'worn' | 'activityTotals' | 'exploredSquares'> => {
   const killsByCreature = new Map<string, number>();
   for (const character of characters) {
     for (const [creature, amount] of Object.entries(snapshot.kills[character] ?? {})) {
@@ -42,6 +42,7 @@ const pluginStatsOf = (
     topKill: byMostKills[0]?.[0] ?? null,
     areas: [...new Set([...characters].flatMap((character) => snapshot.visitedAreas[character] ?? []))],
     gear: (snapshot.gear[latest] ?? []).toReversed(),
+    worn: snapshot.worn[latest] ?? null,
     activityTotals,
     exploredSquares: new Set([...characters].flatMap((character) => snapshot.explored[character] ?? [])).size,
   };

@@ -51,6 +51,7 @@ export type LogEvent = { timeUtc: string } & (
   | { type: 'pvpChanged'; character: string; isOn: boolean }
   | { type: 'wentToBed'; character: string }
   | { type: 'gearSeen'; character: string; item: string; quality: number }
+  | { type: 'wearing'; character: string; items: string[] }
   | { type: 'creatureKilled'; creature: string; level: number; attackers: string[] }
   | { type: 'tameChanged'; creature: string; change: TameChange; name: string | null }
   | { type: 'petNamed'; creature: string; name: string }
