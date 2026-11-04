@@ -2,12 +2,15 @@
   import { tick } from 'svelte';
 
   import ItemIcon from '#/lib/components/ItemIcon';
-  import { RECIPE_BIOMES } from '#/lib/models';
-  import { PICKER_RECIPES, movedIndex } from '#/lib/picker';
+  import { RECIPE_BIOMES, type Recipe } from '#/lib/models';
+  import { movedIndex } from '#/lib/picker';
   import { recipeById } from '#/lib/recipes';
 
-  /** Id of the picked recipe, and the question shown above the picker. */
-  let { value = $bindable(), label }: { value: string; label: string } = $props();
+  /** Id of the picked recipe, the question shown above the picker, and the recipes it offers in picker order. */
+  let { value = $bindable(), label, recipes }: { value: string; label: string; recipes: readonly Recipe[] } = $props();
+
+  /** Biomes that have a recipe to offer. */
+  const biomes = $derived(RECIPE_BIOMES.filter((biome) => recipes.some((recipe) => recipe.biome === biome)));
 
   /** Prefix that keeps this picker's element ids unique on the page. */
   const uid = $props.id();
@@ -15,7 +18,7 @@
   /** Whether the recipe list is showing. */
   let isOpen = $state(false);
 
-  /** Position in [PICKER_RECIPES] of the highlighted recipe while the list is open. */
+  /** Position in [recipes] of the highlighted recipe while the list is open. */
   let highlighted = $state(0);
 
   /** The whole picker, the button that opens it and the open list. */
@@ -35,7 +38,7 @@
 
   /** Opens the list with the picked recipe highlighted, and moves the keyboard into it. */
   const open = async (): Promise<void> => {
-    highlighted = PICKER_RECIPES.findIndex((recipe) => recipe.id === value);
+    highlighted = recipes.findIndex((recipe) => recipe.id === value);
     isOpen = true;
     await tick();
     list?.focus();
@@ -43,7 +46,7 @@
 
   /** Picks the recipe at [index], closes the list and gives the keyboard back to the button. */
   const choose = (index: number): void => {
-    value = PICKER_RECIPES[index]!.id;
+    value = recipes[index]!.id;
     isOpen = false;
     button.focus();
   };
@@ -58,7 +61,7 @@
 
   /** Moves the highlight, picks with Enter or Space, and closes with Escape. */
   const onListKey = (event: KeyboardEvent): void => {
-    const moved = movedIndex(highlighted, event.key, PICKER_RECIPES.length);
+    const moved = movedIndex(highlighted, event.key, recipes.length);
     if (moved !== undefined) {
       event.preventDefault();
       highlighted = moved;
@@ -106,10 +109,10 @@
       bind:this={list}
       onkeydown={onListKey}
     >
-      {#each RECIPE_BIOMES as biome (biome)}
+      {#each biomes as biome (biome)}
         <div role="group" aria-labelledby="{uid}-{biome}">
           <div id="{uid}-{biome}" class="biome" role="presentation">{biome}</div>
-          {#each PICKER_RECIPES as recipe, index (recipe.id)}
+          {#each recipes as recipe, index (recipe.id)}
             {#if recipe.biome === biome}
               <div
                 id="{uid}-{index}"
