@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { playersOf } from '#/lib/players';
-import { builderNames, chestStock, craftables, recipeItemName } from '#/lib/stock';
+import { bagStock, builderNames, chestStock, craftables, recipeItemName } from '#/lib/stock';
 import { sessionWith, snapshotWith, TEST_NOON_MS } from '#/lib/test-common';
 
 describe('recipeItemName', () => {
@@ -14,6 +14,19 @@ describe('recipeItemName', () => {
 
     // THEN the first two match recipes and the last has the game's name
     expect(recipeNames).toEqual(['Deer hide', 'Core wood', 'Deer trophy']);
+  });
+});
+
+describe('bagStock', () => {
+  it('names what a bag holds as recipes do', () => {
+    // GIVEN a bag with core wood and deer hide by prefab
+    const bag = { RoundLog: 4, DeerHide: 2 };
+
+    // WHEN its stock is read
+    const stock = bagStock(bag);
+
+    // THEN the items have their recipe names
+    expect(stock).toEqual({ 'Core wood': 4, 'Deer hide': 2 });
   });
 });
 

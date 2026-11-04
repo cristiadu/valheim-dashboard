@@ -6,14 +6,14 @@
   import RecipePicker from '#/lib/components/RecipePicker';
   import { live, useSnapshot } from '#/lib/live.svelte';
   import { foundChests } from '#/lib/map';
-  import { MAX_CRAFTS, RECIPE_ICON_PX, type Plan } from '#/lib/models';
+  import { BAG_SOURCE, CHESTS_SOURCE, MAX_CRAFTS, RECIPE_ICON_PX, type Plan } from '#/lib/models';
   import { knownRecipes } from '#/lib/picker';
   import { planPill } from '#/lib/pills';
   import { clampCrafts, newPlan, planItems, stillNeeded, withHave } from '#/lib/planner';
   import { playersOf } from '#/lib/players';
   import { loadPlans, planner, savePlans } from '#/lib/plans.svelte';
   import { madeAt, recipeById } from '#/lib/recipes';
-  import { builderNames, chestStock, craftables } from '#/lib/stock';
+  import { bagStock, builderNames, chestStock, craftables } from '#/lib/stock';
 
   onMount(loadPlans);
 
@@ -26,16 +26,22 @@
   /** Players at the page clock, whose chests the viewer can pick. */
   const players = $derived(live.nowMs === null ? [] : playersOf(snapshot, live.nowMs));
 
-  /** Key of the player whose chests count, or empty for every chest. */
-  let ownerKey = $state('');
+  /** What the recipes are made from: empty for every chest, `chests:` and a player key, or `bag:` and a character. */
+  let source = $state('');
 
-  /** Items in the picked chests, by recipe item name. */
+  /** Characters whose bag the server has a guess for, by name. */
+  const bagOwners = $derived(Object.keys(snapshot.bags).toSorted());
+
+  /** Items in the picked chests or bag, by recipe item name. */
   const stock = $derived.by(() => {
-    const owner = players.find((player) => player.key === ownerKey);
+    if (source.startsWith(BAG_SOURCE)) {
+      return bagStock(snapshot.bags[source.slice(BAG_SOURCE.length)] ?? {});
+    }
+    const owner = players.find((player) => `${CHESTS_SOURCE}${player.key}` === source);
     return chestStock(snapshot, owner === undefined ? null : builderNames(owner));
   });
 
-  /** Recipes the picked chests have enough for. */
+  /** Recipes the picked chests or bag have enough for. */
   const canMake = $derived(craftables(stock));
 
   /** Recipes whose every ingredient someone has handled or seen in a found chest, so nobody sees what is ahead. */
@@ -107,20 +113,35 @@
   </section>
 
   <section class="panel" aria-labelledby="chests-title">
-    <h2 id="chests-title" class="panel-title">WHAT THE CHESTS CAN MAKE</h2>
+    <h2 id="chests-title" class="panel-title">WHAT YOU CAN MAKE</h2>
     <label>
-      <span class="muted">Whose chests?</span>
-      <select bind:value={ownerKey}>
-        <option value="">Every chest</option>
-        {#each players as player (player.key)}
-          <option value={player.key}>Built by {player.character}</option>
-        {/each}
+      <span class="muted">Made from</span>
+      <select bind:value={source}>
+        <optgroup label="Chests">
+          <option value="">Every chest</option>
+          {#each players as player (player.key)}
+            <option value="{CHESTS_SOURCE}{player.key}">Chests built by {player.character}</option>
+          {/each}
+        </optgroup>
+        {#if bagOwners.length > 0}
+          <optgroup label="What someone carries">
+            {#each bagOwners as character (character)}
+              <option value="{BAG_SOURCE}{character}">{character}'s bag</option>
+            {/each}
+          </optgroup>
+        {/if}
       </select>
     </label>
+    {#if source.startsWith(BAG_SOURCE)}
+      <p class="muted">
+        The bag is a guess from what the server sees: pickups, chest moves, smelting, eating and tombstones. Crafting,
+        building and dropping things aren't in the log, so it can be off.
+      </p>
+    {/if}
     {#if canMake.length === 0}
-      <p class="muted">Not enough in these chests for any recipe yet. Chests show up once the server has seen them.</p>
+      <p class="muted">Not enough here for any recipe yet.</p>
     {:else}
-      <p class="muted">How many of each you could make from what's stored, if nobody takes anything out first.</p>
+      <p class="muted">How many of each you could make from these items.</p>
       <ul class="items">
         {#each canMake as craftable (craftable.recipe.id)}
           <li>
@@ -195,7 +216,7 @@
                     value={line.have}
                     onchange={(event) => updatePlan(plan, withHave(plan, line.item, event.currentTarget.valueAsNumber))}
                   />
-                  <span class="muted">of {line.need}{#if stock[line.item]}&nbsp;· {stock[line.item]} in chests{/if}</span>
+                  <span class="muted">of {line.need}{#if stock[line.item]}&nbsp;· {stock[line.item]} on hand{/if}</span>
                 </td>
                 <td class="mono">{line.missing === 0 ? '–' : line.missing}</td>
               </tr>

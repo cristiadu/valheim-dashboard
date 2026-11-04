@@ -15,6 +15,7 @@ import {
   STORY_EVENT_TYPES,
   type StoryEvent,
 } from '#/lib/models';
+import { updateBags } from '#/lib/server/bags';
 import { addSourceLine, keepServerLine, keepSourceLines } from '#/lib/server/log-sources';
 import {
   ACTIVITY_GAP_MS,
@@ -213,6 +214,7 @@ export const createServerState = (serverUtcOffsetMinutes: number): ServerState =
       chests: {},
       deathItems: {},
       seenItems: [],
+      bags: {},
       terrain: {},
     },
   };
@@ -282,6 +284,7 @@ export const readLogLine = (state: ServerState, line: string): void => {
     pushCapped(snapshot.events, { ...event, line } as StoryEvent, MAX_EVENTS);
   }
   addActivityOf(snapshot, event, line);
+  updateBags(snapshot, event);
   for (const item of itemsSeenIn(event)) {
     if (!snapshot.seenItems.includes(item)) {
       snapshot.seenItems.push(item);

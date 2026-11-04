@@ -36,6 +36,16 @@ export const chestStock = (snapshot: Snapshot, builders: string[] | null): Recor
   return stock;
 };
 
+/** Returns how many of each item [bag] holds, by recipe item name, for a bag kept by item prefab. */
+export const bagStock = (bag: Record<string, number>): Record<string, number> => {
+  const stock: Record<string, number> = {};
+  for (const [item, amount] of Object.entries(bag)) {
+    const name = recipeItemName(item);
+    stock[name] = (stock[name] ?? 0) + amount;
+  }
+  return stock;
+};
+
 /** Returns every recipe [stock] has enough for at least once, with how many times, in recipe list order. */
 export const craftables = (stock: Record<string, number>): Craftable[] =>
   RECIPES.map((recipe) => ({

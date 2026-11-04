@@ -167,6 +167,18 @@ the page gives nothing away.
 
 Recipe plans are saved in each viewer's browser (`localStorage`). The server stores nothing for them. Chest items are matched to recipe items through `itemName`, so `RoundLog` counts as `Core wood`. Only chests someone has found count.
 
+Recipes can also count one character's bag. The server never gets a player's inventory, so the bag is a guess
+kept in the snapshot:
+
+```mermaid
+flowchart LR
+  in["Picked up (first time), taken from a chest, tombstone emptied"] --> bag[Bag per character]
+  bag --> out["Stored, smelted, eaten"]
+  death["Tombstone made"] -->|empties| bag
+```
+
+Crafting, building and dropping are not in the log, so the guess can be off.
+
 The plugin logs gear the first time a player holds or wears it, not what they wear now. So the Vikings
 character sheet puts the newest piece of each kind in its slot, for example the newest helmet on the head.
 Tools, such as the hammer, and older pieces show under "Also carries".
