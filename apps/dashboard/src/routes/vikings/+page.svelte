@@ -7,6 +7,7 @@
   import NoData from '#/lib/components/NoData';
   import Pill from '#/lib/components/Pill';
   import TimeLanes from '#/lib/components/TimeLanes';
+  import VitalsBar from '#/lib/components/VitalsBar';
   import { live, useSnapshot } from '#/lib/live.svelte';
   import {
     ACTIVITY_STORY_KINDS,
@@ -90,6 +91,9 @@
               {#if player.steamName}Steam: {player.steamName} ·{/if}
               {player.isOnline ? `Since ${clockTime(player.sinceUtc!, timeZone)}` : `Last seen ${clockTime(player.lastSeenUtc!, timeZone)}`}
             </p>
+            {#if snapshot.vitals[player.character]}
+              <VitalsBar vitals={snapshot.vitals[player.character]!} isOnline={player.isOnline} />
+            {/if}
             <ul class="stats">
               {#each statsOf(player) as stat (stat.label)}
                 <li>

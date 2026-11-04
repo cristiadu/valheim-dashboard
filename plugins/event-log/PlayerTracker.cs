@@ -98,6 +98,7 @@ namespace ValheimDashboard.EventLog
                 LogNewGear(player, name);
                 LogWearing(player, name);
             }
+            PlayerVitals.Write(Players);
             Players.Clear();
             Portals.Clear();
         }

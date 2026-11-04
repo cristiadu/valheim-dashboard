@@ -256,6 +256,22 @@ export type Snapshot = {
   itemStacks: Record<string, number>;
   /** Terrain letter of each explored square, by `x,z` square number, once the plugin's terrain file was read. */
   terrain: Record<string, string>;
+  /** Health, stamina and eitr each character had when the plugin last saw them, by character name. */
+  vitals: Record<string, Vitals>;
+};
+
+/** How a character was doing when the plugin last saw them, in whole points as the game shows them. */
+export type Vitals = {
+  /** Health now. */
+  health: number;
+  /** Most health they can have now, from base health and the food they ate. */
+  maxHealth: number;
+  /** Stamina now. The game sends no max stamina to the server. */
+  stamina: number;
+  /** Eitr now, which stays 0 until they eat food that gives it. */
+  eitr: number;
+  /** When the plugin wrote these numbers, as a UTC ISO string. */
+  timeUtc: string;
 };
 
 /**

@@ -169,7 +169,7 @@ the page gives nothing away.
 | Tab | Shows | Data from |
 | --- | --- | --- |
 | Hall | Who is online and where, the last 24 hours on a day wheel, the latest events | Snapshot |
-| Vikings | Each player now: when they were online, their numbers, areas visited, gear laid out like a character sheet, and what is probably in their bag | Snapshot |
+| Vikings | Each player now: when they were online, health and stamina, their numbers, areas visited, gear laid out like a character sheet, and what is probably in their bag | Snapshot |
 | Saga | Every game event and chat, with filters | Snapshot |
 | World | The in-game day, bosses defeated, saves, backups, disk space | Snapshot |
 | Map | Land each player walked, chests with what they hold, who is where, last deaths | Snapshot |
@@ -213,6 +213,25 @@ flowchart LR
   wiki[Valheim wiki] -->|on start, missing icons only| icons["item-icons folder next to logs.txt"]
   icons -->|/icons/flint-spear.png| pages[Recipes and Vikings tabs]
 ```
+
+Each Vikings card also shows health, max health, stamina and eitr. The game keeps these on the player's world
+object, so the plugin's world scan sees them. It rewrites a small file whenever a number changes:
+
+```mermaid
+flowchart LR
+  scan[World scan, every 5 s] -->|only when a number changed| file["player-vitals.txt next to logs.txt: Ragnar 45 110 60 0"]
+  file -->|file changed| snap[Snapshot: health 45 of 110, stamina 60, eitr 0]
+  snap --> card[Vikings card]
+```
+
+| Number | Meaning |
+| --- | --- |
+| Health | Health now, and the most it can be with the food eaten, shown as a bar |
+| Stamina | Stamina now. The server never gets the max, so it shows as a number |
+| Eitr | Eitr now, shown only once it is above 0 |
+
+The file only lists players online. Players who left keep the numbers from when they were last seen, until the
+dashboard restarts. Skill levels never reach the server, so Vikings cannot show them.
 
 Icons are downloaded for every recipe item and every piece of gear the dashboard knows by name.
 
@@ -277,7 +296,7 @@ flowchart LR
 
 | Source | What it finds |
 | --- | --- |
-| World scan | New objects (pieces, plants, summoned bosses), items put into smelters, food put on cooking stations, mead bases put into fermenters, who takes the helm of each ship, the in-game day, each player's position, area, portal trips, death, PvP, bed and gear, what each chest, cart, ship and new tombstone holds, tames, signs, item stands, chests and harvested plants, and objects destroyed, such as creatures with every player who hit them, trees cut down, rocks mined out, items picked up and emptied tombstones |
+| World scan | New objects (pieces, plants, summoned bosses), items put into smelters, food put on cooking stations, mead bases put into fermenters, who takes the helm of each ship, the in-game day, each player's position, area, portal trips, death, PvP, bed, gear, health, stamina and eitr, what each chest, cart, ship and new tombstone holds, tames, signs, item stands, chests and harvested plants, and objects destroyed, such as creatures with every player who hit them, trees cut down, rocks mined out, items picked up and emptied tombstones |
 | Calls through the server | Chat and map pings, which the server passes from one player to the others, creature attack moves, to say what a player was fighting when they died, and who asked to harvest a plant, hit a tree or rock, or fill a smelter or fermenter |
 | Every frame | Food shown in an online player's hand, which only happens while they eat or drink, and lasts about a second |
 | Game hooks | Global keys, such as a boss defeat, and the end of a raid |
@@ -415,6 +434,8 @@ Every log lives in `C:\Valheim Server`.
 | `updater-state.json` | The update script: commits of the running dashboard and the installed plugin |
 | `zrok.log` | zrok's output while it shares the link |
 | `terrain-<world>.txt` | The event log plugin, once per world: the land type of every 32 m square |
+| `item-stacks.txt` | The event log plugin, once per start: the most of each item one slot holds |
+| `player-vitals.txt` | The event log plugin, when a number changes: health, max health, stamina and eitr of each player online |
 
 The dashboard also reads the world save, `worlds_local\Cotil\_main.<save number>.db2`, and never writes to it.
 

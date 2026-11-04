@@ -8,6 +8,8 @@ import { logger } from '#/lib/server/logger';
 import {
   HISTORY_FOLDER_NAME,
   ITEM_STACKS_FILE_NAME,
+  MISSING_FILE_MS,
+  PLAYER_VITALS_FILE_NAME,
   POLL_INTERVAL_MS,
   TERRAIN_FILE_PREFIX,
   WORLDS_FOLDER_NAME,
@@ -15,6 +17,7 @@ import {
 } from '#/lib/server/models';
 import { addSavedBosses, createServerState, readLogLine, setTerrain, startNewLog } from '#/lib/server/server-state';
 import { readItemStacks } from '#/lib/server/item-stacks';
+import { readVitals } from '#/lib/server/player-vitals';
 import { readTerrain } from '#/lib/server/terrain';
 import { readSavedGlobalKeys } from '#/lib/server/world-save';
 import { changeBetween } from '#/lib/snapshot-change';
@@ -91,6 +94,27 @@ const readStacks = async (follower: Follower): Promise<void> => {
   }
 };
 
+/**
+ * Reads the player vitals file the plugin rewrites next to the log when a player's health, stamina or eitr changes.
+ * Players missing from it keep the numbers they had when last seen. A missing file is reported once.
+ */
+const readPlayerVitals = async (follower: Follower): Promise<void> => {
+  const path = join(dirname(follower.logFile), PLAYER_VITALS_FILE_NAME);
+  try {
+    const read = await readVitals(path, follower.vitalsChangedMs);
+    if (read !== null) {
+      Object.assign(follower.state.snapshot.vitals, read.vitals);
+      follower.vitalsChangedMs = read.changedMs;
+      follower.hasNewLines = true;
+    }
+  } catch (error) {
+    if (follower.vitalsChangedMs !== MISSING_FILE_MS) {
+      follower.vitalsChangedMs = MISSING_FILE_MS;
+      logger.warn(`No player vitals in ${path} yet: ${String(error)}`);
+    }
+  }
+};
+
 /** Reads the new lines once and copies them to the history, then tells the listeners what changed if any arrived. */
 const poll = async (follower: Follower): Promise<void> => {
   try {
@@ -102,6 +126,7 @@ const poll = async (follower: Follower): Promise<void> => {
   await readSavedBosses(follower);
   await readWorldTerrain(follower);
   await readStacks(follower);
+  await readPlayerVitals(follower);
   if (follower.hasNewLines) {
     follower.hasNewLines = false;
     const { snapshot } = follower.state;
@@ -146,6 +171,7 @@ const start = async (): Promise<Follower> => {
     worldSaveRead: null,
     terrainRead: null,
     itemStacksRead: null,
+    vitalsChangedMs: null,
     tail: new LogTail(config.logFile, {
       onLine: (line) => {
         readLogLine(state, line);
