@@ -29,15 +29,14 @@ pnpm version, run `install-startup.cmd` again.
 
 Friends open one link and type a password. They install nothing.
 
-1. Make a free account at [ngrok.com](https://dashboard.ngrok.com/signup). Copy your auth token, and the free
-   domain under Domains.
-2. In PowerShell, run once:
+1. Make a free account at [myzrok.io](https://myzrok.io) and copy your account token.
+2. In PowerShell, run once, with a name for the link:
 
    ```powershell
-   .\scripts\share-dashboard.ps1 -Domain "longhouse.ngrok-free.app" -AuthToken "<your token>"
+   .\scripts\share-dashboard.ps1 -Name "cotil-longhouse" -Token "<your token>"
    ```
 
-Friends open `https://longhouse.ngrok-free.app`, click past ngrok's notice the first time, and type the
+Friends open `https://cotil-longhouse.share.zrok.io`, click past zrok's notice the first time, and type the
 Valheim server's password on the dashboard's password page. The dashboard reads it from
 `start_headless_server.bat`, so change it there and restart the dashboard. The page remembers them for 30
 days. The link starts hidden each time you log on. `share-dashboard.ps1 -Remove` stops sharing.

@@ -6,7 +6,7 @@ import { requestTo, TUNNEL_HOST } from '#/lib/test-common';
 /** Cookie value for the password `skol`. */
 const SKOL_TOKEN = '368a3b15864d6e32f5c02567aadc497bdec1974f47625a426a7031a9f315f67b';
 
-/** Header ngrok adds with the friend's address. */
+/** Header zrok adds with the friend's address. */
 const FORWARDED = { 'x-forwarded-for': '203.0.113.7' };
 
 describe('passwordToken', () => {
@@ -86,7 +86,7 @@ describe('checkAccess', () => {
   });
 
   it('turns tunnel requests away when no password is set', () => {
-    // GIVEN a friend coming through ngrok and no password
+    // GIVEN a friend coming through zrok and no password
     const request = requestTo(TUNNEL_HOST, FORWARDED);
 
     // WHEN access is checked
