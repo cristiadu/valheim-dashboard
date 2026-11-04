@@ -32,6 +32,24 @@ describe('updateBags', () => {
     expect(bag).toEqual({ Wood: 4, RawMeat: 2 });
   });
 
+  it('takes out food put on to cook and mead bases put in a fermenter', () => {
+    // GIVEN Inge Dragonchow takes meat and a mead base from a chest, cooks two meats and fills a fermenter
+    readLines(state, [
+      ...RUN_START,
+      logLine('03:00:00', 'Taken: RawMeat x3 from piece_chest_wood by Inge Dragonchow'),
+      logLine('03:00:01', 'Taken: MeadBaseHealthMinor x1 from piece_chest_wood by Inge Dragonchow'),
+      logLine('03:00:02', 'Cooking: RawMeat on piece_cookingstation by Inge Dragonchow'),
+      logLine('03:00:03', 'Cooking: RawMeat on piece_cookingstation by Inge Dragonchow'),
+      logLine('03:00:04', 'Fermenting: MeadBaseHealthMinor in fermenter by Inge Dragonchow'),
+    ]);
+
+    // WHEN her bag is read
+    const bag = state.snapshot.bags['Inge Dragonchow'];
+
+    // THEN only the meat she did not cook is left
+    expect(bag).toEqual({ RawMeat: 1 });
+  });
+
   it('empties the bag into the tombstone on death and fills it again when the tombstone is emptied', () => {
     // GIVEN Ragnar carries stone, dies with a sword and coins, then empties his tombstone
     readLines(state, [

@@ -84,7 +84,7 @@ const characterOf = (event: LogEvent): string | null => {
 
 /**
  * Updates the guess of what each character carries in [state] from [event]. Items come in when picked up for the
- * first time, taken from a chest or a tombstone, or seen worn or held, and go out when stored, smelted, cooked,
+ * first time, taken from a chest or a tombstone, or seen worn or held, and go out when stored, smelted, cooked, fermented,
  * eaten, hung on a stand, or used to build or plant. A death empties the bag into the tombstone. Crafting and
  * dropping are not in the log, so the bag is only a guess, kept within the player's slots.
  */
