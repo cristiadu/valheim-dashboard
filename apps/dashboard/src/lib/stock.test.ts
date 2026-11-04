@@ -6,20 +6,21 @@ import { sessionWith, snapshotWith, TEST_NOON_MS } from '#/lib/test-common';
 
 describe('recipeItemName', () => {
   it('turns the game item names into the names recipes use', () => {
-    // GIVEN names that differ by spaces, a listed exception and one no recipe uses
+    // GIVEN prefabs that differ by spaces, a listed exception and one no recipe uses
     const names = ['DeerHide', 'RoundLog', 'TrophyDeer'];
 
     // WHEN each is turned into a recipe item name
     const recipeNames = names.map(recipeItemName);
 
-    // THEN the first two match recipes and the last stays as it was
-    expect(recipeNames).toEqual(['Deer hide', 'Core wood', 'TrophyDeer']);
+    // THEN the first two match recipes and the last has the game's name
+    expect(recipeNames).toEqual(['Deer hide', 'Core wood', 'Deer trophy']);
   });
 });
 
 describe('chestStock', () => {
   it("adds up every chest, or only the ones a player's names built", () => {
-    // GIVEN Ragnar, known on Steam as Tony Example, built one chest by each name, and Bjorn built another
+    // GIVEN Ragnar, known on Steam as Tony Example, built one chest by each name, Bjorn built another, and nobody
+    // has found a treasure chest yet
     const timeUtc = '2026-10-29T11:00:00.000Z';
     const snapshot = snapshotWith({
       sessions: [sessionWith({ steamId: 'Steam_1', steamName: 'Tony Example' })],
@@ -27,6 +28,7 @@ describe('chestStock', () => {
         '1:1': { chest: 'piece_chest_wood', x: 0, z: 0, builder: 'Ragnar', items: { Wood: 10 }, timeUtc },
         '1:2': { chest: 'Cart', x: 5, z: 0, builder: 'Tony Example', items: { Wood: 4, DeerHide: 2 }, timeUtc },
         '1:3': { chest: 'piece_chest', x: 9, z: 0, builder: 'Bjorn', items: { Stone: 7 }, timeUtc },
+        '1:4': { chest: 'TreasureChest_meadows', x: 900, z: 900, builder: null, items: { Coins: 20 }, timeUtc },
       },
     });
     const ragnar = playersOf(snapshot, TEST_NOON_MS)[0]!;
@@ -35,7 +37,7 @@ describe('chestStock', () => {
     const all = chestStock(snapshot, null);
     const his = chestStock(snapshot, builderNames(ragnar));
 
-    // THEN all chests count once each, and his leave out Bjorn's
+    // THEN the found chests count once each, and his leave out Bjorn's
     expect(all).toEqual({ Wood: 14, 'Deer hide': 2, Stone: 7 });
     expect(his).toEqual({ Wood: 14, 'Deer hide': 2 });
   });

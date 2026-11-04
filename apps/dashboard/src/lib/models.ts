@@ -966,22 +966,6 @@ export const ITEM_ICON_PX = 28;
 /** Size of a recipe's icon beside its name or preview, in pixels. */
 export const RECIPE_ICON_PX = 40;
 
-/**
- * Item names as recipes show them, by the game's item name, for items whose names differ by more than spaces
- * and capitals. `DeerHide` is `Deer hide` without being listed here.
- */
-export const ITEM_NAMES: Record<string, string> = {
-  ElderBark: 'Ancient bark',
-  RawMeat: 'Boar meat',
-  RoundLog: 'Core wood',
-  Raspberry: 'Raspberries',
-  SerpentMeatCooked: 'Cooked serpent meat',
-  TrophyHatchling: 'Drake trophy',
-  TrophyWolf: 'Wolf trophy',
-  YmirRemains: 'Ymir flesh',
-  MushroomYellow: 'Yellow mushroom',
-};
-
 /** A recipe and how many times the items in stock can make it. */
 export type Craftable = {
   /** The recipe. */
