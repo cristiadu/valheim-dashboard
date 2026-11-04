@@ -1,12 +1,13 @@
 import {
   MAP_CHEST_METERS,
+  MAP_CHEST_STEP,
   MAP_CHESTS_ACROSS,
   MAP_MARGIN_METERS,
   MAP_SQUARE_METERS,
   MAP_TRAIL_METERS,
   type ChestRecord,
   type MapChest,
-  type MapChestGroup,
+  type MapChestSpot,
   type MapView,
   OTHER_PLAYER_COLOR,
   type Player,
@@ -45,21 +46,27 @@ export const foundChests = (snapshot: Snapshot): [string, ChestRecord][] => {
 };
 
 /**
- * Groups [chests] that share a square [chestMeters] wide, so marks never cover each other and each can be
- * tapped. Each group sits at the middle of its chests, in the order the chests come.
+ * Places each of [chests] on the map. Chests that share a square [chestMeters] wide would cover each other, so they
+ * sit side by side in a small grid around their middle, and each one can still be pointed at and tapped on its own.
  */
-const chestGroupsOf = (chests: MapChest[], chestMeters: number): MapChestGroup[] => {
-  const groups = new Map<string, MapChest[]>();
+const chestSpotsOf = (chests: MapChest[], chestMeters: number): MapChestSpot[] => {
+  const cells = new Map<string, MapChest[]>();
   for (const chest of chests) {
     const key = `${Math.floor(chest.x / chestMeters)},${Math.floor(chest.y / chestMeters)}`;
-    groups.set(key, [...(groups.get(key) ?? []), chest]);
+    cells.set(key, [...(cells.get(key) ?? []), chest]);
   }
-  return [...groups].map(([key, members]) => ({
-    key,
-    x: members.reduce((sum, chest) => sum + chest.x, 0) / members.length,
-    y: members.reduce((sum, chest) => sum + chest.y, 0) / members.length,
-    ids: members.map((chest) => chest.id),
-  }));
+  return [...cells.values()].flatMap((members) => {
+    const columns = Math.ceil(Math.sqrt(members.length));
+    const rows = Math.ceil(members.length / columns);
+    const step = chestMeters * MAP_CHEST_STEP;
+    const middleX = members.reduce((sum, chest) => sum + chest.x, 0) / members.length;
+    const middleY = members.reduce((sum, chest) => sum + chest.y, 0) / members.length;
+    return members.map((chest, index) => ({
+      id: chest.id,
+      x: middleX + ((index % columns) - (columns - 1) / 2) * step,
+      y: middleY + (Math.floor(index / columns) - (rows - 1) / 2) * step,
+    }));
+  });
 };
 
 /**
@@ -140,7 +147,7 @@ export const mapOf = (snapshot: Snapshot, players: Player[]): MapView | null => 
     land,
     trails,
     chests,
-    chestGroups: chestGroupsOf(chests, chestMeters),
+    chestSpots: chestSpotsOf(chests, chestMeters),
     marks,
   };
 };

@@ -30,11 +30,11 @@
   /** What the map draws. */
   const map = $derived(mapOf(snapshot, players));
 
-  /** IDs of the picked chests: the ones under a mark tapped on the map, or one picked in the list. */
-  let pickedIds = $state<string[]>([]);
+  /** ID of the chest tapped on the map or picked in a list, or null when none is open. */
+  let pickedId = $state<string | null>(null);
 
-  /** Chests picked on the map or in the list, while they still exist. */
-  const picked = $derived((map?.chests ?? []).filter((chest) => pickedIds.includes(chest.id)));
+  /** Chest picked on the map or in a list, while it still exists. */
+  const picked = $derived((map?.chests ?? []).find((chest) => chest.id === pickedId));
 
   /** Panel that shows the picked chest. */
   let pickedPanel = $state<HTMLElement>();
@@ -62,9 +62,9 @@
     );
   });
 
-  /** Picks the chests with [ids] and brings their panel into view. */
-  const pick = async (ids: string[]): Promise<void> => {
-    pickedIds = ids;
+  /** Opens the chest with [id] and brings its panel into view. */
+  const pick = async (id: string): Promise<void> => {
+    pickedId = id;
     await tick();
     pickedPanel?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   };
@@ -79,8 +79,8 @@
       <h2 id="map-title" class="panel-title">WHERE EVERYONE HAS BEEN</h2>
       <p class="muted">
         Each square is {MAP_SQUARE_METERS} m of land someone walked, in its terrain color, with a dot for each player who
-        was there. North is up. Point at a chest to make it bigger, and tap it to look inside. Chests close together
-        share one mark, with how many there are on its corner.
+        was there. North is up. Point at a chest to make it bigger, and tap it to look inside. Chests built close
+        together sit side by side, so each one can be tapped.
       </p>
       <div class="legend">
         {#each players as player (player.key)}
@@ -110,26 +110,21 @@
         {#each map.trails as trail (trail.key)}
           <rect class="trail" x={trail.x} y={trail.y} width={MAP_TRAIL_METERS} height={MAP_TRAIL_METERS} fill={trail.color} />
         {/each}
-        {#each map.chestGroups as group (group.key)}
-          {@const label = group.ids.length === 1 ? chestName(map.chests.find((chest) => chest.id === group.ids[0])!.record.chest) : count(group.ids.length, 'chest', 'chests')}
+        {#each map.chestSpots as spot (spot.id)}
+          {@const label = chestName(map.chests.find((chest) => chest.id === spot.id)!.record.chest)}
           <g
             class="chest"
-            class:picked={group.ids.some((id) => pickedIds.includes(id))}
-            transform="translate({group.x} {group.y}) scale({map.chestMeters})"
+            class:picked={spot.id === pickedId}
+            transform="translate({spot.x} {spot.y}) scale({map.chestMeters})"
             role="button"
             tabindex="0"
             aria-label={label}
-            onclick={() => pick(group.ids)}
-            onkeydown={(event) => (event.key === 'Enter' ? pick(group.ids) : undefined)}
+            onclick={() => pick(spot.id)}
+            onkeydown={(event) => (event.key === 'Enter' ? pick(spot.id) : undefined)}
           >
             <title>{label}</title>
-            <g class="chest-mark">
-              <use href="#chest-icon" />
-              {#if group.ids.length > 1}
-                <circle class="chest-badge" cx="0.42" cy="-0.42" r="0.3" />
-                <text class="chest-badge-count" x="0.42" y="-0.42">{group.ids.length}</text>
-              {/if}
-            </g>
+            <rect class="chest-hit" x="-0.5" y="-0.5" width="1" height="1" />
+            <g class="chest-mark"><use href="#chest-icon" /></g>
           </g>
         {/each}
         {#each map.marks as mark (mark.key)}
@@ -144,23 +139,19 @@
       </svg>
     </section>
 
-    {#if picked.length > 0}
+    {#if picked !== undefined}
       <section class="panel" aria-labelledby="picked-title" bind:this={pickedPanel}>
         <div class="picked-head">
-          <h2 id="picked-title" class="panel-title">
-            {picked.length === 1 ? chestName(picked[0]!.record.chest).toUpperCase() : `${picked.length} CHESTS HERE`}
-          </h2>
-          <button type="button" onclick={() => (pickedIds = [])}>Close</button>
-        </div>
-        {#each picked as chest (chest.id)}
-          <div class="picked-chest">
-            {#if picked.length > 1}<h3>{chestName(chest.record.chest)}</h3>{/if}
+          <svg class="picked-icon" viewBox="-0.5 -0.5 1 1" aria-hidden="true"><use href="#chest-icon" /></svg>
+          <div>
+            <h2 id="picked-title" class="panel-title">{chestName(picked.record.chest).toUpperCase()}</h2>
             <p class="muted">
-              Built by {chest.record.builder ?? 'someone'} · last looked at {whenLabel(chest.record.timeUtc, timeZone, nowMs)}
+              {picked.record.builder === null ? 'Came with the world' : `Built by ${picked.record.builder}`} · last looked at {whenLabel(picked.record.timeUtc, timeZone, nowMs)}
             </p>
-            <ChestContents chest={chest.record.chest} items={chest.record.items} />
           </div>
-        {/each}
+          <button type="button" onclick={() => (pickedId = null)}>Close</button>
+        </div>
+        <ChestContents chest={picked.record.chest} items={picked.record.items} />
       </section>
     {/if}
 
@@ -168,8 +159,8 @@
       <h2 id="chests-title" class="panel-title">CHESTS</h2>
       {#each chestList as chest (chest.id)}
         {@const kinds = Object.keys(chest.record.items).length}
-        <button type="button" class="line" class:picked={pickedIds.includes(chest.id)} onclick={() => pick([chest.id])}>
-          <span><strong>{chestName(chest.record.chest)}</strong> <span class="muted">by {chest.record.builder ?? 'someone'}</span></span>
+        <button type="button" class="line" class:picked={chest.id === pickedId} onclick={() => pick(chest.id)}>
+          <span><strong>{chestName(chest.record.chest)}</strong> <span class="muted">{chest.record.builder === null ? 'from the world' : `by ${chest.record.builder}`}</span></span>
           <span class="muted">
             {kinds === 0 ? 'Empty' : `${count(kinds, 'kind', 'kinds')} · ${Object.values(chest.record.items).reduce((sum, amount) => sum + amount, 0).toLocaleString()} items`}
           </span>
@@ -196,10 +187,10 @@
           <ul>
             {#each row.chests as { chest, count: amount } (chest.id)}
               <li>
-                <button type="button" class="link" onclick={() => pick([chest.id])}>
+                <button type="button" class="link" onclick={() => pick(chest.id)}>
                   <span class="amount">{amount.toLocaleString()}</span>
                   {chestName(chest.record.chest)}
-                  <span class="muted">by {chest.record.builder ?? 'someone'}</span>
+                  <span class="muted">{chest.record.builder === null ? 'from the world' : `by ${chest.record.builder}`}</span>
                 </button>
               </li>
             {/each}
@@ -289,8 +280,9 @@
     stroke-width: 0.03;
   }
 
-  /* Each chest grows from its middle when pointed at, focused or picked */
+  /* Each chest grows from its middle when pointed at, focused or picked, and leaves pointing to its fixed square */
   .chest-mark {
+    pointer-events: none;
     transform-box: fill-box;
     transform-origin: center;
     transition: transform 0.15s ease-out;
@@ -331,43 +323,30 @@
     dominant-baseline: central;
   }
 
-  /* Count of chests that share a mark, on its corner */
-  .chest-badge {
-    fill: var(--ember);
-    stroke: #2a1a0e;
-    stroke-width: 0.04;
+  /* Invisible square that catches the pointer, so a grown chest never takes the pointer from its neighbor */
+  .chest-hit {
+    fill: transparent;
   }
 
-  /* Number inside the badge */
-  .chest-badge-count {
-    fill: #1a120a;
-    font-size: 0.38px;
-    font-weight: 700;
-    text-anchor: middle;
-    dominant-baseline: central;
-  }
-
-  /* Each picked chest, with a hairline between chests */
-  .picked-chest + .picked-chest {
-    margin-top: 16px;
-    padding-top: 14px;
-    border-top: 1px solid var(--line-soft);
-  }
-
-  /* Chest name when several chests share the panel */
-  h3 {
-    margin: 0 0 4px;
-    font-family: var(--font-heading);
-    font-size: 16px;
-    font-weight: 500;
-  }
-
-  /* Picked chest's name and the close button in one row */
+  /* The picked chest drawn big beside its name, then who built it, and the close button at the end */
   .picked-head {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 12px;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 12px;
+  }
+
+  /* Big chest drawing in the panel head */
+  .picked-icon {
+    width: 44px;
+    height: 44px;
+  }
+
+  /* No gap under the title and builder line in the head */
+  .picked-head h2,
+  .picked-head p {
+    margin: 0;
   }
 
   /* Buttons share the Longhouse look */

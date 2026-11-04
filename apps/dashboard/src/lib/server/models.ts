@@ -66,6 +66,15 @@ export const WIKI_ICON_FILES: Record<string, string> = {
   'Blackmetal sword': 'Black Metal Sword.png',
   'Blackmetal axe': 'Black Metal Axe.png',
   'Blackmetal shield': 'Black Metal Shield.png',
+  'Finewood bow': 'Finewood Bow.png',
+  'Rag tunic': 'Rag Tunic.png',
+  'Rag pants': 'Rag Pants.png',
+  'Pulled bear': 'Pulled Bear.png',
+  'Bear hide': 'Bear Hide.png',
+  'Bear paw': 'Bear Paw.png',
+  'Bear trophy': 'Bear Trophy.png',
+  'Troll trophy': 'Troll Trophy.png',
+  'Greydwarf shaman trophy': 'Greydwarf Shaman Trophy.png',
 };
 
 /** How often the log file is checked for new lines. */

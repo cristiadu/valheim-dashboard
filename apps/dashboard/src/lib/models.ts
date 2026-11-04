@@ -332,6 +332,9 @@ export const MAP_CHEST_METERS = 16;
 /** How many chest marks fit across the map, so marks stay big enough to see and tap on a big map. */
 export const MAP_CHESTS_ACROSS = 40;
 
+/** Distance between chests placed side by side on the map, in chest marks, so a mark grown on hover still shows its neighbors. */
+export const MAP_CHEST_STEP = 1.15;
+
 /**
  * Names the game shows for chests, carts and ships, by the prefab the plugin logs. Chests the world came with,
  * such as `TreasureChest_meadows`, start with [TREASURE_CHEST_PREFIX].
@@ -370,7 +373,10 @@ export const DEFAULT_CONTAINER_SIZE: ContainerSize = { columns: 5, rows: 2 };
 export const TREASURE_CHEST_PREFIX = 'TreasureChest';
 
 /** Size of an item icon in a chest's slots, in pixels. */
-export const CHEST_SLOT_ICON_PX = 40;
+export const CHEST_SLOT_ICON_PX = 44;
+
+/** Size of an item icon in the list beside a chest's slots, in pixels. */
+export const CHEST_LIST_ICON_PX = 24;
 
 /** What the map draws, in map units: meters east as `x` and meters south as `y`, so north is up. */
 export type MapView = {
@@ -384,8 +390,8 @@ export type MapView = {
   trails: { key: string; x: number; y: number; color: string }[];
   /** Chests, carts and ships, by their ID. */
   chests: { id: string; x: number; y: number; record: ChestRecord }[];
-  /** Chests close enough to share one mark, so each mark can be tapped. */
-  chestGroups: MapChestGroup[];
+  /** Where each chest's mark sits, moved apart from chests it would cover. */
+  chestSpots: MapChestSpot[];
   /** Where each online player stands and where each character last died. */
   marks: { key: string; kind: 'player' | 'death'; label: string; x: number; y: number; color: string }[];
 };
@@ -393,8 +399,8 @@ export type MapView = {
 /** A chest, cart or ship on the map, by its ID, with `y` meters south so north is up. */
 export type MapChest = MapView['chests'][number];
 
-/** Chests that share one mark on the map: where the mark sits and the chests' IDs. */
-export type MapChestGroup = { key: string; x: number; y: number; ids: string[] };
+/** Where one chest's mark sits on the map, by the chest's ID. */
+export type MapChestSpot = { id: string; x: number; y: number };
 
 /** One item across every chest on the map: how many there are in all, and in which chests. */
 export type StockRow = {
@@ -592,6 +598,11 @@ export const GEAR_NAMES: Record<string, string> = {
   SledgeIron: 'Iron sledge',
   Bow: 'Crude bow',
   BowFineWood: 'Finewood bow',
+  AxeWood: 'Wooden axe',
+  KnifeWood: 'Wooden knife',
+  SpearWood: 'Wooden spear',
+  SwordWood: 'Wooden sword',
+  FistBjornClaw: 'Paws of the Bear',
   BowHuntsman: 'Huntsman bow',
   BowDraugrFang: 'Draugr fang',
   ShieldWood: 'Wood shield',
@@ -687,9 +698,11 @@ export const ITEM_NAMES: Record<string, string> = {
   TrophySurtling: 'Surtling trophy',
   TrophyWolf: 'Wolf trophy',
   TrophyHatchling: 'Drake trophy',
-  TrophyBjorn: 'Bjørn trophy',
-  BjornHide: 'Bjørn hide',
-  BjornPaw: 'Bjørn paw',
+  TrophyBjorn: 'Bear trophy',
+  BjornHide: 'Bear hide',
+  BjornPaw: 'Bear paw',
+  PulledBear: 'Pulled bear',
+  AxeHead2: 'Mysterious axe head',
   KnifeButcher: 'Butcher knife',
 };
 

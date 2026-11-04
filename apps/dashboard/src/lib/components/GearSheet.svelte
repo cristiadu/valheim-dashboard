@@ -14,9 +14,7 @@
 {#snippet pieceSlot(piece: GearPiece, label: string)}
   <LogLines title={gearLabel(piece)} source={sourceOf(piece.prefab)}>
     <span class="slot" role="img" aria-label={label} title={label}>
-      <ItemIcon item={piece.name} size={GEAR_ICON_PX}>
-        {#snippet fallback()}<span class="initials" aria-hidden="true">{piece.name.slice(0, 2)}</span>{/snippet}
-      </ItemIcon>
+      <ItemIcon item={piece.name} size={GEAR_ICON_PX} />
       {#if piece.quality > 1}<span class="level" aria-hidden="true">{piece.quality}</span>{/if}
     </span>
   </LogLines>
@@ -95,13 +93,6 @@
     letter-spacing: 0.06em;
     color: var(--muted);
     text-transform: uppercase;
-  }
-
-  /* First letters of an item when the wiki has no icon for it */
-  .initials {
-    font-family: var(--font-heading);
-    font-size: 16px;
-    color: var(--muted);
   }
 
   /* Upgrade level in the corner, like an item stack count */
