@@ -238,6 +238,13 @@ export type Snapshot = {
   chests: Record<string, ChestRecord>;
   /** What each character carried at their last death, by character name. */
   deathItems: Record<string, DeathItems>;
+  /** Prefabs of every item a player picked up, stored, took, wore, ate, smelted or left in a tombstone, such as `CopperOre`. */
+  seenItems: string[];
+  /**
+   * A guess of what each character carries, by character name and item prefab, from pickups, chest moves, smelting,
+   * eating and tombstones. Crafting, building and dropping are not in the log.
+   */
+  bags: Record<string, Record<string, number>>;
   /** Terrain letter of each explored square, by `x,z` square number, once the plugin's terrain file was read. */
   terrain: Record<string, string>;
 };
@@ -963,6 +970,20 @@ export const ITEM_ICON_PX = 28;
 
 /** Size of a recipe's icon beside its name or preview, in pixels. */
 export const RECIPE_ICON_PX = 40;
+
+/** Start of a Recipes source value that picks one player's chests, followed by the player's key. */
+export const CHESTS_SOURCE = 'chests:';
+
+/** Start of a Recipes source value that picks one character's bag, followed by the character's name. */
+export const BAG_SOURCE = 'bag:';
+
+/** A recipe and how many times the items in stock can make it. */
+export type Craftable = {
+  /** The recipe. */
+  recipe: Recipe;
+  /** How many crafts the stock covers. */
+  times: number;
+};
 
 /** The browser's live stream and page clock, while the page is open. */
 export type LiveConnection = {
