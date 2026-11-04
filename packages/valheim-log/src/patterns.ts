@@ -101,7 +101,7 @@ export const PVP_PATTERN = /^PvP turned (?<state>on|off): (?<character>.+)$/;
 export const BED_PATTERN = /^Went to bed: (?<character>.+)$/;
 
 /** A player wore or held a piece of gear for the first time since the server started. Written by the event log plugin. */
-export const GEAR_PATTERN = /^Gear: (?<character>\S+) (?<item>\S+)(?: quality (?<quality>\d+))?$/;
+export const GEAR_PATTERN = /^Gear: (?<character>.+?) (?<item>\S+)(?: quality (?<quality>\d+))?$/;
 
 /** A creature died after players hit it, with everyone who hit it. Written by the event log plugin. */
 export const CREATURE_KILLED_PATTERN = /^Creature killed: (?<creature>\S+) level (?<level>\d+) by (?<attackers>.+)$/;

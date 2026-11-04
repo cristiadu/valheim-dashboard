@@ -75,6 +75,7 @@ export const WIKI_ICON_FILES: Record<string, string> = {
   'Bear trophy': 'Bear Trophy.png',
   'Troll trophy': 'Troll Trophy.png',
   'Greydwarf shaman trophy': 'Greydwarf Shaman Trophy.png',
+  'Greydwarf brute trophy': 'Greydwarf Brute Trophy.png',
 };
 
 /** How often the log file is checked for new lines. */

@@ -4,22 +4,59 @@
   import ItemIcon from '#/lib/components/ItemIcon';
   import Pill from '#/lib/components/Pill';
   import RecipePicker from '#/lib/components/RecipePicker';
-  import { MAX_CRAFTS, RECIPE_ICON_PX, type Plan } from '#/lib/models';
+  import { live, useSnapshot } from '#/lib/live.svelte';
+  import { foundChests } from '#/lib/map';
+  import { BAG_SOURCE, CHESTS_SOURCE, MAX_CRAFTS, RECIPE_ICON_PX, type Plan } from '#/lib/models';
+  import { knownRecipes } from '#/lib/picker';
   import { planPill } from '#/lib/pills';
   import { clampCrafts, newPlan, planItems, stillNeeded, withHave } from '#/lib/planner';
+  import { playersOf } from '#/lib/players';
   import { loadPlans, planner, savePlans } from '#/lib/plans.svelte';
-  import { RECIPES, madeAt, recipeById } from '#/lib/recipes';
+  import { madeAt, recipeById } from '#/lib/recipes';
+  import { bagStock, builderNames, chestStock, craftables } from '#/lib/stock';
 
   onMount(loadPlans);
 
-  /** Recipe picked in the new plan form. */
-  let pickedId = $state(RECIPES[0]!.id);
+  /** Getter for the snapshot the layout shares. */
+  const getSnapshot = useSnapshot();
+
+  /** Current snapshot. */
+  const snapshot = $derived(getSnapshot());
+
+  /** Players at the page clock, whose chests the viewer can pick. */
+  const players = $derived(live.nowMs === null ? [] : playersOf(snapshot, live.nowMs));
+
+  /** What the recipes are made from: empty for every chest, `chests:` and a player key, or `bag:` and a character. */
+  let source = $state('');
+
+  /** Characters whose bag the server has a guess for, by name. */
+  const bagOwners = $derived(Object.keys(snapshot.bags).toSorted());
+
+  /** Items in the picked chests or bag, by recipe item name. */
+  const stock = $derived.by(() => {
+    if (source.startsWith(BAG_SOURCE)) {
+      return bagStock(snapshot.bags[source.slice(BAG_SOURCE.length)] ?? {});
+    }
+    const owner = players.find((player) => `${CHESTS_SOURCE}${player.key}` === source);
+    return chestStock(snapshot, owner === undefined ? null : builderNames(owner));
+  });
+
+  /** Recipes the picked chests or bag have enough for. */
+  const canMake = $derived(craftables(stock));
+
+  /** Recipes whose every ingredient someone has handled or seen in a found chest, so nobody sees what is ahead. */
+  const known = $derived(
+    knownRecipes([...snapshot.seenItems, ...foundChests(snapshot).flatMap(([, chest]) => Object.keys(chest.items))]),
+  );
+
+  /** Recipe chosen in the new plan form, if any yet. */
+  let chosenId = $state<string | null>(null);
+
+  /** Recipe picked in the new plan form: the chosen one while it is known, else the first known one. */
+  const picked = $derived(known.find((recipe) => recipe.id === chosenId) ?? known[0] ?? null);
 
   /** How many crafts the new plan form asks for. */
   let pickedCrafts = $state(1);
-
-  /** Full recipe for [pickedId]. */
-  const picked = $derived(recipeById(pickedId)!);
 
   /** Items still missing across every plan. */
   const needed = $derived(stillNeeded(planner.plans));
@@ -27,7 +64,7 @@
   /** Adds a plan for the picked recipe. */
   const addPlan = (event: SubmitEvent): void => {
     event.preventDefault();
-    savePlans([...planner.plans, newPlan(planner.plans, pickedId, pickedCrafts)]);
+    savePlans([...planner.plans, newPlan(planner.plans, picked!.id, pickedCrafts)]);
   };
 
   /** Replaces [plan] with [changed]. */
@@ -44,27 +81,76 @@
 <div class="recipes">
   <section class="panel" aria-labelledby="new-title">
     <h2 id="new-title" class="panel-title">START A PLAN</h2>
-    <form onsubmit={addPlan}>
-      <RecipePicker bind:value={pickedId} label="What do you want to make?" />
-      <label>
-        <span class="muted">{picked.yields > 1 ? 'How many batches?' : 'How many?'}</span>
-        <input type="number" min="1" max={MAX_CRAFTS} bind:value={pickedCrafts} />
-      </label>
-      <button type="submit">Start tracking</button>
-    </form>
-    <div class="preview">
-      <ItemIcon item={picked.name} size={RECIPE_ICON_PX} />
-      <div>
-        <p class="muted">
-          {madeAt(picked.station)} {picked.yields > 1 ? `Each batch makes ${picked.yields} and takes:` : 'Takes:'}
-        </p>
-        <ul class="items">
-          {#each picked.ingredients as line (line.item)}
-            <li><ItemIcon item={line.item} /><span class="amount">{line.amount}</span>{line.item}</li>
-          {/each}
-        </ul>
+    {#if picked === null}
+      <p class="muted">No recipes yet. They show up once someone has found everything a recipe takes.</p>
+    {:else}
+      <form onsubmit={addPlan}>
+        <RecipePicker
+          bind:value={() => picked.id, (id) => (chosenId = id)}
+          label="What do you want to make?"
+          recipes={known}
+        />
+        <label>
+          <span class="muted">{picked.yields > 1 ? 'How many batches?' : 'How many?'}</span>
+          <input type="number" min="1" max={MAX_CRAFTS} bind:value={pickedCrafts} />
+        </label>
+        <button type="submit">Start tracking</button>
+      </form>
+      <div class="preview">
+        <ItemIcon item={picked.name} size={RECIPE_ICON_PX} />
+        <div>
+          <p class="muted">
+            {madeAt(picked.station)} {picked.yields > 1 ? `Each batch makes ${picked.yields} and takes:` : 'Takes:'}
+          </p>
+          <ul class="items">
+            {#each picked.ingredients as line (line.item)}
+              <li><ItemIcon item={line.item} /><span class="amount">{line.amount}</span>{line.item}</li>
+            {/each}
+          </ul>
+        </div>
       </div>
-    </div>
+    {/if}
+  </section>
+
+  <section class="panel" aria-labelledby="chests-title">
+    <h2 id="chests-title" class="panel-title">WHAT YOU CAN MAKE</h2>
+    <label>
+      <span class="muted">Made from</span>
+      <select bind:value={source}>
+        <optgroup label="Chests">
+          <option value="">Every chest</option>
+          {#each players as player (player.key)}
+            <option value="{CHESTS_SOURCE}{player.key}">Chests built by {player.character}</option>
+          {/each}
+        </optgroup>
+        {#if bagOwners.length > 0}
+          <optgroup label="What someone carries">
+            {#each bagOwners as character (character)}
+              <option value="{BAG_SOURCE}{character}">{character}'s bag</option>
+            {/each}
+          </optgroup>
+        {/if}
+      </select>
+    </label>
+    {#if source.startsWith(BAG_SOURCE)}
+      <p class="muted">
+        The bag is a guess from what the server sees: pickups, chest moves, smelting, eating and tombstones. Crafting,
+        building and dropping things aren't in the log, so it can be off.
+      </p>
+    {/if}
+    {#if canMake.length === 0}
+      <p class="muted">Not enough here for any recipe yet.</p>
+    {:else}
+      <p class="muted">How many of each you could make from these items.</p>
+      <ul class="items">
+        {#each canMake as craftable (craftable.recipe.id)}
+          <li>
+            <ItemIcon item={craftable.recipe.name} />
+            <span class="amount">{craftable.times * craftable.recipe.yields}</span>{craftable.recipe.name}
+          </li>
+        {/each}
+      </ul>
+    {/if}
   </section>
 
   {#if planner.isLoaded}
@@ -130,7 +216,7 @@
                     value={line.have}
                     onchange={(event) => updatePlan(plan, withHave(plan, line.item, event.currentTarget.valueAsNumber))}
                   />
-                  <span class="muted">of {line.need}</span>
+                  <span class="muted">of {line.need}{#if stock[line.item]}&nbsp;· {stock[line.item]} on hand{/if}</span>
                 </td>
                 <td class="mono">{line.missing === 0 ? '–' : line.missing}</td>
               </tr>
@@ -148,7 +234,7 @@
     display: flex;
     flex-direction: column;
     gap: 22px;
-    max-width: 900px;
+    max-width: var(--page-width);
   }
 
   /* Text under a panel title */
@@ -171,8 +257,9 @@
     gap: 4px;
   }
 
-  /* Inputs and buttons share the Longhouse look and stay 44px tall for touch */
+  /* Inputs, lists and buttons share the Longhouse look and stay 44px tall for touch */
   input[type='number'],
+  select,
   button {
     min-height: 44px;
     box-sizing: border-box;
@@ -182,6 +269,12 @@
     color: var(--text);
     font: inherit;
     font-size: 14px;
+  }
+
+  /* Owner list fits the longest player name */
+  select {
+    align-self: flex-start;
+    min-width: 200px;
   }
 
   /* Number fields only need a few digits */

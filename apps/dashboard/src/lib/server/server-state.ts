@@ -15,6 +15,7 @@ import {
   STORY_EVENT_TYPES,
   type StoryEvent,
 } from '#/lib/models';
+import { updateBags } from '#/lib/server/bags';
 import { addSourceLine, keepServerLine, keepSourceLines } from '#/lib/server/log-sources';
 import {
   ACTIVITY_GAP_MS,
@@ -90,6 +91,22 @@ const addNew = (lists: Record<string, string[]>, key: string, value: string): bo
   }
   lists[key] = [...list, value];
   return true;
+};
+
+/** Game item names [event] shows a player has found, such as what they picked up, stored, wore or ate. */
+const itemsSeenIn = (event: LogEvent): string[] => {
+  switch (event.type) {
+    case 'itemPickedUp':
+    case 'chestChanged':
+    case 'gearSeen':
+    case 'ate':
+    case 'smelting':
+      return [event.item];
+    case 'tombstoneContents':
+      return Object.keys(event.items);
+    default:
+      return [];
+  }
 };
 
 /**
@@ -202,6 +219,8 @@ export const createServerState = (serverUtcOffsetMinutes: number): ServerState =
       positions: {},
       chests: {},
       deathItems: {},
+      seenItems: [],
+      bags: {},
       terrain: {},
     },
   };
@@ -271,6 +290,12 @@ export const readLogLine = (state: ServerState, line: string): void => {
     pushCapped(snapshot.events, { ...event, line } as StoryEvent, MAX_EVENTS);
   }
   addActivityOf(snapshot, event, line);
+  updateBags(snapshot, event);
+  for (const item of itemsSeenIn(event)) {
+    if (!snapshot.seenItems.includes(item)) {
+      snapshot.seenItems.push(item);
+    }
+  }
   switch (event.type) {
     case 'worldLoaded':
       snapshot.world = event.world;

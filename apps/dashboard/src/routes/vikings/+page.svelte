@@ -134,7 +134,7 @@
     display: flex;
     flex-direction: column;
     gap: 22px;
-    max-width: 1120px;
+    max-width: var(--page-width);
   }
 
   /* As many cards per row as fit */
