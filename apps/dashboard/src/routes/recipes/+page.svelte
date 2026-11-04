@@ -5,6 +5,7 @@
   import Pill from '#/lib/components/Pill';
   import RecipePicker from '#/lib/components/RecipePicker';
   import { live, useSnapshot } from '#/lib/live.svelte';
+  import { foundChests } from '#/lib/map';
   import { MAX_CRAFTS, RECIPE_ICON_PX, type Plan } from '#/lib/models';
   import { knownRecipes } from '#/lib/picker';
   import { planPill } from '#/lib/pills';
@@ -37,8 +38,10 @@
   /** Recipes the picked chests have enough for. */
   const canMake = $derived(craftables(stock));
 
-  /** Recipes whose every ingredient someone has found, so nobody sees what is still ahead of them. */
-  const known = $derived(knownRecipes(snapshot.seenItems));
+  /** Recipes whose every ingredient someone has handled or seen in a found chest, so nobody sees what is ahead. */
+  const known = $derived(
+    knownRecipes([...snapshot.seenItems, ...foundChests(snapshot).flatMap(([, chest]) => Object.keys(chest.items))]),
+  );
 
   /** Recipe chosen in the new plan form, if any yet. */
   let chosenId = $state<string | null>(null);

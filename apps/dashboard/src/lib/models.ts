@@ -238,7 +238,7 @@ export type Snapshot = {
   chests: Record<string, ChestRecord>;
   /** What each character carried at their last death, by character name. */
   deathItems: Record<string, DeathItems>;
-  /** Game names of every item any player has found, picked up, stored, worn or eaten, such as `CopperOre`. */
+  /** Prefabs of every item a player picked up, stored, took, wore, ate, smelted or left in a tombstone, such as `CopperOre`. */
   seenItems: string[];
   /** Terrain letter of each explored square, by `x,z` square number, once the plugin's terrain file was read. */
   terrain: Record<string, string>;

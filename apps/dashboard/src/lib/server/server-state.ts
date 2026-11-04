@@ -101,7 +101,6 @@ const itemsSeenIn = (event: LogEvent): string[] => {
     case 'ate':
     case 'smelting':
       return [event.item];
-    case 'chestContents':
     case 'tombstoneContents':
       return Object.keys(event.items);
     default:
