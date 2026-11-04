@@ -39,7 +39,7 @@ Friends open one link and type a password. They install nothing.
 Friends open `https://cotil-longhouse.share.zrok.io`, click past zrok's notice the first time, and type the
 Valheim server's password on the dashboard's password page. The dashboard reads it from
 `start_headless_server.bat`, so change it there and restart the dashboard. The page remembers them for 30
-days. The link starts hidden each time you log on. `share-dashboard.ps1 -Remove` stops sharing.
+days. The link starts in its own window, titled `Valheim dashboard link (zrok)`, each time you log on. Closing that window stops the link. `share-dashboard.ps1 -Remove` stops sharing.
 
 After a manual `git pull`, start it with `scripts\start-dashboard.cmd -Rebuild`. Other settings are in
 [apps/dashboard/README.md](apps/dashboard/README.md).

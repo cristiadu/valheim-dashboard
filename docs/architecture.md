@@ -336,7 +336,7 @@ flowchart TD
 ```
 
 `install-startup.cmd` adds the logon task and the update task once. `share-dashboard.ps1` adds one more
-that starts zrok with no window. Every window stays hidden when it
+that starts zrok in its own visible window. Every other window stays hidden when it
 starts at logon.
 
 ## Updates from main
