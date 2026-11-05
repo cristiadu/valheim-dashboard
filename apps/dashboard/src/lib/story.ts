@@ -56,7 +56,7 @@ export const thingList = (things: Record<string, number>): string =>
 
 /**
  * Story line for one stretch of activity, such as building or kills. Skill levels have no list, since the server
- * never learns which skill. Times at the helm name the ships without a count, since the log can't tell two ships
+ * never learns which skill. Steering names the ships without a count, since the log can't tell two ships
  * of the same kind apart.
  */
 const activityItem = (activity: ActivityRecord): StoryText => {
@@ -78,7 +78,8 @@ const activityItem = (activity: ActivityRecord): StoryText => {
   }
   if (activity.kind === 'sailed') {
     const ships = Object.keys(activity.things).map(thingName).join(' and the ');
-    return { timeUtc, kind, text: `${sentence} on the ${ships}` };
+    const times = count(total, words.one, words.many);
+    return { timeUtc, kind, text: `${activity.player ?? 'Someone'} ${words.verb} the ${ships} ${times}` };
   }
   return { timeUtc, kind, text: `${sentence}: ${thingList(activity.things)}` };
 };
