@@ -1,7 +1,7 @@
 <script lang="ts">
   import { builtByShortLabel, chestName, itemTotal } from '#/lib/items';
   import type { MapChest } from '#/lib/models';
-  import { count } from '#/lib/story';
+  import { count } from '#/lib/text';
 
   /** Chests on the map, the open one's ID, and what to do when one is tapped. */
   let {

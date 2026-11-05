@@ -2,7 +2,7 @@
   import ChestContents from '#/lib/components/ChestContents';
   import { builtByLabel, chestName } from '#/lib/items';
   import type { MapChest } from '#/lib/models';
-  import { whenLabel } from '#/lib/status';
+  import { whenLabel } from '#/lib/time';
 
   /**
    * The open chest, the most of each item one slot holds, the viewer's time zone and the page clock, what to do on

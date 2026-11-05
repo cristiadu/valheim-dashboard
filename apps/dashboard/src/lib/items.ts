@@ -8,7 +8,7 @@ import {
   type StockRow,
   TREASURE_CHEST_PREFIX,
 } from '#/lib/models';
-import { capitalized, thingName } from '#/lib/story';
+import { capitalized, thingName } from '#/lib/text';
 
 /**
  * Returns the name the game shows for the item the plugin logs as [prefab], which also picks its icon. For

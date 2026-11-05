@@ -1,6 +1,6 @@
 import { GEAR_NAMES, GEAR_QUALITY_PATTERN, GEAR_SLOT_PATTERNS, type GearPiece, type GearSheet, ITEM_NAMES } from '#/lib/models';
 import { recipeItems } from '#/lib/recipes';
-import { capitalized, thingName } from '#/lib/story';
+import { capitalized, thingName } from '#/lib/text';
 
 /** Reads one piece of gear the snapshot keeps, for example `SpearFlint quality 4`. */
 export const gearPiece = (entry: string): GearPiece => {

@@ -1,4 +1,5 @@
 import type { Pill, WarningKind } from '#/lib/models';
+import { count } from '#/lib/text';
 
 /** Whether the server is up: `Online` in green or `Offline` in red. */
 export const serverPill = (isOnline: boolean): Pill => (isOnline ? { text: 'Online', tone: 'good' } : { text: 'Offline', tone: 'bad' });
@@ -34,5 +35,5 @@ export const planPill = (missingItems: number): Pill => {
   if (missingItems === 0) {
     return { text: 'Ready to craft', tone: 'good' };
   }
-  return { text: missingItems === 1 ? '1 item missing' : `${missingItems} items missing`, tone: 'quiet' };
+  return { text: `${count(missingItems, 'item', 'items')} missing`, tone: 'quiet' };
 };

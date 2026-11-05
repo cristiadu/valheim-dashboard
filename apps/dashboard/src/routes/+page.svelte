@@ -10,9 +10,10 @@
   import { serverPill } from '#/lib/pills';
   import { playersOf } from '#/lib/players';
   import { playerSource } from '#/lib/sources';
-  import { clockTime, durationLabel, isServerOnline, viewerTimeZone, whenLabel } from '#/lib/status';
-  import { gigabytesLabel } from '#/lib/health';
-  import { areaLabel, daySummaryParts, storyOf } from '#/lib/story';
+  import { gigabytesLabel, isServerOnline } from '#/lib/status';
+  import { daySummaryParts, storyOf } from '#/lib/story';
+  import { areaLabel, count } from '#/lib/text';
+  import { clockTime, durationLabel, viewerTimeZone, whenLabel } from '#/lib/time';
 
   /** Getter for the snapshot the layout shares. */
   const getSnapshot = useSnapshot();
@@ -113,7 +114,7 @@
       <Pill pill={serverPill(isUp)} />
       {#if isUp && snapshot.startedUtc}<span>Up {durationLabel(nowMs - Date.parse(snapshot.startedUtc))}</span>{/if}
       {#if lastSave}<span>Last save {at(lastSave.timeUtc)}</span>{/if}
-      <span>{online.length === 1 ? '1 player online' : `${online.length} players online`}</span>
+      <span>{count(online.length, 'player', 'players')} online</span>
       {#if snapshot.diskSpace}<span>{gigabytesLabel(snapshot.diskSpace.availableBytes)} disk free</span>{/if}
       {#if snapshot.isGameServerConnected === false}<Pill pill={{ text: 'Steam connection lost', tone: 'bad' }} />{/if}
       <span class="link">Server details</span>
