@@ -346,13 +346,15 @@ flowchart LR
   chest["Chest: 5273:1203 piece_chest_wood at 118 -336 ... holds Wood x20"] --> chests[Chest by ID]
   removed["Chest removed: 5273:1203"] --> chests
   tomb["Tombstone: Ragnar at 410 -77 holds ..."] --> death[Ragnar's last death]
+  levi["Leviathan: 5273:4410 at -1520 2210"] --> leviathans[Leviathan by ID]
+  gone["Leviathan gone: 5273:4410"] --> leviathans
   terrain["terrain-Cotil.txt, once per world"] --> land[Terrain color of each explored square]
 ```
 
 A position marks its whole 32 m square as explored. Chest IDs last until the server stops, and every run lists
 all chests again, so a new run starts the chest list over. The plugin writes the terrain file once per world
 from the game's own world generator, and the map colors only squares someone walked.
-Nothing nobody has seen shows: a chest appears only on a square someone walked.
+Nothing nobody has seen shows: a chest or Leviathan appears only on a square someone walked.
 The map uses the game's own coordinates: `x` east and `z` north of the world's center, the same numbers the
 game's `pos` command prints. The world is a circle 10,500 m from the center to its edge, which the terrain file
 covers in full. The map opens on the explored land, drawn to the world's true scale, and zooming out goes as far as

@@ -86,6 +86,8 @@ export type LogEvent = { timeUtc: string } & (
       items: Record<string, number>;
     }
   | { type: 'chestRemoved'; id: string }
+  | { type: 'leviathan'; id: string; x: number; z: number }
+  | { type: 'leviathanGone'; id: string }
   | { type: 'tombstoneContents'; owner: string | null; x: number; z: number; items: Record<string, number> }
   | { type: 'worldSaveStep'; step: number; durationMs: number; saveNumber: number | null }
   | { type: 'backupCreated'; backup: string }

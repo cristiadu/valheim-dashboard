@@ -240,6 +240,7 @@ export const createServerState = (serverUtcOffsetMinutes: number): ServerState =
       positions: {},
       chests: {},
       deathItems: {},
+      leviathans: {},
       seenItems: [],
       bags: {},
       itemStacks: {},
@@ -251,8 +252,8 @@ export const createServerState = (serverUtcOffsetMinutes: number): ServerState =
 
 /**
  * Starts a new run when the server writes a new `logs.txt`. Sessions still open had no clean stop, so they
- * end at the old log's last line as a crash. History is kept, except chests: the new run lists them again
- * with new IDs.
+ * end at the old log's last line as a crash. History is kept, except chests and Leviathans: the new run lists
+ * them again with new IDs.
  */
 export const startNewLog = (state: ServerState): void => {
   const { snapshot } = state;
@@ -277,6 +278,7 @@ export const startNewLog = (state: ServerState): void => {
     stoppedUtc: null,
     isGameServerConnected: null,
     chests: {},
+    leviathans: {},
   });
 };
 
@@ -390,6 +392,14 @@ export const readLogLine = (state: ServerState, line: string): void => {
     }
     case 'chestRemoved':
       delete snapshot.chests[event.id];
+      break;
+    case 'leviathan': {
+      const { id, x, z, timeUtc } = event;
+      snapshot.leviathans[id] = { x, z, timeUtc };
+      break;
+    }
+    case 'leviathanGone':
+      delete snapshot.leviathans[event.id];
       break;
     case 'tombstoneContents':
       if (event.owner !== null) {

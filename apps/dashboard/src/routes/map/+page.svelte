@@ -13,6 +13,7 @@
     MAP_CHEST_PX,
     MAP_CHEST_SMALL_PX,
     MAP_DEATH_PX,
+    MAP_LEVIATHAN_PX,
     MAP_DRAG_PX,
     MAP_PLAYER_PX,
     MAP_SQUARE_METERS,
@@ -238,6 +239,9 @@
         {/each}
         <span><span class="edge-swatch" aria-hidden="true"></span>Edge of the world</span>
         <span><span class="death-swatch" aria-hidden="true">✕</span>Last death</span>
+        <span>
+          <svg class="legend-chest" viewBox="-0.5 -0.5 1 1" aria-hidden="true"><use href="#leviathan-icon" /></svg>Leviathan
+        </span>
         {#each terrainKinds as [letter, style] (letter)}
           <span><span class="swatch" style:background={style.color}></span>{style.name}</span>
         {/each}
@@ -278,6 +282,11 @@
               <rect class="chest-band" x="-0.46" y="-0.2" width="0.92" height="0.06" />
               <circle class="chest-wheel" cx="-0.24" cy="0.2" r="0.17" />
               <circle class="chest-wheel" cx="0.24" cy="0.2" r="0.17" />
+            </g>
+            <g id="leviathan-icon">
+              <path class="leviathan-shell" d="M -0.48 0.2 Q -0.4 -0.4 0 -0.42 Q 0.4 -0.4 0.48 0.2 Z" />
+              <path class="leviathan-ridge" d="M -0.24 0.12 L -0.18 -0.22 M 0 0.12 L 0 -0.3 M 0.24 0.12 L 0.18 -0.22" />
+              <path class="leviathan-water" d="M -0.5 0.3 Q -0.25 0.18 0 0.3 Q 0.25 0.42 0.5 0.3" />
             </g>
             <g id="ship-icon">
               <path class="chest-sail" d="M -0.04 -0.46 L -0.04 0.04 L -0.34 0.04 Z" />
@@ -353,6 +362,11 @@
               >
                 <title>{mark.label}</title>
               </rect>
+            {:else if mark.kind === 'leviathan'}
+              <g class="leviathan" transform="translate({mark.x} {mark.y}) scale({MAP_LEVIATHAN_PX * metersPerPixel})">
+                <title>{mark.label}</title>
+                <use href="#leviathan-icon" />
+              </g>
             {:else}
               <text class="death" x={mark.x} y={mark.y} fill={mark.color} font-size={MAP_DEATH_PX * metersPerPixel}>✕<title>{mark.label}</title></text>
             {/if}
@@ -681,6 +695,27 @@
   /* Online players as turned squares with a dark edge */
   .player {
     stroke: var(--background);
+  }
+
+  /* Leviathan shell in sea-green with dark ridges, above a frost-blue wave */
+  .leviathan-shell {
+    fill: #4f7a6a;
+    stroke: #1d2b26;
+    stroke-width: 0.05;
+  }
+
+  /* Ridges on the Leviathan's shell */
+  .leviathan-ridge {
+    fill: none;
+    stroke: #1d2b26;
+    stroke-width: 0.05;
+  }
+
+  /* Wave under the Leviathan */
+  .leviathan-water {
+    fill: none;
+    stroke: var(--frost);
+    stroke-width: 0.07;
   }
 
   /* Death marks centered on the spot */

@@ -259,6 +259,22 @@ describe('server state', () => {
     });
   });
 
+  it('keeps each Leviathan of the run until it dives away', () => {
+    // GIVEN two Leviathans are listed, then one dives away
+    readLines(state, [
+      ...RUN_START,
+      logLine('03:00:00', 'Leviathan: 1:20 at -1520 2210'),
+      logLine('03:00:00', 'Leviathan: 1:21 at 800 -400'),
+      logLine('03:05:00', 'Leviathan gone: 1:21'),
+    ]);
+
+    // WHEN the snapshot is read
+    const { leviathans } = state.snapshot;
+
+    // THEN only the one still there is kept, where it floats
+    expect(leviathans).toEqual({ '1:20': { x: -1520, z: 2210, timeUtc: '2026-10-29T10:00:00.000Z' } });
+  });
+
   it('adds the terrain of squares explored before and after the terrain file was read', () => {
     // GIVEN Ragnar explored square 0,0, then the terrain of four squares around the center is read
     readLines(state, [...RUN_START, logLine('03:00:00', 'Position: Ragnar 10 20')]);

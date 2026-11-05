@@ -141,3 +141,24 @@ describe('spotLabelOf', () => {
     expect(far).toBe('x 3000, z 4000 · 5.0 km from the center');
   });
 });
+
+describe('mapOf Leviathans', () => {
+  it('marks a Leviathan only on a square someone walked', () => {
+    // GIVEN Ragnar walked square 0,0, where one Leviathan floats, and another floats far out at sea
+    const snapshot = snapshotWith({
+      explored: { Ragnar: ['0,0'] },
+      leviathans: {
+        '1:20': { x: 10, z: 20, timeUtc: '2026-10-29T11:00:00.000Z' },
+        '1:21': { x: 3000, z: 3000, timeUtc: '2026-10-29T11:00:00.000Z' },
+      },
+    });
+
+    // WHEN the map is made
+    const map = mapOf(snapshot, playersOf(snapshot, TEST_NOON_MS));
+
+    // THEN only the Leviathan on the walked square is marked, with north up
+    expect(map?.marks).toEqual([
+      { key: 'leviathan:1:20', kind: 'leviathan', label: 'Leviathan', x: 10, y: -20, color: 'var(--frost)' },
+    ]);
+  });
+});

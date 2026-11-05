@@ -6,6 +6,7 @@ import {
   MAP_SQUARE_METERS,
   MAP_TRAIL_METERS,
   type ChestRecord,
+  LEVIATHAN_COLOR,
   type MapChest,
   type MapChestSpot,
   type MapView,
@@ -79,7 +80,7 @@ export const chestSpotsOf = (chests: MapChest[], chestMeters: number): MapChestS
 
 /**
  * What the map draws for [snapshot]: explored squares in their terrain color, each player's trail, chests,
- * online players and last deaths, colored by [players], fitted to what was explored. Null when the plugin has logged nothing to draw yet.
+ * online players, last deaths and Leviathans on a square someone walked, colored by [players], fitted to what was explored. Null when the plugin has logged nothing to draw yet.
  */
 export const mapOf = (snapshot: Snapshot, players: Player[]): MapView | null => {
   const squareKeys = [...new Set(Object.values(snapshot.explored).flat())];
@@ -131,6 +132,16 @@ export const mapOf = (snapshot: Snapshot, players: Player[]): MapView | null => 
       y: -death.z,
       color: colorOf(players, character),
     })),
+    ...Object.entries(snapshot.leviathans)
+      .filter(([, leviathan]) => squareKeys.includes(squareKeyOf(leviathan.x, leviathan.z)))
+      .map(([id, leviathan]) => ({
+        key: `leviathan:${id}`,
+        kind: 'leviathan' as const,
+        label: 'Leviathan',
+        x: leviathan.x,
+        y: -leviathan.z,
+        color: LEVIATHAN_COLOR,
+      })),
   ];
   const xs = [
     ...land.flatMap((square) => [square.x, square.x + MAP_SQUARE_METERS]),
