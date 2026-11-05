@@ -375,6 +375,9 @@ export const MAP_CHEST_MIN_PX = 6;
 /** Biggest size of a chest mark on the map, once zoomed in, in screen pixels. */
 export const MAP_CHEST_PX = 24;
 
+/** Widest a chest's hover box gets with its margins, in screen pixels, so it can be kept inside the map. */
+export const MAP_CHEST_HOVER_PX = 246;
+
 /** Distance between chests placed side by side on the map, in chest marks, so a mark grown on hover still shows its neighbors. */
 export const MAP_CHEST_STEP = 1.15;
 

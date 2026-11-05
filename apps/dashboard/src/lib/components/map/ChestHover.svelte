@@ -33,7 +33,9 @@
     display: grid;
     gap: 2px;
     min-width: 170px;
+    max-width: 200px;
     margin: 0 10px;
+    overflow-wrap: anywhere;
     padding: 8px 12px;
     font-size: 13px;
     background: var(--panel);

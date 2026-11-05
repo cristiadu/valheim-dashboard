@@ -5,6 +5,7 @@
   import { chestSpotsOf, spotLabelOf } from '#/lib/map';
   import {
     type ChestHoverSpot,
+    MAP_CHEST_HOVER_PX,
     MAP_CHEST_MIN_PX,
     MAP_CHEST_MOVED_STEP,
     MAP_CHEST_PX,
@@ -137,12 +138,13 @@
     press = null;
   };
 
-  /** Shows the hover box of the chest with [id] beside its mark [target]. */
+  /** Shows the hover box of the chest with [id] beside its mark [target], moved over the mark when it would leave the map. */
   const showHover = (id: string, target: Element): void => {
     const mark = target.getBoundingClientRect();
     const frame = mapSvg!.getBoundingClientRect();
     const isLeftOfMark = mark.right - frame.left > frame.width / 2;
-    const left = isLeftOfMark ? frame.right - mark.left : mark.right - frame.left;
+    const fromMark = isLeftOfMark ? frame.right - mark.left : mark.right - frame.left;
+    const left = Math.max(0, Math.min(fromMark, frame.width - MAP_CHEST_HOVER_PX));
     hovered = { id, left, top: mark.top + mark.height / 2 - frame.top, isLeftOfMark };
   };
 
