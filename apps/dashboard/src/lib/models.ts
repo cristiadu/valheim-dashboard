@@ -365,6 +365,9 @@ export const MAP_MARGIN_METERS = 64;
 /** Size of a chest mark on the map when it shows all the explored land, in screen pixels. Marks grow as the map zooms in. */
 export const MAP_CHEST_SMALL_PX = 12;
 
+/** Smallest size of a chest mark on the map, when it shows much more of the world than the explored land, in screen pixels. */
+export const MAP_CHEST_MIN_PX = 6;
+
 /** Biggest size of a chest mark on the map, once zoomed in, in screen pixels. */
 export const MAP_CHEST_PX = 24;
 

@@ -8,6 +8,7 @@
   import { live, useSnapshot } from '#/lib/live.svelte';
   import { chestSpotsOf, mapOf, spotLabelOf } from '#/lib/map';
   import {
+    MAP_CHEST_MIN_PX,
     MAP_CHEST_MOVED_STEP,
     MAP_CHEST_PX,
     MAP_CHEST_SMALL_PX,
@@ -53,11 +54,11 @@
   /** What the map draws. */
   const map = $derived(mapOf(snapshot, players));
 
-  /** Part of the map in view after zooming, or null for the explored land. */
+  /** Part of the map in view after zooming, or null for the whole world. */
   let zoomBox = $state<MapBox | null>(null);
 
-  /** Part of the map in view. */
-  const box = $derived(zoomBox ?? map?.box ?? MAP_WORLD_BOX);
+  /** Part of the map in view, the whole world until the map is zoomed in. */
+  const box = $derived(zoomBox ?? MAP_WORLD_BOX);
 
   /** How many times the view zooms into the explored land, below 1 when it shows more of the world. */
   const zoom = $derived(map === null ? 1 : zoomOf(box, map.box));
@@ -72,14 +73,23 @@
   /** Meters in one screen pixel, so marks keep the same size on screen at any zoom and map shape. */
   const metersPerPixel = $derived(Math.max(box.width / mapWidthPx, box.height / mapHeightPx));
 
-  /** Size of a chest mark, in meters at this zoom: small on the whole explored land, so a base keeps its shape, and bigger zoomed in. */
-  const chestMeters = $derived(Math.min(MAP_CHEST_PX, MAP_CHEST_SMALL_PX * Math.sqrt(Math.max(zoom, 1))) * metersPerPixel);
+  /** Size of a chest mark, in meters at this zoom: small on the whole world, so a base keeps its shape, and bigger zoomed in. */
+  const chestMeters = $derived(
+    Math.min(MAP_CHEST_PX, Math.max(MAP_CHEST_MIN_PX, MAP_CHEST_SMALL_PX * Math.sqrt(zoom))) * metersPerPixel,
+  );
 
   /**
    * Where each chest's mark sits at this zoom: marks keep their size on screen, so they spread less when zoomed.
-   * None when the view shows more than the explored land, where every chest would sit in one heap.
+   * When the view shows more than the explored land, each mark stays on its real spot, as spreading them would
+   * push them far from where they stand.
    */
-  const chestSpots = $derived(map === null || zoom < 1 ? [] : chestSpotsOf(map.chests, chestMeters));
+  const chestSpots = $derived(
+    map === null
+      ? []
+      : zoom < 1
+        ? map.chests.map(({ id, x, y }) => ({ id, x, y }))
+        : chestSpotsOf(map.chests, chestMeters),
+  );
 
   /** Scale bar under the map. */
   const scaleBar = $derived(scaleBarOf(metersPerPixel));
@@ -235,8 +245,6 @@
       <div class="zoom-tools">
         <button type="button" onclick={() => zoomBy(MAP_ZOOM_STEP)} aria-label="Zoom in">+</button>
         <button type="button" onclick={() => zoomBy(1 / MAP_ZOOM_STEP)} aria-label="Zoom out" disabled={isWholeWorld}>−</button>
-        <button type="button" onclick={() => (zoomBox = null)} disabled={zoomBox === null}>Explored land</button>
-        <button type="button" onclick={() => (zoomBox = MAP_WORLD_BOX)} disabled={isWholeWorld}>Whole world</button>
       </div>
       <div class="map-frame" bind:clientWidth={mapWidthPx} bind:clientHeight={mapHeightPx}>
         <svg
