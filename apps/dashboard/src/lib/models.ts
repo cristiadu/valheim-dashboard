@@ -496,6 +496,20 @@ export type MapBox = { x: number; y: number; width: number; height: number };
 /** Where one chest's mark sits on the map, by the chest's ID. */
 export type MapChestSpot = { id: string; x: number; y: number };
 
+/**
+ * Chest under the pointer or focused, by its ID, and where its hover box sits over the map in pixels: [left] from
+ * the map's left edge, or from its right edge when the box opens to the left of the mark.
+ */
+export type ChestHoverSpot = { id: string; left: number; top: number; isLeftOfMark: boolean };
+
+/** Chest drawings in the map legend, with what each stands for. */
+export const MAP_CHEST_LEGEND: [ChestMarkKind, string][] = [
+  ['chest', 'Chest'],
+  ['treasure', 'Chest the world came with'],
+  ['cart', 'Cart'],
+  ['ship', 'Ship'],
+];
+
 /** One item across every chest on the map: how many there are in all, and in which chests. */
 export type StockRow = {
   /** Prefab the plugin logs, for example `CopperOre`. */
