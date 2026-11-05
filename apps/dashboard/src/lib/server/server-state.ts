@@ -227,6 +227,8 @@ export const createServerState = (serverUtcOffsetMinutes: number): ServerState =
     pendingSaveNumber: null,
     terrain: null,
     pieceCosts: {},
+    craftCosts: {},
+    pickedUpItemIds: new Set(),
     snapshot: {
       serverUtcOffsetMinutes,
       world: null,
@@ -270,7 +272,7 @@ export const createServerState = (serverUtcOffsetMinutes: number): ServerState =
 /**
  * Starts a new run when the server writes a new `logs.txt`. Sessions still open had no clean stop, so they
  * end at the old log's last line as a crash. History is kept, except chests and Leviathans: the new run lists
- * them again with new IDs.
+ * them again with new IDs. Item IDs start over too.
  */
 export const startNewLog = (state: ServerState): void => {
   const { snapshot } = state;
@@ -287,6 +289,7 @@ export const startNewLog = (state: ServerState): void => {
   }
   state.reader = createLogReader(snapshot.serverUtcOffsetMinutes);
   state.pendingSaveNumber = null;
+  state.pickedUpItemIds.clear();
   Object.assign(snapshot, {
     world: null,
     version: null,

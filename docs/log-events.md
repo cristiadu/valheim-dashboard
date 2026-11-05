@@ -188,7 +188,8 @@ when the plugin does not know who it was.
 | Tame named | `Pet named: Wolf Fluffy` | `^Pet named: (?<creature>\S+) (?<name>.+)$` |
 | Sign written | `Sign written: Ragnar: Keep out` | `^Sign written: (?<author>.+?): (?<text>.*)$` |
 | Item hung on an item stand, or put on an armor stand | `Item hung: TrophyDeer by Ragnar` | `^Item hung: (?<item>\S+) by (?<player>.+)$` |
-| Item picked up | `Picked up: Wood x20 by Ragnar`, or `Picked up again: Wood x20 by Ragnar` | `^Picked up(?<again> again)?: (?<item>\S+) x(?<count>\d+) by (?<player>.+)$` |
+| Item picked up | `Picked up: Wood x20 by Ragnar (item 52731986:1420)`, or `Picked up again: Wood x20 by Ragnar (item 52731986:1420)` | `^Picked up(?<again> again)?: (?<item>\S+) x(?<count>\d+) by (?<player>.+?)(?: \(item (?<id>\S+)\))?$` |
+| Item dropped | `Dropped: Wood x20 by Ragnar (item 52731986:1420)` | `^Dropped: (?<item>\S+) x(?<count>\d+) by (?<player>.+) \(item (?<id>\S+)\)$` |
 | Items put in or taken from a chest | `Stored: Wood x20 in piece_chest_wood by Ragnar` | `^(?<change>Stored\|Taken): (?<item>\S+) x(?<count>\d+) (?:in\|from) (?<chest>\S+) by (?<player>.+)$` |
 | Plant harvested | `Harvested: RaspberryBush by Ragnar` | `^Harvested: (?<plant>\S+) by (?<player>.+)$` |
 | Crop or sapling planted | `Planted: sapling_carrot by Ragnar` | `^Planted: (?<plant>\S+) by (?<player>.+)$` |
@@ -225,6 +226,7 @@ when the plugin does not know who it was.
 | Terrain file written | `Terrain written: C:\Valheim Server\terrain-Cotil.txt` | `^Terrain written: (?<path>.+)$` |
 | Item stacks file written | `Item stacks written: C:\Valheim Server\item-stacks.txt` | `^Item stacks written: (?<path>.+)$` |
 | Piece costs file written | `Piece costs written: C:\Valheim Server\piece-costs.txt` | `^Piece costs written: (?<path>.+)$` |
+| Craft costs file written | `Craft costs written: C:\Valheim Server\craft-costs.txt` | `^Craft costs written: (?<path>.+)$` |
 | Tombstone emptied | `Tombstone emptied: Ragnar by Bjorn` | `^Tombstone emptied: (?<owner>.+?) by (?<player>.+)$` |
 
 - **Chat** only reaches the server when another player is online to receive it. `said` is normal
@@ -245,7 +247,11 @@ when the plugin does not know who it was.
 - **Picked up** is only logged when that player stands within 10 meters of the item, since items left
   alone despawn, and no creature that eats off the ground stands within 3 meters of it. The game marks an
   item the first time it reaches anyone's inventory, and the mark stays through drops and chests. An item
-  with the mark is logged as **Picked up again**.
+  with the mark is logged as **Picked up again**. `item` is the object ID the item had on the ground; lines from
+  before plugin 2.15.0 have none.
+- **Dropped** is logged when an item someone carried lands on the ground, naming the player whose game made it.
+  The game starts an object's ID with the ID of the game that made it, so the dropper is exact. Items a broken
+  chest, cart or ship, or an emptied item stand, let go of are not drops. The pickup line repeats the same `item` ID.
 - **Harvested** names the player who asked to harvest, or the player whose game owns the plant.
 - **Ate** reads the food the character holds for a moment after the eat animation, which every game shows.
   Food held this way is never logged as **Gear**.
@@ -272,6 +278,8 @@ when the plugin does not know who it was.
   next to `logs.txt`, one `Wood 50` line per item.
 - **Piece costs written** follows it, when the plugin writes what building each piece takes next to `logs.txt`,
   one `wood_floor Wood x2` line per piece, crops and saplings included.
+- **Craft costs written** follows it, when the plugin writes what crafting takes next to `logs.txt`, one line per
+  item and level with how many one craft makes: `ArrowWood 1 20 Wood x8`, or `SwordBronze 2 1 Bronze x4` for an upgrade.
 
 To build it, install the .NET SDK and BepInExPack_Valheim on the server, run `dotnet build -c Release`
 in `plugins/event-log`, and copy `bin\Release\netstandard2.1\ValheimDashboard.EventLog.dll` to the

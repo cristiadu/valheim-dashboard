@@ -4,7 +4,8 @@ namespace ValheimDashboard.EventLog
 {
     /// <summary>
     /// Logs signs players write and items they hang on item stands, such as trophies, or put on armor stands. A
-    /// player's game takes over the sign or stand before changing it, so its owner is the player who did it.
+    /// player's game takes over the sign or stand before changing it, so its owner is the player who did it. A
+    /// stand that lets go of its item drops it on the ground, which is not a player's drop.
     /// </summary>
     internal static class PlacedItemTracker
     {
@@ -36,6 +37,10 @@ namespace ValheimDashboard.EventLog
                 {
                     GameEventLog.Write($"Item hung: {Names.Item(item)} by {Names.Peer(zdo.GetOwner())}");
                 }
+                if (item == 0 && StandItems.TryGetValue(zdo.m_uid, out int heldItem) && heldItem != 0)
+                {
+                    ItemTracker.NoteSpill(zdo.GetPosition());
+                }
                 StandItems[zdo.m_uid] = item;
             }
             else if (Names.Has<ArmorStand>(zdo))
@@ -64,6 +69,10 @@ namespace ValheimDashboard.EventLog
                 if (isNewItem && now[slot] != 0)
                 {
                     GameEventLog.Write($"Item hung: {Names.Item(now[slot])} by {Names.Peer(zdo.GetOwner())}");
+                }
+                if (now[slot] == 0 && before != null && before[slot] != 0)
+                {
+                    ItemTracker.NoteSpill(zdo.GetPosition());
                 }
             }
             ArmorStandItems[zdo.m_uid] = now;

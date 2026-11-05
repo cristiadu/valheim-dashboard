@@ -294,10 +294,12 @@ describe('parseMessage', () => {
   });
 
   it('reads item, chest, harvest and tombstone lines from the event log plugin', () => {
-    // GIVEN one line of each kind
+    // GIVEN one line of each kind, and pickup and drop lines with the item's ID
     const messages = [
       'Picked up: Wood x20 by Ragnar',
       'Picked up again: Wood x3 by Bjorn',
+      'Picked up again: Wood x3 by Bjorn (item 52731986:1420)',
+      'Dropped: Wood x3 by Ragnar (item 52731986:1420)',
       'Stored: Wood x20 in piece_chest_wood by Ragnar',
       'Taken: Coins x5 from piece_chest_wood by an unknown player',
       'Harvested: RaspberryBush by Ragnar',
@@ -310,8 +312,10 @@ describe('parseMessage', () => {
     // THEN each line gives its event and values
     const timeUtc = '2026-01-01T00:00:00.000Z';
     expect(events).toEqual([
-      { type: 'itemPickedUp', timeUtc, item: 'Wood', count: 20, player: 'Ragnar', isFirstPickup: true },
-      { type: 'itemPickedUp', timeUtc, item: 'Wood', count: 3, player: 'Bjorn', isFirstPickup: false },
+      { type: 'itemPickedUp', timeUtc, item: 'Wood', count: 20, player: 'Ragnar', isFirstPickup: true, itemId: null },
+      { type: 'itemPickedUp', timeUtc, item: 'Wood', count: 3, player: 'Bjorn', isFirstPickup: false, itemId: null },
+      { type: 'itemPickedUp', timeUtc, item: 'Wood', count: 3, player: 'Bjorn', isFirstPickup: false, itemId: '52731986:1420' },
+      { type: 'itemDropped', timeUtc, item: 'Wood', count: 3, player: 'Ragnar', itemId: '52731986:1420' },
       { type: 'chestChanged', timeUtc, item: 'Wood', count: 20, chest: 'piece_chest_wood', player: 'Ragnar', isStored: true },
       { type: 'chestChanged', timeUtc, item: 'Coins', count: 5, chest: 'piece_chest_wood', player: null, isStored: false },
       { type: 'harvested', timeUtc, plant: 'RaspberryBush', player: 'Ragnar' },

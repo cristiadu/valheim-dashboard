@@ -119,10 +119,17 @@ export const PET_NAMED_PATTERN = /^Pet named: (?<creature>\S+) (?<name>.+)$/;
 export const ITEM_HUNG_PATTERN = /^Item hung: (?<item>\S+) by (?<player>.+)$/;
 
 /**
- * A player picked up an item. `again` marks an item someone already carried, such as one a player dropped.
+ * A player picked up an item. `again` marks an item someone already carried, such as one a player dropped. Since
+ * plugin 2.15.0 the line ends with the object ID the item had on the ground. Written by the event log plugin.
+ */
+export const PICKED_UP_PATTERN =
+  /^Picked up(?<again> again)?: (?<item>\S+) x(?<count>\d+) by (?<player>.+?)(?: \(item (?<id>\S+)\))?$/;
+
+/**
+ * A player dropped an item they carried, with the object ID it has on the ground, which its pickup line repeats.
  * Written by the event log plugin.
  */
-export const PICKED_UP_PATTERN = /^Picked up(?<again> again)?: (?<item>\S+) x(?<count>\d+) by (?<player>.+)$/;
+export const DROPPED_PATTERN = /^Dropped: (?<item>\S+) x(?<count>\d+) by (?<player>.+) \(item (?<id>\S+)\)$/;
 
 /** A player put items in a chest or took them out. Written by the event log plugin. */
 export const CHEST_PATTERN =

@@ -4,10 +4,11 @@ using UnityEngine;
 namespace ValheimDashboard.EventLog
 {
     /// <summary>
-    /// Logs items players pick up, put in or take out of chests, and harvest, and tombstones they empty. A
+    /// Logs items players pick up, drop, put in or take out of chests, and harvest, and tombstones they empty. A
     /// player's game takes over an item, chest or tombstone before changing it, so its owner is the player who
-    /// did it. A player harvesting a plant another game owns asks that game through the server, so the server
-    /// sees who asked.
+    /// did it. An item on the ground is made by the game of the player who dropped it, and its object ID starts
+    /// with that player's ID. A player harvesting a plant another game owns asks that game through the server, so
+    /// the server sees who asked.
     /// </summary>
     internal static class ItemTracker
     {
@@ -26,6 +27,12 @@ namespace ValheimDashboard.EventLog
         /// <summary>Farthest a player stands from an item they pick up, in meters. Items left alone despawn instead.</summary>
         private const float PickupRangeMeters = 10f;
 
+        /// <summary>Farthest an item lands from the chest or item stand that let go of it, in meters.</summary>
+        private const float SpillRangeMeters = 3f;
+
+        /// <summary>How long a chest or item stand that let go of its items is remembered, in seconds, longer than a scan.</summary>
+        private const float SpillMemorySeconds = 15f;
+
         /// <summary>Width and height of the inventory chest contents are read into, larger than any chest.</summary>
         private const int ChestReadSize = 16;
 
@@ -35,6 +42,15 @@ namespace ValheimDashboard.EventLog
 
         /// <summary>Tombstones that appeared since the server started, until their contents are logged.</summary>
         private static readonly HashSet<ZDOID> NewTombstones = new HashSet<ZDOID>();
+
+        /// <summary>Items on the ground a scan saw, by object ID.</summary>
+        private static readonly HashSet<ZDOID> GroundItems = new HashSet<ZDOID>();
+
+        /// <summary>Items that appeared on the ground during the scan in progress, checked for drops once it ends.</summary>
+        private static readonly List<ZDO> NewGroundItems = new List<ZDO>();
+
+        /// <summary>Where chests and item stands let go of their items lately, with the game time in seconds.</summary>
+        private static readonly List<(Vector3 Position, float Time)> Spills = new List<(Vector3 Position, float Time)>();
 
         /// <summary>Whether each plant was harvested at the last scan, by object ID.</summary>
         private static readonly Dictionary<ZDOID, bool> PickedStates = new Dictionary<ZDOID, bool>();
@@ -69,7 +85,7 @@ namespace ValheimDashboard.EventLog
 
         /// <summary>
         /// Logs a chest whose contents changed, a plant harvested, or what a new tombstone holds, since the last
-        /// scan. [isNew] is true when the object appeared since the last scan.
+        /// scan, and notes items new on the ground. [isNew] is true when the object appeared since the last scan.
         /// </summary>
         public static void See(ZDO zdo, bool isNew)
         {
@@ -90,23 +106,53 @@ namespace ValheimDashboard.EventLog
                 }
                 PickedStates[zdo.m_uid] = isPicked;
             }
+            else if (Names.Has<ItemDrop>(zdo) && GroundItems.Add(zdo.m_uid) && isNew)
+            {
+                NewGroundItems.Add(zdo);
+            }
+        }
+
+        /// <summary>
+        /// Logs each item that appeared on the ground during the scan and was dropped by a player, after the scan,
+        /// once every chest and item stand that let go of items in it is known.
+        /// </summary>
+        public static void AfterScan()
+        {
+            Spills.RemoveAll(spill => Time.time - spill.Time > SpillMemorySeconds);
+            foreach (ZDO item in NewGroundItems)
+            {
+                LogDrop(item, LoadItem(item));
+            }
+            NewGroundItems.Clear();
+        }
+
+        /// <summary>Remembers that a chest or item stand at [position] let go of its items, so they are not logged as dropped.</summary>
+        public static void NoteSpill(Vector3 position)
+        {
+            Spills.Add((position, Time.time));
         }
 
         /// <summary>
         /// Logs an item picked up, a plant harvested away, a tombstone emptied or a chest removed, as the server
-        /// destroys it.
+        /// destroys it. An item no scan saw was dropped and picked up between two scans, so its drop is logged first.
         /// </summary>
         public static void Destroyed(ZDO zdo)
         {
             if (ChestContents.Remove(zdo.m_uid))
             {
+                NoteSpill(zdo.GetPosition());
                 GameEventLog.Write($"Chest removed: {zdo.m_uid}");
             }
             PickedStates.Remove(zdo.m_uid);
             NewTombstones.Remove(zdo.m_uid);
             if (Names.Has<ItemDrop>(zdo))
             {
-                LogPickup(zdo);
+                ItemDrop.ItemData itemData = LoadItem(zdo);
+                if (!GroundItems.Remove(zdo.m_uid))
+                {
+                    LogDrop(zdo, itemData);
+                }
+                LogPickup(zdo, itemData);
             }
             else if (Names.Has<Pickable>(zdo))
             {
@@ -243,13 +289,38 @@ namespace ValheimDashboard.EventLog
             return counts;
         }
 
+        /// <summary>Returns what the item on the ground [item] is, with its stack and whether anyone carried it before.</summary>
+        private static ItemDrop.ItemData LoadItem(ZDO item)
+        {
+            ItemDrop.ItemData itemData = new ItemDrop.ItemData();
+            ItemDrop.LoadFromZDO(itemData, item);
+            return itemData;
+        }
+
+        /// <summary>
+        /// Logs [item] as dropped by the player whose game made it, when someone carried it before. Items a chest
+        /// or item stand let go of were not in anyone's bag, so they are skipped. The line ends with the item's
+        /// object ID, which its pickup line repeats.
+        /// </summary>
+        private static void LogDrop(ZDO item, ItemDrop.ItemData itemData)
+        {
+            ZNetPeer dropper = ZNet.instance.GetPeer(item.m_uid.UserID);
+            Vector3 position = item.GetPosition();
+            bool isSpilled = Spills.Exists(spill => Vector3.Distance(spill.Position, position) <= SpillRangeMeters);
+            if (!itemData.m_pickedUp || dropper == null || isSpilled)
+            {
+                return;
+            }
+            GameEventLog.Write($"Dropped: {Names.PrefabName(item)} x{itemData.m_stack} by {dropper.m_playerName} (item {item.m_uid})");
+        }
+
         /// <summary>
         /// Logs [item] as picked up by the player whose game owns it, if that player stands next to it. An item
         /// next to a creature that eats food off the ground is skipped, since the creature may have eaten it. The
         /// game marks an item the first time it reaches anyone's inventory, so an item that was already carried,
-        /// such as one a player dropped, is logged as picked up again.
+        /// such as one a player dropped, is logged as picked up again. The line ends with the item's object ID.
         /// </summary>
-        private static void LogPickup(ZDO item)
+        private static void LogPickup(ZDO item, ItemDrop.ItemData itemData)
         {
             ZNetPeer peer = ZNet.instance.GetPeer(item.GetOwner());
             bool isPlayerNear = peer != null && Vector3.Distance(peer.GetRefPos(), item.GetPosition()) <= PickupRangeMeters;
@@ -257,10 +328,8 @@ namespace ValheimDashboard.EventLog
             {
                 return;
             }
-            ItemDrop.ItemData itemData = new ItemDrop.ItemData();
-            ItemDrop.LoadFromZDO(itemData, item);
             string pickedUp = itemData.m_pickedUp ? "Picked up again" : "Picked up";
-            GameEventLog.Write($"{pickedUp}: {Names.PrefabName(item)} x{itemData.m_stack} by {peer.m_playerName}");
+            GameEventLog.Write($"{pickedUp}: {Names.PrefabName(item)} x{itemData.m_stack} by {peer.m_playerName} (item {item.m_uid})");
         }
 
         /// <summary>Logs [plant] as harvested by the player who asked for it, or else by the player whose game owns it.</summary>

@@ -6,6 +6,7 @@ import { firstRunKey, LogHistory, readHistory } from '#/lib/server/log-history';
 import { LogTail } from '#/lib/server/log-tail';
 import { logger } from '#/lib/server/logger';
 import {
+  CRAFT_COSTS_FILE_NAME,
   HISTORY_FOLDER_NAME,
   ITEM_STACKS_FILE_NAME,
   MISSING_FILE_MS,
@@ -18,7 +19,7 @@ import {
   type Follower,
 } from '#/lib/server/models';
 import { addSavedBosses, createServerState, readLogLine, setTerrain, startNewLog } from '#/lib/server/server-state';
-import { readItemStacks, readPieceCosts } from '#/lib/server/game-data';
+import { readCraftCosts, readItemStacks, readPieceCosts } from '#/lib/server/game-data';
 import { readVitals } from '#/lib/server/player-vitals';
 import { readTerrain } from '#/lib/server/terrain';
 import { readSavedGlobalKeys } from '#/lib/server/world-save';
@@ -74,14 +75,15 @@ const readWorldTerrain = async (follower: Follower): Promise<void> => {
   }
 };
 
-/** Reads the item stacks and piece costs files the plugin writes next to the log in [folder] into [state]. */
+/** Reads the item stacks, piece costs and craft costs files the plugin writes next to the log in [folder] into [state]. */
 const loadGameData = async (state: ServerState, folder: string): Promise<void> => {
   state.snapshot.itemStacks = await readItemStacks(join(folder, ITEM_STACKS_FILE_NAME));
   state.pieceCosts = await readPieceCosts(join(folder, PIECE_COSTS_FILE_NAME));
+  state.craftCosts = await readCraftCosts(join(folder, CRAFT_COSTS_FILE_NAME));
 };
 
 /**
- * Reads the item stacks and piece costs files the plugin writes next to the log on each server start, once per run.
+ * Reads the item stacks, piece costs and craft costs files the plugin writes next to the log on each server start, once per run.
  * Missing files are reported once, since the plugin writes them a few seconds after the start.
  */
 const readGameData = async (follower: Follower): Promise<void> => {
