@@ -1,0 +1,25 @@
+11/05/2026 10:00:00: Valheim version: 1.0.21 (network version 41)
+11/05/2026 10:00:03: ZNet.LoadWorld: Cotil (Cotil), save number 1300
+11/05/2026 10:00:05: Game server connected
+11/05/2026 10:01:00: PlayFab listen socket child connected to remote player A100000000000000
+11/05/2026 10:01:00: PlayFab socket with remote ID playfab/A100000000000000 received local Platform ID Steam_76561198000000001
+11/05/2026 10:01:00: Got handshake from client playfab/A100000000000000
+11/05/2026 10:01:00: Got character ZDOID from wynnyarD : 549297300:1
+11/05/2026 10:02:00: PlayFab listen socket child connected to remote player B200000000000000
+11/05/2026 10:02:00: PlayFab socket with remote ID playfab/B200000000000000 received local Platform ID Steam_76561198000000002
+11/05/2026 10:02:00: Got handshake from client playfab/B200000000000000
+11/05/2026 10:02:00: Got character ZDOID from Yan : 549297301:1
+11/05/2026 10:03:00: Wearing: wynnyarD has ArmorBronzeChest, ArmorBronzeLegs, CapeTrollHide, HelmetBronze, SwordBronze
+11/05/2026 10:03:00: Wearing: Yan has ArmorTrollLeatherChest, ArmorTrollLeatherLegs, HelmetTrollLeather, MaceBronze
+11/05/2026 10:04:00: Picked up: Wood x50 by wynnyarD (item 549297300:101)
+11/05/2026 10:04:05: Picked up: Wood x10 by wynnyarD (item 549297300:102)
+11/05/2026 10:04:10: Picked up: Flint x20 by wynnyarD (item 549297300:103)
+11/05/2026 10:04:15: Picked up: Feathers x10 by wynnyarD (item 549297300:104)
+11/05/2026 10:05:10: Stored: SwordBronze x1 in piece_chest_wood by wynnyarD
+11/05/2026 10:06:00: Dropped: Wood x40 by wynnyarD (item 549297300:120)
+11/05/2026 10:06:05: Picked up again: Wood x40 by Yan (item 549297300:120)
+11/05/2026 10:06:05: Picked up again: Wood x40 by Yan (item 549297300:120)
+11/05/2026 10:07:00: Picked up: Stone x12 by Yan (item 549297301:130)
+11/05/2026 10:08:00: Stored: ArrowFlint x40 in piece_chest_wood by wynnyarD
+11/05/2026 10:08:00: Made: ArrowFlint x40 by wynnyarD
+11/05/2026 10:09:00: Picked up: Resin x5 by wynnyarD (item 549297300:140)

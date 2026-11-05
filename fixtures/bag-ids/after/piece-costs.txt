@@ -1,0 +1,659 @@
+ArmorStand FineWood x8, IronNails x4, LeatherScraps x2
+ArmorStand_Female FineWood x8, BronzeNails x2, Tar x4
+ArmorStand_Male FineWood x8, BronzeNails x2, Tar x4
+artisan_ext1 BlackMarble x5, Bronze x5, QueenDrop x1
+Ashlands_Arch1 Stone x3
+Ashlands_Arch2 Stone x3
+Ashlands_WallBlock_1x2x2 Stone x3
+Ashlands_WallBlock_base Stone x3
+ashwood_arch_big Blackwood x2
+ashwood_arch_bottom Blackwood x2
+ashwood_arch_top Blackwood x2
+ashwood_beam_1m Blackwood x1
+ashwood_beam_2m Blackwood x2
+ashwood_bed Blackwood x8, LoxPelt x2, AskHide x2
+ashwood_deco_floor Blackwood x4
+ashwood_decowall_2x2 Blackwood x4
+ashwood_decowall_divider Blackwood x2
+ashwood_decowall_tree Blackwood x2
+ashwood_door FlametalNew x1, Blackwood x5
+ashwood_floor_1x1 Blackwood x1
+ashwood_floor_2x2 Blackwood x2
+ashwood_halfwall_1x2 Blackwood x1
+ashwood_pole_1m Blackwood x1
+ashwood_pole_2m Blackwood x2
+ashwood_quarterwall_1x1 Blackwood x1
+ashwood_stair Blackwood x2
+ashwood_wall_2x2 Blackwood x2
+ashwood_wall_arch Blackwood x2
+ashwood_wall_beam_26 Blackwood x2
+ashwood_wall_beam_26_alt Blackwood x2
+ashwood_wall_beam_45 Blackwood x2
+ashwood_wall_beam_45_alt Blackwood x2
+ashwood_wall_beam_67 Blackwood x2
+ashwood_wall_cross_26 Blackwood x2
+ashwood_wall_cross_26_alt Blackwood x2
+ashwood_wall_cross_45 Blackwood x2
+ashwood_wall_cross_45_alt Blackwood x2
+ashwood_wall_cross_67 Blackwood x2
+ashwood_wall_roof_26 Blackwood x2
+ashwood_wall_roof_26_upsidedown Blackwood x2
+ashwood_wall_roof_45 Blackwood x2
+ashwood_wall_roof_45_upsidedown Blackwood x2
+ashwood_wall_roof_67_a Blackwood x2
+ashwood_wall_roof_67_upsidedown Blackwood x2
+BakedPoteitr BakedPoteitr x1
+bar_ancientmetal_stack Flametal x30
+bar_blackmetal_stack BlackMetal x30
+bar_bronze_stack Bronze x30
+bar_copper_stack Copper x30
+bar_flametal_stack FlametalNew x30
+bar_gold_stack Gold x30
+bar_iron_stack Iron x30
+bar_silver_stack Silver x30
+bar_tin_stack Tin x30
+BarleyWine BarleyWine x1
+BatteringRam Blackwood x20, FlametalNew x10, SurtlingCore x2
+bed Wood x8
+Beech_Sapling BeechSeeds x1
+Birch_Sapling BirchSeeds x1
+blackforge BlackMarble x10, YggdrasilWood x10, BlackCore x5
+blackforge_ext1 Iron x5, Copper x5, BlackMarble x4
+blackforge_ext2_vise Iron x5, Copper x8, MechanicalSpring x2
+blackforge_ext3_metalcutter BlackMarble x5, FlametalNew x5, Blackwood x5, CharredBone x4
+blackforge_ext4_gemcutter FlametalNew x5, Blackwood x8, MorgenSinew x2, GemstoneRed x1
+blackforge_ext5_apron Gold x5, Frostwood x8, MooseHide x2
+blackmarble_1x1 BlackMarble x2
+blackmarble_2x1x1 BlackMarble x4
+blackmarble_2x2_enforced BlackMarble x1, CopperScrap x1
+blackmarble_2x2x1 BlackMarble x6
+blackmarble_2x2x2 BlackMarble x8
+blackmarble_arch BlackMarble x5
+blackmarble_base_1 BlackMarble x5
+blackmarble_base_2 BlackMarble x1
+blackmarble_basecorner BlackMarble x6
+blackmarble_column_1 BlackMarble x2
+blackmarble_column_2 BlackMarble x4
+blackmarble_column_3 BlackMarble x1
+blackmarble_creep_4x1x1 BlackMarble x1
+blackmarble_creep_4x2x1 BlackMarble x1
+blackmarble_creep_slope_inverted_1x1x2 BlackMarble x1
+blackmarble_creep_slope_inverted_2x2x1 BlackMarble x1
+blackmarble_creep_stair BlackMarble x2
+blackmarble_floor BlackMarble x4
+blackmarble_floor_large BlackMarble x8
+blackmarble_floor_triangle BlackMarble x3
+blackmarble_head_big01 BlackMarble x1
+blackmarble_head_big02 BlackMarble x1
+blackmarble_head01 CopperScrap x2
+blackmarble_head02 CopperScrap x2
+blackmarble_out_1 BlackMarble x5
+blackmarble_out_2 BlackMarble x1
+blackmarble_outcorner BlackMarble x6
+blackmarble_pile BlackMarble x50
+blackmarble_slope_1x2 BlackMarble x1
+blackmarble_slope_inverted_1x2 BlackMarble x1
+blackmarble_stair BlackMarble x8
+blackmarble_stair_corner BlackMarble x2
+blackmarble_stair_corner_left BlackMarble x2
+blackmarble_tile_floor_1x1 BlackMarble x2
+blackmarble_tile_floor_2x2 BlackMarble x2
+blackmarble_tile_wall_1x1 BlackMarble x2
+blackmarble_tile_wall_2x2 BlackMarble x2
+blackmarble_tile_wall_2x4 BlackMarble x2
+blackmarble_tip BlackMarble x2
+BlackSoup BlackSoup x1
+blackwood_stack Blackwood x50
+blastfurnace Stone x20, SurtlingCore x5, Iron x10, FineWood x20
+BloodPudding BloodPudding x1
+Blueberries Blueberries x1
+BoarJerky BoarJerky x1
+BogWitch_Fire_Pit Stone x5, Wood x2
+bone_stack BoneFragments x50
+bonfire SurtlingCore x1, ElderBark x5, FineWood x5, RoundLog x5
+Bread Bread x1
+Candle_resin Resin x1, CandleWick x1
+Candle_resin_bogwitch Resin x1, CandleWick x1
+Carrot Carrot x1
+CarrotSoup CarrotSoup x1
+Cart Wood x20, BronzeNails x10
+Catapult Blackwood x20, FlametalNew x10, CharredCogwheel x1
+cauldron_ext1_spice Dandelion x3, Carrot x2, Mushroom x5, Thistle x3, Turnip x3
+cauldron_ext3_butchertable ElderBark x2, RoundLog x4, FineWood x4, Silver x2
+cauldron_ext4_pots Iron x5, Copper x5, BlackMetal x5, FineWood x10
+cauldron_ext5_mortarandpestle BlackMarble x8, FineWood x6, RoundLog x4
+cauldron_ext6_rollingpins Blackwood x8, FineWood x6, FlametalNew x4
+cauldron_ext7_smoker Gold x5, Frostwood x6
+charcoal_kiln Stone x20, SurtlingCore x5
+charred_shieldgenerator Stone x5, ShieldCore x1, CeramicPlate x5
+Cloudberry Cloudberry x1
+coal_pile Coal x50
+CookedAsksvinMeat CookedAsksvinMeat x1
+CookedBjornMeat CookedBjornMeat x1
+CookedBoneMawSerpentMeat CookedBoneMawSerpentMeat x1
+CookedBugMeat CookedBugMeat x1
+CookedChickenMeat CookedChickenMeat x1
+CookedDeerMeat CookedDeerMeat x1
+CookedEgg CookedEgg x1
+CookedHareMeat CookedHareMeat x1
+CookedLoxMeat CookedLoxMeat x1
+CookedMeat CookedMeat x1
+CookedMooseMeat CookedMooseMeat x1
+CookedSealBlubber CookedSealBlubber x1
+CookedVoltureMeat CookedVoltureMeat x1
+CookedWolfMeat CookedWolfMeat x1
+crystal_wall_1x1 Crystal x2
+darkwood_arch Wood x2, Tar x1
+darkwood_beam Wood x2, Tar x1
+darkwood_beam_26 Wood x2, Tar x1
+darkwood_beam_45 Wood x2, Tar x1
+darkwood_beam_67 Wood x2, Tar x1
+darkwood_beam4x4 Wood x4, Tar x1
+darkwood_decowall FineWood x2, Tar x1
+darkwood_gate Wood x16, Iron x4, Tar x2
+darkwood_pole Wood x2, Tar x1
+darkwood_pole4 Wood x4, Tar x1
+darkwood_raven FineWood x10, Tar x1
+darkwood_roof Wood x2, Tar x1
+darkwood_roof_45 Wood x2, Tar x1
+darkwood_roof_67 Wood x2, Tar x1
+darkwood_roof_icorner Wood x2, Tar x1
+darkwood_roof_icorner_45 Wood x2, Tar x1
+darkwood_roof_icorner_67 Wood x2, Tar x1
+darkwood_roof_ocorner Wood x2, Tar x1
+darkwood_roof_ocorner_45 Wood x2, Tar x1
+darkwood_roof_ocorner_67 Wood x2, Tar x1
+darkwood_roof_top Wood x2, Tar x1
+darkwood_roof_top_45 Wood x2, Tar x1
+darkwood_roof_top_67 Wood x2, Tar x1
+darkwood_wolf FineWood x10, Tar x1
+DeerStew DeerStew x1
+dverger_guardstone FineWood x5, GreydwarfEye x5, SurtlingCore x1
+dvergrprops_wood_floor Wood x2
+dvergrprops_wood_stair YggdrasilWood x4
+eitrrefinery BlackMarble x20, BlackMetal x5, YggdrasilWood x10, BlackCore x5, Sap x3
+Eyescream Eyescream x1
+FeastAshlands FeastAshlands_Material x1
+FeastBlackforest FeastBlackforest_Material x1
+FeastDeepNorth FeastDeepNorth_Material x1
+FeastMeadows FeastMeadows_Material x1
+FeastMistlands FeastMistlands_Material x1
+FeastMountains FeastMountains_Material x1
+FeastOceans FeastOceans_Material x1
+FeastPlains FeastPlains_Material x1
+FeastSwamps FeastSwamps_Material x1
+fermenter FineWood x30, Bronze x5, Resin x10
+Fiddleheadfern Fiddleheadfern x1
+FierySvinstew FierySvinstew x1
+fire_pit Stone x5, Wood x2
+fire_pit_haldor Stone x5, Wood x2
+fire_pit_hildir Stone x5, Wood x2
+fire_pit_iron Ironpit x1, Wood x1
+FirTree_big_Sapling FirConeFrost x1
+FirTree_Sapling FirCone x1
+FishAndBread FishAndBread x1
+FishCooked FishCooked x1
+FishSoup FishSoup x1
+FishWraps FishWraps x1
+flametal_gate FlametalNew x16
+flint_pile Flint x50
+forge Stone x4, Coal x4, Wood x10, Copper x6
+forge_ext1 Wood x5, DeerHide x5, Chain x4
+forge_ext2 Wood x5, Bronze x2
+forge_ext3 Wood x25, SharpeningStone x1
+forge_ext4 Iron x20, Wood x5
+forge_ext5 FineWood x25, Copper x10
+forge_ext6 Iron x15, Wood x10
+fuling_trap BlackMetal x5, BronzeNails x10, MechanicalSpring x1
+fuling_turret BlackMetal x10, YggdrasilWood x10, MechanicalSpring x3
+GlowWorm GlowWorm x1
+grausten_pile Grausten x50
+guard_stone FineWood x5, GreydwarfEye x5, SurtlingCore x1
+guard_stone_test Stone x20, SurtlingCore x5
+hearth Stone x15
+Honey Honey x1
+HoneyGlazedChicken HoneyGlazedChicken x1
+incinerator Iron x8, Copper x4, Thunderstone x1
+iron_floor_1x1 Iron x1
+iron_floor_1x1_v2 Iron x1
+iron_floor_2x2 Iron x2
+iron_grate Iron x4
+iron_wall_1x1 Iron x1
+iron_wall_1x1_rusty Iron x1
+iron_wall_2x2 Iron x2
+itemstand FineWood x4, BronzeNails x1
+itemstandh FineWood x4, BronzeNails x1
+jute_carpet JuteRed x4
+jute_carpet_blue JuteBlue x4
+Kale Kale x1
+KaleChips KaleChips x1
+Karve FineWood x30, DeerHide x10, Resin x20, BronzeNails x80
+Lingonberry Lingonberry x1
+Lingondricka Lingondricka x1
+loot_chest_stone Wood x10
+loot_chest_wood Wood x10
+loot_deepNorth_Granary Wood x10
+loot_deepNorth_TimberHall Wood x10
+LoxPie LoxPie x1
+MagicallyStuffedShroom MagicallyStuffedShroom x1
+MarinatedGreens MarinatedGreens x1
+MashedMeat MashedMeat x1
+MeadBugRepellent MeadBugRepellent x1
+MeadBzerker MeadBzerker x1
+MeadEitrLingering MeadEitrLingering x1
+MeadEitrMinor MeadEitrMinor x1
+MeadFrostResist MeadFrostResist x1
+MeadHasty MeadHasty x1
+MeadHealthLingering MeadHealthLingering x1
+MeadHealthMajor MeadHealthMajor x1
+MeadHealthMedium MeadHealthMedium x1
+MeadHealthMinor MeadHealthMinor x1
+MeadLightfoot MeadLightfoot x1
+MeadPoisonResist MeadPoisonResist x1
+MeadStaminaLingering MeadStaminaLingering x1
+MeadStaminaMedium MeadStaminaMedium x1
+MeadStaminaMinor MeadStaminaMinor x1
+MeadStrength MeadStrength x1
+MeadSwimmer MeadSwimmer x1
+MeadTamer MeadTamer x1
+MeadTasty MeadTasty x1
+MeadTrollPheromones MeadTrollPheromones x1
+MeatballsMashedPoteitr MeatballsMashedPoteitr x1
+MeatPlatter MeatPlatter x1
+metalbar_1x2 BlackMarble x1
+MinceMeatSauce MinceMeatSauce x1
+MisthareSupreme MisthareSupreme x1
+MooseKebab MooseKebab x1
+Morkhalla_ChestAncient Wood x10, Tar x2, BlackMetal x6
+Morkhalla_firepit Stone x5, Wood x2
+Morkhalla_Stonepile BlackMarble x50
+Mushroom Mushroom x1
+MushroomBzerker MushroomBzerker x1
+MushroomJotunPuffs MushroomJotunPuffs x1
+MushroomMagecap MushroomMagecap x1
+MushroomOmelette MushroomOmelette x1
+MushroomSmokePuff MushroomSmokePuff x1
+MushroomYellow MushroomYellow x1
+NeckTailGrilled NeckTailGrilled x1
+Oak_Sapling Acorn x1
+Oat Oat x1
+OatmealLingonberryJam OatmealLingonberryJam x1
+OatMilk OatMilk x1
+obsidian_pile Obsidian x50
+OLD_wood_roof Wood x2
+OLD_wood_roof_icorner Wood x2
+OLD_wood_roof_ocorner Wood x2
+OLD_wood_roof_top Wood x2
+OLD_wood_wall_roof Wood x2
+Onion Onion x1
+OnionSoup OnionSoup x1
+OvenPancake OvenPancake x1
+Pancakes Pancakes x1
+paved_road Stone x1
+piece_ArcheryTarget FineWood x4, LeatherScraps x10
+piece_artisanstation Wood x10, DragonTear x2
+piece_asksvinskeleton BoneFragments x50, AsksvinCarrionNeck x1, AsksvinCarrionPelvic x1, AsksvinCarrionRibcage x1, AsksvinCarrionSkull x1
+piece_banner01 LeatherScraps x6, FineWood x2, Coal x4
+piece_banner02 LeatherScraps x6, FineWood x2, Blueberries x4
+piece_banner03 LeatherScraps x6, FineWood x2, Raspberry x4
+piece_banner04 LeatherScraps x6, FineWood x2, Bloodbag x1
+piece_banner05 LeatherScraps x6, FineWood x2, Guck x1
+piece_banner06 LeatherScraps x6, FineWood x2, Blueberries x2, Raspberry x2, Cloudberry x1
+piece_banner07 LeatherScraps x6, FineWood x2, Blueberries x2, Cloudberry x3
+piece_banner08 LeatherScraps x6, FineWood x2, Dandelion x4, Coal x2
+piece_banner09 LeatherScraps x6, FineWood x2, Blueberries x2, Raspberry x3
+piece_banner10 LeatherScraps x6, FineWood x2, Carrot x2, Cloudberry x3
+piece_banner11 LeatherScraps x6, FineWood x2, Coal x2, Cloudberry x4
+piece_barber FineWood x10, BarberKit x1, BronzeNails x5, TrollHide x5
+piece_bathtub Wood x20, Tar x6, Iron x10, Stone x8
+piece_bed02 FineWood x40, DeerHide x7, WolfPelt x4, Feathers x10, IronNails x15
+piece_beehive Wood x10, QueenBee x1
+piece_bench_runed Frostwood x6, MooseHide x1
+piece_bench01 FineWood x6
+piece_birdnest WrithanRoots x2, Acorn x3, Thistle x5
+piece_blackmarble_bench BlackMarble x6, Copper x3
+piece_blackmarble_table BlackMarble x6, Copper x3
+piece_blackmarble_throne BlackMarble x20, ScaleHide x4, DeerHide x2, Copper x5
+piece_blackwood_bench Blackwood x6
+piece_blackwood_bench01 Blackwood x6
+piece_bone_throne CharredBone x15, FlametalNew x4, Grausten x20, Charredskull x3
+piece_brazierceiling01 Bronze x5, Coal x2, Chain x1
+piece_brazierfloor01 Bronze x5, Coal x2, WolfClaw x3
+piece_brazierfloor02 Bronze x5, GreydwarfEye x5, WolfClaw x3
+piece_cartographytable FineWood x10, BoneFragments x10, Bronze x2, LeatherScraps x5, Raspberry x4
+piece_cauldron Tin x10
+piece_CelebrationGarland FineWood x2, Dandelion x1
+piece_chair FineWood x4
+piece_chair_runed Frostwood x4, MooseSinew x1
+piece_chair02 FineWood x4
+piece_chair03 FineWood x4, Tar x1, IronNails x5, DeerHide x1
+piece_chest FineWood x10, Iron x2
+piece_chest_barrel Wood x10, BarrelRings x1
+piece_chest_blackmetal Wood x10, Tar x2, BlackMetal x6
+piece_chest_grausten Grausten x10, TrophyCharredMelee x5, FlametalNew x2
+piece_chest_private FineWood x10, Iron x8
+piece_chest_treasure Coins x99, Ruby x5, SilverNecklace x2, FineWood x8, Silver x2
+piece_chest_warderobe Frostwood x10, Tar x2, BlackMetal x6
+piece_chest_wood Wood x10
+piece_cloth_hanging_door JuteRed x4, FineWood x1
+piece_cloth_hanging_door_blue JuteBlue x4, FineWood x1
+piece_cloth_hanging_door_blue2 JuteBlue x4, FineWood x1
+piece_cookingstation Wood x2
+piece_cookingstation_iron Iron x3, Chain x3
+piece_drawbridge FlametalNew x2, Gold x2, Frostwood x24
+piece_drawbridge_log Silver x2, TrophyWolf x2, RoundLog x10
+piece_dvergr_lantern Copper x2, Lantern x1, Chain x1
+piece_dvergr_lantern_pole Copper x3, Lantern x1, Chain x1
+piece_dvergr_metal_wall_2x2 Copper x2
+piece_dvergr_pole YggdrasilWood x4, Copper x2
+piece_dvergr_sharpstakes YggdrasilWood x5, Iron x2
+piece_dvergr_spiralstair YggdrasilWood x5, Copper x2
+piece_dvergr_spiralstair_right YggdrasilWood x5, Copper x2
+piece_dvergr_stake_wall YggdrasilWood x8, Iron x8
+piece_dvergr_wood_door YggdrasilWood x8, Copper x8
+piece_dvergr_wood_wall YggdrasilWood x20, Copper x10
+piece_EternalPyre Stone x10, FaderDrop x1
+piece_FaderEmbers Stone x10, FaderDrop x1
+piece_FairylightGarland FineWood x2, Thistle x1
+Piece_flametal_beam FlametalNew x2
+Piece_flametal_pillar FlametalNew x2
+piece_FrostFoundry Iron x15, Stone x20, FrostCore x10
+piece_FrostKiln Stone x20, FrostCore x10, Ice x5
+piece_gift1 FineWood x2, BoneFragments x1
+piece_gift2 FineWood x3, Dandelion x1
+piece_gift3 FineWood x4, Raspberry x1
+Piece_grausten_floor_1x1 Grausten x2
+Piece_grausten_floor_2x2 Grausten x4
+Piece_grausten_floor_4x4 Grausten x8
+Piece_grausten_pillar_arch Grausten x4
+Piece_grausten_pillar_arch_small Grausten x2
+Piece_grausten_pillarbase_medium Grausten x3
+Piece_grausten_pillarbase_small Grausten x1
+Piece_grausten_pillarbase_tapered Grausten x5
+Piece_grausten_pillarbase_tapered_inverted Grausten x5
+Piece_grausten_pillarbeam_medium Grausten x3
+Piece_grausten_pillarbeam_small Grausten x1
+piece_grausten_roof_45 Grausten x5
+piece_grausten_roof_45_arch Grausten x5
+piece_grausten_roof_45_arch_corner Grausten x5
+piece_grausten_roof_45_arch_corner2 Grausten x5
+piece_grausten_roof_45_corner Grausten x5
+piece_grausten_roof_45_corner2 Grausten x5
+Piece_grausten_stone_ladder Grausten x5
+piece_grausten_stonestair Grausten x8
+Piece_grausten_wall_1x2 Grausten x4
+Piece_grausten_wall_2x2 Grausten x6
+Piece_grausten_wall_4x2 Grausten x12
+Piece_grausten_wall_arch Grausten x2
+Piece_grausten_wall_arch_inverted Grausten x2
+Piece_grausten_window_2x2 Grausten x4
+Piece_grausten_window_4x2 Grausten x10
+piece_groundtorch Iron x2, Resin x2
+piece_groundtorch_blue Iron x2, GreydwarfEye x2
+piece_groundtorch_green Iron x2, Guck x2
+piece_groundtorch_mist YggdrasilWood x1, Wisp x1
+piece_groundtorch_wood Wood x2, Resin x2
+piece_hexagonal_door YggdrasilWood x8, Copper x8
+piece_hoodedlantern Frostwood x3, GlowWorm x1
+piece_icecube Ice x2
+piece_jackoturnip Turnip x4, Resin x2
+piece_Lavalantern FlametalNew x1, ProustitePowder x1, SulfurStone x1
+piece_logbench01 RoundLog x2
+piece_magetable YggdrasilWood x20, BlackMetal x10, BlackCore x5, Eitr x5
+piece_magetable_ext BlackMarble x10, YggdrasilWood x5, Eitr x10
+piece_magetable_ext2 BlackMarble x10, TrophySkeleton x3, Eitr x10, Resin x15
+piece_magetable_ext3 CelestialFeather x8, TrophyAsksvin x1, Eitr x10, Blackwood x3
+piece_magetable_ext4 Frostwood x5, NornThread x10
+piece_maypole Wood x10, Dandelion x4, Thistle x4
+piece_MeadCauldron Tin x4, Copper x6, LeatherScraps x2
+piece_mistletoe FineWood x1, JuteRed x1
+piece_moose_throne Frostwood x15, TrophyMoose x1, MooseHide x5
+piece_oven Iron x15, Stone x20, SurtlingCore x4
+piece_pot1 Pot_Shard_Green x4, CharcoalResin x1
+piece_pot1_cracked Pot_Shard_Green x4, CharcoalResin x1
+piece_pot1_red Pot_Shard_Red x4, CharcoalResin x1
+piece_pot2 Pot_Shard_Green x5, CharcoalResin x1
+piece_pot2_cracked Pot_Shard_Green x5, CharcoalResin x1
+piece_pot2_red Pot_Shard_Red x5, CharcoalResin x1
+piece_pot3 Pot_Shard_Green x3, CharcoalResin x1
+piece_pot3_cracked Pot_Shard_Green x3, CharcoalResin x1
+piece_pot3_red Pot_Shard_Red x3, CharcoalResin x1
+piece_preptable Iron x5, FineWood x20, LeatherScraps x15
+piece_sapcollector YggdrasilWood x10, BlackMetal x5, DvergrNeedle x1
+piece_sharpstakes Wood x6, RoundLog x4
+piece_shieldgenerator Iron x5, Copper x5, ShieldCore x1
+piece_snowlantern Snowball x8
+piece_spinningwheel FineWood x20, IronNails x10, LeatherScraps x5
+piece_stakewall_blackwood Blackwood x6
+piece_stonecutter Wood x10, Iron x2, Stone x4
+piece_table FineWood x6
+piece_table_oak FineWood x20, Tar x2, IronNails x20
+piece_table_round FineWood x10, Tar x2, IronNails x20
+piece_table_runed Frostwood x20, Tar x2, IronNails x20
+piece_table_runed_small Frostwood x6, Tar x1, IronNails x6
+piece_throne01 FineWood x20, IronNails x10
+piece_throne02 Stone x20, DeerHide x2, WolfPelt x2
+piece_TrainingDummy FineWood x5, BronzeNails x10, Ectoplasm x5
+piece_trap_troll BlackMetal x5, BronzeNails x10, MechanicalSpring x1
+piece_turret BlackMetal x10, YggdrasilWood x10, MechanicalSpring x3
+piece_walltorch Wood x2, Copper x2, Resin x2
+piece_wisplure Stone x10, YagluthDrop x1
+piece_workbench Wood x10
+piece_workbench_ext1 Wood x10, Flint x10
+piece_workbench_ext2 Wood x10, Flint x15, LeatherScraps x20, DeerHide x5
+piece_workbench_ext3 FineWood x10, Bronze x3
+piece_workbench_ext4 Iron x4, FineWood x10, Obsidian x4
+piece_xmascrown PineCone x4, JuteRed x1, FineWood x1
+piece_xmasgarland FineWood x2, PineCone x1
+piece_xmastree Wood x10, FirCone x1
+PineTree_Sapling PineCone x1
+PiquantPie PiquantPie x1
+placeable_bigrock_01 Stone x25
+placeable_bigrock_02 Stone x10
+Placeable_HardRock StoneRock x1, Coal x1
+Placeable_Stone Stone x1
+portal GreydwarfEye x6, Stone x4
+portal_stone GreydwarfEye x10, Grausten x30, MoltenCore x2
+portal_wood GreydwarfEye x10, FineWood x20, SurtlingCore x2
+Poteitr Poteitr x1
+Pukeberries Pukeberries x1
+PulledBear PulledBear x1
+QueensJam QueensJam x1
+Raft Wood x20, LeatherScraps x6, Resin x6
+raise Stone x4
+Raspberry Raspberry x1
+RoastedCrustPie RoastedCrustPie x1
+RottenMeat RottenMeat x1
+RoyalJelly RoyalJelly x1
+rug_asksvin AskHide x4
+rug_Bjorn BjornHide x1, BjornPaw x2, TrophyBjorn x1
+rug_deer DeerHide x4
+rug_fur LoxPelt x4
+rug_hare ScaleHide x4
+rug_moose MooseHide x4
+rug_seal SealHide x4
+rug_straw Barley x1, Flax x1
+rug_wolf WolfPelt x4
+Salad Salad x1
+sapling_barley Barley x1
+sapling_carrot CarrotSeeds x1
+sapling_flax Flax x1
+sapling_jotunpuffs MushroomJotunPuffs x1
+sapling_Kale KaleSeeds x1
+sapling_magecap MushroomMagecap x1
+sapling_oat OatSeeds x1
+sapling_onion OnionSeeds x1
+sapling_poteitr PoteitrSeeds x1
+sapling_seedcarrot Carrot x1
+sapling_seedkale KaleSeeds x1
+sapling_seedonion Onion x1
+sapling_seedturnip Turnip x1
+sapling_turnip TurnipSeeds x1
+Sausages Sausages x1
+scale_halfwall_1x2 Frostwood x1
+scale_quarterwall_1x1 Frostwood x1
+scale_wall_2x2 Frostwood x2
+scale_wall_roof_26 Frostwood x2
+scale_wall_roof_26_flipped Frostwood x2
+scale_wall_roof_26_upsidedown Frostwood x2
+scale_wall_roof_26_upsidedown_flipped Frostwood x2
+scale_wall_roof_45 Frostwood x2
+scale_wall_roof_45_flipped Frostwood x2
+scale_wall_roof_45_upsidedown Frostwood x2
+scale_wall_roof_45_upsidedown_flipped Frostwood x2
+scale_wall_roof_67 Frostwood x2
+scale_wall_roof_67_flipped Frostwood x2
+scale_wall_roof_67_upsidedown Frostwood x2
+scale_wall_roof_67_upsidedown_flipped Frostwood x2
+ScorchingMedley ScorchingMedley x1
+SealSoup SealSoup x1
+SeekerAspic SeekerAspic x1
+SerpentMeatCooked SerpentMeatCooked x1
+SerpentStew SerpentStew x1
+ship_construction Wood x20, DeerHide x4
+ShocklateSmoothie ShocklateSmoothie x1
+siege_wall_1x1 Stone x3
+sign Wood x2, Coal x1
+sign_notext Wood x2, Coal x1
+SizzlingBerryBroth SizzlingBerryBroth x1
+skull_pile Charredskull x50
+Sled Wood x20, BronzeNails x10
+smelter Stone x20, SurtlingCore x5
+SmokedFish SmokedFish x1
+SmokedMooseMeat SmokedMooseMeat x1
+SparklingShroomshake SparklingShroomshake x1
+SpicyMarmalade SpicyMarmalade x1
+stake_wall Wood x4
+stave_beam_26 Frostwood x2
+stave_beam_2m Frostwood x2
+stave_beam_45 Frostwood x2
+stave_beam_4m Frostwood x4
+stave_beam_67 Frostwood x2
+stave_deco_beam_26 Frostwood x2
+stave_deco_beam_2m Frostwood x2
+stave_deco_beam_45 Frostwood x2
+stave_deco_beam_67 Frostwood x2
+stave_deco_pole_2m Frostwood x2
+stave_deco_wall_2x2 Frostwood x4
+stave_gate Frostwood x24, Gold x4
+stave_pole_2m Frostwood x2
+stave_pole_4m Frostwood x4
+stave_wall_2x2 Frostwood x4
+stave_wall_cross_26 Frostwood x2
+stave_wall_cross_45 Frostwood x2
+stave_wall_cross_67 Frostwood x2
+stone_arch Stone x4
+stone_fence Stone x4
+stone_floor Stone x8
+stone_floor_2x2 Stone x6
+stone_pile Stone x50
+stone_pillar Stone x5
+stone_stair Stone x8
+stone_wall_1x1 Stone x3
+stone_wall_2x1 Stone x4
+stone_wall_4x2 Stone x6
+Trailership IronNails x80, DeerHide x10, FineWood x40, ElderBark x40
+treasure_pile Coins x999
+treasure_stack Coins x99
+TreasureChest_ashland_stone Stone x10
+TreasureChest_blackforest Wood x10
+TreasureChest_charredfortress CharredBone x10
+TreasureChest_deepnorth_village Wood x10
+TreasureChest_dvergr_loose_stone Stone x10
+TreasureChest_dvergrtower Wood x10
+TreasureChest_dvergrtown Wood x10
+TreasureChest_fCrypt Stone x10
+TreasureChest_forestcrypt Stone x10
+TreasureChest_forestcrypt_hildir Wood x10
+TreasureChest_heath Wood x10
+TreasureChest_heath_hildir Wood x10
+TreasureChest_meadows Wood x10
+TreasureChest_meadows_01 Wood x10
+TreasureChest_meadows_02 Wood x10
+TreasureChest_meadows_buried Wood x10
+TreasureChest_meadows_combat Wood x10
+TreasureChest_memorial_buried Wood x10
+TreasureChest_morkhalla Wood x10
+TreasureChest_mountaincave Stone x10
+TreasureChest_mountaincave_hildir Wood x10
+TreasureChest_mountains Wood x10
+TreasureChest_plains_stone Stone x10
+TreasureChest_plainsfortress_hildir Wood x10
+TreasureChest_sunkencrypt Stone x10
+TreasureChest_swamp Wood x10
+TreasureChest_trollcave Stone x10
+turf_roof Wood x2
+turf_roof_top Wood x2
+turf_roof_wall Wood x2
+TurnipStew TurnipStew x1
+VikingCupcake VikingCupcake x1
+VikingShip IronNails x100, DeerHide x10, FineWood x40, ElderBark x40
+VikingShip_Ashlands IronNails x100, CeramicPlate x30, FineWood x50, YggdrasilWood x25
+VineAsh_sapling VineberrySeeds x1
+Vineberry Vineberry x1
+VineGreen_sapling VineGreenSeeds x1
+windmill Stone x20, Wood x30, IronNails x30
+WolfJerky WolfJerky x1
+WolfMeatSkewer WolfMeatSkewer x1
+wood_beam Wood x2
+wood_beam_1 Wood x1
+wood_beam_26 Wood x2
+wood_beam_45 Wood x2
+wood_beam_67 Wood x2
+wood_core_stack RoundLog x50
+wood_door Wood x4
+wood_dragon1 FineWood x10
+wood_fence Wood x1
+wood_fence_gate Wood x4
+wood_fine_stack FineWood x50
+wood_floor Wood x2
+wood_floor_1x1 Wood x1
+wood_frost_stack Frostwood x50
+wood_gate Wood x12
+wood_ledge Wood x1
+wood_log_26 RoundLog x2
+wood_log_45 RoundLog x2
+wood_log_67 RoundLog x2
+wood_pole Wood x1
+wood_pole_log RoundLog x1
+wood_pole_log_4 RoundLog x2
+wood_pole_log_4_worn RoundLog x2
+wood_pole2 Wood x2
+wood_roof Wood x2
+wood_roof_45 Wood x2
+wood_roof_67 Wood x2
+wood_roof_icorner Wood x2
+wood_roof_icorner_45 Wood x2
+wood_roof_icorner_67 Wood x2
+wood_roof_ocorner Wood x2
+wood_roof_ocorner_45 Wood x2
+wood_roof_ocorner_67 Wood x2
+wood_roof_top Wood x2
+wood_roof_top_45 Wood x2
+wood_roof_top_67 Wood x2
+wood_stack Wood x50
+wood_stair Wood x2
+wood_stepladder Wood x2
+wood_wall_half Wood x1
+wood_wall_log RoundLog x1
+wood_wall_log_4x0.5 RoundLog x2
+wood_wall_quarter Wood x1
+wood_wall_roof Wood x2
+wood_wall_roof_45 Wood x2
+wood_wall_roof_45_upsidedown Wood x2
+wood_wall_roof_67_a Wood x2
+wood_wall_roof_67_upsidedown Wood x2
+wood_wall_roof_a Wood x2
+wood_wall_roof_top Wood x2
+wood_wall_roof_top_45 Wood x2
+wood_wall_roof_top_67 Wood x2
+wood_wall_roof_upsidedown Wood x2
+wood_window Wood x4, BronzeNails x2
+wood_yggdrasil_stack YggdrasilWood x50
+woodiron_beam Wood x2, Iron x1
+woodiron_beam_26 Wood x2, Iron x1
+woodiron_beam_45 Wood x2, Iron x1
+woodiron_beam_67 Wood x2, Iron x1
+woodiron_pole Wood x2, Iron x1
+woodwall Wood x2
+YggdrasilPorridge YggdrasilPorridge x1

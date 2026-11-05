@@ -1,0 +1,2 @@
+ArrowFlint 1 20 Wood x8, Flint x2, Feathers x2
+ArrowWood 1 20 Wood x8
