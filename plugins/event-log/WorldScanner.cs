@@ -59,6 +59,7 @@ namespace ValheimDashboard.EventLog
                 CreatureTracker.See(zdo, isNew);
                 PlacedItemTracker.See(zdo, isNew);
                 ItemTracker.See(zdo, isNew);
+                ChestLabelTracker.See(zdo);
                 WorkTracker.See(zdo);
                 KitchenTracker.See(zdo);
                 ShipTracker.See(zdo);
@@ -79,6 +80,7 @@ namespace ValheimDashboard.EventLog
             PlayerTracker.AfterScan();
             ItemTracker.AfterScan();
             CraftedItemTracker.AfterScan();
+            ChestLabelTracker.AfterScan();
             TerrainMap.WriteOnce();
             GameDataFiles.WriteOnce();
             CombatTracker.ForgetOldMoves();
@@ -97,6 +99,7 @@ namespace ValheimDashboard.EventLog
             SeenObjects.Remove(uid);
             PlayerTracker.Forget(uid);
             PlacedItemTracker.Destroyed(uid);
+            ChestLabelTracker.Forget(uid);
             KitchenTracker.Forget(uid);
             ShipTracker.Forget(uid);
             LeviathanTracker.Forget(uid);

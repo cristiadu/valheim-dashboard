@@ -196,6 +196,12 @@ export const CHEST_CONTENTS_PATTERN =
 /** A chest, cart or ship was destroyed. Written by the event log plugin. */
 export const CHEST_REMOVED_PATTERN = /^Chest removed: (?<id>\S+)$/;
 
+/** Text of the sign put right against a chest, which names that chest. Written by the event log plugin. */
+export const CHEST_LABEL_PATTERN = /^Chest label: (?<id>\S+) (?<label>.+)$/;
+
+/** The sign that named a chest is gone or blank now. Written by the event log plugin. */
+export const CHEST_UNLABELED_PATTERN = /^Chest unlabeled: (?<id>\S+)$/;
+
 /** Where a Leviathan is, with the ID the server gives it until it stops. Written by the event log plugin. */
 export const LEVIATHAN_PATTERN = /^Leviathan: (?<id>\S+) at (?<x>-?\d+) (?<z>-?\d+)$/;
 

@@ -1,7 +1,7 @@
 <script lang="ts">
   import ChestHover from '#/lib/components/map/ChestHover';
   import MapIcons from '#/lib/components/map/MapIcons';
-  import { chestName } from '#/lib/items';
+  import { chestTitle } from '#/lib/items';
   import { chestSpotsOf, spotLabelOf } from '#/lib/map';
   import {
     type ChestHoverSpot,
@@ -205,7 +205,7 @@
         transform="translate({spot.x} {spot.y}) scale({chestMeters})"
         role="button"
         tabindex="0"
-        aria-label={chestName(chest.record.chest)}
+        aria-label={chestTitle(chest.record)}
         onclick={() => onpick(spot.id)}
         onkeydown={(event) => (event.key === 'Enter' ? onpick(spot.id) : undefined)}
         onpointerenter={(event) => showHover(spot.id, event.currentTarget)}

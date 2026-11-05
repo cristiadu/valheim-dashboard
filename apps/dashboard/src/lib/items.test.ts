@@ -4,6 +4,7 @@ import {
   builtByLabel,
   builtByShortLabel,
   chestName,
+  chestTitle,
   containerGrid,
   itemName,
   itemSlots,
@@ -68,6 +69,19 @@ describe('itemTotal', () => {
 
     // THEN the first holds 27 and the empty one none
     expect(totals).toEqual([27, 0]);
+  });
+});
+
+describe('chestTitle', () => {
+  it('calls a chest by the text of its sign, or by its name when it has none', () => {
+    // GIVEN a wood chest with a sign and one without
+    const chest = { chest: 'piece_chest_wood', x: 0, z: 0, builder: 'Ragnar', items: {}, timeUtc: '2026-10-29T11:00:00.000Z' };
+
+    // WHEN each is titled
+    const titles = [chestTitle({ ...chest, label: 'Ores' }), chestTitle(chest)];
+
+    // THEN the signed one goes by its sign and the other by its name
+    expect(titles).toEqual(['Ores', 'Wood chest']);
   });
 });
 

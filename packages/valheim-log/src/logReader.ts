@@ -8,8 +8,10 @@ import {
   BOSS_SUMMONED_PATTERN,
   CHAT_PATTERN,
   CHEST_CONTENTS_PATTERN,
+  CHEST_LABEL_PATTERN,
   CHEST_PATTERN,
   CHEST_REMOVED_PATTERN,
+  CHEST_UNLABELED_PATTERN,
   CREATURE_KILLED_PATTERN,
   DAY_STARTED_PATTERN,
   DEATH_DETAILS_PATTERN,
@@ -475,6 +477,14 @@ const MATCHERS: readonly Matcher[] = [
   {
     pattern: CHEST_REMOVED_PATTERN,
     toEvent: (groups, timeUtc) => ({ type: 'chestRemoved', timeUtc, id: groups.id! }),
+  },
+  {
+    pattern: CHEST_LABEL_PATTERN,
+    toEvent: (groups, timeUtc) => ({ type: 'chestLabeled', timeUtc, id: groups.id!, label: groups.label! }),
+  },
+  {
+    pattern: CHEST_UNLABELED_PATTERN,
+    toEvent: (groups, timeUtc) => ({ type: 'chestUnlabeled', timeUtc, id: groups.id! }),
   },
   {
     pattern: LEVIATHAN_PATTERN,

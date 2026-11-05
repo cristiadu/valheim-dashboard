@@ -350,6 +350,8 @@ export type ChestRecord = MapPoint & {
   builder: string | null;
   /** How many of each item it holds, by item name, for example `{ Wood: 20 }`. */
   items: Record<string, number>;
+  /** Text of the sign put right against it, for example `Ores`, when it has one. */
+  label?: string;
 };
 
 /** Everything a character carried when they died, as their tombstone held it, and where they died. */
