@@ -581,7 +581,7 @@ export const ACTIVITY_WORDS: Record<Exclude<ActivityKind, 'destroyed'>, { verb: 
   smelted: { verb: 'put', one: 'item', many: 'items', ending: ' into smelters and kilns' },
   cooked: { verb: 'started cooking', one: 'thing', many: 'things', ending: '' },
   brewed: { verb: 'started brewing', one: 'mead', many: 'meads', ending: '' },
-  sailed: { verb: 'steered', one: 'ship', many: 'ships', ending: '' },
+  sailed: { verb: 'took the helm', one: 'time', many: 'times', ending: '' },
   crafted: { verb: 'worked at', one: 'crafting station', many: 'crafting stations', ending: '' },
   emoted: { verb: 'did', one: 'emote', many: 'emotes', ending: '' },
   made: { verb: 'made', one: 'item', many: 'items', ending: '' },
