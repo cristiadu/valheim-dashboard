@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { MS_PER_HOUR } from '#/lib/models';
-import { playersOf, sessionEndMs } from '#/lib/players';
+import { playersOf, playerStats, sessionEndMs } from '#/lib/players';
 import { sessionWith, snapshotWith, TEST_NOON_MS } from '#/lib/test-common';
 
 describe('playersOf', () => {
@@ -74,5 +74,35 @@ describe('playersOf', () => {
     // THEN the player is offline, last seen at the last log line, and the quiet time is not counted
     expect(player).toMatchObject({ isOnline: false, lastSeenUtc: '2026-10-29T11:40:00.000Z' });
     expect(sessionEndMs(snapshot.sessions[0]!, snapshot, TEST_NOON_MS)).toBe(Date.parse('2026-10-29T11:40:00.000Z'));
+  });
+});
+
+describe('playerStats', () => {
+  it('lists the fixed numbers, the activities done at least once and the land explored', () => {
+    // GIVEN Ragnar online for over 2 hours with one death line, 4 pieces built, no gathering and 10 squares of 32 m walked
+    const deathLine = { timeUtc: '2026-10-29T10:00:00.000Z', line: 'Got character ZDOID from Ragnar : 0:0', kind: 'died' as const };
+    const snapshot = snapshotWith({
+      lastLineUtc: '2026-10-29T11:59:00.000Z',
+      sessions: [sessionWith({ deaths: 1 })],
+      sources: { 'deaths:Ragnar': { total: 1, lines: [deathLine] } },
+      activityTotals: { Ragnar: { built: 4, gathered: 0 } },
+      explored: { Ragnar: Array.from({ length: 10 }, (_, column) => `${column},0`) },
+    });
+    const [player] = playersOf(snapshot, TEST_NOON_MS);
+
+    // WHEN the card's numbers are made
+    const stats = playerStats(snapshot, player!);
+
+    // THEN gathering is left out, deaths keep their line, and land explored has none, as it links to the map
+    expect(stats.map(({ label, value, kind }) => ({ label, value, kind }))).toEqual([
+      { label: 'Time played', value: '2h 16m', kind: 'night' },
+      { label: 'Visits', value: '1', kind: 'joined' },
+      { label: 'Deaths', value: '1', kind: 'died' },
+      { label: 'Kills', value: '0', kind: 'fight' },
+      { label: 'Pieces built', value: '4', kind: 'built' },
+      { label: 'Land explored', value: '0.01 km²', kind: 'travel' },
+    ]);
+    expect(stats[2]!.source).toEqual({ total: 1, lines: [deathLine] });
+    expect(stats.at(-1)!.source).toBeNull();
   });
 });
