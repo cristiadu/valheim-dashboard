@@ -214,8 +214,8 @@ hand". Until a character's first `Wearing:` line, the newest piece seen of each 
 
 ```mermaid
 flowchart LR
-  wiki[Valheim wiki] -->|on start, missing icons only| icons["item-icons folder next to logs.txt"]
-  icons -->|/icons/flint-spear.png| pages[Recipes and Vikings tabs]
+  wiki[Valheim wiki] -->|on start: named items; later: any item a page asks for| icons["item-icons folder next to logs.txt"]
+  icons -->|/icons/flint-spear.png| pages[Every tab with item icons]
 ```
 
 Each Vikings card also shows health, max health, stamina and eitr. The game keeps these on the player's world
@@ -237,7 +237,8 @@ flowchart LR
 The file only lists players online. Players who left keep the numbers from when they were last seen, until the
 dashboard restarts. Skill levels never reach the server, so Vikings cannot show them.
 
-Icons are downloaded for every recipe item and every piece of gear the dashboard knows by name.
+Icons for every recipe item and named piece of gear download on start. Any other item, such as one only
+`item-stacks.txt` lists, downloads the first time a page shows it. The wiki is asked once per item per run.
 
 ## Where a number comes from
 
@@ -368,7 +369,7 @@ really is. Zoom in to see it up close.
 Every chest has its own mark. Marks are small on the whole world and grow as the map zooms in. Once the view
 is no wider than the explored land, chests that would cover each other sit side by side. Pointing at a chest shows a box with its name, who built it and how many slots are full. Tapping one opens it as the
 game's slot grid, and pointing at a slot shows the item's name and count. Item names and icons come from the item's prefab, through
-`GEAR_NAMES` and `ITEM_NAMES`, and every name listed there gets its icon downloaded. An item the wiki has no icon
+`GEAR_NAMES` and `ITEM_NAMES`, or the prefab split into words. An item the wiki has no icon
 for shows a plain sack.
 
 BepInEx's own log file is turned off, so its messages land in
