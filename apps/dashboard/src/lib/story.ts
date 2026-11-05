@@ -10,6 +10,7 @@ import {
   DAY_MS,
   DEATH_DETAILS_WINDOW_MS,
   DUNGEON_AREA,
+  MS_PER_MINUTE,
   type Snapshot,
   type SourceLines,
   type StoryEvent,
@@ -18,6 +19,7 @@ import {
   type StoryText,
 } from '#/lib/models';
 import { mergedSource, sourceKey } from '#/lib/sources';
+import { durationLabel } from '#/lib/status';
 
 /** Returns `1 death` or `2 deaths` style text. */
 export const count = (amount: number, one: string, many: string): string => `${amount} ${amount === 1 ? one : many}`;
@@ -56,8 +58,8 @@ export const thingList = (things: Record<string, number>): string =>
 
 /**
  * Story line for one stretch of activity, such as building or kills. Skill levels have no list, since the server
- * never learns which skill. Steering names the ships without a count, since the log can't tell two ships
- * of the same kind apart.
+ * never learns which skill. Steering names the ships and how long the stretch lasted, from the first time a player
+ * took the wheel to the last, since the log can't tell two ships of the same kind apart.
  */
 const activityItem = (activity: ActivityRecord): StoryText => {
   const total = activityTotal(activity);
@@ -78,8 +80,9 @@ const activityItem = (activity: ActivityRecord): StoryText => {
   }
   if (activity.kind === 'sailed') {
     const ships = Object.keys(activity.things).map(thingName).join(' and the ');
-    const times = count(total, words.one, words.many);
-    return { timeUtc, kind, text: `${activity.player ?? 'Someone'} ${words.verb} the ${ships} ${times}` };
+    const steeredMs = Date.parse(activity.endUtc) - Date.parse(activity.startUtc);
+    const time = steeredMs < MS_PER_MINUTE ? '' : ` for ${durationLabel(steeredMs)}`;
+    return { timeUtc, kind, text: `${activity.player ?? 'Someone'} ${words.verb} the ${ships}${time}` };
   }
   return { timeUtc, kind, text: `${sentence}: ${thingList(activity.things)}` };
 };
