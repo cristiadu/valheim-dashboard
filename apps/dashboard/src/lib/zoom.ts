@@ -3,6 +3,7 @@ import {
   MAP_SCALE_BAR_PX,
   MAP_SCALE_STEPS_METERS,
   type MapBox,
+  MAP_WORLD_BOX,
   METERS_PER_KM,
 } from '#/lib/models';
 
@@ -46,4 +47,14 @@ export const scaleBarOf = (metersPerPixel: number): { px: number; label: string 
   const meters = MAP_SCALE_STEPS_METERS.findLast((step) => step <= target) ?? MAP_SCALE_STEPS_METERS[0]!;
   const label = meters >= METERS_PER_KM ? `${meters / METERS_PER_KM} km` : `${meters} m`;
   return { px: meters / metersPerPixel, label };
+};
+
+/**
+ * Returns a square around the middle of [box], as wide as its longest side, kept inside the whole world. The map
+ * opens on it, so zooming out keeps the world's square shape until it shows the whole world.
+ */
+export const squareBoxOf = (box: MapBox): MapBox => {
+  const side = Math.min(Math.max(box.width, box.height), MAP_WORLD_BOX.width);
+  const square = { x: box.x + (box.width - side) / 2, y: box.y + (box.height - side) / 2, width: side, height: side };
+  return keptInside(square, MAP_WORLD_BOX);
 };

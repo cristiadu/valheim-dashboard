@@ -26,7 +26,7 @@
   import { playersOf } from '#/lib/players';
   import { viewerTimeZone, whenLabel } from '#/lib/status';
   import { count } from '#/lib/story';
-  import { pannedBox, scaleBarOf, zoomedBox, zoomOf } from '#/lib/zoom';
+  import { pannedBox, scaleBarOf, squareBoxOf, zoomedBox, zoomOf } from '#/lib/zoom';
 
   /** Getter for the snapshot the layout shares. */
   const getSnapshot = useSnapshot();
@@ -54,11 +54,11 @@
   /** What the map draws. */
   const map = $derived(mapOf(snapshot, players));
 
-  /** Part of the map in view after zooming, or null for the whole world. */
+  /** Part of the map in view after zooming or moving, or null before the viewer touched it. */
   let zoomBox = $state<MapBox | null>(null);
 
-  /** Part of the map in view, the whole world until the map is zoomed in. */
-  const box = $derived(zoomBox ?? MAP_WORLD_BOX);
+  /** Part of the map in view: the explored land until the viewer zooms or moves, out to the whole world at most. */
+  const box = $derived(zoomBox ?? (map === null ? MAP_WORLD_BOX : squareBoxOf(map.box)));
 
   /** How many times the view zooms into the explored land, below 1 when it shows more of the world. */
   const zoom = $derived(map === null ? 1 : zoomOf(box, map.box));
@@ -73,7 +73,7 @@
   /** Meters in one screen pixel, so marks keep the same size on screen at any zoom and map shape. */
   const metersPerPixel = $derived(Math.max(box.width / mapWidthPx, box.height / mapHeightPx));
 
-  /** Size of a chest mark, in meters at this zoom: small on the whole world, so a base keeps its shape, and bigger zoomed in. */
+  /** Size of a chest mark, in meters at this zoom: small zoomed out, so a base keeps its shape, and bigger zoomed in. */
   const chestMeters = $derived(
     Math.min(MAP_CHEST_PX, Math.max(MAP_CHEST_MIN_PX, MAP_CHEST_SMALL_PX * Math.sqrt(zoom))) * metersPerPixel,
   );

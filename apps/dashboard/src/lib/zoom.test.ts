@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { pannedBox, scaleBarOf, zoomedBox } from '#/lib/zoom';
+import { pannedBox, scaleBarOf, squareBoxOf, zoomedBox } from '#/lib/zoom';
 
 /** The whole map in these tests: 1000 by 1000 units from the origin. */
 const WHOLE = { x: 0, y: 0, width: 1000, height: 1000 };
@@ -51,5 +51,21 @@ describe('scaleBarOf', () => {
     expect(close).toEqual({ px: 100, label: '200 m' });
     expect(far.label).toBe('2 km');
     expect(far.px).toBeCloseTo(66.67, 2);
+  });
+});
+
+describe('squareBoxOf', () => {
+  it('turns explored land into a square around its middle, inside the world', () => {
+    // GIVEN explored land 1000 m wide and 3000 m tall, and land reaching past the world's west edge
+    const tall = { x: -500, y: -2000, width: 1000, height: 3000 };
+    const atEdge = { x: -10_600, y: 0, width: 400, height: 200 };
+
+    // WHEN each becomes a square
+    const square = squareBoxOf(tall);
+    const kept = squareBoxOf(atEdge);
+
+    // THEN the tall land gets a 3000 m square on its middle, and the edge one is moved back inside the world
+    expect(square).toEqual({ x: -1500, y: -2000, width: 3000, height: 3000 });
+    expect(kept).toEqual({ x: -10_564, y: -100, width: 400, height: 400 });
   });
 });

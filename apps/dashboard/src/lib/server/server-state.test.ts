@@ -133,7 +133,7 @@ describe('server state', () => {
   });
 
   it('keeps cooking, brewing and steering ships as activities per player', () => {
-    // GIVEN Inge Dragonchow cooks twice, starts a mead and takes the helm of a karve
+    // GIVEN Inge Dragonchow cooks twice, starts a mead and steers a karve
     readLines(state, [
       ...RUN_START,
       logLine('03:00:00', 'Cooking: RawMeat on piece_cookingstation by Inge Dragonchow'),
