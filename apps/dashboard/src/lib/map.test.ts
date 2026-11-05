@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { chestSpotsOf, foundChests, mapOf } from '#/lib/map';
+import { chestMarkKindOf, chestSpotsOf, foundChests, mapOf, spotLabelOf } from '#/lib/map';
 import { playersOf } from '#/lib/players';
 import { sessionWith, snapshotWith, TEST_NOON_MS } from '#/lib/test-common';
 
@@ -36,7 +36,6 @@ describe('mapOf', () => {
     // THEN each thing sits at its spot with z turned into y, in Ragnar's color
     expect(map).toEqual({
       box: { x: -64, y: -96, width: 192, height: 192 },
-      chestMeters: 16,
       land: [
         { key: '0,0', x: 0, y: -32, color: '#5f7a3a' },
         { key: '1,-1', x: 32, y: 0, color: 'var(--line)' },
@@ -45,7 +44,7 @@ describe('mapOf', () => {
         { key: 'Ragnar:0,0', x: 10, y: -22, color: 'var(--gold)' },
         { key: 'Ragnar:1,-1', x: 42, y: 10, color: 'var(--gold)' },
       ],
-      chests: [{ id: '1:10', x: 12, y: -18, record: snapshot.chests['1:10'] }],
+      chests: [{ id: '1:10', x: 12, y: -18, kind: 'chest', record: snapshot.chests['1:10'] }],
       marks: [
         { key: 'player:Ragnar', kind: 'player', label: 'Ragnar', x: 40, y: 10, color: 'var(--gold)' },
         { key: 'death:Ragnar', kind: 'death', label: 'Ragnar died here', x: 50, y: 20, color: 'var(--gold)' },
@@ -84,7 +83,7 @@ describe('chestSpotsOf', () => {
 
     // WHEN the map is made and its chests are placed
     const map = mapOf(snapshot, playersOf(snapshot, TEST_NOON_MS))!;
-    const spots = chestSpotsOf(map.chests, map.chestMeters);
+    const spots = chestSpotsOf(map.chests, 16);
 
     // THEN the close chests each get a mark, one step apart around their middle, and the far one stays put
     expect(spots).toEqual([
@@ -114,5 +113,31 @@ describe('foundChests', () => {
 
     // THEN only the chest on the walked square shows
     expect(ids).toEqual(['1:11']);
+  });
+});
+
+describe('chestMarkKindOf', () => {
+  it('draws carts and ships as their own marks, and chests the world came with apart from built ones', () => {
+    // GIVEN a built chest, a world chest, a shipwreck chest, a cart and a longship
+    const prefabs = ['piece_chest', 'TreasureChest_forestcrypt', 'shipwreck_karve_chest', 'Cart', 'VikingShip'];
+
+    // WHEN their marks are picked
+    const kinds = prefabs.map(chestMarkKindOf);
+
+    // THEN each gets its own drawing
+    expect(kinds).toEqual(['chest', 'treasure', 'treasure', 'cart', 'ship']);
+  });
+});
+
+describe('spotLabelOf', () => {
+  it("names a map spot by the game's x and z and its distance from the center", () => {
+    // GIVEN a spot 120 m east and 340 m south, and one 3 km east and 4 km north
+    // WHEN the spots are named
+    const near = spotLabelOf(120, 340);
+    const far = spotLabelOf(3000, -4000);
+
+    // THEN north turns back into the game's z, and long distances read in km
+    expect(near).toBe('x 120, z -340 · 361 m from the center');
+    expect(far).toBe('x 3000, z 4000 · 5.0 km from the center');
   });
 });

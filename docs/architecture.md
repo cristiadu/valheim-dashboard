@@ -352,8 +352,22 @@ A position marks its whole 32 m square as explored. Chest IDs last until the ser
 all chests again, so a new run starts the chest list over. The plugin writes the terrain file once per world
 from the game's own world generator, and the map colors only squares someone walked.
 Nothing nobody has seen shows: a chest appears only on a square someone walked.
-Every chest has its own mark, and marks keep their size on screen when the map zooms in. Chests that would
-cover each other sit side by side. Tapping one opens it as the
+The map uses the game's own coordinates: `x` east and `z` north of the world's center, the same numbers the
+game's `pos` command prints. The world is a circle 10,500 m from the center to its edge, which the terrain file
+covers in full. The map opens on the explored land, and **Whole world** zooms out to the whole circle, so you can
+see where the explored land sits in it.
+
+| Map part | What it shows |
+| --- | --- |
+| Dashed ring | Edge of the world, 10,500 m from the center |
+| Scale bar | A plain distance, such as 500 m, at the current zoom |
+| Spot under the pointer | Game `x` and `z`, and how far it is from the center |
+| Chest, world chest, cart, ship | Each with its own drawing |
+| Line and dot from a chest | The chest was set beside its neighbors, and the dot is where it really stands |
+
+Every chest has its own mark. Marks are small on the whole explored land and grow as the map zooms in, and
+they are hidden when the view is wider than the explored land. Chests that would cover each other sit side by
+side. Pointing at a chest shows a box with its name, who built it and how many slots are full. Tapping one opens it as the
 game's slot grid, and pointing at a slot shows the item's name and count. Item names and icons come from the item's prefab, through
 `GEAR_NAMES` and `ITEM_NAMES`, and every name listed there gets its icon downloaded. An item the wiki has no icon
 for shows a plain sack.

@@ -1,7 +1,7 @@
 import {
-  MAP_CHEST_METERS,
+  CHEST_MARK_KINDS,
+  type ChestMarkKind,
   MAP_CHEST_STEP,
-  MAP_CHESTS_ACROSS,
   MAP_MARGIN_METERS,
   MAP_SQUARE_METERS,
   MAP_TRAIL_METERS,
@@ -13,7 +13,9 @@ import {
   type Player,
   type Snapshot,
   TERRAIN_STYLES,
+  TREASURE_CHEST_PREFIX,
   UNKNOWN_TERRAIN_COLOR,
+  METERS_PER_KM,
 } from '#/lib/models';
 
 /** Returns the color of [character], from the player it belongs to among [players]. */
@@ -35,6 +37,20 @@ const squareKeyOf = (x: number, z: number): string => `${Math.floor(x / MAP_SQUA
 export const foundChests = (snapshot: Snapshot): [string, ChestRecord][] => {
   const explored = new Set(Object.values(snapshot.explored).flat());
   return Object.entries(snapshot.chests).filter(([, chest]) => explored.has(squareKeyOf(chest.x, chest.z)));
+};
+
+/** Returns which drawing the map uses for the chest, cart or ship [prefab]: chests the world came with get their own. */
+export const chestMarkKindOf = (prefab: string): ChestMarkKind =>
+  CHEST_MARK_KINDS[prefab] ?? (prefab.startsWith(TREASURE_CHEST_PREFIX) ? 'treasure' : 'chest');
+
+/**
+ * Returns where the map spot [x], [y] is, as the game's own coordinates and how far it is from the world's
+ * center, for example `x 120, z -340 · 360 m from the center`. The game shows the same `x` and `z` with `pos`.
+ */
+export const spotLabelOf = (x: number, y: number): string => {
+  const meters = Math.round(Math.hypot(x, y));
+  const distance = meters >= METERS_PER_KM ? `${(meters / METERS_PER_KM).toFixed(1)} km` : `${meters} m`;
+  return `x ${Math.round(x)}, z ${Math.round(-y)} · ${distance} from the center`;
 };
 
 /**
@@ -63,7 +79,7 @@ export const chestSpotsOf = (chests: MapChest[], chestMeters: number): MapChestS
 
 /**
  * What the map draws for [snapshot]: explored squares in their terrain color, each player's trail, chests,
- * online players and last deaths, colored by [players]. Null when the plugin has logged nothing to draw yet.
+ * online players and last deaths, colored by [players], fitted to what was explored. Null when the plugin has logged nothing to draw yet.
  */
 export const mapOf = (snapshot: Snapshot, players: Player[]): MapView | null => {
   const squareKeys = [...new Set(Object.values(snapshot.explored).flat())];
@@ -90,6 +106,7 @@ export const mapOf = (snapshot: Snapshot, players: Player[]): MapView | null => 
     id,
     x: record.x,
     y: -record.z,
+    kind: chestMarkKindOf(record.chest),
     record: { ...record, builder: builderOf(players, record.builder) },
   }));
   const online = players.filter((player) => player.isOnline && snapshot.positions[player.character] !== undefined);
@@ -132,10 +149,8 @@ export const mapOf = (snapshot: Snapshot, players: Player[]): MapView | null => 
   const top = Math.min(...ys) - MAP_MARGIN_METERS;
   const width = Math.max(...xs) + MAP_MARGIN_METERS - left;
   const height = Math.max(...ys) + MAP_MARGIN_METERS - top;
-  const chestMeters = Math.max(MAP_CHEST_METERS, Math.round(width / MAP_CHESTS_ACROSS));
   return {
     box: { x: left, y: top, width, height },
-    chestMeters,
     land,
     trails,
     chests,
