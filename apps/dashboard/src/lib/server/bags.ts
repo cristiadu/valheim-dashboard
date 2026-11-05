@@ -27,6 +27,46 @@ const keepInBag = (snapshot: Snapshot, character: string, item: string): void =>
   bag[item] ??= 1;
 };
 
+/** Puts back in [character]'s bag in [snapshot] each piece they wear now, except [movedItem], which just left the bag. */
+const keepWorn = (snapshot: Snapshot, character: string, movedItem: string | null): void => {
+  for (const item of snapshot.worn[character] ?? []) {
+    if (item !== movedItem) {
+      keepInBag(snapshot, character, item);
+    }
+  }
+};
+
+/**
+ * Takes what making [count] of [item] at [level] costs out of [character]'s bag in [state]. A craft can make more
+ * than one, such as 20 arrows, and an upgrade makes one.
+ */
+const payForCraft = (state: ServerState, character: string, item: string, level: number, count: number): void => {
+  const cost = state.craftCosts[item]?.[level];
+  if (cost === undefined) {
+    return;
+  }
+  const crafts = Math.ceil(count / cost.yields);
+  for (const [ingredient, amount] of Object.entries(cost.items)) {
+    addToBag(state.snapshot, character, ingredient, -amount * crafts);
+  }
+};
+
+/**
+ * Returns true when [event], a pickup, puts its item in the bag. A first pickup always does. An item picked up again
+ * does only when its line has the item's ID, which every new line has, and the ID did not count yet in [state]: the
+ * drop that came before it took the item out of the dropper's bag.
+ */
+const isPickupNew = (state: ServerState, event: Extract<LogEvent, { type: 'itemPickedUp' }>): boolean => {
+  if (event.itemId === null) {
+    return event.isFirstPickup;
+  }
+  if (state.pickedUpItemIds.has(event.itemId)) {
+    return false;
+  }
+  state.pickedUpItemIds.add(event.itemId);
+  return true;
+};
+
 /** Takes what building [piece] costs out of [character]'s bag in [state]. */
 const payFor = (state: ServerState, character: string, piece: string): void => {
   for (const [item, count] of Object.entries(state.pieceCosts[piece] ?? {})) {
@@ -58,6 +98,19 @@ const fitBag = (snapshot: Snapshot, character: string): void => {
   }
 };
 
+/** Returns the item [event] takes out of a bag on purpose, so worn gear moved away is not put back, or null. */
+const movedItemOf = (event: LogEvent): string | null => {
+  switch (event.type) {
+    case 'chestChanged':
+      return event.isStored ? event.item : null;
+    case 'itemDropped':
+    case 'itemHung':
+      return event.item;
+    default:
+      return null;
+  }
+};
+
 /** Returns the character whose bag [event] changes, or null when it changes none. */
 const characterOf = (event: LogEvent): string | null => {
   switch (event.type) {
@@ -65,11 +118,14 @@ const characterOf = (event: LogEvent): string | null => {
     case 'gearSeen':
     case 'wearing':
       return event.character;
+    case 'itemMade':
+      return event.crafter;
     case 'pieceBuilt':
       return event.builder;
     case 'tombstoneContents':
       return event.owner;
     case 'itemPickedUp':
+    case 'itemDropped':
     case 'chestChanged':
     case 'smelting':
     case 'foodStarted':
@@ -83,10 +139,11 @@ const characterOf = (event: LogEvent): string | null => {
 };
 
 /**
- * Updates the guess of what each character carries in [state] from [event]. Items come in when picked up for the
- * first time, taken from a chest or a tombstone, or seen worn or held, and go out when stored, smelted, cooked, fermented,
- * eaten, hung on a stand, or used to build or plant. A death empties the bag into the tombstone. Crafting and
- * dropping are not in the log, so the bag is only a guess, kept within the player's slots.
+ * Updates the guess of what each character carries in [state] from [event]. Items come in when picked up, taken from
+ * a chest or a tombstone, or seen worn or held, and go out when dropped, stored, smelted, cooked, fermented, eaten,
+ * hung on a stand, or used to build, plant or craft. An item on the ground has an ID, so each pickup counts once.
+ * Gear worn now always stays in the bag, and a death empties it into the tombstone. Crafting is only seen once a
+ * made item reaches a chest or the ground, so the bag is only a guess, kept within the player's slots.
  */
 export const updateBags = (state: ServerState, event: LogEvent): void => {
   const { snapshot } = state;
@@ -96,9 +153,15 @@ export const updateBags = (state: ServerState, event: LogEvent): void => {
   }
   switch (event.type) {
     case 'itemPickedUp':
-      if (event.isFirstPickup) {
+      if (isPickupNew(state, event)) {
         addToBag(snapshot, character, event.item, event.count);
       }
+      break;
+    case 'itemDropped':
+      addToBag(snapshot, character, event.item, -event.count);
+      break;
+    case 'itemMade':
+      payForCraft(state, character, event.item, event.level, event.count);
       break;
     case 'chestChanged':
       addToBag(snapshot, character, event.item, event.isStored ? -event.count : event.count);
@@ -137,6 +200,9 @@ export const updateBags = (state: ServerState, event: LogEvent): void => {
     }
     default:
       break;
+  }
+  if (event.type !== 'tombstoneContents' && event.type !== 'wearing') {
+    keepWorn(snapshot, character, movedItemOf(event));
   }
   fitBag(snapshot, character);
 };

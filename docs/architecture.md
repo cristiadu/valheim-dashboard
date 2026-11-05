@@ -183,14 +183,27 @@ kept in the snapshot:
 
 ```mermaid
 flowchart LR
-  in["Picked up (first time), taken from a chest, tombstone emptied, gear seen worn"] --> bag[Bag per character]
-  bag --> out["Stored, smelted, cooked, put in a fermenter, eaten, hung on a stand, built with, planted"]
+  in["Picked up, taken from a chest, tombstone emptied, gear worn"] --> bag[Bag per character]
+  bag --> out["Dropped, stored, smelted, cooked, put in a fermenter, eaten, hung on a stand, built with, planted, crafted with"]
   death["Tombstone made"] -->|empties| bag
 ```
 
-Building and planting take out what the piece costs, from `piece-costs.txt`, which the plugin writes next to
-`logs.txt` on each start from the game's pieces (`wood_floor Wood x2`). Crafting and dropping are not in the log,
-so the guess can be off.
+Building and planting take out what the piece costs, from `piece-costs.txt` (`wood_floor Wood x2`). Crafting takes
+out what the recipe costs, from `craft-costs.txt` (`ArrowWood 1 20 Wood x8`). The plugin writes both next to
+`logs.txt` on each start. A craft is only seen once the made item reaches a chest or the ground, so the guess can
+be off. Gear worn now always stays in the bag.
+
+Items on the ground have an ID, the game's object ID. The same ID is on the drop and the pickup, so an item
+counts once however often it is seen:
+
+```mermaid
+flowchart LR
+  drop["Dropped: Wood x20 by Ragnar (item 52731986:1420)"] -->|takes 20 out| ragnar[Ragnar's bag]
+  pick["Picked up again: Wood x20 by Bjorn (item 52731986:1420)"] -->|puts 20 in, once per ID| bjorn[Bjorn's bag]
+```
+
+Stacked items such as wood have no ID of their own in the game, only a kind and a count, so the bag counts them
+that way. IDs are never shown.
 
 Every player's bag has the game's 8 by 4 grid, 32 slots, and worn gear takes a slot there too, as in the game.
 Megingjord adds carry weight, not slots. Items fill slots in stacks of the size the game gives each one:
@@ -457,6 +470,8 @@ Every log lives in `C:\Valheim Server`.
 | `zrok.log` | zrok's output while it shares the link |
 | `terrain-<world>.txt` | The event log plugin, once per world: the land type of every 32 m square |
 | `item-stacks.txt` | The event log plugin, once per start: the most of each item one slot holds |
+| `piece-costs.txt` | The event log plugin, once per start: what building each piece takes |
+| `craft-costs.txt` | The event log plugin, once per start: what crafting or upgrading each item takes |
 | `player-vitals.txt` | The event log plugin, when a number changes: health, max health, stamina and eitr of each player online |
 
 The dashboard also reads the world save, `worlds_local\Cotil\_main.<save number>.db2`, and never writes to it.

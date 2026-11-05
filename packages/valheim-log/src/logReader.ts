@@ -18,6 +18,7 @@ import {
   CRAFTING_PATTERN,
   DISCONNECT_PATTERN,
   DISK_SPACE_PATTERN,
+  DROPPED_PATTERN,
   EMOTE_PATTERN,
   FOOD_STARTED_PATTERN,
   GAME_SERVER_PATTERN,
@@ -312,6 +313,18 @@ const MATCHERS: readonly Matcher[] = [
       count: Number(groups.count),
       player: playerOf(groups.player),
       isFirstPickup: groups.again === undefined,
+      itemId: groups.id ?? null,
+    }),
+  },
+  {
+    pattern: DROPPED_PATTERN,
+    toEvent: (groups, timeUtc) => ({
+      type: 'itemDropped',
+      timeUtc,
+      item: groups.item!,
+      count: Number(groups.count),
+      player: playerOf(groups.player),
+      itemId: groups.id!,
     }),
   },
   {

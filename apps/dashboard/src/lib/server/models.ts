@@ -170,6 +170,18 @@ export type ServerState = {
   terrain: Terrain | null;
   /** What building each piece takes, by piece prefab, from the plugin's piece costs file, for example `{ wood_floor: { Wood: 2 } }`. */
   pieceCosts: Record<string, Record<string, number>>;
+  /** What crafting each item takes, by item prefab and level, from the plugin's craft costs file. */
+  craftCosts: Record<string, Record<number, CraftCost>>;
+  /** IDs of the items on the ground whose pickup already went into a bag this run, so each counts once. */
+  pickedUpItemIds: Set<string>;
+};
+
+/** What one craft of an item at one level makes and takes, for example 20 wood arrows from `{ Wood: 8 }`. */
+export type CraftCost = {
+  /** How many items one craft makes, or 1 for an upgrade. */
+  yields: number;
+  /** What one craft takes, by item prefab. */
+  items: Record<string, number>;
 };
 
 /**
@@ -200,6 +212,12 @@ export const PIECE_COSTS_FILE_NAME = 'piece-costs.txt';
 
 /** One line of the piece costs file, for example `wood_floor Wood x2`. */
 export const PIECE_COST_LINE_PATTERN = /^(?<piece>\S+) (?<items>.+)$/;
+
+/** Name of the plugin's file next to the log with what crafting and upgrading each item takes. */
+export const CRAFT_COSTS_FILE_NAME = 'craft-costs.txt';
+
+/** One line of the craft costs file, for example `ArrowWood 1 20 Wood x8`: item, level, how many one craft makes, cost. */
+export const CRAFT_COST_LINE_PATTERN = /^(?<item>\S+) (?<level>\d+) (?<yields>\d+) (?<items>.+)$/;
 
 /** Name of the plugin's file next to the log with each player's health, stamina and eitr now. */
 export const PLAYER_VITALS_FILE_NAME = 'player-vitals.txt';

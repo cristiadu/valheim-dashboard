@@ -126,4 +126,61 @@ describe('updateBags', () => {
     expect(bag['Trophy2']).toBeUndefined();
     expect(bag['Trophy3']).toBe(1);
   });
+
+  it('moves a dropped item to whoever picks it up, and counts each item ID once', () => {
+    // GIVEN Ragnar carries 30 wood and drops 20, Bjorn picks them up, and the same pickup line is read twice
+    readLines(state, [
+      ...RUN_START,
+      logLine('03:00:00', 'Picked up: Wood x30 by Ragnar (item 52731986:1400)'),
+      logLine('03:00:01', 'Dropped: Wood x20 by Ragnar (item 52731986:1420)'),
+      logLine('03:00:02', 'Picked up again: Wood x20 by Bjorn (item 52731986:1420)'),
+      logLine('03:00:03', 'Picked up again: Wood x20 by Bjorn (item 52731986:1420)'),
+    ]);
+
+    // WHEN their bags are read
+    const { bags } = state.snapshot;
+
+    // THEN Ragnar has the 10 he kept and Bjorn the 20 he picked up
+    expect(bags['Ragnar']).toEqual({ Wood: 10 });
+    expect(bags['Bjorn']).toEqual({ Wood: 20 });
+  });
+
+  it('takes what crafting and upgrading cost out of the crafter\'s bag', () => {
+    // GIVEN 20 wood arrows take 8 wood, upgrading a club to level 2 takes 3 wood, and Ragnar picks up 40 wood, then
+    // makes 40 arrows and upgrades a club
+    state.craftCosts = {
+      ArrowWood: { 1: { yields: 20, items: { Wood: 8 } } },
+      Club: { 2: { yields: 1, items: { Wood: 3 } } },
+    };
+    readLines(state, [
+      ...RUN_START,
+      logLine('03:00:00', 'Picked up: Wood x40 by Ragnar'),
+      logLine('03:00:01', 'Made: ArrowWood x40 by Ragnar'),
+      logLine('03:00:02', 'Upgraded: Club to level 2 by Ragnar'),
+    ]);
+
+    // WHEN his bag is read
+    const bag = state.snapshot.bags['Ragnar'];
+
+    // THEN two crafts took 16 wood and the upgrade 3
+    expect(bag).toEqual({ Wood: 21 });
+  });
+
+  it('puts worn gear back after a spare is stored, but not gear stored and taken off', () => {
+    // GIVEN Ragnar wears a sword and a helmet, stores a spare sword, picks up stone, then stores the helmet and takes it off
+    readLines(state, [
+      ...RUN_START,
+      logLine('03:00:00', 'Wearing: Ragnar has HelmetLeather, SwordBronze'),
+      logLine('03:00:01', 'Stored: SwordBronze x1 in piece_chest_wood by Ragnar'),
+      logLine('03:00:02', 'Picked up: Stone x2 by Ragnar'),
+      logLine('03:00:03', 'Stored: HelmetLeather x1 in piece_chest_wood by Ragnar'),
+      logLine('03:00:04', 'Wearing: Ragnar has SwordBronze'),
+    ]);
+
+    // WHEN his bag is read
+    const bag = state.snapshot.bags['Ragnar'];
+
+    // THEN the worn sword is there and the helmet is not
+    expect(bag).toEqual({ SwordBronze: 1, Stone: 2 });
+  });
 });
