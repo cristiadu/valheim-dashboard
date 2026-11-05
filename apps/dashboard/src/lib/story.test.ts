@@ -153,7 +153,7 @@ describe('storyOf', () => {
   });
 
   it('tells kills and items in one line per stretch', () => {
-    // GIVEN Ragnar killed creatures, moved items, cooked, brewed and steered a ship
+    // GIVEN Ragnar killed creatures, moved items, cooked, brewed and took the helm of a karve three times
     const snapshot = snapshotWith({
       activities: [
         { player: 'Ragnar', kind: 'killed', startUtc: '2026-10-29T10:00:00.000Z', endUtc: '2026-10-29T10:05:00.000Z', things: { Greydwarf: 3, Troll: 1 }, source: NO_LINES },
@@ -163,7 +163,7 @@ describe('storyOf', () => {
         { player: 'Ragnar', kind: 'planted', startUtc: '2026-10-29T10:09:00.000Z', endUtc: '2026-10-29T10:09:00.000Z', things: { sapling_carrot: 3 }, source: NO_LINES },
         { player: 'Ragnar', kind: 'cooked', startUtc: '2026-10-29T10:10:00.000Z', endUtc: '2026-10-29T10:10:00.000Z', things: { RawMeat: 2 }, source: NO_LINES },
         { player: 'Ragnar', kind: 'brewed', startUtc: '2026-10-29T10:11:00.000Z', endUtc: '2026-10-29T10:11:00.000Z', things: { MeadBaseTasty: 1 }, source: NO_LINES },
-        { player: 'Ragnar', kind: 'sailed', startUtc: '2026-10-29T10:12:00.000Z', endUtc: '2026-10-29T10:12:00.000Z', things: { Karve: 1 }, source: NO_LINES },
+        { player: 'Ragnar', kind: 'sailed', startUtc: '2026-10-29T10:12:00.000Z', endUtc: '2026-10-29T10:12:00.000Z', things: { Karve: 3 }, source: NO_LINES },
         { player: 'Ragnar', kind: 'made', startUtc: '2026-10-29T10:13:00.000Z', endUtc: '2026-10-29T10:13:00.000Z', things: { ArrowFlint: 20 }, source: NO_LINES },
       ],
     });
@@ -174,7 +174,7 @@ describe('storyOf', () => {
     // THEN each stretch reads plainly, and item lines leave the list to their item icons
     expect(story.map((item) => [item.kind, item.text, item.things])).toEqual([
       ['items', 'Ragnar made 20 items', { ArrowFlint: 20 }],
-      ['travel', 'Ragnar steered 1 ship: 1 karve', undefined],
+      ['travel', 'Ragnar took the helm 3 times on the karve', undefined],
       ['items', 'Ragnar started brewing 1 mead', { MeadBaseTasty: 1 }],
       ['items', 'Ragnar started cooking 2 things', { RawMeat: 2 }],
       ['built', 'Ragnar planted 3 plants: 3 sapling carrot', undefined],
