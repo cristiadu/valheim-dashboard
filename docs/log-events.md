@@ -238,7 +238,7 @@ when the plugin does not know who it was.
   alone despawn, and no creature that eats off the ground stands within 3 meters of it. The game marks an
   item the first time it reaches anyone's inventory, and the mark stays through drops and chests. An item
   with the mark is logged as **Picked up again**. `item` is the object ID the item had on the ground; lines from
-  before plugin 2.14.0 have none.
+  before plugin 2.15.0 have none.
 - **Dropped** is logged when an item someone carried lands on the ground, naming the player whose game made it.
   The game starts an object's ID with the ID of the game that made it, so the dropper is exact. Items a broken
   chest, cart or ship, or an emptied item stand, let go of are not drops. The pickup line repeats the same `item` ID.

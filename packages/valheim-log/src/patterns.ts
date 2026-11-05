@@ -120,7 +120,7 @@ export const ITEM_HUNG_PATTERN = /^Item hung: (?<item>\S+) by (?<player>.+)$/;
 
 /**
  * A player picked up an item. `again` marks an item someone already carried, such as one a player dropped. Since
- * plugin 2.14.0 the line ends with the object ID the item had on the ground. Written by the event log plugin.
+ * plugin 2.15.0 the line ends with the object ID the item had on the ground. Written by the event log plugin.
  */
 export const PICKED_UP_PATTERN =
   /^Picked up(?<again> again)?: (?<item>\S+) x(?<count>\d+) by (?<player>.+?)(?: \(item (?<id>\S+)\))?$/;
