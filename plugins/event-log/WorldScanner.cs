@@ -62,6 +62,7 @@ namespace ValheimDashboard.EventLog
                 WorkTracker.See(zdo);
                 KitchenTracker.See(zdo);
                 ShipTracker.See(zdo);
+                LeviathanTracker.See(zdo);
                 PieceStateTracker.See(zdo);
                 CraftedItemTracker.See(zdo);
                 if (isNew)
@@ -97,6 +98,7 @@ namespace ValheimDashboard.EventLog
             PlacedItemTracker.Destroyed(uid);
             KitchenTracker.Forget(uid);
             ShipTracker.Forget(uid);
+            LeviathanTracker.Forget(uid);
             PieceStateTracker.Forget(uid);
             ActionTracker.Forget(uid);
             CraftedItemTracker.Forget(uid);

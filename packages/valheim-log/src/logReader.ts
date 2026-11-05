@@ -29,6 +29,8 @@ import {
   ITEM_HUNG_PATTERN,
   KNOWN_PLAYER_PATTERN,
   LEGACY_WORLD_SAVED_PATTERN,
+  LEVIATHAN_GONE_PATTERN,
+  LEVIATHAN_PATTERN,
   MADE_PATTERN,
   MS_PER_MINUTE,
   NIGHT_SKIPPED_PATTERN,
@@ -460,6 +462,14 @@ const MATCHERS: readonly Matcher[] = [
   {
     pattern: CHEST_REMOVED_PATTERN,
     toEvent: (groups, timeUtc) => ({ type: 'chestRemoved', timeUtc, id: groups.id! }),
+  },
+  {
+    pattern: LEVIATHAN_PATTERN,
+    toEvent: (groups, timeUtc) => ({ type: 'leviathan', timeUtc, id: groups.id!, x: Number(groups.x), z: Number(groups.z) }),
+  },
+  {
+    pattern: LEVIATHAN_GONE_PATTERN,
+    toEvent: (groups, timeUtc) => ({ type: 'leviathanGone', timeUtc, id: groups.id! }),
   },
   {
     pattern: TOMBSTONE_PATTERN,

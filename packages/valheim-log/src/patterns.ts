@@ -189,6 +189,12 @@ export const CHEST_CONTENTS_PATTERN =
 /** A chest, cart or ship was destroyed. Written by the event log plugin. */
 export const CHEST_REMOVED_PATTERN = /^Chest removed: (?<id>\S+)$/;
 
+/** Where a Leviathan is, with the ID the server gives it until it stops. Written by the event log plugin. */
+export const LEVIATHAN_PATTERN = /^Leviathan: (?<id>\S+) at (?<x>-?\d+) (?<z>-?\d+)$/;
+
+/** A Leviathan dived away for good. Written by the event log plugin. */
+export const LEVIATHAN_GONE_PATTERN = /^Leviathan gone: (?<id>\S+)$/;
+
 /** Everything a player carried when they died, as their tombstone holds it. Written by the event log plugin. */
 export const TOMBSTONE_PATTERN = /^Tombstone: (?<owner>.+?) at (?<x>-?\d+) (?<z>-?\d+) holds (?<items>.+)$/;
 

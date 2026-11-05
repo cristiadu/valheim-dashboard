@@ -249,6 +249,8 @@ export type Snapshot = {
   chests: Record<string, ChestRecord>;
   /** What each character carried at their last death, by character name. */
   deathItems: Record<string, DeathItems>;
+  /** Every Leviathan of the current run, by the ID the plugin logs. */
+  leviathans: Record<string, MapPoint>;
   /** Prefabs of every item a player picked up, stored, took, wore, ate, smelted or left in a tombstone, such as `CopperOre`. */
   seenItems: string[];
   /**
@@ -380,6 +382,12 @@ export const MAP_CHEST_MOVED_STEP = 0.5;
 /** Size of an online player mark on the map, in screen pixels. */
 export const MAP_PLAYER_PX = 16;
 
+/** Size of a Leviathan mark on the map, in screen pixels. */
+export const MAP_LEVIATHAN_PX = 20;
+
+/** Color of a Leviathan mark on the map. */
+export const LEVIATHAN_COLOR = 'var(--frost)';
+
 /** Size of a death mark on the map, in screen pixels. */
 export const MAP_DEATH_PX = 22;
 
@@ -476,7 +484,7 @@ export type MapView = {
   /** Chests, carts and ships, by their ID. */
   chests: { id: string; x: number; y: number; kind: ChestMarkKind; record: ChestRecord }[];
   /** Where each online player stands and where each character last died. */
-  marks: { key: string; kind: 'player' | 'death'; label: string; x: number; y: number; color: string }[];
+  marks: { key: string; kind: 'player' | 'death' | 'leviathan'; label: string; x: number; y: number; color: string }[];
 };
 
 /** A chest, cart or ship on the map, by its ID, with `y` meters south so north is up. */
