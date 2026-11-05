@@ -66,7 +66,8 @@ How to link the lines into one session:
 
 1. The PlayFab ID links the connect, Steam ID and handshake lines.
 2. The first `Got character ZDOID` after a handshake belongs to that player. It gives the character
-   name and the peer ID.
+   name and the peer ID. A player whose join fails can handshake again; only their latest handshake
+   counts, so the next player's character is not given their account.
 3. The leave is the `Destroying abandoned ... owner {peer ID}` line with the same peer ID.
 4. `RPC_Disconnect` and the `now N player(s)` lines have no player in them. Use them only for counts.
 5. If a leave is missed, `Sent to playfab/{PlayFab ID}` at each world save lists who is still online.

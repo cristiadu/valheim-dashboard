@@ -33,6 +33,19 @@ const takeLeaveReason = (state: SessionState): SessionEndReason => {
   return reason;
 };
 
+/**
+ * Forgets earlier handshakes of [connectionId] and of its Steam account. A player whose join failed and who
+ * tries again handshakes again; only the newest try can still spawn.
+ */
+const dropPendingHandshakes = (state: SessionState, connectionId: string): void => {
+  const steamId = state.connectionSteamIds.get(connectionId) ?? null;
+  state.pendingHandshakeConnectionIds = state.pendingHandshakeConnectionIds.filter((pendingId) => {
+    const isSameConnection = pendingId === connectionId;
+    const isSameAccount = steamId !== null && state.connectionSteamIds.get(pendingId) === steamId;
+    return !isSameConnection && !isSameAccount;
+  });
+};
+
 /** Ends every online session and clears handshakes that cannot spawn into a later log run. */
 export const endAllSessions = (state: SessionState, timeUtc: string, reason: SessionEndReason): void => {
   endSessions(state, () => true, timeUtc, reason);
@@ -58,6 +71,7 @@ export const applyEvent = (state: SessionState, event: LogEvent): void => {
       state.connectionSteamIds.set(event.playFabId, event.steamId);
       break;
     case 'handshake':
+      dropPendingHandshakes(state, event.connectionId);
       state.pendingHandshakeConnectionIds.push(event.connectionId);
       break;
     case 'characterSpawned': {

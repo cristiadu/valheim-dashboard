@@ -74,6 +74,173 @@ describe('buildSessions', () => {
     ]);
   });
 
+  it('keeps later players on their own account after a player retries a failed join', () => {
+    // GIVEN Yan handshakes three times on one connection before spawning, then wynnyarD and Inge join
+    const events: LogEvent[] = [
+      {
+        type: 'knownPlayer',
+        steamName: 'Tony Almeida',
+        steamId: 'Steam_76561197984647657',
+        timeUtc: '2026-11-04T22:55:42.000Z',
+      },
+      {
+        type: 'knownPlayer',
+        steamName: 'YanFlandre',
+        steamId: 'Steam_76561198025323876',
+        timeUtc: '2026-11-04T22:55:42.000Z',
+      },
+      {
+        type: 'knownPlayer',
+        steamName: 'whyspyr',
+        steamId: 'Steam_76561198007191322',
+        timeUtc: '2026-11-04T22:55:42.000Z',
+      },
+      {
+        type: 'steamLinked',
+        playFabId: 'YAN',
+        steamId: 'Steam_76561198025323876',
+        timeUtc: '2026-11-05T02:08:54.000Z',
+      },
+      {
+        type: 'handshake',
+        connectionId: 'YAN',
+        timeUtc: '2026-11-05T02:08:54.000Z',
+      },
+      {
+        type: 'handshake',
+        connectionId: 'YAN',
+        timeUtc: '2026-11-05T02:09:22.000Z',
+      },
+      {
+        type: 'handshake',
+        connectionId: 'YAN',
+        timeUtc: '2026-11-05T02:10:57.000Z',
+      },
+      {
+        type: 'characterSpawned',
+        character: 'Yan',
+        peerId: '1',
+        timeUtc: '2026-11-05T02:11:23.000Z',
+      },
+      {
+        type: 'steamLinked',
+        playFabId: 'TONY',
+        steamId: 'Steam_76561197984647657',
+        timeUtc: '2026-11-05T02:32:09.000Z',
+      },
+      {
+        type: 'handshake',
+        connectionId: 'TONY',
+        timeUtc: '2026-11-05T02:32:09.000Z',
+      },
+      {
+        type: 'characterSpawned',
+        character: 'wynnyarD',
+        peerId: '2',
+        timeUtc: '2026-11-05T02:32:33.000Z',
+      },
+      {
+        type: 'steamLinked',
+        playFabId: 'INGE',
+        steamId: 'Steam_76561198007191322',
+        timeUtc: '2026-11-05T03:11:07.000Z',
+      },
+      {
+        type: 'handshake',
+        connectionId: 'INGE',
+        timeUtc: '2026-11-05T03:11:07.000Z',
+      },
+      {
+        type: 'characterSpawned',
+        character: 'Inge Dragonchow',
+        peerId: '3',
+        timeUtc: '2026-11-05T03:11:40.000Z',
+      },
+    ];
+
+    // WHEN sessions are built
+    const sessions = buildSessions(events);
+
+    // THEN each character keeps the Steam account of its own connection
+    expect(sessions.map(({ character, steamName }) => ({ character, steamName }))).toEqual([
+      { character: 'Yan', steamName: 'YanFlandre' },
+      { character: 'wynnyarD', steamName: 'Tony Almeida' },
+      { character: 'Inge Dragonchow', steamName: 'whyspyr' },
+    ]);
+  });
+
+  it('forgets a failed join when the same account comes back on a new connection', () => {
+    // GIVEN Yan handshakes on one connection, never spawns, then joins on a new one after wynnyarD handshakes
+    const events: LogEvent[] = [
+      {
+        type: 'knownPlayer',
+        steamName: 'Tony Almeida',
+        steamId: 'Steam_76561197984647657',
+        timeUtc: '2026-11-04T22:55:42.000Z',
+      },
+      {
+        type: 'knownPlayer',
+        steamName: 'YanFlandre',
+        steamId: 'Steam_76561198025323876',
+        timeUtc: '2026-11-04T22:55:42.000Z',
+      },
+      {
+        type: 'steamLinked',
+        playFabId: 'YAN-OLD',
+        steamId: 'Steam_76561198025323876',
+        timeUtc: '2026-11-05T02:08:54.000Z',
+      },
+      {
+        type: 'handshake',
+        connectionId: 'YAN-OLD',
+        timeUtc: '2026-11-05T02:08:54.000Z',
+      },
+      {
+        type: 'steamLinked',
+        playFabId: 'YAN-NEW',
+        steamId: 'Steam_76561198025323876',
+        timeUtc: '2026-11-05T02:10:57.000Z',
+      },
+      {
+        type: 'handshake',
+        connectionId: 'YAN-NEW',
+        timeUtc: '2026-11-05T02:10:57.000Z',
+      },
+      {
+        type: 'steamLinked',
+        playFabId: 'TONY',
+        steamId: 'Steam_76561197984647657',
+        timeUtc: '2026-11-05T02:11:00.000Z',
+      },
+      {
+        type: 'handshake',
+        connectionId: 'TONY',
+        timeUtc: '2026-11-05T02:11:00.000Z',
+      },
+      {
+        type: 'characterSpawned',
+        character: 'Yan',
+        peerId: '1',
+        timeUtc: '2026-11-05T02:11:23.000Z',
+      },
+      {
+        type: 'characterSpawned',
+        character: 'wynnyarD',
+        peerId: '2',
+        timeUtc: '2026-11-05T02:11:30.000Z',
+      },
+    ];
+
+    // WHEN sessions are built
+    const sessions = buildSessions(events);
+
+    // THEN wynnyarD is not given Yan's account from the failed join
+    expect(sessions.map(({ character, steamName }) => ({ character, steamName }))).toEqual([
+      { character: 'Yan', steamName: 'YanFlandre' },
+      { character: 'wynnyarD', steamName: 'Tony Almeida' },
+    ]);
+  });
+
   it('ends a Steam-only session at the socket close after a timeout', () => {
     // THEN the refused attempt opens no session and the timeout is the end reason
     expect(steamOnlySessions).toEqual([
