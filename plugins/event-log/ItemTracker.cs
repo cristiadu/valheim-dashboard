@@ -14,6 +14,15 @@ namespace ValheimDashboard.EventLog
         /// <summary>Hash of the call a player sends to harvest a plant another player's game owns.</summary>
         private static readonly int PickHash = "RPC_Pick".GetStableHashCode();
 
+        /// <summary>Hash of the call an obliterator's game sends to every player when its lever is pulled.</summary>
+        private static readonly int LeverHash = "RPC_AnimateLever".GetStableHashCode();
+
+        /// <summary>Hash of the call a player sends to pull the lever of an obliterator another player's game owns.</summary>
+        private static readonly int IncinerateHash = "RPC_RequestIncinerate".GetStableHashCode();
+
+        /// <summary>Seconds after a lever pull in which items leaving an obliterator count as destroyed.</summary>
+        private const float ObliterateSeconds = 15f;
+
         /// <summary>Farthest a player stands from an item they pick up, in meters. Items left alone despawn instead.</summary>
         private const float PickupRangeMeters = 10f;
 
@@ -33,12 +42,28 @@ namespace ValheimDashboard.EventLog
         /// <summary>Player who asked to harvest each plant, by object ID, until the harvest is logged.</summary>
         private static readonly Dictionary<ZDOID, string> PickedBy = new Dictionary<ZDOID, string>();
 
-        /// <summary>Remembers who asked to harvest a plant when [data] is such a request.</summary>
+        /// <summary>When each obliterator's lever was last pulled, and who asked for it if the call came through the server.</summary>
+        private static readonly Dictionary<ZDOID, (float Time, string Player)> LeverPulls = new Dictionary<ZDOID, (float Time, string Player)>();
+
+        /// <summary>
+        /// Remembers who asked to harvest a plant or to pull an obliterator's lever, and when a lever was pulled, when
+        /// [data] is such a call.
+        /// </summary>
         public static void Read(ZRoutedRpc.RoutedRPCData data)
         {
             if (data.m_methodHash == PickHash)
             {
                 PickedBy[data.m_targetZDO] = Names.Peer(data.m_senderPeerID);
+            }
+            else if (data.m_methodHash == IncinerateHash)
+            {
+                LeverPulls[data.m_targetZDO] = (float.MinValue, Names.Peer(data.m_senderPeerID));
+            }
+            else if (data.m_methodHash == LeverHash)
+            {
+                ZDO lever = ZDOMan.instance.GetZDO(data.m_targetZDO);
+                bool isAsked = LeverPulls.TryGetValue(data.m_targetZDO, out (float Time, string Player) asked) && asked.Time == float.MinValue;
+                LeverPulls[data.m_targetZDO] = (Time.time, isAsked ? asked.Player : Names.Peer(lever == null ? data.m_senderPeerID : lever.GetOwner()));
             }
         }
 
@@ -92,6 +117,7 @@ namespace ValheimDashboard.EventLog
                 GameEventLog.Write($"Tombstone emptied: {zdo.GetString(ZDOVars.s_ownerName, Names.UnknownPlayer)} by {Names.Peer(zdo.GetOwner())}");
             }
             PickedBy.Remove(zdo.m_uid);
+            LeverPulls.Remove(zdo.m_uid);
         }
 
         /// <summary>
@@ -120,6 +146,11 @@ namespace ValheimDashboard.EventLog
             }
             string player = Names.Peer(chest.GetOwner());
             string chestName = Names.PrefabName(chest);
+            if (LeverPulls.TryGetValue(chest.m_uid, out (float Time, string Player) pull) && Time.time - pull.Time <= ObliterateSeconds)
+            {
+                LogObliterated(chestName, pull.Player, before.Counts, counts);
+                return;
+            }
             foreach (KeyValuePair<string, int> item in counts)
             {
                 before.Counts.TryGetValue(item.Key, out int oldCount);
@@ -134,6 +165,22 @@ namespace ValheimDashboard.EventLog
                 if (item.Value > newCount)
                 {
                     GameEventLog.Write($"Taken: {item.Key} x{item.Value - newCount} from {chestName} by {player}");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Logs each item that left obliterator [chestName] after [player] pulled its lever, from [before] to [now].
+        /// What it makes from them, such as coal, is left out, since nobody put it there.
+        /// </summary>
+        private static void LogObliterated(string chestName, string player, Dictionary<string, int> before, Dictionary<string, int> now)
+        {
+            foreach (KeyValuePair<string, int> item in before)
+            {
+                now.TryGetValue(item.Key, out int newCount);
+                if (item.Value > newCount)
+                {
+                    GameEventLog.Write($"Obliterated: {item.Key} x{item.Value - newCount} in {chestName} by {player}");
                 }
             }
         }

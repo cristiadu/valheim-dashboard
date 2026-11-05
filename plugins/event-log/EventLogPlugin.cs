@@ -17,7 +17,7 @@ namespace ValheimDashboard.EventLog
         public const string PluginName = "Valheim Dashboard Event Log";
 
         /// <summary>Plugin version.</summary>
-        public const string PluginVersion = "2.13.0";
+        public const string PluginVersion = "2.14.0";
 
         /// <summary>
         /// Keeps clicks from freezing the console, sends BepInEx messages to the server's log and applies the
@@ -32,7 +32,6 @@ namespace ValheimDashboard.EventLog
             harmony.PatchAll(typeof(RoutedRpcTracker));
             harmony.PatchAll(typeof(WorldEventTracker));
             harmony.PatchAll(typeof(ActionTracker));
-            harmony.PatchAll(typeof(EffectTracker));
             Logger.LogInfo($"{PluginName} {PluginVersion} loaded");
         }
     }

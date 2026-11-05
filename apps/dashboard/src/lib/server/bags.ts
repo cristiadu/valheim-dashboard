@@ -109,7 +109,9 @@ export const updateBags = (state: ServerState, event: LogEvent): void => {
     case 'ate':
     case 'foodStarted':
     case 'itemHung':
-      addToBag(snapshot, character, event.item, -1);
+      if (event.item !== null) {
+        addToBag(snapshot, character, event.item, -1);
+      }
       break;
     case 'pieceBuilt':
       payFor(state, character, event.piece);

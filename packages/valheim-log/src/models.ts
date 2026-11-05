@@ -63,7 +63,7 @@ export type LogEvent = { timeUtc: string } & (
   | { type: 'tombstoneEmptied'; owner: string | null; player: string | null }
   | { type: 'position'; character: string; x: number; z: number }
   | { type: 'planted'; plant: string; player: string | null }
-  | { type: 'ate'; character: string; item: string }
+  | { type: 'ate'; character: string; item: string | null }
   | { type: 'smelting'; item: string; count: number; station: string; player: string | null }
   | { type: 'foodStarted'; kind: 'cooking' | 'fermenting'; item: string; station: string; player: string | null }
   | { type: 'sailing'; character: string; ship: string }
@@ -73,8 +73,17 @@ export type LogEvent = { timeUtc: string } & (
   | { type: 'portalNamed'; portal: string; player: string | null }
   | { type: 'wardChanged'; ward: string; builder: string | null; isOn: boolean }
   | { type: 'itemMade'; item: string; count: number; level: number; crafter: string }
-  | { type: 'skillUp'; player: string | null }
-  | { type: 'traded'; player: string | null; trader: string; isBuy: boolean }
+  | { type: 'powerUsed'; character: string }
+  | { type: 'locationRevealed'; location: string; player: string | null }
+  | { type: 'riding'; player: string | null; creature: string }
+  | { type: 'saddled'; creature: string; player: string | null }
+  | { type: 'tameFollowing'; creature: string; player: string }
+  | { type: 'cartPulled'; player: string | null; cart: string }
+  | { type: 'obliterated'; item: string; count: number; player: string | null }
+  | { type: 'fueled'; fire: string; player: string | null }
+  | { type: 'repaired'; piece: string; player: string | null }
+  | { type: 'mapShared'; player: string | null; table: string }
+  | { type: 'wardAccess'; player: string; ward: string; builder: string | null; isGiven: boolean }
   | { type: 'depleted'; kind: 'tree' | 'rock'; thing: string; player: string | null }
   | {
       type: 'chestContents';

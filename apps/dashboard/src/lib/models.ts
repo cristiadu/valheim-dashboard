@@ -140,7 +140,11 @@ export const STORY_EVENT_TYPES = [
   'bedClaimed',
   'portalNamed',
   'wardChanged',
-  'traded',
+  'locationRevealed',
+  'saddled',
+  'tameFollowing',
+  'wardAccess',
+  'mapShared',
 ] as const;
 
 /** A game event friends see, such as a death or a raid. */
@@ -512,7 +516,8 @@ export type StockRow = {
  * What a stretch of activity is: pieces built, a builder's pieces destroyed, creatures killed, items gathered
  * from the world, items stored in or taken from chests, crops planted, food eaten, items put into smelters, food
  * put on to cook, mead bases put into fermenters, ships steered, crafting stations opened, emotes, items made or
- * upgraded, skill levels gained, trees cut down or rocks mined out.
+ * upgraded, tames ridden, forsaken powers used, carts pulled, fires fueled, pieces repaired, items obliterated,
+ * trees cut down or rocks mined out.
  */
 export type ActivityKind =
   | 'built'
@@ -531,7 +536,12 @@ export type ActivityKind =
   | 'emoted'
   | 'made'
   | 'upgraded'
-  | 'leveled'
+  | 'rode'
+  | 'powered'
+  | 'pulled'
+  | 'fueled'
+  | 'repaired'
+  | 'obliterated'
   | 'cut'
   | 'mined';
 
@@ -569,7 +579,12 @@ export const ACTIVITY_STORY_KINDS: Record<ActivityKind, StoryKind> = {
   emoted: 'chat',
   made: 'items',
   upgraded: 'items',
-  leveled: 'world',
+  rode: 'travel',
+  powered: 'boss',
+  pulled: 'travel',
+  fueled: 'built',
+  repaired: 'built',
+  obliterated: 'items',
   cut: 'items',
   mined: 'items',
 };
@@ -594,7 +609,12 @@ export const ACTIVITY_WORDS: Record<Exclude<ActivityKind, 'destroyed'>, { verb: 
   emoted: { verb: 'did', one: 'emote', many: 'emotes', ending: '' },
   made: { verb: 'made', one: 'item', many: 'items', ending: '' },
   upgraded: { verb: 'upgraded', one: 'item', many: 'items', ending: '' },
-  leveled: { verb: 'gained', one: 'skill level', many: 'skill levels', ending: '' },
+  rode: { verb: 'rode', one: 'tame', many: 'tames', ending: '' },
+  powered: { verb: 'used a forsaken power', one: 'time', many: 'times', ending: '' },
+  pulled: { verb: 'pulled a cart', one: 'time', many: 'times', ending: '' },
+  fueled: { verb: 'fueled', one: 'fire', many: 'fires', ending: '' },
+  repaired: { verb: 'repaired', one: 'piece', many: 'pieces', ending: '' },
+  obliterated: { verb: 'obliterated', one: 'item', many: 'items', ending: '' },
   cut: { verb: 'cut down', one: 'tree', many: 'trees', ending: '' },
   mined: { verb: 'mined out', one: 'rock', many: 'rocks', ending: '' },
 };
@@ -614,8 +634,16 @@ export const PLAYER_ACTIVITY_STATS: { kind: ActivityKind; label: string }[] = [
   { kind: 'emoted', label: 'Emotes' },
   { kind: 'made', label: 'Items made' },
   { kind: 'upgraded', label: 'Items upgraded' },
-  { kind: 'leveled', label: 'Skill levels' },
+  { kind: 'rode', label: 'Rides' },
+  { kind: 'powered', label: 'Powers used' },
+  { kind: 'pulled', label: 'Carts pulled' },
+  { kind: 'fueled', label: 'Fires fueled' },
+  { kind: 'repaired', label: 'Pieces repaired' },
+  { kind: 'obliterated', label: 'Items obliterated' },
 ];
+
+/** Thing a meal counts as when the server never learned what the player ate, left out of the item list. */
+export const UNKNOWN_FOOD = 'something';
 
 /** Fewest items one slot holds for an item to count as a stackable material, not a tool or piece of gear. */
 export const MIN_STACKABLE = 2;
@@ -656,6 +684,15 @@ export const BOSS_NAMES: Record<string, string> = {
   defeated_goblinking: 'Yagluth',
   defeated_queen: 'The Queen',
   defeated_fader: 'Fader',
+};
+
+/** Boss names as the game shows them, by the boss altar place a vegvisir marks. */
+export const BOSS_ALTAR_NAMES: Record<string, string> = {
+  Eikthyrnir: 'Eikthyr',
+  GDKing: 'The Elder',
+  Bonemass: 'Bonemass',
+  Dragonqueen: 'Moder',
+  GoblinKing: 'Yagluth',
 };
 
 /** Start of the global key a boss defeat sets, for example `defeated_eikthyr`. */

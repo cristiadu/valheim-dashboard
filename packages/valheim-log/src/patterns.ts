@@ -167,11 +167,41 @@ export const MADE_PATTERN = /^Made: (?<item>\S+) x(?<count>\d+) by (?<crafter>.+
 /** An item a player crafted showed up at a new level. Written by the event log plugin. */
 export const UPGRADED_PATTERN = /^Upgraded: (?<item>\S+) to level (?<level>\d+) by (?<crafter>.+)$/;
 
-/** A player's skill went up a level. Written by the event log plugin. */
-export const SKILL_UP_PATTERN = /^Skill up: (?<player>.+)$/;
+/** A player started eating or drinking, but the food never showed in their hand. Written by the event log plugin. */
+export const ATE_SOMETHING_PATTERN = /^Ate something: (?<character>.+)$/;
 
-/** A player bought from or sold to a trader such as Haldor. Written by the event log plugin. */
-export const TRADED_PATTERN = /^Traded: (?<player>.+) (?<action>bought from|sold to) (?<trader>\S+)$/;
+/** A player used their forsaken power. Written by the event log plugin. */
+export const POWER_USED_PATTERN = /^Power used: (?<character>.+)$/;
+
+/** A player read a vegvisir or rune stone, which marks a place on their map. Written by the event log plugin. */
+export const LOCATION_REVEALED_PATTERN = /^Location revealed: (?<location>\S+) by (?<player>.+)$/;
+
+/** A player got on a saddled tame. Written by the event log plugin. */
+export const RIDING_PATTERN = /^Riding: (?<player>.+) on (?<creature>\S+)$/;
+
+/** A player put a saddle on a tame. Written by the event log plugin. */
+export const SADDLED_PATTERN = /^Saddled: (?<creature>\S+) by (?<player>.+)$/;
+
+/** A tame started following a player. Written by the event log plugin. */
+export const TAME_FOLLOWING_PATTERN = /^Tame following: (?<creature>\S+) follows (?<player>.+)$/;
+
+/** A player started pulling a cart. Written by the event log plugin. */
+export const PULLING_CART_PATTERN = /^Pulling cart: (?<player>.+) with (?<cart>\S+)$/;
+
+/** Items a player destroyed in an obliterator. Written by the event log plugin. */
+export const OBLITERATED_PATTERN = /^Obliterated: (?<item>\S+) x(?<count>\d+) in (?<station>\S+) by (?<player>.+)$/;
+
+/** A player put fuel on a fire. Written by the event log plugin. */
+export const FUELED_PATTERN = /^Fueled: (?<fire>\S+) by (?<player>.+)$/;
+
+/** A player repaired a built piece. Written by the event log plugin. */
+export const REPAIRED_PATTERN = /^Repaired: (?<piece>\S+) by (?<player>.+)$/;
+
+/** A player added what they explored to a map table. Written by the event log plugin. */
+export const MAP_SHARED_PATTERN = /^Map shared: (?<player>.+) at (?<table>\S+)$/;
+
+/** A player gave themselves access to a ward, or took it away. Written by the event log plugin. */
+export const WARD_ACCESS_PATTERN = /^Ward access (?<change>given|removed): (?<player>.+) on (?<ward>\S+) built by (?<builder>.+)$/;
 
 /** A player cut down a tree or mined out a rock. Written by the event log plugin. */
 export const DEPLETED_PATTERN = /^(?<kind>Tree cut|Rock mined): (?<thing>\S+) by (?<player>.+)$/;
