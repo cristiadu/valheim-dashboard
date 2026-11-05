@@ -362,17 +362,40 @@ export const MAP_SQUARE_METERS = 32;
 /** Space kept around everything the map shows, in meters. */
 export const MAP_MARGIN_METERS = 64;
 
-/** Smallest size of a chest mark on the map, in meters. */
-export const MAP_CHEST_METERS = 16;
+/** Size of a chest mark on the map when it shows all the explored land, in screen pixels. Marks grow as the map zooms in. */
+export const MAP_CHEST_SMALL_PX = 12;
 
-/** How many chest marks fit across the map, so marks stay big enough to see and tap on a big map. */
-export const MAP_CHESTS_ACROSS = 40;
+/** Smallest size of a chest mark on the map, when it shows much more of the world than the explored land, in screen pixels. */
+export const MAP_CHEST_MIN_PX = 6;
+
+/** Biggest size of a chest mark on the map, once zoomed in, in screen pixels. */
+export const MAP_CHEST_PX = 24;
 
 /** Distance between chests placed side by side on the map, in chest marks, so a mark grown on hover still shows its neighbors. */
 export const MAP_CHEST_STEP = 1.15;
 
-/** How far the map can zoom in, as times the whole map. */
-export const MAP_MAX_ZOOM = 16;
+/** How far a chest mark sits from its real spot before a line joins them, in chest marks. */
+export const MAP_CHEST_MOVED_STEP = 0.5;
+
+/** Size of an online player mark on the map, in screen pixels. */
+export const MAP_PLAYER_PX = 16;
+
+/** Size of a death mark on the map, in screen pixels. */
+export const MAP_DEATH_PX = 22;
+
+/** Distance from the world's center to the edge of the world, where its ocean ends, in meters. */
+export const WORLD_EDGE_METERS = 10_500;
+
+/** Part of the map the whole world fits in, with a margin, in map units. */
+export const MAP_WORLD_BOX: MapBox = {
+  x: -WORLD_EDGE_METERS - MAP_MARGIN_METERS,
+  y: -WORLD_EDGE_METERS - MAP_MARGIN_METERS,
+  width: 2 * (WORLD_EDGE_METERS + MAP_MARGIN_METERS),
+  height: 2 * (WORLD_EDGE_METERS + MAP_MARGIN_METERS),
+};
+
+/** Narrowest part of the map the zoom can show, in meters. */
+export const MAP_MIN_VIEW_METERS = 128;
 
 /** How much one zoom step or wheel notch zooms the map in or out. */
 export const MAP_ZOOM_STEP = 1.5;
@@ -380,11 +403,26 @@ export const MAP_ZOOM_STEP = 1.5;
 /** How far a pointer must move before a press on the map counts as a drag and not a tap, in pixels. */
 export const MAP_DRAG_PX = 4;
 
-/** Size of a player mark on the map at the whole-map zoom, in meters. */
-export const MAP_PLAYER_METERS = 16;
+/** Length the map's scale bar aims for, in screen pixels, before it is rounded to a plain distance. */
+export const MAP_SCALE_BAR_PX = 120;
 
-/** Size of a death mark on the map at the whole-map zoom, in meters. */
-export const MAP_DEATH_METERS = 24;
+/** Plain distances the scale bar can show, in meters. */
+export const MAP_SCALE_STEPS_METERS = [10, 20, 50, 100, 200, 500, 1000, 2000, 5000];
+
+/** Meters in one kilometer. */
+export const METERS_PER_KM = 1000;
+
+/** Kinds of chest marks on the map, each with its own drawing. */
+export type ChestMarkKind = 'chest' | 'treasure' | 'cart' | 'ship';
+
+/** Mark kind of each chest prefab that does not use the plain chest drawing. */
+export const CHEST_MARK_KINDS: Record<string, ChestMarkKind> = {
+  Cart: 'cart',
+  Raft: 'ship',
+  Karve: 'ship',
+  VikingShip: 'ship',
+  shipwreck_karve_chest: 'treasure',
+};
 
 /**
  * Names the game shows for chests, carts and ships, by the prefab the plugin logs. Chests the world came with,
@@ -429,16 +467,14 @@ export const CHEST_SLOT_ICON_PX = 44;
 
 /** What the map draws, in map units: meters east as `x` and meters south as `y`, so north is up. */
 export type MapView = {
-  /** Part of the map that fits everything, with a margin. */
+  /** Part of the map that fits all explored land and marks, with a margin. */
   box: MapBox;
-  /** Size of a chest mark, in meters. */
-  chestMeters: number;
   /** Explored squares, once each, in their terrain color, or the line color before the terrain is known. */
   land: { key: string; x: number; y: number; color: string }[];
   /** A small mark in the middle of each square a character walked, in that character's player color. */
   trails: { key: string; x: number; y: number; color: string }[];
   /** Chests, carts and ships, by their ID. */
-  chests: { id: string; x: number; y: number; record: ChestRecord }[];
+  chests: { id: string; x: number; y: number; kind: ChestMarkKind; record: ChestRecord }[];
   /** Where each online player stands and where each character last died. */
   marks: { key: string; kind: 'player' | 'death'; label: string; x: number; y: number; color: string }[];
 };
