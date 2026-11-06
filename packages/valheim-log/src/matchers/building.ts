@@ -2,7 +2,9 @@ import { heldItemsOf, playerOf } from '#/fields';
 import type { Matcher } from '#/models';
 import {
   CHEST_CONTENTS_PATTERN,
+  CHEST_LABEL_PATTERN,
   CHEST_REMOVED_PATTERN,
+  CHEST_UNLABELED_PATTERN,
   FUELED_PATTERN,
   PIECE_BUILT_PATTERN,
   PIECE_DESTROYED_PATTERN,
@@ -71,5 +73,13 @@ export const BUILDING_MATCHERS: readonly Matcher[] = [
   {
     pattern: CHEST_REMOVED_PATTERN,
     toEvent: (groups, timeUtc) => ({ type: 'chestRemoved', timeUtc, id: groups.id! }),
+  },
+  {
+    pattern: CHEST_LABEL_PATTERN,
+    toEvent: (groups, timeUtc) => ({ type: 'chestLabeled', timeUtc, id: groups.id!, label: groups.label! }),
+  },
+  {
+    pattern: CHEST_UNLABELED_PATTERN,
+    toEvent: (groups, timeUtc) => ({ type: 'chestUnlabeled', timeUtc, id: groups.id! }),
   },
 ];
