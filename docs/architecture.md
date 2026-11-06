@@ -356,6 +356,7 @@ flowchart LR
   pos["Position: Ragnar 120 -340"] --> square["Square 3,-11 explored by Ragnar"]
   chest["Chest: 5273:1203 piece_chest_wood at 118 -336 ... holds Wood x20"] --> chests[Chest by ID]
   removed["Chest removed: 5273:1203"] --> chests
+  label["Chest label: 5273:1203 Ores"] --> chests
   tomb["Tombstone: Ragnar at 410 -77 holds ..."] --> death[Ragnar's last death]
   levi["Leviathan: 5273:4410 at -1520 2210"] --> leviathans[Leviathan by ID]
   gone["Leviathan gone: 5273:4410"] --> leviathans
@@ -379,8 +380,18 @@ the whole world, so you can see where the explored land sits in it.
 | Chest, world chest, cart, ship | Each with its own drawing |
 | Line and dot from a chest | The chest was set beside its neighbors, and the dot is where it really stands |
 
+A sign put right against a chest names it, for example `Ores`: the plugin finds signs within 1.25 m of a chest,
+and each sign names only its closest chest. The map then calls the chest by that name everywhere, with the chest's
+kind beside it.
+
+```mermaid
+flowchart LR
+  sign["Sign 'Ores', 0.5 m from chest A, 1.6 m from chest B"] --> a[Chest A is called Ores]
+  sign -.->|too far| b[Chest B keeps its name, Wood chest]
+```
+
 Every chest has its own mark. Marks are small zoomed out and grow as the map zooms in. Once the view
-is no wider than the explored land, chests that would cover each other sit side by side. Pointing at a chest shows a box with its name, who built it and how many slots are full. Tapping one opens it as the
+is no wider than the explored land, chests that would cover each other sit side by side. Pointing at a chest shows a box with its name or sign, who built it and how many slots are full. Tapping one opens it as the
 game's slot grid, and pointing at a slot shows the item's name and count. Item names and icons come from the item's prefab, through
 `GEAR_NAMES` and `ITEM_NAMES`, or the prefab split into words. An item the wiki has no icon
 for shows a plain sack.
