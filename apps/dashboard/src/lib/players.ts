@@ -1,7 +1,19 @@
 import type { PlayerSession } from 'valheim-log';
 
-import { type ActivityKind, OTHER_PLAYER_COLOR, PLAYER_COLORS, type Player, type Snapshot } from '#/lib/models';
-import { isServerOnline } from '#/lib/status';
+import {
+  ACTIVITY_STORY_KINDS,
+  type ActivityKind,
+  MAP_SQUARE_METERS,
+  OTHER_PLAYER_COLOR,
+  PLAYER_ACTIVITY_STATS,
+  PLAYER_COLORS,
+  type Player,
+  type PlayerStat,
+  type Snapshot,
+  SQUARE_METERS_PER_KM2,
+} from '#/lib/models';
+import { playerSource } from '#/lib/sources';
+import { durationLabel, isServerOnline } from '#/lib/status';
 
 /**
  * End of [session] in milliseconds. An open session ends now while the server is online, or at the last
@@ -77,3 +89,26 @@ export const playersOf = (snapshot: Snapshot, nowMs: number): Player[] => {
     };
   });
 };
+
+/**
+ * Numbers on [player]'s card, each with the log lines in [snapshot] behind it: time played, visits, deaths, kills,
+ * every activity they did at least once, and the land they explored.
+ */
+export const playerStats = (snapshot: Snapshot, player: Player): PlayerStat[] => [
+  { label: 'Time played', value: durationLabel(player.totalMs), kind: 'night', source: playerSource(snapshot, player, 'visits') },
+  { label: 'Visits', value: String(player.sessions.length), kind: 'joined', source: playerSource(snapshot, player, 'visits') },
+  { label: 'Deaths', value: String(player.deaths), kind: 'died', source: playerSource(snapshot, player, 'deaths') },
+  { label: 'Kills', value: String(player.kills), kind: 'fight', source: playerSource(snapshot, player, 'kills') },
+  ...PLAYER_ACTIVITY_STATS.filter(({ kind }) => (player.activityTotals[kind] ?? 0) > 0).map(({ kind, label }) => ({
+    label,
+    value: player.activityTotals[kind]!.toLocaleString(),
+    kind: ACTIVITY_STORY_KINDS[kind],
+    source: playerSource(snapshot, player, 'activity', kind),
+  })),
+  {
+    label: 'Land explored',
+    value: `${((player.exploredSquares * MAP_SQUARE_METERS ** 2) / SQUARE_METERS_PER_KM2).toFixed(2)} km²`,
+    kind: 'travel',
+    source: null,
+  },
+];
