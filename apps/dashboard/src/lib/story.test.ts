@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { areaLabel, daySummaryParts, storyOf } from '#/lib/story';
+import { daySummaryParts, storyOf } from '#/lib/story';
 import { NO_LINES, sessionWith, snapshotWith } from '#/lib/test-common';
 
 describe('storyOf', () => {
@@ -301,12 +301,5 @@ describe('story sources', () => {
       ['Ragnar joined', ['join line']],
     ]);
     expect(story[0]!.source.lines.map((record) => record.kind)).toEqual(['died', 'died']);
-  });
-});
-
-describe('labels', () => {
-  it('names areas the way the game shows them', () => {
-    // WHEN / THEN plugin names read plainly
-    expect(['BlackForest', 'Mountain', 'Ocean', 'Dungeon'].map(areaLabel)).toEqual(['Black Forest', 'Mountains', 'Ocean', 'Dungeon']);
   });
 });

@@ -4,7 +4,7 @@
   import VikingCard from '#/lib/components/vikings/VikingCard';
   import { live, useSnapshot } from '#/lib/live.svelte';
   import { playersOf } from '#/lib/players';
-  import { viewerTimeZone } from '#/lib/status';
+  import { viewerTimeZone } from '#/lib/time';
 
   /** Getter for the snapshot the layout shares. */
   const getSnapshot = useSnapshot();

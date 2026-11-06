@@ -4,7 +4,7 @@
   import Pill from '#/lib/components/Pill';
   import { live } from '#/lib/live.svelte';
   import { type SourceLines, STORY_STYLES } from '#/lib/models';
-  import { viewerTimeZone, whenLabel } from '#/lib/status';
+  import { viewerTimeZone, whenLabel } from '#/lib/time';
 
   /** What the lines are about, the lines, what to say when there are none, and what to show as the button that opens them. */
   let {
