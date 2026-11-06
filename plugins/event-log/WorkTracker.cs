@@ -22,6 +22,17 @@ namespace ValheimDashboard.EventLog
         /// <summary>Hash of the call a player sends to write a name on a portal.</summary>
         private static readonly int SetTagHash = "RPC_SetTag".GetStableHashCode();
 
+        /// <summary>Hash of the call a player sends to put a saddle on a tame another player's game owns.</summary>
+        private static readonly int AddSaddleHash = "AddSaddle".GetStableHashCode();
+
+        /// <summary>Hashes of the calls a player sends to fuel a fire, repair a piece or share their map on a table.</summary>
+        private static readonly HashSet<int> UpkeepHashes = new HashSet<int>
+        {
+            "RPC_AddFuel".GetStableHashCode(),
+            "RPC_Repair".GetStableHashCode(),
+            "MapData".GetStableHashCode(),
+        };
+
         /// <summary>
         /// Seconds a player who asked through the server counts as the one who did it. Longer than a scan, since
         /// stations are read once per scan.
@@ -34,11 +45,14 @@ namespace ValheimDashboard.EventLog
         /// <summary>Items queued in each station at the last scan, by object ID.</summary>
         private static readonly Dictionary<ZDOID, List<string>> Queues = new Dictionary<ZDOID, List<string>>();
 
-        /// <summary>Remembers who asked when [data] is a hit, an item put into a station or a fermenter, or a portal name.</summary>
+        /// <summary>
+        /// Remembers who asked when [data] is a hit, an item put into a station or a fermenter, a portal name, a
+        /// saddle, fuel, a repair or a map shared.
+        /// </summary>
         public static void Read(ZRoutedRpc.RoutedRPCData data)
         {
             if (data.m_methodHash == DamageHash || data.m_methodHash == AddOreHash || data.m_methodHash == AddItemHash
-                || data.m_methodHash == SetTagHash)
+                || data.m_methodHash == SetTagHash || data.m_methodHash == AddSaddleHash || UpkeepHashes.Contains(data.m_methodHash))
             {
                 AskedBy[data.m_targetZDO] = (data.m_senderPeerID, Time.time);
             }
