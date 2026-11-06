@@ -173,15 +173,22 @@ describe('server state', () => {
     ]);
   });
 
-  it('keeps items made, upgrades and skill levels as activities per player', () => {
-    // GIVEN Yan makes arrows twice, upgrades a sword and gains two skill levels
+  it('keeps items made, upgrades, powers, rides, carts, meals, fuel, repairs and obliterating as activities per player', () => {
+    // GIVEN Yan makes arrows, upgrades a sword, uses his power twice, rides, pulls a cart, eats, fuels, repairs and obliterates
     readLines(state, [
       ...RUN_START,
       logLine('03:00:00', 'Made: ArrowFlint x20 by Yan'),
       logLine('03:00:30', 'Made: ArrowFlint x10 by Yan'),
       logLine('03:01:00', 'Upgraded: SwordBronze to level 2 by Yan'),
-      logLine('03:01:10', 'Skill up: Yan'),
-      logLine('03:01:20', 'Skill up: Yan'),
+      logLine('03:01:10', 'Power used: Yan'),
+      logLine('03:01:20', 'Power used: Yan'),
+      logLine('03:01:30', 'Riding: Yan on Lox'),
+      logLine('03:01:40', 'Pulling cart: Yan with Cart'),
+      logLine('03:01:50', 'Ate something: Yan'),
+      logLine('03:02:00', 'Fueled: fire_pit by Yan'),
+      logLine('03:02:10', 'Repaired: wood_wall by Yan'),
+      logLine('03:02:20', 'Repaired: wood_wall by Yan'),
+      logLine('03:02:30', 'Obliterated: Resin x20 in incinerator by Yan'),
     ]);
 
     // WHEN the activities are listed
@@ -191,7 +198,13 @@ describe('server state', () => {
     expect(kinds).toEqual([
       ['Yan', 'made', { ArrowFlint: 30 }],
       ['Yan', 'upgraded', { SwordBronze: 1 }],
-      ['Yan', 'leveled', { skill: 2 }],
+      ['Yan', 'powered', { power: 2 }],
+      ['Yan', 'rode', { Lox: 1 }],
+      ['Yan', 'pulled', { Cart: 1 }],
+      ['Yan', 'ate', { something: 1 }],
+      ['Yan', 'fueled', { fire_pit: 1 }],
+      ['Yan', 'repaired', { wood_wall: 2 }],
+      ['Yan', 'obliterated', { Resin: 20 }],
     ]);
   });
 

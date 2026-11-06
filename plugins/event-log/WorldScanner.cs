@@ -65,6 +65,8 @@ namespace ValheimDashboard.EventLog
                 ShipTracker.See(zdo);
                 LeviathanTracker.See(zdo);
                 PieceStateTracker.See(zdo);
+                RideTracker.See(zdo);
+                UpkeepTracker.See(zdo);
                 CraftedItemTracker.See(zdo);
                 if (isNew)
                 {
@@ -106,7 +108,8 @@ namespace ValheimDashboard.EventLog
             PieceStateTracker.Forget(uid);
             ActionTracker.Forget(uid);
             CraftedItemTracker.Forget(uid);
-            EffectTracker.Forget(uid);
+            RideTracker.Forget(uid);
+            UpkeepTracker.Forget(uid);
             ZDO zdo = __instance.GetZDO(uid);
             if (zdo == null)
             {

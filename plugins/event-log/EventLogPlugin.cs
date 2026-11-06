@@ -32,7 +32,6 @@ namespace ValheimDashboard.EventLog
             harmony.PatchAll(typeof(RoutedRpcTracker));
             harmony.PatchAll(typeof(WorldEventTracker));
             harmony.PatchAll(typeof(ActionTracker));
-            harmony.PatchAll(typeof(EffectTracker));
             Logger.LogInfo($"{PluginName} {PluginVersion} loaded");
         }
     }

@@ -52,6 +52,7 @@ $env:LOG_FILE = "C:\Valheim Server\logs.txt"
 pnpm --filter dashboard dev   # live reload at http://localhost:5173
 pnpm check                    # types
 pnpm test                     # tests
+pnpm coverage                 # tests, with unit and integration coverage
 pnpm build                    # what CI runs last
 ```
 

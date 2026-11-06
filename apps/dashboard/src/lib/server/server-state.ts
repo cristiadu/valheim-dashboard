@@ -13,6 +13,7 @@ import {
   type Snapshot,
   STORY_EVENT_TYPES,
   type StoryEvent,
+  UNKNOWN_FOOD,
 } from '#/lib/models';
 import { updateBags } from '#/lib/server/bags';
 import { addSourceLine, keepServerLine, keepSourceLines } from '#/lib/server/log-sources';
@@ -104,9 +105,10 @@ const itemsSeenIn = (event: LogEvent): string[] => {
     case 'itemPickedUp':
     case 'chestChanged':
     case 'gearSeen':
-    case 'ate':
     case 'smelting':
       return [event.item];
+    case 'ate':
+      return event.item === null ? [] : [event.item];
     case 'tombstoneContents':
       return Object.keys(event.items);
     case 'wearing':
@@ -170,7 +172,7 @@ const addActivityOf = (snapshot: Snapshot, event: LogEvent, line: string): void 
       addActivity(snapshot, line, timeUtc, event.player, 'planted', event.plant, 1);
       break;
     case 'ate':
-      addActivity(snapshot, line, timeUtc, event.character, 'ate', event.item, 1);
+      addActivity(snapshot, line, timeUtc, event.character, 'ate', event.item ?? UNKNOWN_FOOD, 1);
       break;
     case 'smelting':
       addActivity(snapshot, line, timeUtc, event.player, 'smelted', event.item, event.count);
@@ -190,8 +192,23 @@ const addActivityOf = (snapshot: Snapshot, event: LogEvent, line: string): void 
     case 'itemMade':
       addActivity(snapshot, line, timeUtc, event.crafter, event.level === 1 ? 'made' : 'upgraded', event.item, event.count);
       break;
-    case 'skillUp':
-      addActivity(snapshot, line, timeUtc, event.player, 'leveled', 'skill', 1);
+    case 'riding':
+      addActivity(snapshot, line, timeUtc, event.player, 'rode', event.creature, 1);
+      break;
+    case 'powerUsed':
+      addActivity(snapshot, line, timeUtc, event.character, 'powered', 'power', 1);
+      break;
+    case 'obliterated':
+      addActivity(snapshot, line, timeUtc, event.player, 'obliterated', event.item, event.count);
+      break;
+    case 'fueled':
+      addActivity(snapshot, line, timeUtc, event.player, 'fueled', event.fire, 1);
+      break;
+    case 'repaired':
+      addActivity(snapshot, line, timeUtc, event.player, 'repaired', event.piece, 1);
+      break;
+    case 'cartPulled':
+      addActivity(snapshot, line, timeUtc, event.player, 'pulled', event.cart, 1);
       break;
     case 'depleted':
       addActivity(snapshot, line, timeUtc, event.player, event.kind === 'tree' ? 'cut' : 'mined', event.thing, 1);
