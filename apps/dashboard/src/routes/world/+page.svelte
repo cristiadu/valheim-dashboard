@@ -8,7 +8,7 @@
   import { LATEST_SAVE_COUNT } from '#/lib/models';
   import { bossPill } from '#/lib/pills';
   import { linesAt, serverSource } from '#/lib/sources';
-  import { viewerTimeZone, whenLabel } from '#/lib/status';
+  import { viewerTimeZone, whenLabel } from '#/lib/time';
 
   /** Getter for the snapshot the layout shares. */
   const getSnapshot = useSnapshot();

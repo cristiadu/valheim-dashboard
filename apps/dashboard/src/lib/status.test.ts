@@ -1,16 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  clockTime,
-  durationLabel,
-  isServerOnline,
-  offsetLabel,
-  offsetMinutesAt,
-  onlinePlayers,
-  statusLine,
-  whenLabel,
-} from '#/lib/status';
 import { MS_PER_MINUTE } from '#/lib/models';
+import { gigabytesLabel, isServerOnline, onlinePlayers, serverWarnings, statusLine, upStretches } from '#/lib/status';
 import { sessionWith, snapshotWith, TEST_NOON_MS, TEST_TIME_ZONE } from '#/lib/test-common';
 
 /** A run that started at 09:42Z with its last line at 12:00Z and one player inside. */
@@ -72,60 +63,53 @@ describe('statusLine', () => {
   });
 });
 
-describe('formatting', () => {
-  it('names offsets with hours and minutes', () => {
-    // GIVEN offsets west, east and half-hour
-    // WHEN / THEN they read like zone names
-    expect([offsetLabel(-420), offsetLabel(60), offsetLabel(330)]).toEqual(['UTC−7', 'UTC+1', 'UTC+5:30']);
-  });
-
-  it('moves a UTC time to a zone clock', () => {
-    // GIVEN 02:30Z
-    // WHEN / THEN it is the evening before in Los Angeles
-    expect(clockTime('2026-10-29T02:30:00.000Z', TEST_TIME_ZONE)).toBe('19:30');
-  });
-
-  it('shows hours only past an hour', () => {
-    // GIVEN 12 minutes and 3h 5m
-    // WHEN / THEN they read short
-    expect([durationLabel(12 * MS_PER_MINUTE), durationLabel(185 * MS_PER_MINUTE)]).toEqual(['12m', '3h 5m']);
+describe('gigabytesLabel', () => {
+  it('rounds free bytes to whole gigabytes', () => {
+    // GIVEN the free space from a real disk check
+    // WHEN / THEN it reads in whole gigabytes
+    expect(gigabytesLabel(278647042048)).toBe('279 GB');
   });
 });
 
-describe('whenLabel', () => {
-  it('shows only the time today and adds the date for other days', () => {
-    // GIVEN noon on Oct 29 in UTC
-    const nowMs = Date.parse('2026-10-29T12:00:00.000Z');
+describe('serverWarnings', () => {
+  it('lists crashes, Steam drops and low disk, newest first', () => {
+    // GIVEN a crashed run, a Steam drop and a disk under the warning size
+    const snapshot = snapshotWith({
+      runs: [{ startUtc: '2026-10-29T01:00:00.000Z', lastLineUtc: '2026-10-29T03:00:00.000Z', endReason: 'crashed' }],
+      steamDropsUtc: ['2026-10-29T05:00:00.000Z'],
+      diskSpace: { timeUtc: '2026-10-29T06:00:00.000Z', availableBytes: 20e6, warnBelowBytes: 29e6, blockedBelowBytes: 15e6 },
+    });
 
-    // WHEN a time today and one the day before are labeled
-    // THEN only the older one has a date
-    expect(whenLabel('2026-10-29T09:15:00.000Z', 'UTC', nowMs)).toBe('09:15');
-    expect(whenLabel('2026-10-28T23:05:00.000Z', 'UTC', nowMs)).toBe('Oct 28 23:05');
-  });
+    // WHEN warnings are listed
+    const warnings = serverWarnings(snapshot).map((warning) => [warning.kind, warning.text]);
 
-  it('keeps the clock a time had before daylight saving ended', () => {
-    // GIVEN Nov 2 in Los Angeles, after clocks went back on Nov 1
-    const nowMs = Date.parse('2026-11-02T20:00:00.000Z');
-
-    // WHEN an evening on Oct 31 and one on Nov 1 are labeled
-    // THEN each shows the clock of its own day: 19:30 both times
-    expect(whenLabel('2026-11-01T02:30:00.000Z', TEST_TIME_ZONE, nowMs)).toBe('Oct 31 19:30');
-    expect(whenLabel('2026-11-02T03:30:00.000Z', TEST_TIME_ZONE, nowMs)).toBe('Nov 1 19:30');
+    // THEN each problem has its kind and reads plainly, newest first
+    expect(warnings).toEqual([
+      ['disk', 'Disk almost full: 0.0 GB free'],
+      ['steam', 'Server lost its Steam connection'],
+      ['crash', 'Server went down without a clean stop'],
+    ]);
   });
 });
 
-describe('offsetMinutesAt', () => {
-  it('follows daylight saving time', () => {
-    // GIVEN the moments just before and after clocks went back in Los Angeles
-    // WHEN / THEN the offset moves from UTC−7 to UTC−8
-    expect(offsetMinutesAt(Date.parse('2026-11-01T08:59:59.000Z'), TEST_TIME_ZONE)).toBe(-420);
-    expect(offsetMinutesAt(Date.parse('2026-11-01T09:00:00.000Z'), TEST_TIME_ZONE)).toBe(-480);
-  });
+describe('upStretches', () => {
+  it('keeps the last 24 hours of each run and runs the live one to now', () => {
+    // GIVEN a run that stopped yesterday morning and a live run since 08:00
+    const snapshot = snapshotWith({
+      lastLineUtc: '2026-10-29T11:59:00.000Z',
+      runs: [
+        { startUtc: '2026-10-28T06:00:00.000Z', lastLineUtc: '2026-10-28T14:00:00.000Z', endReason: 'stopped' },
+        { startUtc: '2026-10-29T08:00:00.000Z', lastLineUtc: '2026-10-29T11:59:00.000Z', endReason: null },
+      ],
+    });
 
-  it('reads half-hour zones and UTC', () => {
-    // GIVEN noon on the test day
-    // WHEN / THEN Kolkata is UTC+5:30 and UTC is 0
-    expect(offsetMinutesAt(TEST_NOON_MS, 'Asia/Kolkata')).toBe(330);
-    expect(offsetMinutesAt(TEST_NOON_MS, 'UTC')).toBe(0);
+    // WHEN the stretches are found at noon
+    const stretches = upStretches(snapshot, TEST_NOON_MS);
+
+    // THEN the old run starts at the window edge and the live run ends now
+    expect(stretches).toEqual([
+      { startMs: Date.parse('2026-10-28T12:00:00.000Z'), endMs: Date.parse('2026-10-28T14:00:00.000Z') },
+      { startMs: Date.parse('2026-10-29T08:00:00.000Z'), endMs: TEST_NOON_MS },
+    ]);
   });
 });

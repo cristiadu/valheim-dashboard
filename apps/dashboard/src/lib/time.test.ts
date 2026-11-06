@@ -1,7 +1,19 @@
 import { describe, expect, it } from 'vitest';
 
-import { arcPath, clip, dayParts, dayPercent, hourOfDay, midnightBeforeMs, wedgePath, wheelPoint } from '#/lib/day';
-import { TEST_TIME_ZONE } from '#/lib/test-common';
+import { MS_PER_MINUTE } from '#/lib/models';
+import { TEST_NOON_MS, TEST_TIME_ZONE } from '#/lib/test-common';
+import {
+  clip,
+  clockTime,
+  dayParts,
+  dayPercent,
+  durationLabel,
+  hourOfDay,
+  midnightBeforeMs,
+  offsetLabel,
+  offsetMinutesAt,
+  whenLabel,
+} from '#/lib/time';
 
 describe('day helpers', () => {
   it('keeps only the part of a range inside the window', () => {
@@ -27,24 +39,6 @@ describe('day helpers', () => {
     // WHEN it is read in Los Angeles
     // THEN it is 19:30 the day before
     expect(hourOfDay(Date.parse('2026-10-29T02:30:00.000Z'), TEST_TIME_ZONE)).toBe(19.5);
-  });
-
-  it('puts midnight at the top and 6 on the right', () => {
-    // GIVEN radius 100
-    // WHEN points are placed
-    const [topX, topY] = wheelPoint(0, 100);
-    const [rightX, rightY] = wheelPoint(6, 100);
-
-    // THEN they sit at the top and right of the center
-    expect([Math.round(topX), Math.round(topY), Math.round(rightX), Math.round(rightY)]).toEqual([150, 50, 250, 150]);
-  });
-
-  it('draws the long way round only for arcs over 12 hours', () => {
-    // GIVEN an arc from 22:00 to 02:00 and one from 01:00 to 23:00
-    // WHEN paths are made
-    // THEN only the second uses the large arc flag
-    expect(arcPath(22, 2, 100)).toContain(' 0 0 1 ');
-    expect(arcPath(1, 23, 100)).toContain(' 0 1 1 ');
   });
 
   it('finds the last midnight in the viewer zone', () => {
@@ -101,11 +95,62 @@ describe('day helpers', () => {
       { startMs: Date.parse('2026-10-29T00:00:00.000Z'), endMs: nowMs, isYesterday: false },
     ]);
   });
+});
 
-  it('draws a wedge from the center out to the rim', () => {
-    // GIVEN the wedge from 18:00 to midnight at radius 100
-    // WHEN its path is made
-    // THEN it starts at the center, goes out to 18:00 and arcs round to the top
-    expect(wedgePath(18, 24, 100)).toBe('M 150 150 L 50.0 150.0 A 100 100 0 0 1 150.0 50.0 Z');
+describe('formatting', () => {
+  it('names offsets with hours and minutes', () => {
+    // GIVEN offsets west, east and half-hour
+    // WHEN / THEN they read like zone names
+    expect([offsetLabel(-420), offsetLabel(60), offsetLabel(330)]).toEqual(['UTC−7', 'UTC+1', 'UTC+5:30']);
+  });
+
+  it('moves a UTC time to a zone clock', () => {
+    // GIVEN 02:30Z
+    // WHEN / THEN it is the evening before in Los Angeles
+    expect(clockTime('2026-10-29T02:30:00.000Z', TEST_TIME_ZONE)).toBe('19:30');
+  });
+
+  it('shows hours only past an hour', () => {
+    // GIVEN 12 minutes and 3h 5m
+    // WHEN / THEN they read short
+    expect([durationLabel(12 * MS_PER_MINUTE), durationLabel(185 * MS_PER_MINUTE)]).toEqual(['12m', '3h 5m']);
+  });
+});
+
+describe('whenLabel', () => {
+  it('shows only the time today and adds the date for other days', () => {
+    // GIVEN noon on Oct 29 in UTC
+    const nowMs = Date.parse('2026-10-29T12:00:00.000Z');
+
+    // WHEN a time today and one the day before are labeled
+    // THEN only the older one has a date
+    expect(whenLabel('2026-10-29T09:15:00.000Z', 'UTC', nowMs)).toBe('09:15');
+    expect(whenLabel('2026-10-28T23:05:00.000Z', 'UTC', nowMs)).toBe('Oct 28 23:05');
+  });
+
+  it('keeps the clock a time had before daylight saving ended', () => {
+    // GIVEN Nov 2 in Los Angeles, after clocks went back on Nov 1
+    const nowMs = Date.parse('2026-11-02T20:00:00.000Z');
+
+    // WHEN an evening on Oct 31 and one on Nov 1 are labeled
+    // THEN each shows the clock of its own day: 19:30 both times
+    expect(whenLabel('2026-11-01T02:30:00.000Z', TEST_TIME_ZONE, nowMs)).toBe('Oct 31 19:30');
+    expect(whenLabel('2026-11-02T03:30:00.000Z', TEST_TIME_ZONE, nowMs)).toBe('Nov 1 19:30');
+  });
+});
+
+describe('offsetMinutesAt', () => {
+  it('follows daylight saving time', () => {
+    // GIVEN the moments just before and after clocks went back in Los Angeles
+    // WHEN / THEN the offset moves from UTC−7 to UTC−8
+    expect(offsetMinutesAt(Date.parse('2026-11-01T08:59:59.000Z'), TEST_TIME_ZONE)).toBe(-420);
+    expect(offsetMinutesAt(Date.parse('2026-11-01T09:00:00.000Z'), TEST_TIME_ZONE)).toBe(-480);
+  });
+
+  it('reads half-hour zones and UTC', () => {
+    // GIVEN noon on the test day
+    // WHEN / THEN Kolkata is UTC+5:30 and UTC is 0
+    expect(offsetMinutesAt(TEST_NOON_MS, 'Asia/Kolkata')).toBe(330);
+    expect(offsetMinutesAt(TEST_NOON_MS, 'UTC')).toBe(0);
   });
 });

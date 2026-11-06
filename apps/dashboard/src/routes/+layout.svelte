@@ -9,7 +9,8 @@
   import { connectLive, live, provideSnapshot } from '#/lib/live.svelte';
   import { PASSWORD_PATH, type Snapshot } from '#/lib/models';
   import { serverPill } from '#/lib/pills';
-  import { isServerOnline, statusLine, viewerTimeZone } from '#/lib/status';
+  import { isServerOnline, statusLine } from '#/lib/status';
+  import { viewerTimeZone } from '#/lib/time';
   import { tabFor } from '#/lib/tabs';
 
   /** Snapshot from the server render, and the page for the current tab. */
