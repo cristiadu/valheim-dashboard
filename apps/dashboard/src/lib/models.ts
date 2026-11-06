@@ -1014,6 +1014,12 @@ export type Player = {
   exploredSquares: number;
 };
 
+/**
+ * One number on a player's card, with the story kind whose rune it shows and the log lines behind it. Land explored
+ * has no lines, so its [source] is null and it links to the Map tab instead.
+ */
+export type PlayerStat = { label: string; value: string; kind: StoryKind; source: SourceLines | null };
+
 /** What kind of thing happened, which picks its rune and color. */
 export type StoryKind =
   | 'joined'
