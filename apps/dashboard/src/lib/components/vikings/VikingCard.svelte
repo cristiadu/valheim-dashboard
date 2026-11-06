@@ -10,8 +10,8 @@
   import { playerPill } from '#/lib/pills';
   import { playerStats } from '#/lib/players';
   import { playerSource } from '#/lib/sources';
-  import { clockTime } from '#/lib/status';
-  import { areaLabel, thingName } from '#/lib/story';
+  import { areaLabel, thingName } from '#/lib/text';
+  import { clockTime } from '#/lib/time';
 
   /** The player the card is about, the snapshot their numbers come from, and the viewer's time zone. */
   let { player, snapshot, timeZone }: { player: Player; snapshot: Snapshot; timeZone: string } = $props();

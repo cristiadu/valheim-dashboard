@@ -13,7 +13,8 @@ import {
   SQUARE_METERS_PER_KM2,
 } from '#/lib/models';
 import { playerSource } from '#/lib/sources';
-import { durationLabel, isServerOnline } from '#/lib/status';
+import { isServerOnline } from '#/lib/status';
+import { durationLabel } from '#/lib/time';
 
 /**
  * End of [session] in milliseconds. An open session ends now while the server is online, or at the last
