@@ -1,192 +1,56 @@
-import type { ChatKind, LogEvent, LogReader, Matcher } from '#/models';
+import { heldItemsOf, playerOf } from '#/fields';
+import { ANYWHERE_MATCHERS } from '#/matchers/anywhere';
+import { CONNECTION_MATCHERS } from '#/matchers/connections';
+import { PLAYER_MATCHERS } from '#/matchers/players';
+import { WORLD_MATCHERS } from '#/matchers/world';
+import type { LogEvent, LogReader, Matcher } from '#/models';
 import {
-  AREA_ENTERED_PATTERN,
   ATE_PATTERN,
   ATE_SOMETHING_PATTERN,
-  BACKUP_PATTERN,
-  BED_CLAIMED_PATTERN,
-  BED_PATTERN,
-  BOSS_SUMMONED_PATTERN,
-  CHAT_PATTERN,
   CHEST_CONTENTS_PATTERN,
   CHEST_PATTERN,
   CHEST_REMOVED_PATTERN,
   CREATURE_KILLED_PATTERN,
-  DAY_STARTED_PATTERN,
-  DEATH_DETAILS_PATTERN,
   DEPLETED_PATTERN,
-  CHARACTER_PATTERN,
-  CRAFTING_PATTERN,
-  DISCONNECT_PATTERN,
-  DISK_SPACE_PATTERN,
   DROPPED_PATTERN,
-  EMOTE_PATTERN,
-  FUELED_PATTERN,
   FOOD_STARTED_PATTERN,
-  GAME_SERVER_PATTERN,
-  GEAR_PATTERN,
-  GLOBAL_KEY_PATTERN,
-  HANDSHAKE_PATTERN,
+  FUELED_PATTERN,
   HARVESTED_PATTERN,
-  HELD_ITEM_PATTERN,
   ITEM_HUNG_PATTERN,
-  KNOWN_PLAYER_PATTERN,
-  LEGACY_WORLD_SAVED_PATTERN,
-  LOCATION_REVEALED_PATTERN,
-  MAP_SHARED_PATTERN,
   LEVIATHAN_GONE_PATTERN,
   LEVIATHAN_PATTERN,
   MADE_PATTERN,
   MS_PER_MINUTE,
-  NIGHT_SKIPPED_PATTERN,
-  NOTHING_HELD,
-  OBJECTS_REMOVED_PATTERN,
   OBLITERATED_PATTERN,
   PET_NAMED_PATTERN,
   PICKED_UP_PATTERN,
   PIECE_BUILT_PATTERN,
   PIECE_DESTROYED_PATTERN,
   PLANTED_PATTERN,
-  PING_PATTERN,
-  PLAYER_COUNT_PATTERN,
-  PLAYFAB_CONNECTED_PATTERN,
-  POSITION_PATTERN,
-  PVP_PATTERN,
-  POSSIBLE_RAIDS_PATTERN,
   PORTAL_NAMED_PATTERN,
-  POWER_USED_PATTERN,
-  PULLING_CART_PATTERN,
-  RAID_ENDED_PATTERN,
-  RAID_PATTERN,
-  REFUSED_JOIN_PATTERN,
   REPAIRED_PATTERN,
-  SAILING_PATTERN,
-  REFUSED_JOIN_REASONS,
-  SERVER_STOPPED_PATTERN,
-  SIGN_PATTERN,
-  RIDING_PATTERN,
   SADDLED_PATTERN,
+  SERVER_STOPPED_PATTERN,
   SMELTING_PATTERN,
-  SOCKET_CLOSED_PATTERN,
-  STEAM_CONNECTED_PATTERN,
-  STEAM_ID_PREFIX,
-  STEAM_LINKED_PATTERN,
   TAME_CHANGES,
+  TAME_FOLLOWING_PATTERN,
   TAME_PATTERN,
-  TELEPORTED_PATTERN,
   TIMESTAMP_PATTERN,
   TOMBSTONE_EMPTIED_PATTERN,
   TOMBSTONE_PATTERN,
-  TAME_FOLLOWING_PATTERN,
+  UPGRADED_PATTERN,
   WARD_ACCESS_PATTERN,
   WARD_PATTERN,
-  UNKNOWN_PLAYER,
-  UNNAMED_PORTAL,
-  UPGRADED_PATTERN,
-  VERSION_PATTERN,
-  WEARING_PATTERN,
-  WORLD_LOADED_PATTERN,
-  WORLD_SAVE_STEP_PATTERN,
 } from '#/patterns';
 
-/** Reads an optional number group, or null when it did not match. */
-const optionalNumber = (value: string | undefined): number | null => (value === undefined ? null : Number(value));
-
-/** Reads a held items list, such as `Wood x20, Stone x3` or `nothing`, into counts by item name. */
-export const heldItemsOf = (text: string): Record<string, number> => {
-  const items: Record<string, number> = {};
-  if (text === NOTHING_HELD) {
-    return items;
-  }
-  for (const entry of text.split(', ')) {
-    const groups = HELD_ITEM_PATTERN.exec(entry)?.groups;
-    if (groups !== undefined) {
-      items[groups.item!] = (items[groups.item!] ?? 0) + Number(groups.count);
-    }
-  }
-  return items;
-};
-
-/** Reads a player from the event log plugin, or null when the plugin did not know who it was. */
-const playerOf = (player: string | undefined): string | null => (player === UNKNOWN_PLAYER ? null : player!);
-
-/** Every known message, in the order it is checked. */
+/**
+ * Every known message. Each one but the last group starts with its own words, so their order does not matter; the
+ * messages found anywhere in a line come last.
+ */
 const MATCHERS: readonly Matcher[] = [
-  {
-    pattern: SIGN_PATTERN,
-    toEvent: (groups, timeUtc) => ({ type: 'signWritten', timeUtc, author: playerOf(groups.author), text: groups.text! }),
-  },
-  {
-    pattern: CHAT_PATTERN,
-    toEvent: (groups, timeUtc) => ({
-      type: 'chatMessage',
-      timeUtc,
-      character: groups.character!,
-      kind: groups.kind as ChatKind,
-      text: groups.text!,
-    }),
-  },
-  {
-    pattern: KNOWN_PLAYER_PATTERN,
-    toEvent: (groups, timeUtc) => ({ type: 'knownPlayer', timeUtc, steamName: groups.steamName!, steamId: groups.steamId! }),
-  },
-  {
-    pattern: PLAYFAB_CONNECTED_PATTERN,
-    toEvent: (groups, timeUtc) => ({ type: 'playerConnecting', timeUtc, connectionId: groups.playFabId!, steamId: null }),
-  },
-  {
-    pattern: STEAM_CONNECTED_PATTERN,
-    toEvent: (groups, timeUtc) => ({
-      type: 'playerConnecting',
-      timeUtc,
-      connectionId: groups.steamId!,
-      steamId: `${STEAM_ID_PREFIX}${groups.steamId}`,
-    }),
-  },
-  {
-    pattern: STEAM_LINKED_PATTERN,
-    toEvent: (groups, timeUtc) => ({ type: 'steamLinked', timeUtc, playFabId: groups.playFabId!, steamId: groups.steamId! }),
-  },
-  {
-    pattern: HANDSHAKE_PATTERN,
-    toEvent: (groups, timeUtc) => ({ type: 'handshake', timeUtc, connectionId: groups.connectionId! }),
-  },
-  {
-    pattern: CHARACTER_PATTERN,
-    toEvent: (groups, timeUtc) =>
-      groups.peerId === '0' && groups.objectId === '0'
-        ? { type: 'playerDied', timeUtc, character: groups.character! }
-        : { type: 'characterSpawned', timeUtc, character: groups.character!, peerId: groups.peerId! },
-  },
-  {
-    pattern: OBJECTS_REMOVED_PATTERN,
-    toEvent: (groups, timeUtc) => ({ type: 'playerLeft', timeUtc, peerId: groups.peerId! }),
-  },
-  {
-    pattern: PLAYER_COUNT_PATTERN,
-    toEvent: (groups, timeUtc) => ({
-      type: 'playerCount',
-      timeUtc,
-      players: Number(groups.players),
-      isJoin: groups.change === 'joined',
-    }),
-  },
-  {
-    pattern: DISCONNECT_PATTERN,
-    toEvent: (groups, timeUtc) => ({ type: 'playerDisconnecting', timeUtc, isTimeout: groups.timeout !== undefined }),
-  },
-  {
-    pattern: SOCKET_CLOSED_PATTERN,
-    toEvent: (groups, timeUtc) => ({ type: 'socketClosed', timeUtc, steamId: `${STEAM_ID_PREFIX}${groups.steamId}` }),
-  },
-  {
-    pattern: POSSIBLE_RAIDS_PATTERN,
-    toEvent: (groups, timeUtc) => ({ type: 'raidCheck', timeUtc, possibleRaids: Number(groups.count) }),
-  },
-  {
-    pattern: RAID_PATTERN,
-    toEvent: (groups, timeUtc) => ({ type: 'raidStarted', timeUtc, raid: groups.raid! }),
-  },
+  ...CONNECTION_MATCHERS,
+  ...WORLD_MATCHERS,
+  ...PLAYER_MATCHERS,
   {
     pattern: PIECE_BUILT_PATTERN,
     toEvent: (groups, timeUtc) => ({ type: 'pieceBuilt', timeUtc, piece: groups.piece!, builder: playerOf(groups.builder) }),
@@ -196,123 +60,54 @@ const MATCHERS: readonly Matcher[] = [
     toEvent: (groups, timeUtc) => ({ type: 'pieceDestroyed', timeUtc, piece: groups.piece!, builder: playerOf(groups.builder) }),
   },
   {
-    pattern: WORLD_SAVE_STEP_PATTERN,
+    pattern: PORTAL_NAMED_PATTERN,
+    toEvent: (groups, timeUtc) => ({ type: 'portalNamed', timeUtc, portal: groups.portal!, player: playerOf(groups.player) }),
+  },
+  {
+    pattern: WARD_PATTERN,
     toEvent: (groups, timeUtc) => ({
-      type: 'worldSaveStep',
+      type: 'wardChanged',
       timeUtc,
-      step: Number(groups.step),
-      durationMs: Number(groups.ms),
-      saveNumber: optionalNumber(groups.saveNumber),
+      ward: groups.ward!,
+      builder: playerOf(groups.builder),
+      isOn: groups.state === 'on',
     }),
   },
   {
-    pattern: LEGACY_WORLD_SAVED_PATTERN,
+    pattern: WARD_ACCESS_PATTERN,
     toEvent: (groups, timeUtc) => ({
-      type: 'worldSaveStep',
+      type: 'wardAccess',
       timeUtc,
-      step: 5,
-      durationMs: Math.round(Number(groups.ms)),
-      saveNumber: null,
+      player: groups.player!,
+      ward: groups.ward!,
+      builder: playerOf(groups.builder),
+      isGiven: groups.change === 'given',
     }),
   },
   {
-    pattern: BACKUP_PATTERN,
-    toEvent: (groups, timeUtc) => ({ type: 'backupCreated', timeUtc, backup: groups.backup! }),
+    pattern: REPAIRED_PATTERN,
+    toEvent: (groups, timeUtc) => ({ type: 'repaired', timeUtc, piece: groups.piece!, player: playerOf(groups.player) }),
   },
   {
-    pattern: DISK_SPACE_PATTERN,
+    pattern: FUELED_PATTERN,
+    toEvent: (groups, timeUtc) => ({ type: 'fueled', timeUtc, fire: groups.fire!, player: playerOf(groups.player) }),
+  },
+  {
+    pattern: CHEST_CONTENTS_PATTERN,
     toEvent: (groups, timeUtc) => ({
-      type: 'diskSpace',
+      type: 'chestContents',
       timeUtc,
-      availableBytes: Number(groups.available),
-      blockedBelowBytes: Number(groups.blockedBelow),
-      warnBelowBytes: Number(groups.warnBelow),
-    }),
-  },
-  {
-    pattern: VERSION_PATTERN,
-    toEvent: (groups, timeUtc) => ({
-      type: 'serverVersion',
-      timeUtc,
-      version: groups.version!,
-      networkVersion: Number(groups.network),
-    }),
-  },
-  {
-    pattern: WORLD_LOADED_PATTERN,
-    toEvent: (groups, timeUtc) => ({
-      type: 'worldLoaded',
-      timeUtc,
-      world: groups.world!,
-      saveNumber: optionalNumber(groups.saveNumber),
-    }),
-  },
-  {
-    pattern: GAME_SERVER_PATTERN,
-    toEvent: (groups, timeUtc) => ({ type: 'gameServer', timeUtc, isConnected: groups.state === 'connected' }),
-  },
-  {
-    pattern: SERVER_STOPPED_PATTERN,
-    toEvent: (_, timeUtc) => ({ type: 'serverStopped', timeUtc }),
-  },
-  {
-    pattern: PING_PATTERN,
-    toEvent: (groups, timeUtc) => ({
-      type: 'ping',
-      timeUtc,
-      character: groups.character!,
+      id: groups.id!,
+      chest: groups.chest!,
       x: Number(groups.x),
       z: Number(groups.z),
+      builder: playerOf(groups.builder),
+      items: heldItemsOf(groups.items!),
     }),
   },
   {
-    pattern: GLOBAL_KEY_PATTERN,
-    toEvent: (groups, timeUtc) => ({ type: 'globalKey', timeUtc, key: groups.key!, isSet: groups.change === 'set' }),
-  },
-  {
-    pattern: RAID_ENDED_PATTERN,
-    toEvent: (groups, timeUtc) => ({ type: 'raidEnded', timeUtc, raid: groups.raid! }),
-  },
-  {
-    pattern: BOSS_SUMMONED_PATTERN,
-    toEvent: (groups, timeUtc) => ({
-      type: 'bossSummoned',
-      timeUtc,
-      boss: groups.boss!,
-      summoner: playerOf(groups.summoner),
-    }),
-  },
-  {
-    pattern: DAY_STARTED_PATTERN,
-    toEvent: (groups, timeUtc) => ({ type: 'dayStarted', timeUtc, day: Number(groups.day) }),
-  },
-  {
-    pattern: CREATURE_KILLED_PATTERN,
-    toEvent: (groups, timeUtc) => ({
-      type: 'creatureKilled',
-      timeUtc,
-      creature: groups.creature!,
-      level: Number(groups.level),
-      attackers: groups.attackers!.split(', '),
-    }),
-  },
-  {
-    pattern: TAME_PATTERN,
-    toEvent: (groups, timeUtc) => ({
-      type: 'tameChanged',
-      timeUtc,
-      creature: groups.creature!,
-      change: TAME_CHANGES.get(groups.change!)!,
-      name: groups.name ?? null,
-    }),
-  },
-  {
-    pattern: PET_NAMED_PATTERN,
-    toEvent: (groups, timeUtc) => ({ type: 'petNamed', timeUtc, creature: groups.creature!, name: groups.name! }),
-  },
-  {
-    pattern: ITEM_HUNG_PATTERN,
-    toEvent: (groups, timeUtc) => ({ type: 'itemHung', timeUtc, item: groups.item!, player: playerOf(groups.player) }),
+    pattern: CHEST_REMOVED_PATTERN,
+    toEvent: (groups, timeUtc) => ({ type: 'chestRemoved', timeUtc, id: groups.id! }),
   },
   {
     pattern: PICKED_UP_PATTERN,
@@ -338,6 +133,10 @@ const MATCHERS: readonly Matcher[] = [
     }),
   },
   {
+    pattern: ITEM_HUNG_PATTERN,
+    toEvent: (groups, timeUtc) => ({ type: 'itemHung', timeUtc, item: groups.item!, player: playerOf(groups.player) }),
+  },
+  {
     pattern: CHEST_PATTERN,
     toEvent: (groups, timeUtc) => ({
       type: 'chestChanged',
@@ -356,6 +155,16 @@ const MATCHERS: readonly Matcher[] = [
   {
     pattern: PLANTED_PATTERN,
     toEvent: (groups, timeUtc) => ({ type: 'planted', timeUtc, plant: groups.plant!, player: playerOf(groups.player) }),
+  },
+  {
+    pattern: DEPLETED_PATTERN,
+    toEvent: (groups, timeUtc) => ({
+      type: 'depleted',
+      timeUtc,
+      kind: groups.kind === 'Tree cut' ? 'tree' : 'rock',
+      thing: groups.thing!,
+      player: playerOf(groups.player),
+    }),
   },
   {
     pattern: ATE_SOMETHING_PATTERN,
@@ -388,36 +197,6 @@ const MATCHERS: readonly Matcher[] = [
     }),
   },
   {
-    pattern: SAILING_PATTERN,
-    toEvent: (groups, timeUtc) => ({ type: 'sailing', timeUtc, character: groups.character!, ship: groups.ship! }),
-  },
-  {
-    pattern: CRAFTING_PATTERN,
-    toEvent: (groups, timeUtc) => ({ type: 'crafting', timeUtc, character: groups.character!, station: groups.station! }),
-  },
-  {
-    pattern: EMOTE_PATTERN,
-    toEvent: (groups, timeUtc) => ({ type: 'emote', timeUtc, character: groups.character!, emote: groups.emote! }),
-  },
-  {
-    pattern: BED_CLAIMED_PATTERN,
-    toEvent: (groups, timeUtc) => ({ type: 'bedClaimed', timeUtc, character: groups.character! }),
-  },
-  {
-    pattern: PORTAL_NAMED_PATTERN,
-    toEvent: (groups, timeUtc) => ({ type: 'portalNamed', timeUtc, portal: groups.portal!, player: playerOf(groups.player) }),
-  },
-  {
-    pattern: WARD_PATTERN,
-    toEvent: (groups, timeUtc) => ({
-      type: 'wardChanged',
-      timeUtc,
-      ward: groups.ward!,
-      builder: playerOf(groups.builder),
-      isOn: groups.state === 'on',
-    }),
-  },
-  {
     pattern: MADE_PATTERN,
     toEvent: (groups, timeUtc) => ({
       type: 'itemMade',
@@ -440,30 +219,6 @@ const MATCHERS: readonly Matcher[] = [
     }),
   },
   {
-    pattern: POWER_USED_PATTERN,
-    toEvent: (groups, timeUtc) => ({ type: 'powerUsed', timeUtc, character: groups.character! }),
-  },
-  {
-    pattern: LOCATION_REVEALED_PATTERN,
-    toEvent: (groups, timeUtc) => ({ type: 'locationRevealed', timeUtc, location: groups.location!, player: playerOf(groups.player) }),
-  },
-  {
-    pattern: RIDING_PATTERN,
-    toEvent: (groups, timeUtc) => ({ type: 'riding', timeUtc, player: playerOf(groups.player), creature: groups.creature! }),
-  },
-  {
-    pattern: SADDLED_PATTERN,
-    toEvent: (groups, timeUtc) => ({ type: 'saddled', timeUtc, creature: groups.creature!, player: playerOf(groups.player) }),
-  },
-  {
-    pattern: TAME_FOLLOWING_PATTERN,
-    toEvent: (groups, timeUtc) => ({ type: 'tameFollowing', timeUtc, creature: groups.creature!, player: groups.player! }),
-  },
-  {
-    pattern: PULLING_CART_PATTERN,
-    toEvent: (groups, timeUtc) => ({ type: 'cartPulled', timeUtc, player: playerOf(groups.player), cart: groups.cart! }),
-  },
-  {
     pattern: OBLITERATED_PATTERN,
     toEvent: (groups, timeUtc) => ({
       type: 'obliterated',
@@ -472,74 +227,6 @@ const MATCHERS: readonly Matcher[] = [
       count: Number(groups.count),
       player: playerOf(groups.player),
     }),
-  },
-  {
-    pattern: FUELED_PATTERN,
-    toEvent: (groups, timeUtc) => ({ type: 'fueled', timeUtc, fire: groups.fire!, player: playerOf(groups.player) }),
-  },
-  {
-    pattern: REPAIRED_PATTERN,
-    toEvent: (groups, timeUtc) => ({ type: 'repaired', timeUtc, piece: groups.piece!, player: playerOf(groups.player) }),
-  },
-  {
-    pattern: MAP_SHARED_PATTERN,
-    toEvent: (groups, timeUtc) => ({ type: 'mapShared', timeUtc, player: playerOf(groups.player), table: groups.table! }),
-  },
-  {
-    pattern: WARD_ACCESS_PATTERN,
-    toEvent: (groups, timeUtc) => ({
-      type: 'wardAccess',
-      timeUtc,
-      player: groups.player!,
-      ward: groups.ward!,
-      builder: playerOf(groups.builder),
-      isGiven: groups.change === 'given',
-    }),
-  },
-  {
-    pattern: DEPLETED_PATTERN,
-    toEvent: (groups, timeUtc) => ({
-      type: 'depleted',
-      timeUtc,
-      kind: groups.kind === 'Tree cut' ? 'tree' : 'rock',
-      thing: groups.thing!,
-      player: playerOf(groups.player),
-    }),
-  },
-  {
-    pattern: POSITION_PATTERN,
-    toEvent: (groups, timeUtc) => ({
-      type: 'position',
-      timeUtc,
-      character: groups.character!,
-      x: Number(groups.x),
-      z: Number(groups.z),
-    }),
-  },
-  {
-    pattern: CHEST_CONTENTS_PATTERN,
-    toEvent: (groups, timeUtc) => ({
-      type: 'chestContents',
-      timeUtc,
-      id: groups.id!,
-      chest: groups.chest!,
-      x: Number(groups.x),
-      z: Number(groups.z),
-      builder: playerOf(groups.builder),
-      items: heldItemsOf(groups.items!),
-    }),
-  },
-  {
-    pattern: CHEST_REMOVED_PATTERN,
-    toEvent: (groups, timeUtc) => ({ type: 'chestRemoved', timeUtc, id: groups.id! }),
-  },
-  {
-    pattern: LEVIATHAN_PATTERN,
-    toEvent: (groups, timeUtc) => ({ type: 'leviathan', timeUtc, id: groups.id!, x: Number(groups.x), z: Number(groups.z) }),
-  },
-  {
-    pattern: LEVIATHAN_GONE_PATTERN,
-    toEvent: (groups, timeUtc) => ({ type: 'leviathanGone', timeUtc, id: groups.id! }),
   },
   {
     pattern: TOMBSTONE_PATTERN,
@@ -562,68 +249,46 @@ const MATCHERS: readonly Matcher[] = [
     }),
   },
   {
-    pattern: DEATH_DETAILS_PATTERN,
+    pattern: CREATURE_KILLED_PATTERN,
     toEvent: (groups, timeUtc) => ({
-      type: 'deathDetails',
+      type: 'creatureKilled',
       timeUtc,
-      character: groups.character!,
-      area: groups.area!,
-      fighting: groups.fighting === undefined ? [] : groups.fighting.split(', '),
+      creature: groups.creature!,
+      level: Number(groups.level),
+      attackers: groups.attackers!.split(', '),
     }),
   },
   {
-    pattern: AREA_ENTERED_PATTERN,
-    toEvent: (groups, timeUtc) => ({ type: 'areaEntered', timeUtc, character: groups.character!, area: groups.area! }),
-  },
-  {
-    pattern: TELEPORTED_PATTERN,
+    pattern: TAME_PATTERN,
     toEvent: (groups, timeUtc) => ({
-      type: 'teleported',
+      type: 'tameChanged',
       timeUtc,
-      character: groups.character!,
-      portal: groups.portal === UNNAMED_PORTAL ? null : groups.portal!,
+      creature: groups.creature!,
+      change: TAME_CHANGES.get(groups.change!)!,
+      name: groups.name ?? null,
     }),
   },
   {
-    pattern: PVP_PATTERN,
-    toEvent: (groups, timeUtc) => ({ type: 'pvpChanged', timeUtc, character: groups.character!, isOn: groups.state === 'on' }),
+    pattern: PET_NAMED_PATTERN,
+    toEvent: (groups, timeUtc) => ({ type: 'petNamed', timeUtc, creature: groups.creature!, name: groups.name! }),
   },
   {
-    pattern: BED_PATTERN,
-    toEvent: (groups, timeUtc) => ({ type: 'wentToBed', timeUtc, character: groups.character! }),
+    pattern: SADDLED_PATTERN,
+    toEvent: (groups, timeUtc) => ({ type: 'saddled', timeUtc, creature: groups.creature!, player: playerOf(groups.player) }),
   },
   {
-    pattern: GEAR_PATTERN,
-    toEvent: (groups, timeUtc) => ({
-      type: 'gearSeen',
-      timeUtc,
-      character: groups.character!,
-      item: groups.item!,
-      quality: optionalNumber(groups.quality) ?? 1,
-    }),
+    pattern: TAME_FOLLOWING_PATTERN,
+    toEvent: (groups, timeUtc) => ({ type: 'tameFollowing', timeUtc, creature: groups.creature!, player: groups.player! }),
   },
   {
-    pattern: WEARING_PATTERN,
-    toEvent: (groups, timeUtc) => ({
-      type: 'wearing',
-      timeUtc,
-      character: groups.character!,
-      items: groups.items === NOTHING_HELD ? [] : groups.items!.split(', '),
-    }),
+    pattern: LEVIATHAN_PATTERN,
+    toEvent: (groups, timeUtc) => ({ type: 'leviathan', timeUtc, id: groups.id!, x: Number(groups.x), z: Number(groups.z) }),
   },
   {
-    pattern: REFUSED_JOIN_PATTERN,
-    toEvent: (_, timeUtc, message) => ({
-      type: 'joinRefused',
-      timeUtc,
-      reason: REFUSED_JOIN_REASONS.get(REFUSED_JOIN_PATTERN.exec(message)![0])!,
-      message,
-    }),
+    pattern: LEVIATHAN_GONE_PATTERN,
+    toEvent: (groups, timeUtc) => ({ type: 'leviathanGone', timeUtc, id: groups.id! }),
   },
-  {
-    pattern: NIGHT_SKIPPED_PATTERN,
-    toEvent: (groups, timeUtc) => ({ type: 'nightSkipped', timeUtc, day: Number(groups.day) + 1 }),
-  },
+  ...ANYWHERE_MATCHERS,
 ];
 
 /**
