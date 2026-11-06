@@ -1,5 +1,6 @@
 import {
   CHEST_NAMES,
+  type ChestRecord,
   CONTAINER_SIZES,
   DEFAULT_CONTAINER_SIZE,
   GEAR_NAMES,
@@ -30,6 +31,9 @@ export const builtByShortLabel = (builder: string | null): string => (builder ==
 /** Returns how many items [items] holds in all. */
 export const itemTotal = (items: Record<string, number>): number =>
   Object.values(items).reduce((sum, amount) => sum + amount, 0);
+
+/** Returns what the page calls [record]: the text of the sign on it, such as `Ores`, or else its name, such as `Wood chest`. */
+export const chestTitle = (record: ChestRecord): string => record.label ?? chestName(record.chest);
 
 /**
  * Returns the slot grid of the container [prefab] filling [used] slots: its columns and how many slots it has in

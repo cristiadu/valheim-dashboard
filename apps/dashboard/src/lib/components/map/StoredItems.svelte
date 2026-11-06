@@ -1,6 +1,6 @@
 <script lang="ts">
   import ItemIcon from '#/lib/components/ItemIcon';
-  import { builtByShortLabel, chestName, stockOf } from '#/lib/items';
+  import { builtByShortLabel, chestName, chestTitle, stockOf } from '#/lib/items';
   import type { MapChest } from '#/lib/models';
   import { count } from '#/lib/text';
 
@@ -17,7 +17,7 @@
   const visibleStock = $derived.by(() => {
     const text = query.trim().toLowerCase();
     return stock.filter((row) =>
-      [row.name, ...row.chests.map(({ chest }) => chestName(chest.record.chest))].some((name) => name.toLowerCase().includes(text)),
+      [row.name, ...row.chests.flatMap(({ chest }) => [chestName(chest.record.chest), chestTitle(chest.record)])].some((name) => name.toLowerCase().includes(text)),
     );
   });
 </script>
@@ -41,7 +41,7 @@
           <li>
             <button type="button" class="link" onclick={() => onpick(chest.id)}>
               <span class="amount">{amount.toLocaleString()}</span>
-              {chestName(chest.record.chest)}
+              {chestTitle(chest.record)}
               <span class="muted">{builtByShortLabel(chest.record.builder)}</span>
             </button>
           </li>

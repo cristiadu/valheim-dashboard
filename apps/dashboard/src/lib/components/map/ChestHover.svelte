@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { builtByLabel, chestName, containerGrid, slotsUsed } from '#/lib/items';
+  import { builtByLabel, chestName, chestTitle, containerGrid, slotsUsed } from '#/lib/items';
   import type { ChestHoverSpot, MapChest } from '#/lib/models';
 
   /** The pointed chest, where its box sits over the map, and the most of each item one slot holds. */
@@ -16,7 +16,10 @@
   style:top="{spot.top}px"
   role="tooltip"
 >
-  <strong>{chestName(chest.record.chest)}</strong>
+  <strong>{chestTitle(chest.record)}</strong>
+  {#if chest.record.label !== undefined}
+    <span>{chestName(chest.record.chest)}</span>
+  {/if}
   <span class="muted">{builtByLabel(chest.record.builder)}</span>
   <span>{used === 0 ? 'Empty' : `${used} of ${containerGrid(chest.record.chest, used).capacity} slots full`}</span>
   <span class="muted">Tap to look inside</span>
@@ -30,7 +33,9 @@
     display: grid;
     gap: 2px;
     min-width: 170px;
+    max-width: 200px;
     margin: 0 10px;
+    overflow-wrap: anywhere;
     padding: 8px 12px;
     font-size: 13px;
     background: var(--panel);

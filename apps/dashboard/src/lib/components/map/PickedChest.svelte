@@ -1,6 +1,6 @@
 <script lang="ts">
   import ChestContents from '#/lib/components/ChestContents';
-  import { builtByLabel, chestName } from '#/lib/items';
+  import { builtByLabel, chestName, chestTitle } from '#/lib/items';
   import type { MapChest } from '#/lib/models';
   import { whenLabel } from '#/lib/time';
 
@@ -29,9 +29,9 @@
   <div class="picked-head">
     <svg class="picked-icon" viewBox="-0.5 -0.5 1 1" aria-hidden="true"><use href="#chest-icon" /></svg>
     <div>
-      <h2 id="picked-title" class="panel-title">{chestName(chest.record.chest).toUpperCase()}</h2>
+      <h2 id="picked-title" class="panel-title">{chestTitle(chest.record).toUpperCase()}</h2>
       <p class="muted">
-        {builtByLabel(chest.record.builder)} · last looked at {whenLabel(chest.record.timeUtc, timeZone, nowMs)}
+        {chest.record.label === undefined ? '' : `${chestName(chest.record.chest)} · `}{builtByLabel(chest.record.builder)} · last looked at {whenLabel(chest.record.timeUtc, timeZone, nowMs)}
       </p>
     </div>
     <button type="button" onclick={onclose}>Close</button>

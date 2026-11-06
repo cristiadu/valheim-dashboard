@@ -14,7 +14,9 @@ param(
   # Port the dashboard listens on.
   [int]$Port = 3000,
   # Dedicated server folder, with start_headless_server.bat and BepInEx.
-  [string]$ServerDir = 'C:\Program Files (x86)\Steam\steamapps\common\Valheim dedicated server'
+  [string]$ServerDir = 'C:\Program Files (x86)\Steam\steamapps\common\Valheim dedicated server',
+  # Checkout to update. The default is the repo folder this script is in; tests point it at a throwaway one.
+  [string]$RepoRoot = (Split-Path -Parent $PSScriptRoot)
 )
 
 $ErrorActionPreference = 'Stop'
@@ -34,9 +36,6 @@ $DashboardStartSeconds = 120
 
 # Seconds the game server gets to save and exit after Ctrl+C.
 $GameServerStopSeconds = 300
-
-# Repo folder, one level above this script.
-$RepoRoot = Split-Path -Parent $PSScriptRoot
 
 # Built dashboard entry point. start-dashboard.ps1 starts it again 5 seconds after it stops.
 $DashboardEntry = Join-Path $RepoRoot 'apps\dashboard\build\index.js'
