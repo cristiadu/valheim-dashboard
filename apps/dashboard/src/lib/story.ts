@@ -5,6 +5,7 @@ import {
   ACTIVITY_WORDS,
   type ActivityRecord,
   AREA_NAMES,
+  BOSS_ALTAR_NAMES,
   BOSS_NAMES,
   type ChatRecord,
   DAY_MS,
@@ -17,6 +18,7 @@ import {
   type StoryItem,
   type StoryKind,
   type StoryText,
+  UNKNOWN_FOOD,
 } from '#/lib/models';
 import { mergedSource, sourceKey } from '#/lib/sources';
 import { durationLabel } from '#/lib/status';
@@ -57,9 +59,9 @@ export const thingList = (things: Record<string, number>): string =>
     .join(', ');
 
 /**
- * Story line for one stretch of activity, such as building or kills. Skill levels have no list, since the server
- * never learns which skill. Steering names the ships and how long the stretch lasted, from the first time a player
- * took the wheel to the last, since the log can't tell two ships of the same kind apart.
+ * Story line for one stretch of activity, such as building or kills. Powers and carts have no list, and meals leave
+ * out food the server never learned. Steering and riding name the ships or tames and how long the stretch lasted,
+ * from the first time a player took the wheel or got on to the last, since the log can't tell two of a kind apart.
  */
 const activityItem = (activity: ActivityRecord): StoryText => {
   const total = activityTotal(activity);
@@ -73,12 +75,13 @@ const activityItem = (activity: ActivityRecord): StoryText => {
   const kind = ACTIVITY_STORY_KINDS[activity.kind];
   const sentence = `${activity.player ?? 'Someone'} ${words.verb} ${count(total, words.one, words.many)}${words.ending}`;
   if (kind === 'items') {
-    return { timeUtc, kind, text: sentence, things: activity.things };
+    const things = Object.fromEntries(Object.entries(activity.things).filter(([thing]) => thing !== UNKNOWN_FOOD));
+    return { timeUtc, kind, text: sentence, things };
   }
-  if (activity.kind === 'leveled') {
-    return { timeUtc, kind, text: sentence };
+  if (activity.kind === 'powered' || activity.kind === 'pulled') {
+    return { timeUtc, kind, text: total === 1 ? `${activity.player ?? 'Someone'} ${words.verb}` : sentence };
   }
-  if (activity.kind === 'sailed') {
+  if (activity.kind === 'sailed' || activity.kind === 'rode') {
     const ships = Object.keys(activity.things).map(thingName).join(' and the ');
     const steeredMs = Date.parse(activity.endUtc) - Date.parse(activity.startUtc);
     const time = steeredMs < MS_PER_MINUTE ? '' : ` for ${durationLabel(steeredMs)}`;
@@ -191,12 +194,21 @@ const eventItem = (event: StoryEvent, players: Set<string>): StoryText => {
       return { timeUtc, kind: 'night', text: `${event.character} claimed a bed` };
     case 'portalNamed':
       return { timeUtc, kind: 'travel', text: `${event.player ?? 'Someone'} named a portal "${event.portal}"` };
-    case 'traded':
-      return {
-        timeUtc,
-        kind: 'items',
-        text: `${event.player ?? 'Someone'} ${event.isBuy ? 'bought something from' : 'sold something to'} ${event.trader}`,
-      };
+    case 'locationRevealed': {
+      const boss = BOSS_ALTAR_NAMES[event.location];
+      const place = boss === undefined ? `marks ${thingName(event.location)} on the map` : `shows where ${boss} is`;
+      return { timeUtc, kind: 'travel', text: `${event.player ?? 'Someone'} read a stone that ${place}` };
+    }
+    case 'saddled':
+      return { timeUtc, kind: 'tame', text: `${event.player ?? 'Someone'} put a saddle on ${withArticle(thingName(event.creature))}` };
+    case 'tameFollowing':
+      return { timeUtc, kind: 'tame', text: capitalized(`${withArticle(thingName(event.creature))} started following ${event.player}`) };
+    case 'mapShared':
+      return { timeUtc, kind: 'travel', text: `${event.player ?? 'Someone'} added what they explored to a map table` };
+    case 'wardAccess': {
+      const whose = event.builder === event.player ? 'their own' : `${event.builder ?? 'someone'}'s`;
+      return { timeUtc, kind: 'built', text: `${event.player} ${event.isGiven ? 'got access to' : 'gave up access to'} ${whose} ward` };
+    }
     case 'wardChanged':
       return { timeUtc, kind: 'built', text: `${event.builder ?? 'Someone'} turned their ward ${event.isOn ? 'on' : 'off'}` };
     case 'tameChanged':
