@@ -404,15 +404,9 @@ describe('parseMessage', () => {
     ]);
   });
 
-  it('reads items made, upgrades, skill-ups and trades from the event log plugin', () => {
+  it('reads items made and upgrades from the event log plugin', () => {
     // GIVEN one line of each kind, from a player whose name has a space
-    const messages = [
-      'Made: ArrowFlint x20 by Inge Dragonchow',
-      'Upgraded: SwordBronze to level 2 by Inge Dragonchow',
-      'Skill up: Inge Dragonchow',
-      'Traded: Inge Dragonchow bought from Haldor',
-      'Traded: an unknown player sold to Haldor',
-    ];
+    const messages = ['Made: ArrowFlint x20 by Inge Dragonchow', 'Upgraded: SwordBronze to level 2 by Inge Dragonchow'];
 
     // WHEN each message is read
     const events = messages.map((message) => parseMessage(message, '2026-01-01T00:00:00.000Z'));
@@ -422,9 +416,46 @@ describe('parseMessage', () => {
     expect(events).toEqual([
       { type: 'itemMade', timeUtc, item: 'ArrowFlint', count: 20, level: 1, crafter: 'Inge Dragonchow' },
       { type: 'itemMade', timeUtc, item: 'SwordBronze', count: 1, level: 2, crafter: 'Inge Dragonchow' },
-      { type: 'skillUp', timeUtc, player: 'Inge Dragonchow' },
-      { type: 'traded', timeUtc, player: 'Inge Dragonchow', trader: 'Haldor', isBuy: true },
-      { type: 'traded', timeUtc, player: null, trader: 'Haldor', isBuy: false },
+    ]);
+  });
+
+  it('reads eating, powers, stones, rides, tames, carts, ward access, obliterating, fuel, repairs and maps from the event log plugin', () => {
+    // GIVEN one line of each kind, from a player whose name has a space
+    const messages = [
+      'Ate something: Inge Dragonchow',
+      'Power used: Inge Dragonchow',
+      'Location revealed: Eikthyrnir by Inge Dragonchow',
+      'Riding: Inge Dragonchow on Lox',
+      'Saddled: Lox by an unknown player',
+      'Tame following: Wolf follows Inge Dragonchow',
+      'Pulling cart: Inge Dragonchow with Cart',
+      'Ward access given: Inge Dragonchow on guard_stone built by Yan',
+      'Ward access removed: Inge Dragonchow on guard_stone built by an unknown player',
+      'Obliterated: Resin x20 in incinerator by Inge Dragonchow',
+      'Fueled: fire_pit by Inge Dragonchow',
+      'Repaired: wood_wall by Inge Dragonchow',
+      'Map shared: Inge Dragonchow at piece_cartographertable',
+    ];
+
+    // WHEN each message is read
+    const events = messages.map((message) => parseMessage(message, '2026-01-01T00:00:00.000Z'));
+
+    // THEN each line gives its event and values
+    const timeUtc = '2026-01-01T00:00:00.000Z';
+    expect(events).toEqual([
+      { type: 'ate', timeUtc, character: 'Inge Dragonchow', item: null },
+      { type: 'powerUsed', timeUtc, character: 'Inge Dragonchow' },
+      { type: 'locationRevealed', timeUtc, location: 'Eikthyrnir', player: 'Inge Dragonchow' },
+      { type: 'riding', timeUtc, player: 'Inge Dragonchow', creature: 'Lox' },
+      { type: 'saddled', timeUtc, creature: 'Lox', player: null },
+      { type: 'tameFollowing', timeUtc, creature: 'Wolf', player: 'Inge Dragonchow' },
+      { type: 'cartPulled', timeUtc, player: 'Inge Dragonchow', cart: 'Cart' },
+      { type: 'wardAccess', timeUtc, player: 'Inge Dragonchow', ward: 'guard_stone', builder: 'Yan', isGiven: true },
+      { type: 'wardAccess', timeUtc, player: 'Inge Dragonchow', ward: 'guard_stone', builder: null, isGiven: false },
+      { type: 'obliterated', timeUtc, item: 'Resin', count: 20, player: 'Inge Dragonchow' },
+      { type: 'fueled', timeUtc, fire: 'fire_pit', player: 'Inge Dragonchow' },
+      { type: 'repaired', timeUtc, piece: 'wood_wall', player: 'Inge Dragonchow' },
+      { type: 'mapShared', timeUtc, player: 'Inge Dragonchow', table: 'piece_cartographertable' },
     ]);
   });
 

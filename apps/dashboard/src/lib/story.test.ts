@@ -129,26 +129,38 @@ describe('storyOf', () => {
     ]);
   });
 
-  it('tells trades and skill levels in plain sentences', () => {
-    // GIVEN Inge Dragonchow buys from Haldor, sells to him and gains two skill levels
+  it('tells stones, saddles, tames following, ward access, maps, powers, carts and rides in plain sentences', () => {
+    // GIVEN Inge Dragonchow reads a stone, saddles a lox, a wolf follows her, she joins Yan's ward, shares her map and rides
     const snapshot = snapshotWith({
       events: [
-        { type: 'traded', timeUtc: '2026-10-29T10:01:00.000Z', player: 'Inge Dragonchow', trader: 'Haldor', isBuy: true, line: 'test line' },
-        { type: 'traded', timeUtc: '2026-10-29T10:02:00.000Z', player: 'Inge Dragonchow', trader: 'Haldor', isBuy: false, line: 'test line' },
+        { type: 'locationRevealed', timeUtc: '2026-10-29T10:01:00.000Z', location: 'Eikthyrnir', player: 'Inge Dragonchow', line: 'test line' },
+        { type: 'saddled', timeUtc: '2026-10-29T10:02:00.000Z', creature: 'Lox', player: 'Inge Dragonchow', line: 'test line' },
+        { type: 'tameFollowing', timeUtc: '2026-10-29T10:03:00.000Z', creature: 'Wolf', player: 'Inge Dragonchow', line: 'test line' },
+        { type: 'wardAccess', timeUtc: '2026-10-29T10:04:00.000Z', player: 'Inge Dragonchow', ward: 'guard_stone', builder: 'Yan', isGiven: true, line: 'test line' },
+        { type: 'mapShared', timeUtc: '2026-10-29T10:04:30.000Z', player: 'Inge Dragonchow', table: 'piece_cartographertable', line: 'test line' },
       ],
       activities: [
-        { player: 'Inge Dragonchow', kind: 'leveled', startUtc: '2026-10-29T10:03:00.000Z', endUtc: '2026-10-29T10:03:00.000Z', things: { skill: 2 }, source: NO_LINES },
+        { player: 'Inge Dragonchow', kind: 'powered', startUtc: '2026-10-29T10:05:00.000Z', endUtc: '2026-10-29T10:05:00.000Z', things: { power: 2 }, source: NO_LINES },
+        { player: 'Inge Dragonchow', kind: 'pulled', startUtc: '2026-10-29T10:06:00.000Z', endUtc: '2026-10-29T10:06:00.000Z', things: { Cart: 1 }, source: NO_LINES },
+        { player: 'Inge Dragonchow', kind: 'rode', startUtc: '2026-10-29T10:07:00.000Z', endUtc: '2026-10-29T10:17:00.000Z', things: { Lox: 2 }, source: NO_LINES },
+        { player: 'Inge Dragonchow', kind: 'ate', startUtc: '2026-10-29T10:18:00.000Z', endUtc: '2026-10-29T10:18:00.000Z', things: { something: 1, CookedMeat: 1 }, source: NO_LINES },
       ],
     });
 
     // WHEN the story is made
     const story = storyOf(snapshot);
 
-    // THEN each reads as a sentence with no list, newest first
+    // THEN each reads as a sentence, newest first, and food the server never learned stays out of the item list
     expect(story.map((item) => [item.kind, item.text, item.things])).toEqual([
-      ['world', 'Inge Dragonchow gained 2 skill levels', undefined],
-      ['items', 'Inge Dragonchow sold something to Haldor', undefined],
-      ['items', 'Inge Dragonchow bought something from Haldor', undefined],
+      ['items', 'Inge Dragonchow ate or drank 2 things', { CookedMeat: 1 }],
+      ['travel', 'Inge Dragonchow rode the lox for 10m', undefined],
+      ['travel', 'Inge Dragonchow pulled a cart', undefined],
+      ['boss', 'Inge Dragonchow used a forsaken power 2 times', undefined],
+      ['travel', 'Inge Dragonchow added what they explored to a map table', undefined],
+      ['built', "Inge Dragonchow got access to Yan's ward", undefined],
+      ['tame', 'A wolf started following Inge Dragonchow', undefined],
+      ['tame', 'Inge Dragonchow put a saddle on a lox', undefined],
+      ['travel', 'Inge Dragonchow read a stone that shows where Eikthyr is', undefined],
     ]);
   });
 
