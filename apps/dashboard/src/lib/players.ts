@@ -16,6 +16,13 @@ import { playerSource } from '#/lib/sources';
 import { durationLabel, isServerOnline } from '#/lib/status';
 
 /**
+ * Returns the character of the latest of [sessions] whose Steam name is [name], since the plugin names a builder by
+ * Steam name when they have not been online since the server started. Any other name is returned as it is.
+ */
+export const characterOfSteamName = (sessions: PlayerSession[], name: string | null): string | null =>
+  sessions.findLast((session) => session.steamName !== null && session.steamName === name)?.character ?? name;
+
+/**
  * End of [session] in milliseconds. An open session ends now while the server is online, or at the last
  * log line when the server went quiet, so offline time is never counted as play time.
  */

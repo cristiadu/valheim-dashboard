@@ -29,7 +29,13 @@ const builderOf = (players: Player[], builder: string | null): string | null =>
   players.find((player) => player.steamName !== null && player.steamName === builder)?.character ?? builder;
 
 /** Returns the `x,z` square number that the spot [x], [z] falls in, as explored squares are keyed. */
-const squareKeyOf = (x: number, z: number): string => `${Math.floor(x / MAP_SQUARE_METERS)},${Math.floor(z / MAP_SQUARE_METERS)}`;
+export const squareKeyOf = (x: number, z: number): string => `${Math.floor(x / MAP_SQUARE_METERS)},${Math.floor(z / MAP_SQUARE_METERS)}`;
+
+/** Returns the column and row of the square keyed [key], for example `[3, -11]` for `3,-11`. */
+export const squareOf = (key: string): [column: number, row: number] => {
+  const [column, row] = key.split(',').map(Number);
+  return [column!, row!];
+};
 
 /**
  * Returns the chests, carts and ships of [snapshot] that sit on a square someone walked, by ID. Chests anywhere
@@ -85,20 +91,20 @@ export const chestSpotsOf = (chests: MapChest[], chestMeters: number): MapChestS
 export const mapOf = (snapshot: Snapshot, players: Player[]): MapView | null => {
   const squareKeys = [...new Set(Object.values(snapshot.explored).flat())];
   const land = squareKeys.map((key) => {
-    const [column, row] = key.split(',').map(Number);
+    const [column, row] = squareOf(key);
     const letter = snapshot.terrain[key];
     const color = letter === undefined ? UNKNOWN_TERRAIN_COLOR : (TERRAIN_STYLES[letter]?.color ?? UNKNOWN_TERRAIN_COLOR);
-    return { key, x: column! * MAP_SQUARE_METERS, y: (-row! - 1) * MAP_SQUARE_METERS, color };
+    return { key, x: column * MAP_SQUARE_METERS, y: (-row - 1) * MAP_SQUARE_METERS, color };
   });
   const inset = (MAP_SQUARE_METERS - MAP_TRAIL_METERS) / 2;
   const trails = Object.entries(snapshot.explored).flatMap(([character, keys]) => {
     const color = colorOf(players, character);
     return keys.map((key) => {
-      const [column, row] = key.split(',').map(Number);
+      const [column, row] = squareOf(key);
       return {
         key: `${character}:${key}`,
-        x: column! * MAP_SQUARE_METERS + inset,
-        y: (-row! - 1) * MAP_SQUARE_METERS + inset,
+        x: column * MAP_SQUARE_METERS + inset,
+        y: (-row - 1) * MAP_SQUARE_METERS + inset,
         color,
       };
     });

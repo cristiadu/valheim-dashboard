@@ -9,7 +9,6 @@ import {
   CRAFT_COSTS_FILE_NAME,
   HISTORY_FOLDER_NAME,
   ITEM_STACKS_FILE_NAME,
-  MISSING_FILE_MS,
   PLAYER_VITALS_FILE_NAME,
   PIECE_COSTS_FILE_NAME,
   type ServerState,
@@ -18,10 +17,10 @@ import {
   WORLDS_FOLDER_NAME,
   type Follower,
 } from '#/lib/server/models';
-import { addSavedBosses, createServerState, readLogLine, setTerrain, startNewLog } from '#/lib/server/server-state';
+import { addSavedBosses, createServerState, readLogLine, startNewLog } from '#/lib/server/server-state';
 import { readCraftCosts, readItemStacks, readPieceCosts } from '#/lib/server/game-data';
 import { readVitals } from '#/lib/server/player-vitals';
-import { readTerrain } from '#/lib/server/terrain';
+import { readTerrain, setTerrain } from '#/lib/server/terrain';
 import { readSavedGlobalKeys } from '#/lib/server/world-save';
 import { changeBetween } from '#/lib/snapshot-change';
 
@@ -30,6 +29,14 @@ const listeners = new Set<(change: SnapshotChange) => void>();
 
 /** Resolves with the follower once the log was read the first time. Null until the first request. */
 let started: Promise<Follower> | null = null;
+
+/** Logs [message] about the missing file [key] names only the first time, since the plugin writes its files late. */
+const warnOnce = (follower: Follower, key: string, message: string): void => {
+  if (!follower.reportedMissing.has(key)) {
+    follower.reportedMissing.add(key);
+    logger.warn(message);
+  }
+};
 
 /**
  * Reads the bosses defeated from the world's newest save once the world is known and after each save, so
@@ -42,7 +49,7 @@ const readSavedBosses = async (follower: Follower): Promise<void> => {
     return;
   }
   follower.worldSaveRead = saveRead;
-  const worldFolder = join(dirname(follower.logFile), WORLDS_FOLDER_NAME, snapshot.world);
+  const worldFolder = join(follower.folder, WORLDS_FOLDER_NAME, snapshot.world);
   try {
     if (addSavedBosses(snapshot, await readSavedGlobalKeys(worldFolder))) {
       follower.hasNewLines = true;
@@ -62,15 +69,14 @@ const readWorldTerrain = async (follower: Follower): Promise<void> => {
   if (world === null || terrainKey === follower.terrainRead) {
     return;
   }
-  const path = join(dirname(follower.logFile), `${TERRAIN_FILE_PREFIX}${world}.txt`);
+  const path = join(follower.folder, `${TERRAIN_FILE_PREFIX}${world}.txt`);
   try {
     setTerrain(follower.state, await readTerrain(path));
     follower.terrainRead = terrainKey;
     follower.hasNewLines = true;
   } catch (error) {
-    if (follower.state.terrain === null && follower.terrainRead !== `missing ${terrainKey}`) {
-      follower.terrainRead = `missing ${terrainKey}`;
-      logger.warn(`No terrain in ${path} yet: ${String(error)}`);
+    if (follower.state.terrain === null) {
+      warnOnce(follower, `terrain ${terrainKey}`, `No terrain in ${path} yet: ${String(error)}`);
     }
   }
 };
@@ -91,25 +97,21 @@ const readGameData = async (follower: Follower): Promise<void> => {
   if (startedUtc === null || startedUtc === follower.gameDataRead) {
     return;
   }
-  const folder = dirname(follower.logFile);
   try {
-    await loadGameData(follower.state, folder);
+    await loadGameData(follower.state, follower.folder);
     follower.gameDataRead = startedUtc;
     follower.hasNewLines = true;
   } catch (error) {
-    if (follower.gameDataRead !== `missing ${startedUtc}`) {
-      follower.gameDataRead = `missing ${startedUtc}`;
-      logger.warn(`Not all game data files are in ${folder} yet: ${String(error)}`);
-    }
+    warnOnce(follower, `game data ${startedUtc}`, `Not all game data files are in ${follower.folder} yet: ${String(error)}`);
   }
 };
 
 /**
  * Reads the player vitals file the plugin rewrites next to the log when a player's health, stamina or eitr changes.
- * Players missing from it keep the numbers they had when last seen. A missing file is reported once.
+ * Players missing from it keep the numbers they had when last seen. A missing file is reported once each time it goes.
  */
 const readPlayerVitals = async (follower: Follower): Promise<void> => {
-  const path = join(dirname(follower.logFile), PLAYER_VITALS_FILE_NAME);
+  const path = join(follower.folder, PLAYER_VITALS_FILE_NAME);
   try {
     const read = await readVitals(path, follower.vitalsChangedMs);
     if (read !== null) {
@@ -117,11 +119,10 @@ const readPlayerVitals = async (follower: Follower): Promise<void> => {
       follower.vitalsChangedMs = read.changedMs;
       follower.hasNewLines = true;
     }
+    follower.reportedMissing.delete(PLAYER_VITALS_FILE_NAME);
   } catch (error) {
-    if (follower.vitalsChangedMs !== MISSING_FILE_MS) {
-      follower.vitalsChangedMs = MISSING_FILE_MS;
-      logger.warn(`No player vitals in ${path} yet: ${String(error)}`);
-    }
+    follower.vitalsChangedMs = null;
+    warnOnce(follower, PLAYER_VITALS_FILE_NAME, `No player vitals in ${path} yet: ${String(error)}`);
   }
 };
 
@@ -163,9 +164,10 @@ const pollLater = (follower: Follower): void => {
 const start = async (): Promise<Follower> => {
   const config = readConfig(process.env);
   const state = createServerState(config.serverUtcOffsetMinutes);
-  const historyFolder = join(dirname(config.logFile), HISTORY_FOLDER_NAME);
+  const folder = dirname(config.logFile);
+  const historyFolder = join(folder, HISTORY_FOLDER_NAME);
   try {
-    await loadGameData(state, dirname(config.logFile));
+    await loadGameData(state, folder);
   } catch {
     // The first poll reports missing files, once the run start is known.
   }
@@ -179,6 +181,7 @@ const start = async (): Promise<Follower> => {
   const history = new LogHistory(historyFolder);
   const follower: Follower = {
     logFile: config.logFile,
+    folder,
     state,
     history,
     hasNewLines: false,
@@ -187,6 +190,7 @@ const start = async (): Promise<Follower> => {
     terrainRead: null,
     gameDataRead: null,
     vitalsChangedMs: null,
+    reportedMissing: new Set(),
     tail: new LogTail(config.logFile, {
       onLine: (line) => {
         readLogLine(state, line);
@@ -204,17 +208,14 @@ const start = async (): Promise<Follower> => {
   return follower;
 };
 
+/** Returns the follower, starting to follow the log on the first call. */
+const follow = (): Promise<Follower> => (started ??= start());
+
 /** Returns what the server knows now. The first call starts following the log. */
-export const currentSnapshot = async (): Promise<Snapshot> => {
-  started ??= start();
-  return (await started).state.snapshot;
-};
+export const currentSnapshot = async (): Promise<Snapshot> => (await follow()).state.snapshot;
 
 /** Returns the snapshot as the live stream last sent it, which a new stream starts from before any change. */
-export const sentSnapshot = async (): Promise<Snapshot> => {
-  started ??= start();
-  return (await started).sentSnapshot;
-};
+export const sentSnapshot = async (): Promise<Snapshot> => (await follow()).sentSnapshot;
 
 /** Calls [listener] with what changed in the snapshot after each batch of new log lines. Returns a function that stops it. */
 export const subscribe = (listener: (change: SnapshotChange) => void): (() => void) => {

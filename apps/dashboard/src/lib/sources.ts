@@ -1,11 +1,18 @@
 import type { LogLineRecord, Player, ServerSourceKind, Snapshot, SourceKind, SourceLines } from '#/lib/models';
 
-/** Key of the log lines of [kind], then who and what they are about, for example `killed:Ragnar:Troll` or `saves`. */
-export const sourceKey = (kind: SourceKind | ServerSourceKind, ...parts: string[]): string => [kind, ...parts].join(':');
+/**
+ * Key of the log lines of [kind], then who and what they are about, for example `killed:Ragnar:Troll` or `saves`.
+ * Parts that are not given are left out.
+ */
+export const sourceKey = (kind: SourceKind | ServerSourceKind, ...parts: (string | undefined)[]): string =>
+  [kind, ...parts.filter((part) => part !== undefined)].join(':');
+
+/** Returns a group with no log lines yet. */
+export const emptySource = (): SourceLines => ({ total: 0, lines: [] });
 
 /** Log lines of [kind] for the whole server, about [thing] when given, for example `boss` lines about `Eikthyr`. */
 export const serverSource = (snapshot: Snapshot, kind: ServerSourceKind, thing?: string): SourceLines =>
-  snapshot.sources[thing === undefined ? sourceKey(kind) : sourceKey(kind, thing)] ?? { total: 0, lines: [] };
+  snapshot.sources[sourceKey(kind, thing)] ?? emptySource();
 
 /** The lines among [lines] written at [timeUtc], as their own group, for example one save among all saves. */
 export const linesAt = (lines: LogLineRecord[], timeUtc: string): SourceLines => {
@@ -25,6 +32,5 @@ export const mergedSource = (sources: SourceLines[]): SourceLines => ({
  */
 export const playerSource = (snapshot: Snapshot, player: Player, kind: SourceKind, thing?: string): SourceLines => {
   const characters = kind === 'gear' ? [player.character] : [...new Set(player.sessions.map((session) => session.character))];
-  const keys = characters.map((character) => (thing === undefined ? sourceKey(kind, character) : sourceKey(kind, character, thing)));
-  return mergedSource(keys.map((key) => snapshot.sources[key] ?? { total: 0, lines: [] }));
+  return mergedSource(characters.map((character) => snapshot.sources[sourceKey(kind, character, thing)] ?? emptySource()));
 };
