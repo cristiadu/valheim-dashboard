@@ -5,7 +5,7 @@ BeforeAll {
 Describe 'Test-PluginChanged' {
   It 'is true when a file in the plugin folder changed' {
     # GIVEN a commit range that touched the dashboard and the plugin
-    $changedFiles = @('apps/dashboard/src/routes/+page.svelte', 'plugins/event-log/ChatTracker.cs')
+    $changedFiles = @('apps/dashboard/src/routes/+page.svelte', 'plugins/event-log/Players/ChatTracker.cs')
 
     # WHEN checking it
     $isPluginChanged = Test-PluginChanged $changedFiles
