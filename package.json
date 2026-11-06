@@ -6,6 +6,7 @@
     "check": "pnpm -r --if-present run check",
     "lint": "pnpm -r --if-present run lint",
     "test": "pnpm -r --if-present run test",
+    "coverage": "pnpm -r --if-present run coverage",
     "build": "pnpm -r --if-present run build"
   }
 }

@@ -67,10 +67,10 @@
     color: var(--gold);
   }
 
-  /* Slots in the game's grid for this chest, on a dark wood backing like the game's chest window */
+  /* Slots in the game's grid on a dark wood backing like the game's chest window, shrinking to fit a narrow column */
   .slots {
     display: grid;
-    grid-template-columns: repeat(var(--columns), 60px);
+    grid-template-columns: repeat(var(--columns), minmax(0, 60px));
     gap: 4px;
     width: fit-content;
     max-width: 100%;
@@ -82,12 +82,15 @@
     border-radius: 4px;
   }
 
-  /* On a phone the slots shrink so the game's grid still fits the width */
-  @media (max-width: 720px) {
-    .slots {
-      grid-template-columns: repeat(var(--columns), minmax(0, 60px));
-    }
+  /* Icons never spill over the edge of a shrunk slot */
+  .slot :global(img),
+  .slot :global(svg) {
+    max-width: 80%;
+    height: auto;
+  }
 
+  /* On a phone every slot is small */
+  @media (max-width: 720px) {
     /* Icons shrink with their slot instead of spilling over its edge */
     .slot :global(img),
     .slot :global(svg) {

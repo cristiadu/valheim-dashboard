@@ -309,15 +309,13 @@ flowchart LR
   scan -->|"Piece built: wood_floor_1x1 by Ragnar"| log[logs.txt]
   rpc -->|"Chat: Ragnar shouted: Troll!"| log
   hooks -->|"Global key set: defeated_eikthyr"| log
-  fx[Effects players' games share] -->|"Skill up: Ragnar"| log
   bep[BepInEx messages] --> log
 ```
 
 | Source | What it finds |
 | --- | --- |
-| World scan | New objects (pieces, plants, summoned bosses), items put into smelters, food put on cooking stations, mead bases put into fermenters, who takes the helm of each ship, beds claimed, portal names, wards turned on or off, the in-game day, each player's position, area, portal trips, death, PvP, bed, gear, health, stamina and eitr, what each chest, cart, ship and new tombstone holds, items players made or upgraded (each crafted item keeps its maker's name and level), tames, signs, item stands, chests and harvested plants, and objects destroyed, such as creatures with every player who hit them, trees cut down, rocks mined out, items picked up and emptied tombstones |
-| Calls through the server | Chat and map pings, which the server passes from one player to the others, creature attack moves, to say what a player was fighting when they died, and who asked to harvest a plant, hit a tree or rock, fill a smelter or fermenter, or name a portal |
-| Shared effects | Effects a player's game shares with the others, which reach the server as new objects: a skill going up and a trade with a trader |
+| World scan | New objects (pieces, plants, summoned bosses), items put into smelters, food put on cooking stations, mead bases put into fermenters, who takes the helm of each ship, who rides each tame, saddles, who each tame follows, who pulls each cart, fuel put on fires, pieces repaired, maps shared on map tables, items put on armor stands, beds claimed, portal names, wards turned on or off, who has access to each ward, the in-game day, each player's position, area, portal trips, death, PvP, bed, gear, health, stamina and eitr, what each chest, cart, ship and new tombstone holds, items players made or upgraded (each crafted item keeps its maker's name and level), tames, signs, item stands, chests and harvested plants, and objects destroyed, such as creatures with every player who hit them, trees cut down, rocks mined out, items picked up and emptied tombstones |
+| Calls through the server | Chat and map pings, which the server passes from one player to the others, creature attack moves, to say what a player was fighting when they died, each player starting to eat or using a forsaken power, each vegvisir or rune stone read, and who asked to harvest a plant, hit a tree or rock, fill a smelter or fermenter, name a portal, saddle a tame, fuel a fire, repair a piece, share a map or pull an obliterator's lever, and each lever pull |
 | Every frame | For each online player: food shown in their hand, which only happens while they eat or drink and lasts about a second, the crafting station kind they opened, and each emote |
 | Game hooks | Global keys, such as a boss defeat, and the end of a raid |
 
@@ -332,8 +330,8 @@ On the dashboard, plugin lines become:
 
 | Kept as | Lines | Shown as |
 | --- | --- | --- |
-| Activities | Pieces built or destroyed, kills, items gathered, chests, planting, eating, smelting, cooking, brewing, steering ships, crafting station visits, emotes, items made or upgraded, skill levels, trees and rocks | One Saga line per player and kind, until a 10 minute pause, naming every thing, and a running total per player and kind for the Vikings numbers |
-| Story events | Deaths, bosses, raids, portals, tames, signs, item stands, tombstones, beds claimed, portals named, wards turned on or off, trades | One Saga line each |
+| Activities | Pieces built or destroyed, kills, items gathered, chests, planting, eating, smelting, cooking, brewing, steering ships, crafting station visits, emotes, items made or upgraded, rides, forsaken powers, carts pulled, fires fueled, repairs, items obliterated, trees and rocks | One Saga line per player and kind, until a 10 minute pause, naming every thing, and a running total per player and kind for the Vikings numbers |
+| Story events | Deaths, bosses, raids, portals, tames, signs, item stands, tombstones, beds claimed, portals named, wards turned on or off, stones read, saddles, tames following, ward access, maps shared | One Saga line each |
 | News only | Areas, gear, global keys | A Saga line for a first visit or a dungeon trip, new gear, or a boss defeat |
 | Stats | Areas, kills, the day, boss keys | Where each player is now and their kills, areas and gear on Vikings, the day and bosses on World |
 | Chat | Chat and pings | The Saga's "Chat and signs" filter, kept apart so it never pushes out events |
@@ -480,13 +478,27 @@ The dashboard also reads the world save, `worlds_local\Cotil\_main.<save number>
 
 ```mermaid
 flowchart LR
-  pr[Pull request or push to main] --> install[pnpm install] --> check[pnpm check] --> lint[pnpm lint] --> test[pnpm test] --> build[pnpm build]
+  pr[Pull request or push to main] --> install[pnpm install] --> check[pnpm check] --> lint[pnpm lint] --> coverage[pnpm coverage] --> build[pnpm build] --> scripts[Measure-Coverage.ps1]
+  scripts --> summary[Run summary]
+  scripts --> comment[Comment on the pull request]
 ```
+
+`pnpm coverage` runs each project's tests twice, once per kind, and writes what they ran to
+`coverage/<kind>/cobertura-coverage.xml` in that project. `scripts\Measure-Coverage.ps1` does the same for the
+PowerShell scripts with Pester 6.2.0, then turns all those files into one table.
+
+| Test kind | What it checks | Files |
+| --- | --- | --- |
+| Unit | One source file at a time | `*.test.ts`, `*.Tests.ps1` |
+| Integration | Several parts together on real files, for example the dashboard following a log folder in a temp folder, or the updater on a throwaway git checkout | `*.integration.test.ts`, `*.Integration.Tests.ps1` |
+
+The comment is updated on each push, so a pull request has one. Dependabot's pull requests get only the summary,
+since their token cannot comment. The event log plugin is not measured: it builds only against the game's own files.
 
 `pnpm lint` runs ESLint in each project. Besides the recommended TypeScript and Svelte rules, it rejects
 relative imports (use `#/`), `function` declarations, `.then()`, `console` and `if` without braces.
 
-The PowerShell scripts' tests run with Pester 5: `Invoke-Pester scripts`.
+On the PC, `Invoke-Pester scripts` runs both kinds of script tests.
 
 Dependabot opens weekly upgrade PRs for npm packages and GitHub Actions, for versions out for 7 days. The plugin is built on the
 server PC, not in CI.
