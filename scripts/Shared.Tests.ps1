@@ -230,3 +230,52 @@ Describe 'Get-GameServerPassword' {
     $password | Should -BeNullOrEmpty
   }
 }
+
+Describe 'Get-CoberturaCoverage' {
+  It 'reads the line and branch totals from the root element' {
+    # GIVEN a Cobertura file with 1,225 of 1,999 lines and 660 of 1,041 branches covered
+    $path = Join-Path $TestDrive 'cobertura-coverage.xml'
+    Set-Content $path '<?xml version="1.0" ?><coverage lines-valid="1999" lines-covered="1225" branches-valid="1041" branches-covered="660"></coverage>'
+
+    # WHEN it is read
+    $coverage = Get-CoberturaCoverage $path
+
+    # THEN the totals are numbers
+    "$($coverage.LinesCovered) $($coverage.LinesTotal) $($coverage.BranchesCovered) $($coverage.BranchesTotal)" | Should -Be '1225 1999 660 1041'
+  }
+
+  It 'is $null when the project has no tests of that kind' {
+    # WHEN a missing file is read, THEN there is no coverage
+    Get-CoberturaCoverage (Join-Path $TestDrive 'missing.xml') | Should -BeNullOrEmpty
+  }
+
+  It 'rejects a file that is not Cobertura' {
+    # GIVEN an XML file without the totals
+    $path = Join-Path $TestDrive 'other.xml'
+    Set-Content $path '<report name="jacoco"></report>'
+
+    # WHEN it is read, THEN it names the file
+    { Get-CoberturaCoverage $path } | Should -Throw "$path is not a Cobertura coverage file: its <coverage> element has no lines-valid or branches-valid."
+  }
+}
+
+Describe 'Format-CoverageTable' {
+  It 'shows each project with the percent and size of each test kind' {
+    # GIVEN a project with both kinds of coverage and one with only unit coverage and no branches
+    $dashboard = Join-Path $TestDrive 'dashboard'
+    $scripts = Join-Path $TestDrive 'scripts'
+    New-Item -ItemType Directory "$dashboard/coverage/unit", "$dashboard/coverage/integration", "$scripts/coverage/unit" | Out-Null
+    Set-Content "$dashboard/coverage/unit/cobertura-coverage.xml" '<coverage lines-valid="1999" lines-covered="1225" branches-valid="1041" branches-covered="660"></coverage>'
+    Set-Content "$dashboard/coverage/integration/cobertura-coverage.xml" '<coverage lines-valid="1999" lines-covered="400" branches-valid="1041" branches-covered="100"></coverage>'
+    Set-Content "$scripts/coverage/unit/cobertura-coverage.xml" '<coverage lines-valid="10" lines-covered="8" branches-valid="0" branches-covered="0"></coverage>'
+
+    # WHEN the table is made
+    $table = Format-CoverageTable @($dashboard, $scripts)
+
+    # THEN each cell reads plainly, and a missing kind says so
+    ($table -split "`n")[6..7] | Should -Be @(
+      "| ``$dashboard`` | 61.3% of 1,999 lines, 63.4% of 1,041 branches | 20.0% of 1,999 lines, 9.6% of 1,041 branches |",
+      "| ``$scripts`` | 80.0% of 10 lines, no branches | No tests |"
+    )
+  }
+}

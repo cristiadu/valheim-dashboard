@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { builtByShortLabel, chestName, itemTotal } from '#/lib/items';
+  import { builtByShortLabel, chestName, chestTitle, itemTotal } from '#/lib/items';
   import type { MapChest } from '#/lib/models';
   import { count } from '#/lib/story';
 
@@ -21,7 +21,7 @@
   {#each byMostKinds as chest (chest.id)}
     {@const kinds = Object.keys(chest.record.items).length}
     <button type="button" class="line" class:picked={chest.id === pickedId} onclick={() => onpick(chest.id)}>
-      <span><strong>{chestName(chest.record.chest)}</strong> <span class="muted">{builtByShortLabel(chest.record.builder)}</span></span>
+      <span><strong>{chestTitle(chest.record)}</strong> <span class="muted">{chest.record.label === undefined ? '' : `${chestName(chest.record.chest)} `}{builtByShortLabel(chest.record.builder)}</span></span>
       <span class="muted">
         {kinds === 0 ? 'Empty' : `${count(kinds, 'kind', 'kinds')} · ${itemTotal(chest.record.items).toLocaleString()} items`}
       </span>
