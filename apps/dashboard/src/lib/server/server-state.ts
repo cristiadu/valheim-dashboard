@@ -275,6 +275,16 @@ export const readLogLine = (state: ServerState, line: string): void => {
     case 'chestRemoved':
       delete snapshot.chests[event.id];
       break;
+    case 'chestLabeled': {
+      const record = snapshot.chests[event.id];
+      if (record !== undefined) {
+        record.label = event.label;
+      }
+      break;
+    }
+    case 'chestUnlabeled':
+      delete snapshot.chests[event.id]?.label;
+      break;
     case 'leviathan': {
       const { id, x, z, timeUtc } = event;
       snapshot.leviathans[id] = { x, z, timeUtc };

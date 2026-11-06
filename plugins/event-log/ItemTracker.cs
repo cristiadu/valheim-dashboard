@@ -268,6 +268,12 @@ namespace ValheimDashboard.EventLog
             GameEventLog.Write($"Chest: {chest.m_uid} {Names.PrefabName(chest)} at {Names.MapPosition(chest.GetPosition())} built by {Names.Builder(chest)} holds {holds}");
         }
 
+        /// <summary>Returns true when the chest, cart or ship [uid] has had its contents logged.</summary>
+        public static bool IsLogged(ZDOID uid)
+        {
+            return ChestContents.ContainsKey(uid);
+        }
+
         /// <summary>Returns the items in chest contents [data].</summary>
         public static List<ItemDrop.ItemData> LoadItems(byte[] data)
         {
