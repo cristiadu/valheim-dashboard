@@ -13,7 +13,8 @@ import {
   SQUARE_METERS_PER_KM2,
 } from '#/lib/models';
 import { playerSource } from '#/lib/sources';
-import { durationLabel, isServerOnline } from '#/lib/status';
+import { isServerOnline } from '#/lib/status';
+import { durationLabel } from '#/lib/time';
 
 /**
  * Returns the character of the latest of [sessions] whose Steam name is [name], since the plugin names a builder by

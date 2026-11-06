@@ -4,13 +4,12 @@
   import Pill from '#/lib/components/Pill';
   import StatGrid from '#/lib/components/StatGrid';
   import { live, useSnapshot } from '#/lib/live.svelte';
-  import { dayPercent } from '#/lib/day';
-  import { gigabytesLabel, serverWarnings, upStretches } from '#/lib/health';
+  import { gigabytesLabel, isServerOnline, onlinePlayers, serverWarnings, upStretches } from '#/lib/status';
+  import { clockTime, dayPercent, durationLabel, viewerTimeZone, whenLabel } from '#/lib/time';
   import { DAY_MS } from '#/lib/models';
   import { serverPill, steamPill, warningPill } from '#/lib/pills';
   import { playersOf } from '#/lib/players';
   import { linesAt, mergedSource, playerSource, serverSource } from '#/lib/sources';
-  import { clockTime, durationLabel, isServerOnline, onlinePlayers, viewerTimeZone, whenLabel } from '#/lib/status';
 
   /** Getter for the snapshot the layout shares. */
   const getSnapshot = useSnapshot();
