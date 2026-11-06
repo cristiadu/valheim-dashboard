@@ -1,6 +1,17 @@
 import { describe, expect, it } from 'vitest';
 
-import { chestName, containerGrid, itemName, itemSlots, slotsUsed, stackSlots, stockOf } from '#/lib/items';
+import {
+  builtByLabel,
+  builtByShortLabel,
+  chestName,
+  containerGrid,
+  itemName,
+  itemSlots,
+  itemTotal,
+  slotsUsed,
+  stackSlots,
+  stockOf,
+} from '#/lib/items';
 import { mapOf } from '#/lib/map';
 import { playersOf } from '#/lib/players';
 import { snapshotWith, TEST_NOON_MS } from '#/lib/test-common';
@@ -28,6 +39,35 @@ describe('chestName', () => {
 
     // THEN each has the name the game shows, and the unknown one its prefab in plain words
     expect(names).toEqual(['Wood chest', 'Longship', 'Treasure chest', 'Chest odd']);
+  });
+});
+
+describe('builtByLabel', () => {
+  it('names the builder, or says the world came with the chest', () => {
+    // GIVEN a chest Ragnar built and one the world came with
+    const builders = ['Ragnar', null];
+
+    // WHEN each is labeled in full and in short
+    const labels = builders.map((builder) => [builtByLabel(builder), builtByShortLabel(builder)]);
+
+    // THEN the full label leads a line and the short one follows a chest name
+    expect(labels).toEqual([
+      ['Built by Ragnar', 'by Ragnar'],
+      ['Came with the world', 'from the world'],
+    ]);
+  });
+});
+
+describe('itemTotal', () => {
+  it('adds up every item, and is 0 for an empty chest', () => {
+    // GIVEN a chest with wood and stone, and an empty one
+    const chests: Record<string, number>[] = [{ Wood: 20, Stone: 7 }, {}];
+
+    // WHEN their items are added up
+    const totals = chests.map(itemTotal);
+
+    // THEN the first holds 27 and the empty one none
+    expect(totals).toEqual([27, 0]);
   });
 });
 

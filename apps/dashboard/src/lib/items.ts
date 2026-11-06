@@ -20,6 +20,17 @@ export const itemName = (prefab: string): string => GEAR_NAMES[prefab] ?? ITEM_N
 export const chestName = (prefab: string): string =>
   CHEST_NAMES[prefab] ?? (prefab.startsWith(TREASURE_CHEST_PREFIX) ? 'Treasure chest' : itemName(prefab));
 
+/** Returns who built a chest by its [builder], for example `Built by Ragnar`, or `Came with the world`. */
+export const builtByLabel = (builder: string | null): string =>
+  builder === null ? 'Came with the world' : `Built by ${builder}`;
+
+/** Returns the short form of [builtByLabel] that follows a chest's name in a list, for example `by Ragnar`. */
+export const builtByShortLabel = (builder: string | null): string => (builder === null ? 'from the world' : `by ${builder}`);
+
+/** Returns how many items [items] holds in all. */
+export const itemTotal = (items: Record<string, number>): number =>
+  Object.values(items).reduce((sum, amount) => sum + amount, 0);
+
 /**
  * Returns the slot grid of the container [prefab] filling [used] slots: its columns and how many slots it has in
  * the game, and how many slots to draw, with rows added when the items need more slots than the game's grid has.
