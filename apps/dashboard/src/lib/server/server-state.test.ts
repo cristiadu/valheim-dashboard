@@ -273,6 +273,29 @@ describe('server state', () => {
     });
   });
 
+  it('names a chest by the sign on it until the sign is gone, through changes to what it holds', () => {
+    // GIVEN two chests get signs, one is filled and then loses its sign, and a sign names a chest never listed
+    readLines(state, [
+      ...RUN_START,
+      logLine('03:00:00', 'Chest: 1:10 piece_chest_wood at 12 18 built by Ragnar holds nothing'),
+      logLine('03:00:00', 'Chest: 1:11 piece_chest_wood at 14 18 built by Ragnar holds nothing'),
+      logLine('03:00:00', 'Chest label: 1:10 Ores'),
+      logLine('03:00:00', 'Chest label: 1:11 Food'),
+      logLine('03:00:00', 'Chest label: 1:99 Lost'),
+      logLine('03:01:00', 'Chest: 1:10 piece_chest_wood at 12 18 built by Ragnar holds CopperOre x5'),
+      logLine('03:02:00', 'Chest unlabeled: 1:11'),
+    ]);
+
+    // WHEN the snapshot is read
+    const { chests } = state.snapshot;
+
+    // THEN the filled chest keeps its label, the other has none now, and the unknown chest is not made up
+    expect(chests['1:10']?.label).toBe('Ores');
+    expect(chests['1:10']?.items).toEqual({ CopperOre: 5 });
+    expect(chests['1:11']).toEqual({ chest: 'piece_chest_wood', x: 14, z: 18, builder: 'Ragnar', items: {}, timeUtc: '2026-10-29T10:00:00.000Z' });
+    expect(Object.keys(chests)).toEqual(['1:10', '1:11']);
+  });
+
   it('keeps each Leviathan of the run until it dives away', () => {
     // GIVEN two Leviathans are listed, then one dives away
     readLines(state, [

@@ -220,6 +220,8 @@ when the plugin does not know who it was.
 | Where a player stands | `Position: Ragnar 120 -340` | `^Position: (?<character>.+) (?<x>-?\d+) (?<z>-?\d+)$` |
 | What a chest, cart or ship holds | `Chest: 52731986:1203 piece_chest_wood at 118 -336 built by Ragnar holds Wood x20, Stone x3` | `^Chest: (?<id>\S+) (?<chest>\S+) at (?<x>-?\d+) (?<z>-?\d+) built by (?<builder>.+?) holds (?<items>.+)$` |
 | Chest, cart or ship destroyed | `Chest removed: 52731986:1203` | `^Chest removed: (?<id>\S+)$` |
+| A sign right against a chest names it | `Chest label: 52731986:1203 Ores` | `^Chest label: (?<id>\S+) (?<label>.+)$` |
+| The sign that named a chest is gone or blank | `Chest unlabeled: 52731986:1203` | `^Chest unlabeled: (?<id>\S+)$` |
 | Where a Leviathan is | `Leviathan: 52731986:4410 at -1520 2210` | `^Leviathan: (?<id>\S+) at (?<x>-?\d+) (?<z>-?\d+)$` |
 | A Leviathan dived away | `Leviathan gone: 52731986:4410` | `^Leviathan gone: (?<id>\S+)$` |
 | What a player carried when they died | `Tombstone: Ragnar at 410 -77 holds SwordBronze x1, Coins x55` | `^Tombstone: (?<owner>.+?) at (?<x>-?\d+) (?<z>-?\d+) holds (?<items>.+)$` |
@@ -264,6 +266,9 @@ when the plugin does not know who it was.
   changes. `holds nothing` is an empty one. The ID stays the same until the server stops. `built by` is the
   character name, or the Steam name when the builder has not been online since the server started. The dashboard
   shows that Steam name as the player's character.
+- **Chest label** is logged after a chest's first **Chest** line, and again when its sign changes. A sign names a
+  chest when it stands within 1.25 m of the chest's spot. Each sign names only the chest closest to it, and a chest
+  with more than one goes by the closest. Carts and ships get no label, since they move. Color tags are left out.
 - **Leviathan** is logged for every Leviathan when the server starts, and when a new one appears in the sea
   near a player. **Leviathan gone** is logged when one dives away for good after being mined.
 - **Tombstone** is logged when a player dies, with everything they carried.
