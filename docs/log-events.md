@@ -187,13 +187,14 @@ when the plugin does not know who it was.
 | Tame tamed, born, grown up or died | `Tame born: Wolf_cub` | `^(?<change>Tamed\|Tame born\|Tame grew up\|Tame died): (?<creature>\S+)(?: (?<name>.+))?$` |
 | Tame named | `Pet named: Wolf Fluffy` | `^Pet named: (?<creature>\S+) (?<name>.+)$` |
 | Sign written | `Sign written: Ragnar: Keep out` | `^Sign written: (?<author>.+?): (?<text>.*)$` |
-| Item hung on a stand | `Item hung: TrophyDeer by Ragnar` | `^Item hung: (?<item>\S+) by (?<player>.+)$` |
+| Item hung on an item stand, or put on an armor stand | `Item hung: TrophyDeer by Ragnar` | `^Item hung: (?<item>\S+) by (?<player>.+)$` |
 | Item picked up | `Picked up: Wood x20 by Ragnar (item 52731986:1420)`, or `Picked up again: Wood x20 by Ragnar (item 52731986:1420)` | `^Picked up(?<again> again)?: (?<item>\S+) x(?<count>\d+) by (?<player>.+?)(?: \(item (?<id>\S+)\))?$` |
 | Item dropped | `Dropped: Wood x20 by Ragnar (item 52731986:1420)` | `^Dropped: (?<item>\S+) x(?<count>\d+) by (?<player>.+) \(item (?<id>\S+)\)$` |
 | Items put in or taken from a chest | `Stored: Wood x20 in piece_chest_wood by Ragnar` | `^(?<change>Stored\|Taken): (?<item>\S+) x(?<count>\d+) (?:in\|from) (?<chest>\S+) by (?<player>.+)$` |
 | Plant harvested | `Harvested: RaspberryBush by Ragnar` | `^Harvested: (?<plant>\S+) by (?<player>.+)$` |
 | Crop or sapling planted | `Planted: sapling_carrot by Ragnar` | `^Planted: (?<plant>\S+) by (?<player>.+)$` |
 | Food eaten or mead drunk | `Ate: Ragnar CookedMeat` | `^Ate: (?<character>.+) (?<item>\S+)$` |
+| Started eating or drinking, but the food never showed in their hand | `Ate something: Ragnar` | `^Ate something: (?<character>.+)$` |
 | Items put into a smelter, kiln or similar | `Smelting: CopperOre x3 in smelter by Ragnar` | `^Smelting: (?<item>\S+) x(?<count>\d+) in (?<station>\S+) by (?<player>.+)$` |
 | Raw food put on a cooking station, or a mead base into a fermenter | `Cooking: RawMeat on piece_cookingstation by Ragnar`, `Fermenting: MeadBaseTasty in fermenter by Ragnar` | `^(?<kind>Cooking\|Fermenting): (?<item>\S+) (?:on\|in) (?<station>\S+) by (?<player>.+)$` |
 | Took the helm of a raft or ship | `Sailing: Ragnar on Karve` | `^Sailing: (?<character>.+) on (?<ship>\S+)$` |
@@ -204,8 +205,17 @@ when the plugin does not know who it was.
 | Ward turned on or off, which only its builder can do | `Ward turned off: guard_stone by Ragnar` | `^Ward turned (?<state>on\|off): (?<ward>\S+) by (?<builder>.+)$` |
 | Items a player made, once more of them sit in chests or on the ground than ever before. An item carried since before the server started counts when it first shows up | `Made: ArrowFlint x20 by Ragnar` | `^Made: (?<item>\S+) x(?<count>\d+) by (?<crafter>.+)$` |
 | An item a player made showed up at a higher level | `Upgraded: SwordBronze to level 2 by Ragnar` | `^Upgraded: (?<item>\S+) to level (?<level>\d+) by (?<crafter>.+)$` |
-| A skill went up a level, from the effect the game shares with other players. Which skill is never sent | `Skill up: Ragnar` | `^Skill up: (?<player>.+)$` |
-| Bought from or sold to a trader, from the trader's shared effect. What was traded is never sent | `Traded: Ragnar bought from Haldor` | `^Traded: (?<player>.+) (?<action>bought from\|sold to) (?<trader>\S+)$` |
+| Used a forsaken power. Which power is never sent | `Power used: Ragnar` | `^Power used: (?<character>.+)$` |
+| Read a vegvisir or rune stone, which marks a place on the map | `Location revealed: Eikthyrnir by Ragnar` | `^Location revealed: (?<location>\S+) by (?<player>.+)$` |
+| Got on a saddled tame | `Riding: Ragnar on Lox` | `^Riding: (?<player>.+) on (?<creature>\S+)$` |
+| Put a saddle on a tame | `Saddled: Lox by Ragnar` | `^Saddled: (?<creature>\S+) by (?<player>.+)$` |
+| A tame started following a player | `Tame following: Wolf follows Ragnar` | `^Tame following: (?<creature>\S+) follows (?<player>.+)$` |
+| Started pulling a cart | `Pulling cart: Ragnar with Cart` | `^Pulling cart: (?<player>.+) with (?<cart>\S+)$` |
+| Items destroyed in an obliterator after a player pulled its lever | `Obliterated: Resin x20 in incinerator by Ragnar` | `^Obliterated: (?<item>\S+) x(?<count>\d+) in (?<station>\S+) by (?<player>.+)$` |
+| Put fuel on a fire | `Fueled: fire_pit by Ragnar` | `^Fueled: (?<fire>\S+) by (?<player>.+)$` |
+| Repaired a built piece | `Repaired: wood_wall by Ragnar` | `^Repaired: (?<piece>\S+) by (?<player>.+)$` |
+| Added what they explored to a map table | `Map shared: Ragnar at piece_cartographertable` | `^Map shared: (?<player>.+) at (?<table>\S+)$` |
+| A player gave themselves access to a ward that was off, or took it away | `Ward access given: Ragnar on guard_stone built by Bjorn` | `^Ward access (?<change>given\|removed): (?<player>.+) on (?<ward>\S+) built by (?<builder>.+)$` |
 | Tree cut down or rock mined out | `Tree cut: Beech1 by Ragnar`, `Rock mined: rock4_copper by Ragnar` | `^(?<kind>Tree cut\|Rock mined): (?<thing>\S+) by (?<player>.+)$` |
 | Where a player stands | `Position: Ragnar 120 -340` | `^Position: (?<character>.+) (?<x>-?\d+) (?<z>-?\d+)$` |
 | What a chest, cart or ship holds | `Chest: 52731986:1203 piece_chest_wood at 118 -336 built by Ragnar holds Wood x20, Stone x3` | `^Chest: (?<id>\S+) (?<chest>\S+) at (?<x>-?\d+) (?<z>-?\d+) built by (?<builder>.+?) holds (?<items>.+)$` |
