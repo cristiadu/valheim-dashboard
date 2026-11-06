@@ -335,12 +335,14 @@ describe('parseMessage', () => {
   });
 
   it('reads positions, chest contents and tombstones from the event log plugin', () => {
-    // GIVEN a position, a full chest, an empty cart, a removed chest and a tombstone
+    // GIVEN a position, a full chest, an empty cart, a removed chest, a chest label set and cleared, and a tombstone
     const messages = [
       'Position: Ragnar 120 -340',
       'Chest: 52731986:1203 piece_chest_wood at 118 -336 built by Ragnar holds Wood x20, Stone x3',
       'Chest: 52731986:1300 Cart at -5 12 built by Tony Example holds nothing',
       'Chest removed: 52731986:1203',
+      'Chest label: 52731986:1300 Ores and metal',
+      'Chest unlabeled: 52731986:1300',
       'Leviathan: 1:4410 at -1520 2210',
       'Leviathan gone: 1:4410',
       'Tombstone: Ragnar at 410 -77 holds SwordBronze x1, Coins x55',
@@ -365,6 +367,8 @@ describe('parseMessage', () => {
       },
       { type: 'chestContents', timeUtc, id: '52731986:1300', chest: 'Cart', x: -5, z: 12, builder: 'Tony Example', items: {} },
       { type: 'chestRemoved', timeUtc, id: '52731986:1203' },
+      { type: 'chestLabeled', timeUtc, id: '52731986:1300', label: 'Ores and metal' },
+      { type: 'chestUnlabeled', timeUtc, id: '52731986:1300' },
       { type: 'leviathan', timeUtc, id: '1:4410', x: -1520, z: 2210 },
       { type: 'leviathanGone', timeUtc, id: '1:4410' },
       { type: 'tombstoneContents', timeUtc, owner: 'Ragnar', x: 410, z: -77, items: { SwordBronze: 1, Coins: 55 } },

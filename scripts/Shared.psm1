@@ -1,7 +1,7 @@
 <#
 .SYNOPSIS
-  Shared steps for the start and update scripts: logging, running commands, reading the dashboard, and
-  stopping and starting the Valheim server.
+  Shared steps for the scripts: logging, running commands, reading the dashboard, stopping and starting the
+  Valheim server, and the test coverage table CI shows.
 #>
 
 # Folder of the event log plugin's source, as git names it.
@@ -36,6 +36,9 @@ $CiCheckName = 'ci'
 
 # A full git commit hash: 40 lowercase hex characters.
 $CommitHashPattern = '^[0-9a-f]{40}$'
+
+# Kinds of tests each project runs, in the order the coverage table shows them.
+$TestKinds = @('unit', 'integration')
 
 # A URL with a user name or token before the host, such as https://<token>@github.com/...
 $UrlWithCredentialsPattern = '^[a-z][a-z0-9+.-]*://[^/]*@'
@@ -212,6 +215,62 @@ function Get-GameServerPassword([string]$ServerDir) {
   $match = [regex]::Match((Get-Content -Path $startFile -Raw), $GameServerPasswordPattern)
   if (-not $match.Success) { return $null }
   return $match.Groups['password'].Value
+}
+
+<#
+.SYNOPSIS
+  Reads the line and branch totals of the Cobertura file at [Path], or $null when the file is missing.
+#>
+function Get-CoberturaCoverage([string]$Path) {
+  if (-not (Test-Path $Path)) { return $null }
+  $root = ([xml](Get-Content -Path $Path -Raw)).coverage
+  if (-not $root -or -not $root.'lines-valid' -or -not $root.'branches-valid') {
+    throw "$Path is not a Cobertura coverage file: its <coverage> element has no lines-valid or branches-valid."
+  }
+  return [pscustomobject]@{
+    LinesCovered = [int]$root.'lines-covered'
+    LinesTotal = [int]$root.'lines-valid'
+    BranchesCovered = [int]$root.'branches-covered'
+    BranchesTotal = [int]$root.'branches-valid'
+  }
+}
+
+<#
+.SYNOPSIS
+  Returns [Covered] of [Total] [Things] as a percent, for example "61.3% of 1,999 lines", or "no lines".
+#>
+function Format-Covered([int]$Covered, [int]$Total, [string]$Things) {
+  if ($Total -eq 0) { return "no $Things" }
+  $culture = [cultureinfo]::InvariantCulture
+  return '{0}% of {1} {2}' -f ($Covered * 100 / $Total).ToString('0.0', $culture), $Total.ToString('N0', $culture), $Things
+}
+
+<#
+.SYNOPSIS
+  Returns the Markdown coverage table of the projects in [Projects], folders such as apps/dashboard, from the
+  coverage\<kind>\cobertura-coverage.xml file each test kind wrote there.
+#>
+function Format-CoverageTable([string[]]$Projects) {
+  $lines = @(
+    '## Test coverage',
+    '',
+    'Unit tests check one file at a time. Integration tests run several parts together on real files.',
+    '',
+    '| Project | Unit tests | Integration tests |',
+    '| --- | --- | --- |'
+  )
+  foreach ($project in $Projects) {
+    $cells = foreach ($kind in $TestKinds) {
+      $coverage = Get-CoberturaCoverage (Join-Path $project "coverage/$kind/cobertura-coverage.xml")
+      if ($coverage) {
+        "$(Format-Covered $coverage.LinesCovered $coverage.LinesTotal 'lines'), $(Format-Covered $coverage.BranchesCovered $coverage.BranchesTotal 'branches')"
+      } else {
+        'No tests'
+      }
+    }
+    $lines += "| ``$project`` | $($cells -join ' | ') |"
+  }
+  return ($lines -join "`n") + "`n"
 }
 
 Export-ModuleMember -Function *
