@@ -34,17 +34,16 @@ jobs:
       - run: pnpm lint
       - run: pnpm coverage
       - run: pnpm build
-      - name: Script tests with coverage
+      - name: Script tests with coverage, then the coverage table
         shell: pwsh
         run: |
           Install-Module Pester -RequiredVersion 6.2.0 -Force -Scope CurrentUser
           Import-Module Pester -RequiredVersion 6.2.0
           ./scripts/Measure-Coverage.ps1
-      - run: pnpm --silent coverage:report > coverage-report.md
-      - run: cat coverage-report.md >> "$GITHUB_STEP_SUMMARY"
+      - run: cat scripts/coverage/coverage-report.md >> "$GITHUB_STEP_SUMMARY"
       # Dependabot and forks get a read-only token, so only this repository's own pull requests get the comment.
       - if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]'
-        run: gh pr comment "$PR_NUMBER" --body-file coverage-report.md --edit-last --create-if-none
+        run: gh pr comment "$PR_NUMBER" --body-file scripts/coverage/coverage-report.md --edit-last --create-if-none
         env:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ github.event.pull_request.number }}

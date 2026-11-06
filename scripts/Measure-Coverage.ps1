@@ -1,13 +1,21 @@
 <#
 .SYNOPSIS
   Runs the scripts' unit tests (*.Tests.ps1) and integration tests (*.Integration.Tests.ps1) with Pester, and
-  writes what each kind ran to coverage\<kind>\cobertura-coverage.xml in this folder. CI runs it.
+  writes what each kind ran to coverage\<kind>\cobertura-coverage.xml in this folder. Then writes the coverage
+  table of every project to coverage\coverage-report.md here. CI runs it after pnpm coverage.
 
 .EXAMPLE
   .\scripts\Measure-Coverage.ps1
 #>
 
 $ErrorActionPreference = 'Stop'
+Import-Module (Join-Path $PSScriptRoot 'Shared.psm1') -Force
+
+# Projects in the coverage table, from the repo folder.
+$Projects = @('apps/dashboard', 'packages/valheim-log', 'scripts')
+
+# Repo folder, one level above this script.
+$RepoRoot = Split-Path -Parent $PSScriptRoot
 
 # Scripts whose lines count, which leaves out the tests and this script.
 $measuredFiles = Get-ChildItem $PSScriptRoot -File -Include '*.ps1', '*.psm1' -Recurse |
@@ -35,4 +43,11 @@ foreach ($run in @(@{ Kind = 'unit'; Tests = $unitTests }, @{ Kind = 'integratio
 }
 if ($failedCount -gt 0) {
   throw "$failedCount script test(s) failed."
+}
+
+Push-Location $RepoRoot
+try {
+  Format-CoverageTable $Projects | Set-Content -NoNewline (Join-Path $PSScriptRoot 'coverage/coverage-report.md')
+} finally {
+  Pop-Location
 }

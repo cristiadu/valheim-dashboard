@@ -480,14 +480,14 @@ The dashboard also reads the world save, `worlds_local\Cotil\_main.<save number>
 
 ```mermaid
 flowchart LR
-  pr[Pull request or push to main] --> install[pnpm install] --> check[pnpm check] --> lint[pnpm lint] --> coverage[pnpm coverage] --> build[pnpm build] --> scripts[Measure-Coverage.ps1] --> report[pnpm coverage:report]
-  report --> summary[Run summary]
-  report --> comment[Comment on the pull request]
+  pr[Pull request or push to main] --> install[pnpm install] --> check[pnpm check] --> lint[pnpm lint] --> coverage[pnpm coverage] --> build[pnpm build] --> scripts[Measure-Coverage.ps1]
+  scripts --> summary[Run summary]
+  scripts --> comment[Comment on the pull request]
 ```
 
 `pnpm coverage` runs each project's tests twice, once per kind, and writes what they ran to
 `coverage/<kind>/cobertura-coverage.xml` in that project. `scripts\Measure-Coverage.ps1` does the same for the
-PowerShell scripts with Pester 6.2.0. `pnpm coverage:report` turns those files into one table.
+PowerShell scripts with Pester 6.2.0, then turns all those files into one table.
 
 | Test kind | What it checks | Files |
 | --- | --- | --- |
