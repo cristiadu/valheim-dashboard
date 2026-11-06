@@ -4,7 +4,6 @@ import {
   ACTIVITY_STORY_KINDS,
   ACTIVITY_WORDS,
   type ActivityRecord,
-  AREA_NAMES,
   BOSS_ALTAR_NAMES,
   BOSS_NAMES,
   type ChatRecord,
@@ -21,42 +20,12 @@ import {
   UNKNOWN_FOOD,
 } from '#/lib/models';
 import { mergedSource, sourceKey } from '#/lib/sources';
-import { durationLabel } from '#/lib/status';
-
-/** Returns `1 death` or `2 deaths` style text. */
-export const count = (amount: number, one: string, many: string): string => `${amount} ${amount === 1 ? one : many}`;
-
-/** Readable name of a prefab, for example `wood floor 1x1`, `sword iron`, `turnip` or `greydwarf elite`. */
-export const thingName = (prefab: string): string =>
-  prefab
-    .replace(/^(piece|Pickable)_/, '')
-    .replaceAll('_', ' ')
-    .replace(/([a-z])([A-Z])/g, '$1 $2')
-    .toLowerCase();
-
-/** [text] with its first letter in capitals. */
-export const capitalized = (text: string): string => `${text.charAt(0).toUpperCase()}${text.slice(1)}`;
-
-/** Short name of an area the plugin logs, for example `Black Forest` for `BlackForest`. */
-export const areaLabel = (area: string): string => capitalized((AREA_NAMES[area] ?? area).replace(/^(the|a) /, ''));
-
-/** [name] with `a` or `an` before it, for example `a troll` or `an abomination`. */
-const withArticle = (name: string): string => `${/^[aeiou]/i.test(name) ? 'an' : 'a'} ${name}`;
-
-/** Joins [names] as `a, b and c`. */
-const listText = (names: string[]): string =>
-  names.length <= 1 ? (names[0] ?? '') : `${names.slice(0, -1).join(', ')} and ${names.at(-1)}`;
+import { areaName, capitalized, count, listText, thingList, thingName, withArticle } from '#/lib/text';
+import { durationLabel } from '#/lib/time';
 
 /** Total things in a stretch of activity. */
 const activityTotal = (activity: ActivityRecord): number =>
   Object.values(activity.things).reduce((sum, amount) => sum + amount, 0);
-
-/** Every thing of [things], most first, for example `14 wood floor 1x1, 8 wood fence, 1 workbench`. */
-export const thingList = (things: Record<string, number>): string =>
-  Object.entries(things)
-    .sort(([, firstAmount], [, secondAmount]) => secondAmount - firstAmount)
-    .map(([thing, amount]) => `${amount} ${thingName(thing)}`)
-    .join(', ');
 
 /**
  * Story line for one stretch of activity, such as building or kills. Powers and carts have no list, and meals leave
@@ -144,10 +113,8 @@ const eventItem = (event: StoryEvent, players: Set<string>): StoryText => {
   switch (event.type) {
     case 'playerDied':
       return { timeUtc, kind: 'died', text: `${event.character} died` };
-    case 'deathDetails': {
-      const area = AREA_NAMES[event.area] ?? event.area;
-      return { timeUtc, kind: 'died', text: `${event.character} died in ${area}${fightingText(event.fighting, players)}` };
-    }
+    case 'deathDetails':
+      return { timeUtc, kind: 'died', text: `${event.character} died in ${areaName(event.area)}${fightingText(event.fighting, players)}` };
     case 'raidStarted':
       return { timeUtc, kind: 'raid', text: `A raid started: ${event.raid.replaceAll('_', ' ')}` };
     case 'raidEnded':
@@ -165,7 +132,7 @@ const eventItem = (event: StoryEvent, players: Set<string>): StoryText => {
         text:
           event.area === DUNGEON_AREA
             ? `${event.character} went into a dungeon`
-            : `${event.character} reached ${AREA_NAMES[event.area] ?? event.area} for the first time`,
+            : `${event.character} reached ${areaName(event.area)} for the first time`,
       };
     case 'teleported':
       return {
