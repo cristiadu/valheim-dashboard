@@ -16,7 +16,8 @@
     "start": "node build",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "lint": "eslint .",
-    "test": "vitest run"
+    "test": "vitest run",
+    "coverage": "vitest run --coverage --project unit --coverage.reportsDirectory=coverage/unit && vitest run --coverage --project integration --coverage.reportsDirectory=coverage/integration"
   },
   "dependencies": {
     "valheim-log": "workspace:*"
@@ -27,6 +28,7 @@
     "@sveltejs/kit": "3.1.0",
     "@sveltejs/vite-plugin-svelte": "7.3.1",
     "@types/node": "26.6.6",
+    "@vitest/coverage-v8": "5.0.5",
     "eslint": "10.13.0",
     "eslint-plugin-svelte": "3.23.1",
     "globals": "17.13.0",
