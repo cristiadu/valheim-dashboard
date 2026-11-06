@@ -8,8 +8,10 @@ import {
   ATE_PATTERN,
   ATE_SOMETHING_PATTERN,
   CHEST_CONTENTS_PATTERN,
+  CHEST_LABEL_PATTERN,
   CHEST_PATTERN,
   CHEST_REMOVED_PATTERN,
+  CHEST_UNLABELED_PATTERN,
   CREATURE_KILLED_PATTERN,
   DEPLETED_PATTERN,
   DROPPED_PATTERN,
@@ -227,6 +229,82 @@ const MATCHERS: readonly Matcher[] = [
       count: Number(groups.count),
       player: playerOf(groups.player),
     }),
+  },
+  {
+    pattern: FUELED_PATTERN,
+    toEvent: (groups, timeUtc) => ({ type: 'fueled', timeUtc, fire: groups.fire!, player: playerOf(groups.player) }),
+  },
+  {
+    pattern: REPAIRED_PATTERN,
+    toEvent: (groups, timeUtc) => ({ type: 'repaired', timeUtc, piece: groups.piece!, player: playerOf(groups.player) }),
+  },
+  {
+    pattern: MAP_SHARED_PATTERN,
+    toEvent: (groups, timeUtc) => ({ type: 'mapShared', timeUtc, player: playerOf(groups.player), table: groups.table! }),
+  },
+  {
+    pattern: WARD_ACCESS_PATTERN,
+    toEvent: (groups, timeUtc) => ({
+      type: 'wardAccess',
+      timeUtc,
+      player: groups.player!,
+      ward: groups.ward!,
+      builder: playerOf(groups.builder),
+      isGiven: groups.change === 'given',
+    }),
+  },
+  {
+    pattern: DEPLETED_PATTERN,
+    toEvent: (groups, timeUtc) => ({
+      type: 'depleted',
+      timeUtc,
+      kind: groups.kind === 'Tree cut' ? 'tree' : 'rock',
+      thing: groups.thing!,
+      player: playerOf(groups.player),
+    }),
+  },
+  {
+    pattern: POSITION_PATTERN,
+    toEvent: (groups, timeUtc) => ({
+      type: 'position',
+      timeUtc,
+      character: groups.character!,
+      x: Number(groups.x),
+      z: Number(groups.z),
+    }),
+  },
+  {
+    pattern: CHEST_CONTENTS_PATTERN,
+    toEvent: (groups, timeUtc) => ({
+      type: 'chestContents',
+      timeUtc,
+      id: groups.id!,
+      chest: groups.chest!,
+      x: Number(groups.x),
+      z: Number(groups.z),
+      builder: playerOf(groups.builder),
+      items: heldItemsOf(groups.items!),
+    }),
+  },
+  {
+    pattern: CHEST_REMOVED_PATTERN,
+    toEvent: (groups, timeUtc) => ({ type: 'chestRemoved', timeUtc, id: groups.id! }),
+  },
+  {
+    pattern: CHEST_LABEL_PATTERN,
+    toEvent: (groups, timeUtc) => ({ type: 'chestLabeled', timeUtc, id: groups.id!, label: groups.label! }),
+  },
+  {
+    pattern: CHEST_UNLABELED_PATTERN,
+    toEvent: (groups, timeUtc) => ({ type: 'chestUnlabeled', timeUtc, id: groups.id! }),
+  },
+  {
+    pattern: LEVIATHAN_PATTERN,
+    toEvent: (groups, timeUtc) => ({ type: 'leviathan', timeUtc, id: groups.id!, x: Number(groups.x), z: Number(groups.z) }),
+  },
+  {
+    pattern: LEVIATHAN_GONE_PATTERN,
+    toEvent: (groups, timeUtc) => ({ type: 'leviathanGone', timeUtc, id: groups.id! }),
   },
   {
     pattern: TOMBSTONE_PATTERN,

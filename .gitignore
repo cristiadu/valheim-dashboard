@@ -6,6 +6,9 @@ node_modules/
 build/
 .vite/
 
+# Test coverage reports, one folder per test kind in each project
+coverage/
+
 # Plugin build output (.NET bin and obj folders), for every plugin
 /plugins/*/bin/
 /plugins/*/obj/
