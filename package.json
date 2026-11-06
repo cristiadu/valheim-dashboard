@@ -6,6 +6,8 @@
     "check": "pnpm -r --if-present run check",
     "lint": "pnpm -r --if-present run lint",
     "test": "pnpm -r --if-present run test",
+    "coverage": "pnpm -r --if-present run coverage",
+    "coverage:report": "node packages/coverage-report/src/main.ts apps/dashboard packages/valheim-log packages/coverage-report",
     "build": "pnpm -r --if-present run build"
   }
 }

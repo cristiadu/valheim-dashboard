@@ -480,8 +480,22 @@ The dashboard also reads the world save, `worlds_local\Cotil\_main.<save number>
 
 ```mermaid
 flowchart LR
-  pr[Pull request or push to main] --> install[pnpm install] --> check[pnpm check] --> lint[pnpm lint] --> test[pnpm test] --> build[pnpm build]
+  pr[Pull request or push to main] --> install[pnpm install] --> check[pnpm check] --> lint[pnpm lint] --> coverage[pnpm coverage] --> build[pnpm build] --> report[pnpm coverage:report]
+  report --> summary[Run summary]
+  report --> comment[Comment on the pull request]
 ```
+
+`pnpm coverage` runs each project's tests twice, once per kind, and writes what they ran to
+`coverage/<kind>/cobertura-coverage.xml` in that project. `pnpm coverage:report` turns those files into one
+table.
+
+| Test kind | What it checks | Files |
+| --- | --- | --- |
+| Unit | One source file at a time | `*.test.ts` |
+| Integration | Several parts together on real files, for example the dashboard following a log folder in a temp folder | `*.integration.test.ts` |
+
+The comment is updated on each push, so a pull request has one. Dependabot's pull requests get only the summary,
+since their token cannot comment. The event log plugin is not measured: it builds only against the game's own files.
 
 `pnpm lint` runs ESLint in each project. Besides the recommended TypeScript and Svelte rules, it rejects
 relative imports (use `#/`), `function` declarations, `.then()`, `console` and `if` without braces.
