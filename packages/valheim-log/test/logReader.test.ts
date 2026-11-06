@@ -148,6 +148,17 @@ describe('parseLog', () => {
 });
 
 describe('parseMessage', () => {
+  it('keeps a chat line a chat line when it holds words other messages are found by', () => {
+    // GIVEN chat lines that mention a night skip and the server quitting
+    const messages = ['Chat: Ragnar said: sleep, day:12 is coming', 'Chat: Ragnar said: OnApplicationQuit'];
+
+    // WHEN each message is read
+    const events = messages.map((message) => parseMessage(message, '2026-01-01T00:00:00.000Z'));
+
+    // THEN both stay chat
+    expect(events.map((event) => event.type)).toEqual(['chatMessage', 'chatMessage']);
+  });
+
   it('reads every refused join reason', () => {
     // GIVEN one message per reason
     const messages = [
