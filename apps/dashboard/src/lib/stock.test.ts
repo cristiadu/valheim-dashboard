@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
+import { mapOf } from '#/lib/map';
 import { playersOf } from '#/lib/players';
-import { bagStock, builderNames, chestStock, craftables, recipeItemName } from '#/lib/stock';
+import { bagStock, builderNames, chestStock, craftables, itemPlacesOf, recipeItemName } from '#/lib/stock';
 import { sessionWith, snapshotWith, TEST_NOON_MS } from '#/lib/test-common';
 
 describe('recipeItemName', () => {
@@ -54,6 +55,41 @@ describe('chestStock', () => {
     // THEN the found chests count once each, and his leave out Bjorn's
     expect(all).toEqual({ Wood: 14, 'Deer hide': 2, Stone: 7 });
     expect(his).toEqual({ Wood: 14, 'Deer hide': 2 });
+  });
+});
+
+describe('itemPlacesOf', () => {
+  it('lists the bags and found chests that hold each item, most first', () => {
+    // GIVEN Ragnar carries 4 core wood and 6 wood, his cart holds 6 wood and Bjorn's chest 9, and a treasure chest
+    // nobody walked to holds wood too
+    const timeUtc = '2026-10-29T11:00:00.000Z';
+    const snapshot = snapshotWith({
+      sessions: [sessionWith({ steamId: 'Steam_1', steamName: 'Tony Example' })],
+      explored: { Ragnar: ['0,0'] },
+      bags: { Ragnar: { RoundLog: 4, Wood: 6 } },
+      chests: {
+        '1:1': { chest: 'Cart', x: 5, z: 0, builder: 'Tony Example', items: { Wood: 6 }, timeUtc },
+        '1:2': { chest: 'piece_chest', x: 9, z: 0, builder: 'Bjorn', items: { Wood: 9 }, timeUtc, label: 'Logs' },
+        '1:3': { chest: 'TreasureChest_meadows', x: 900, z: 900, builder: null, items: { Wood: 50 }, timeUtc },
+      },
+    });
+    const chests = mapOf(snapshot, playersOf(snapshot, TEST_NOON_MS))!.chests;
+
+    // WHEN the places of each item are listed
+    const places = itemPlacesOf(chests, snapshot.bags);
+
+    // THEN wood is in Bjorn's chest, then Ragnar's bag before his cart, and core wood only in the bag
+    expect(
+      Object.fromEntries(
+        Object.entries(places).map(([item, list]) => [
+          item,
+          list.map((place) => (place.kind === 'bag' ? `bag ${place.character} ${place.count}` : `chest ${place.chest.id} ${place.count}`)),
+        ]),
+      ),
+    ).toEqual({
+      'Core wood': ['bag Ragnar 4'],
+      Wood: ['chest 1:2 9', 'bag Ragnar 6', 'chest 1:1 6'],
+    });
   });
 });
 

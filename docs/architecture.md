@@ -172,10 +172,21 @@ the page gives nothing away.
 | Vikings | Each player now: when they were online, health and stamina, their numbers, areas visited, gear laid out like a character sheet, and what is probably in their bag | Snapshot |
 | Saga | Every game event and chat, with filters | Snapshot |
 | Map | Land each player walked, chests with what they hold, who is where, last deaths | Snapshot |
-| Recipes | Crafting plans and what is still missing, and what the chests can make. Only recipes whose ingredients someone has found | The viewer's browser, and chests and found items from the snapshot |
+| Recipes | Crafting plans and what is still missing, where to find it, and what the chests can make. Only recipes whose ingredients someone has found | The viewer's browser, and chests and found items from the snapshot |
 | Server | Up or down, the world and in-game day, bosses met, uptime in the last 24 hours, the latest saves and backups, warnings | Snapshot |
 
 Recipe plans are saved in each viewer's browser (`localStorage`). The server stores nothing for them. Chest items are matched to recipe items through `itemName`, so `RoundLog` counts as `Core wood`. Only chests someone has found count.
+
+Each missing plan item lists where to find it: every found chest and every guessed bag that holds some, most first.
+A chest links to the Map with that chest open (`/map?chest=1:42`).
+
+```mermaid
+flowchart LR
+  Chests[Found chests] --> Places[Places per item]
+  Bags[Guessed bags] --> Places
+  Places --> Plan[Missing plan item]
+  Plan -- tap a chest --> Map[Map with the chest open]
+```
 
 Recipes can also count one character's bag, and Vikings shows it. The server never gets a player's inventory, so the bag is a guess
 kept in the snapshot:

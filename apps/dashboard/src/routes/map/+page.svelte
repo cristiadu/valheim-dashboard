@@ -1,5 +1,8 @@
 <script lang="ts">
-  import { tick } from 'svelte';
+  import { onMount, tick } from 'svelte';
+
+  import { afterNavigate } from '$app/navigation';
+  import { page } from '$app/state';
 
   import NoData from '#/lib/components/NoData';
   import ChestList from '#/lib/components/map/ChestList';
@@ -9,7 +12,7 @@
   import WorldMap from '#/lib/components/map/WorldMap';
   import { live, useSnapshot } from '#/lib/live.svelte';
   import { mapOf } from '#/lib/map';
-  import { MAP_SQUARE_METERS } from '#/lib/models/map';
+  import { CHEST_QUERY, MAP_SQUARE_METERS } from '#/lib/models/map';
   import { playersOf } from '#/lib/players';
   import { viewerTimeZone } from '#/lib/time';
 
@@ -43,6 +46,21 @@
     await tick();
     pickedPanel?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   };
+
+  /** Whether the chest opened from a link still needs its panel brought into view. */
+  let isLinkedChestUnseen = false;
+
+  onMount(() => {
+    pickedId = page.url.searchParams.get(CHEST_QUERY);
+    isLinkedChestUnseen = pickedId !== null;
+  });
+
+  afterNavigate(() => {
+    if (isLinkedChestUnseen && pickedPanel !== undefined) {
+      isLinkedChestUnseen = false;
+      pickedPanel.scrollIntoView({ block: 'center' });
+    }
+  });
 </script>
 
 {#if map === null}
