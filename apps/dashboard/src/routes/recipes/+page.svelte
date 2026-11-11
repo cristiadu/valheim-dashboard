@@ -6,7 +6,7 @@
   import RecipePicker from '#/lib/components/RecipePicker';
   import { live, useSnapshot } from '#/lib/live.svelte';
   import { foundChests } from '#/lib/map';
-  import { BAG_SOURCE, CHESTS_SOURCE, MAX_CRAFTS, type Plan, RECIPE_ICON_PX } from '#/lib/models';
+  import { BAG_SOURCE, CHESTS_SOURCE, MAX_CRAFTS, type Plan, RECIPE_ICON_PX } from '#/lib/models/recipes';
   import { knownRecipes } from '#/lib/picker';
   import { planPill } from '#/lib/pills';
   import { clampCrafts, newPlan, planItems, stillNeeded, withHave } from '#/lib/planner';

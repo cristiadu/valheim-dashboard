@@ -1,6 +1,6 @@
 import type { PlayerSession } from 'valheim-log';
 
-import { ACTIVITY_STORY_KINDS, type ActivityKind, PLAYER_ACTIVITY_STATS } from '#/lib/models';
+import { ACTIVITY_STORY_KINDS, type ActivityKind, PLAYER_ACTIVITY_STATS } from '#/lib/models/activities';
 import { MAP_SQUARE_METERS, SQUARE_METERS_PER_KM2 } from '#/lib/models/map';
 import { OTHER_PLAYER_COLOR, type Player, PLAYER_COLORS, type PlayerStat } from '#/lib/models/players';
 import type { Snapshot } from '#/lib/models/snapshot';

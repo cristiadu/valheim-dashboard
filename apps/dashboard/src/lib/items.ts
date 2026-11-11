@@ -1,4 +1,3 @@
-import { GEAR_NAMES, ITEM_NAMES } from '#/lib/models';
 import {
   CHEST_NAMES,
   type ChestRecord,
@@ -7,6 +6,8 @@ import {
   type StockRow,
   TREASURE_CHEST_PREFIX,
 } from '#/lib/models/chests';
+import { GEAR_NAMES } from '#/lib/models/gear';
+import { ITEM_NAMES } from '#/lib/models/items';
 import type { MapChest } from '#/lib/models/map';
 import { capitalized, thingName } from '#/lib/text';
 

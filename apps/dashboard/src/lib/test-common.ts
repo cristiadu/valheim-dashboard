@@ -2,7 +2,7 @@ import { gzipSync } from 'node:zlib';
 
 import type { PlayerSession } from 'valheim-log';
 
-import type { Plan } from '#/lib/models';
+import type { Plan } from '#/lib/models/recipes';
 import type { Snapshot, SourceLines } from '#/lib/models/snapshot';
 import type { ServerState } from '#/lib/server/models';
 import { createServerState, readLogLine } from '#/lib/server/server-state';

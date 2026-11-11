@@ -1,6 +1,6 @@
 import type { LogEvent } from 'valheim-log';
 
-import { ACTIVITY_STORY_KINDS, type ActivityKind, UNKNOWN_FOOD } from '#/lib/models';
+import { ACTIVITY_STORY_KINDS, type ActivityKind, UNKNOWN_FOOD } from '#/lib/models/activities';
 import type { Snapshot } from '#/lib/models/snapshot';
 import { characterOfSteamName } from '#/lib/players';
 import { pushCapped } from '#/lib/server/lists';

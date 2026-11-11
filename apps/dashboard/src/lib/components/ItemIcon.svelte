@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { ITEM_ICON_PX } from '#/lib/models';
+  import { ITEM_ICON_PX } from '#/lib/models/items';
   import { iconUrl } from '#/lib/recipes';
 
   /** Item to show the icon of, and the icon size in pixels. */

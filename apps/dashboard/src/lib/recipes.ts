@@ -1,4 +1,5 @@
-import { type CraftingStation, ICON_PATH, type Recipe, type RecipeBiome } from '#/lib/models';
+import { ICON_PATH } from '#/lib/models/items';
+import type { CraftingStation, Recipe, RecipeBiome } from '#/lib/models/recipes';
 
 /** Returns a recipe from its parts. [ingredients] maps each item name to the amount one craft uses. */
 const recipe = (

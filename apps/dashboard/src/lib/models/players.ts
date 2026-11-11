@@ -1,6 +1,6 @@
 import type { PlayerSession } from 'valheim-log';
 
-import type { ActivityKind } from '#/lib/models';
+import type { ActivityKind } from '#/lib/models/activities';
 import type { SourceLines } from '#/lib/models/snapshot';
 import type { StoryKind } from '#/lib/models/story';
 
