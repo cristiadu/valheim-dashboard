@@ -96,7 +96,7 @@ function Invoke-Pnpm([string]$RepoRoot, [string[]]$Arguments) {
   $wantedVersion = Get-PnpmVersion $RepoRoot
   $installedVersion = Get-InstalledPnpmVersion
   if ($installedVersion -ne $wantedVersion) {
-    throw "pnpm $wantedVersion is needed, but the installed version is $installedVersion. Run scripts\install-startup.cmd again to install it."
+    throw "pnpm $wantedVersion is needed, but the installed version is $installedVersion. Run scripts\start-valheim.cmd to install it."
   }
   return Invoke-Checked 'pnpm' $Arguments
 }
