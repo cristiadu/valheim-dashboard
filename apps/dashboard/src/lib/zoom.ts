@@ -1,11 +1,4 @@
-import {
-  MAP_MIN_VIEW_METERS,
-  MAP_SCALE_BAR_PX,
-  MAP_SCALE_STEPS_METERS,
-  type MapBox,
-  MAP_WORLD_BOX,
-  METERS_PER_KM,
-} from '#/lib/models';
+import { MAP_MIN_VIEW_METERS, MAP_SCALE_BAR_PX, MAP_SCALE_STEPS_METERS, MAP_WORLD_BOX, type MapBox, METERS_PER_KM } from '#/lib/models';
 
 /** Returns [value] kept between [low] and [high]. */
 const clamp = (value: number, low: number, high: number): number => Math.min(Math.max(value, low), high);

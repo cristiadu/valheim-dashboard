@@ -4,15 +4,8 @@ import type { LogEvent } from 'valheim-log';
 
 import { gearEntryOf } from '#/lib/gear';
 import { squareKeyOf } from '#/lib/map';
-import {
-  BOSS_NAMES,
-  BOSS_ORDER,
-  DEFEATED_KEY_PREFIX,
-  DUNGEON_AREA,
-  type Snapshot,
-  STORY_EVENT_TYPES,
-  type StoryEvent,
-} from '#/lib/models';
+import { BOSS_NAMES, BOSS_ORDER, DEFEATED_KEY_PREFIX, DUNGEON_AREA } from '#/lib/models';
+import { type Snapshot, STORY_EVENT_TYPES, type StoryEvent } from '#/lib/models/snapshot';
 import { characterOfSteamName } from '#/lib/players';
 import { addActivityOf } from '#/lib/server/activities';
 import { updateBags } from '#/lib/server/bags';

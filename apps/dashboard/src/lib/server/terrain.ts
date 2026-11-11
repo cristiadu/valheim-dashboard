@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
 
-import type { Snapshot } from '#/lib/models';
 import { squareOf } from '#/lib/map';
+import type { Snapshot } from '#/lib/models/snapshot';
 import { type ServerState, TERRAIN_HEADER_PATTERN, type Terrain } from '#/lib/server/models';
 
 /** Reads the plugin's terrain file [text]: a header with the westmost square, then one row of letters per line. */

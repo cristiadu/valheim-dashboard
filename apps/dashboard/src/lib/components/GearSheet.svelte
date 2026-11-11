@@ -1,8 +1,9 @@
 <script lang="ts">
   import ItemIcon from '#/lib/components/ItemIcon';
   import LogLines from '#/lib/components/LogLines';
-  import { GEAR_ICON_PX, GEAR_SLOT_NAMES, GEAR_SLOTS, type GearPiece, type SourceLines } from '#/lib/models';
   import { gearLabel, gearSheet } from '#/lib/gear';
+  import { GEAR_ICON_PX, GEAR_SLOT_NAMES, GEAR_SLOTS, type GearPiece } from '#/lib/models';
+  import type { SourceLines } from '#/lib/models/snapshot';
 
   /**
    * Gear a character was seen with, newest first, as the snapshot keeps it, what they wear now once the plugin logged

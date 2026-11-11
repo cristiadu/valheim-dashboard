@@ -2,7 +2,7 @@
   import { tick } from 'svelte';
 
   import ItemIcon from '#/lib/components/ItemIcon';
-  import { RECIPE_BIOMES, type Recipe } from '#/lib/models';
+  import { type Recipe, RECIPE_BIOMES } from '#/lib/models';
   import { movedIndex } from '#/lib/picker';
   import { recipeById } from '#/lib/recipes';
 

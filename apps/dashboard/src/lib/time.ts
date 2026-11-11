@@ -7,7 +7,7 @@ import {
   MS_PER_MINUTE,
   MS_PER_SECOND,
   ZONE_CLOCK_OPTIONS,
-} from '#/lib/models';
+} from '#/lib/models/time';
 
 /** One clock reader per time zone, built on first use. */
 const zoneClocks = new Map<string, Intl.DateTimeFormat>();

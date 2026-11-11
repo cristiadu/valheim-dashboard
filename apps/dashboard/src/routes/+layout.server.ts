@@ -1,4 +1,4 @@
-import { PASSWORD_PATH } from '#/lib/models';
+import { PASSWORD_PATH } from '#/lib/models/app';
 import { currentSnapshot } from '#/lib/server/live';
 import { createServerState } from '#/lib/server/server-state';
 

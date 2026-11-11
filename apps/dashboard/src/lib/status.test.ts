@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { MS_PER_MINUTE } from '#/lib/models';
+import { MS_PER_MINUTE } from '#/lib/models/time';
 import { gigabytesLabel, isServerOnline, onlinePlayers, serverWarnings, statusLine, upStretches } from '#/lib/status';
 import { sessionWith, snapshotWith, TEST_NOON_MS, TEST_TIME_ZONE } from '#/lib/test-common';
 

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { resolve } from '$app/paths';
-  import { TABS, type Tab } from '#/lib/models';
+  import { type Tab, TABS } from '#/lib/models/app';
 
   /** Tab shown now. */
   let { current }: { current: Tab } = $props();

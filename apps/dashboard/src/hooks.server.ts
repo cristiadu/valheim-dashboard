@@ -1,10 +1,10 @@
 import { redirect } from '@sveltejs/kit';
 import type { Handle, ServerInit } from '@sveltejs/kit/hooks';
 
+import { PASSWORD_PATH } from '#/lib/models/app';
 import { checkAccess, configuredPassword } from '#/lib/server/access';
 import { compressed } from '#/lib/server/compression';
 import { startIconDownload } from '#/lib/server/icons';
-import { PASSWORD_PATH } from '#/lib/models';
 import { NO_PASSWORD_SET_TEXT, PASSWORD_COOKIE, PASSWORD_NEEDED_TEXT } from '#/lib/server/models';
 
 /** Downloads any missing item icons when the dashboard starts. */

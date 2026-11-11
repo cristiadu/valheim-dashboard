@@ -1,12 +1,12 @@
 <script lang="ts">
   import { tick } from 'svelte';
 
+  import NoData from '#/lib/components/NoData';
   import ChestList from '#/lib/components/map/ChestList';
   import MapLegend from '#/lib/components/map/MapLegend';
   import PickedChest from '#/lib/components/map/PickedChest';
   import StoredItems from '#/lib/components/map/StoredItems';
   import WorldMap from '#/lib/components/map/WorldMap';
-  import NoData from '#/lib/components/NoData';
   import { live, useSnapshot } from '#/lib/live.svelte';
   import { mapOf } from '#/lib/map';
   import { MAP_SQUARE_METERS } from '#/lib/models';

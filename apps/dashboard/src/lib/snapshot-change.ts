@@ -1,4 +1,4 @@
-import type { JsonValue, SnapshotChange } from '#/lib/models';
+import type { JsonValue, SnapshotChange } from '#/lib/models/app';
 
 /** Whether [value] is an object with keys, not a list or a plain value. */
 const isObject = (value: JsonValue): value is { [key: string]: JsonValue } =>

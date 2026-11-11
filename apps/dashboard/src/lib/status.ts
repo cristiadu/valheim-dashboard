@@ -1,6 +1,8 @@
 import type { PlayerSession } from 'valheim-log';
 
-import { BYTES_PER_GB, DAY_MS, ONLINE_WINDOW_MS, type ServerWarning, type Snapshot } from '#/lib/models';
+import type { Snapshot } from '#/lib/models/snapshot';
+import { BYTES_PER_GB, ONLINE_WINDOW_MS, type ServerWarning } from '#/lib/models/status';
+import { DAY_MS } from '#/lib/models/time';
 import { linesAt, serverSource } from '#/lib/sources';
 import { clip, clockTime, durationLabel, offsetLabel, offsetMinutesAt } from '#/lib/time';
 
