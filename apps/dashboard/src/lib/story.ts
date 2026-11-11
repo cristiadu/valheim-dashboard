@@ -10,7 +10,7 @@ import { areaName, capitalized, count, listText, thingList, thingName, withArtic
 import { durationLabel } from '#/lib/time';
 
 /** Total things in a stretch of activity. */
-const activityTotal = (activity: ActivityRecord): number =>
+export const activityTotal = (activity: ActivityRecord): number =>
   Object.values(activity.things).reduce((sum, amount) => sum + amount, 0);
 
 /**
