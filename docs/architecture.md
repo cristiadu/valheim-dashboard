@@ -154,14 +154,14 @@ guessing is slow.
 flowchart LR
   log["logs.txt: Global key set: defeated_eikthyr"] --> bosses[Bosses defeated]
   save["worlds_local\Cotil\_main.1561.db2"] -->|on start and after each save| bosses
-  bosses --> world[World tab]
+  bosses --> server[Server tab]
 ```
 
 A boss defeat sets a global key, such as `defeated_eikthyr`, which the world save keeps. The log only has
 defeats since the plugin was installed, so the dashboard also reads the keys from the newest save. A defeat
-from the save shows on the World tab, but has no Saga line, since its time is not known.
+from the save shows on the Server tab, but has no Saga line, since its time is not known.
 
-The World tab lists only bosses someone has defeated or summoned. A boss nobody has met stays hidden, so
+The Server tab lists only bosses someone has defeated or summoned. A boss nobody has met stays hidden, so
 the page gives nothing away.
 
 ## Tabs
@@ -171,10 +171,9 @@ the page gives nothing away.
 | Hall | Who is online and where, the last 24 hours on a day wheel, the latest events | Snapshot |
 | Vikings | Each player now: when they were online, health and stamina, their numbers, areas visited, gear laid out like a character sheet, and what is probably in their bag | Snapshot |
 | Saga | Every game event and chat, with filters | Snapshot |
-| World | The in-game day, bosses defeated, saves, backups, disk space | Snapshot |
 | Map | Land each player walked, chests with what they hold, who is where, last deaths | Snapshot |
 | Recipes | Crafting plans and what is still missing, and what the chests can make. Only recipes whose ingredients someone has found | The viewer's browser, and chests and found items from the snapshot |
-| Server | Up or down, uptime in the last 24 hours, warnings | Snapshot |
+| Server | Up or down, the world and in-game day, bosses met, uptime in the last 24 hours, the latest saves and backups, warnings | Snapshot |
 
 Recipe plans are saved in each viewer's browser (`localStorage`). The server stores nothing for them. Chest items are matched to recipe items through `itemName`, so `RoundLog` counts as `Core wood`. Only chests someone has found count.
 
@@ -286,14 +285,14 @@ has the game's line and the plugin's details, a join or leave has its line from 
 stretch of building, kills or items keeps its latest 50 lines. Every line in the list shows the rune, color
 and label of its Saga kind.
 
-The server numbers on World, Server and the Hall keep their lines the same way:
+The server numbers on Server and the Hall keep their lines the same way:
 
 | Number | Lines |
 | --- | --- |
 | World, up for, status | World loaded and clean stops |
 | In-game day | New day and night skipped |
-| Saves seen, average save time, each save | Save finished |
-| Backups seen, each backup | Backup created |
+| Last save, each save | Save finished |
+| Each backup | Backup created |
 | Disk free, low disk warning | Free disk space |
 | Steam, lost Steam warning | Steam connected or lost |
 | A boss defeated | The defeat's global key. A boss read only from the world save has none. |
@@ -338,7 +337,7 @@ On the dashboard, plugin lines become:
 | Activities | Pieces built or destroyed, kills, items gathered, chests, planting, eating, smelting, cooking, brewing, steering ships, crafting station visits, emotes, items made or upgraded, rides, forsaken powers, carts pulled, fires fueled, repairs, items obliterated, trees and rocks | One Saga line per player and kind, until a 10 minute pause, naming every thing, and a running total per player and kind for the Vikings numbers |
 | Story events | Deaths, bosses, raids, portals, tames, signs, item stands, tombstones, beds claimed, portals named, wards turned on or off, stones read, saddles, tames following, ward access, maps shared | One Saga line each |
 | News only | Areas, gear, global keys | A Saga line for a first visit or a dungeon trip, new gear, or a boss defeat |
-| Stats | Areas, kills, the day, boss keys | Where each player is now and their kills, areas and gear on Vikings, the day and bosses on World |
+| Stats | Areas, kills, the day, boss keys | Where each player is now and their kills, areas and gear on Vikings, the day and bosses on Server |
 | Chat | Chat and pings | The Saga's "Chat and signs" filter, kept apart so it never pushes out events |
 | Map | Positions, chests, tombstones | Explored squares, chests and last deaths on Map, and the land each player explored on Vikings |
 
