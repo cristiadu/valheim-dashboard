@@ -139,3 +139,6 @@ export const MAP_CHEST_LEGEND: [ChestMarkKind, string][] = [
 
 /** Square meters in one square kilometer, for the land a player explored. */
 export const SQUARE_METERS_PER_KM2 = 1_000_000;
+
+/** Map page link part that opens one chest, followed by its ID, for example `?chest=1:42`. */
+export const CHEST_QUERY = 'chest';
