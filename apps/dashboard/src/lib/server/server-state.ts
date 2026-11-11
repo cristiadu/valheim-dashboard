@@ -268,7 +268,8 @@ export const readLogLine = (state: ServerState, line: string): void => {
     case 'chestContents': {
       const { id, chest, x, z, builder, items, timeUtc } = event;
       const label = snapshot.chests[id]?.label;
-      snapshot.chests[id] = { chest, x, z, builder: characterOfSteamName(snapshot.sessions, builder), items, timeUtc };
+      const knownBuilder = characterOfSteamName(snapshot.sessions, builder) ?? snapshot.chests[id]?.builder ?? null;
+      snapshot.chests[id] = { chest, x, z, builder: knownBuilder, items, timeUtc };
       if (label !== undefined) {
         snapshot.chests[id].label = label;
       }

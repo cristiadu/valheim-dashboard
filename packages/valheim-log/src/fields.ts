@@ -18,5 +18,9 @@ export const heldItemsOf = (text: string): Record<string, number> => {
   return items;
 };
 
-/** Reads a player from the event log plugin, or null when the plugin did not know who it was. */
-export const playerOf = (player: string | undefined): string | null => (player === UNKNOWN_PLAYER ? null : player!);
+/**
+ * Reads a player from the event log plugin, or null when the plugin did not know who it was. Plugins before 2.19.0
+ * wrote a blank name for a player who was joining again.
+ */
+export const playerOf = (player: string | undefined): string | null =>
+  player === UNKNOWN_PLAYER || player === '' ? null : player!;
