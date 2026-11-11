@@ -3,7 +3,7 @@
   import LogLines from '#/lib/components/LogLines';
   import NoData from '#/lib/components/NoData';
   import { live, useSnapshot } from '#/lib/live.svelte';
-  import { SAGA_FILTERS, STORY_STYLES } from '#/lib/models';
+  import { SAGA_FILTERS, STORY_STYLES } from '#/lib/models/story';
   import { storyOf } from '#/lib/story';
   import { viewerTimeZone, whenLabel } from '#/lib/time';
 

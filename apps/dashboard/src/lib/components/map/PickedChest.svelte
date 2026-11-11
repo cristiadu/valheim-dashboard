@@ -1,7 +1,7 @@
 <script lang="ts">
   import ChestContents from '#/lib/components/ChestContents';
   import { builtByLabel, chestName, chestTitle } from '#/lib/items';
-  import type { MapChest } from '#/lib/models';
+  import type { MapChest } from '#/lib/models/map';
   import { whenLabel } from '#/lib/time';
 
   /**

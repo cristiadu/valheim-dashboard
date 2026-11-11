@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { type Player, PLAYER_COLORS } from '#/lib/models';
+  import { type Player, PLAYER_COLORS } from '#/lib/models/players';
   import type { Snapshot } from '#/lib/models/snapshot';
   import { HOURS_PER_DAY } from '#/lib/models/time';
   import {
