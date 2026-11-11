@@ -1,7 +1,7 @@
 <script lang="ts">
   import ItemIcon from '#/lib/components/ItemIcon';
   import { builtByShortLabel, chestName, chestTitle, stockOf } from '#/lib/items';
-  import type { MapChest } from '#/lib/models';
+  import type { MapChest } from '#/lib/models/map';
   import { count } from '#/lib/text';
 
   /** Chests on the map, and what to do when one is tapped. */

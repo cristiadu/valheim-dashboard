@@ -9,7 +9,7 @@
   import WorldMap from '#/lib/components/map/WorldMap';
   import { live, useSnapshot } from '#/lib/live.svelte';
   import { mapOf } from '#/lib/map';
-  import { MAP_SQUARE_METERS } from '#/lib/models';
+  import { MAP_SQUARE_METERS } from '#/lib/models/map';
   import { playersOf } from '#/lib/players';
   import { viewerTimeZone } from '#/lib/time';
 

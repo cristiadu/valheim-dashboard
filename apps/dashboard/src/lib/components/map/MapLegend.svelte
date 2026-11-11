@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { MAP_CHEST_LEGEND, type Player, TERRAIN_STYLES } from '#/lib/models';
+  import { MAP_CHEST_LEGEND, TERRAIN_STYLES } from '#/lib/models/map';
+  import type { Player } from '#/lib/models/players';
 
   /** Players with their map colors, and the terrain letters of the explored squares. */
   let { players, terrain }: { players: Player[]; terrain: Record<string, string> } = $props();

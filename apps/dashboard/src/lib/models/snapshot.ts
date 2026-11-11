@@ -1,6 +1,9 @@
 import type { ChatKind, LogEvent, PlayerSession } from 'valheim-log';
 
-import type { ActivityKind, ActivityRecord, ChestRecord, DeathItems, MapPoint, StoryKind } from '#/lib/models';
+import type { ActivityKind, ActivityRecord } from '#/lib/models';
+import type { ChestRecord } from '#/lib/models/chests';
+import type { DeathItems, MapPoint } from '#/lib/models/map';
+import type { StoryKind } from '#/lib/models/story';
 
 /**
  * Event types friends see in the story of the server. Joins and leaves come from the sessions, and building,

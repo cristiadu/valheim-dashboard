@@ -1,4 +1,4 @@
-import type { Player } from '#/lib/models';
+import type { Player } from '#/lib/models/players';
 import type { LogLineRecord, ServerSourceKind, Snapshot, SourceKind, SourceLines } from '#/lib/models/snapshot';
 
 /**

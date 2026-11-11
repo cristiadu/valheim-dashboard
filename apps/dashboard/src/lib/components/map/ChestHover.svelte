@@ -1,6 +1,6 @@
 <script lang="ts">
   import { builtByLabel, chestName, chestTitle, containerGrid, slotsUsed } from '#/lib/items';
-  import type { ChestHoverSpot, MapChest } from '#/lib/models';
+  import type { ChestHoverSpot, MapChest } from '#/lib/models/map';
 
   /** The pointed chest, where its box sits over the map, and the most of each item one slot holds. */
   let { chest, spot, stacks }: { chest: MapChest; spot: ChestHoverSpot; stacks: Record<string, number> } = $props();

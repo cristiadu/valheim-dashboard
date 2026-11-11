@@ -21,7 +21,7 @@
     type MapBox,
     type MapView,
     WORLD_EDGE_METERS,
-  } from '#/lib/models';
+  } from '#/lib/models/map';
   import { pannedBox, scaleBarOf, squareBoxOf, zoomedBox, zoomOf } from '#/lib/zoom';
 
   /** What the map draws, the most of each item one slot holds, the open chest's ID, and what to do when one is tapped. */
