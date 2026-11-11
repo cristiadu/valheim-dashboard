@@ -5,7 +5,8 @@ import { containerGrid, slotsUsed } from '#/lib/items';
 import { MIN_STACKABLE } from '#/lib/models';
 import { PLAYER_PREFAB } from '#/lib/models/chests';
 import type { Snapshot } from '#/lib/models/snapshot';
-import type { ServerState } from '#/lib/server/models';
+import { MS_PER_MINUTE } from '#/lib/models/time';
+import { MEAL_MINUTES, type ServerState } from '#/lib/server/models';
 
 /**
  * Adds [count] of [item] to [character]'s bag in [snapshot], or takes it out when [count] is below zero, never below
@@ -67,6 +68,28 @@ const isPickupNew = (state: ServerState, event: Extract<LogEvent, { type: 'itemP
   }
   state.pickedUpItemIds.add(event.itemId);
   return true;
+};
+
+/** Returns true when [food] is not still in effect at [nowMs], by when each food was last eaten in [meals]. */
+const isFoodReady = (meals: Record<string, string>, food: string, nowMs: number): boolean =>
+  meals[food] === undefined || nowMs - Date.parse(meals[food]) >= MEAL_MINUTES * MS_PER_MINUTE;
+
+/**
+ * Takes one food [character] ate at [timeUtc] out of their bag in [state]. When the log names no food, it is the food
+ * they carry most of among those not eaten in the last [MEAL_MINUTES], since a food still in effect can not be eaten
+ * again.
+ */
+const eat = (state: ServerState, character: string, food: string | null, timeUtc: string): void => {
+  const bag = state.snapshot.bags[character] ?? {};
+  const meals = (state.lastMeals[character] ??= {});
+  const nowMs = Date.parse(timeUtc);
+  const ready = Object.keys(bag).filter((item) => state.foods.has(item) && isFoodReady(meals, item, nowMs));
+  const eaten = food ?? ready.sort((first, second) => bag[second]! - bag[first]!)[0];
+  if (eaten === undefined) {
+    return;
+  }
+  meals[eaten] = timeUtc;
+  addToBag(state.snapshot, character, eaten, -1);
 };
 
 /** Takes what building [piece] costs out of [character]'s bag in [state]. */
@@ -133,6 +156,7 @@ const bagOwnerOf = (event: LogEvent): string | null => {
     case 'foodStarted':
     case 'itemHung':
     case 'planted':
+    case 'fueled':
     case 'tombstoneEmptied':
       return event.player;
     default:
@@ -143,8 +167,9 @@ const bagOwnerOf = (event: LogEvent): string | null => {
 /**
  * Updates the guess of what each character carries in [state] from [event]. Items come in when picked up, taken from
  * a chest or a tombstone, or seen worn or held, and go out when dropped, stored, smelted, cooked, fermented, eaten,
- * hung on a stand, or used to build, plant or craft. An item on the ground has an ID, so each pickup counts once.
- * Gear worn now always stays in the bag, and a death empties it into the tombstone. Crafting is only seen once a
+ * burnt in a fire, hung on a stand, or used to build, plant or craft. An item on the ground has an ID, so each pickup
+ * counts once. Gear worn now always stays in the bag, and a death empties the bag into the tombstone and takes off
+ * everything worn until the next gear line. Crafting is only seen once a
  * made item reaches a chest or the ground, so the bag is only a guess, kept within the player's slots.
  */
 export const updateBags = (state: ServerState, event: LogEvent): void => {
@@ -172,12 +197,19 @@ export const updateBags = (state: ServerState, event: LogEvent): void => {
       addToBag(snapshot, character, event.item, -event.count);
       break;
     case 'ate':
+      eat(state, character, event.item, event.timeUtc);
+      break;
     case 'foodStarted':
     case 'itemHung':
-      if (event.item !== null) {
-        addToBag(snapshot, character, event.item, -1);
+      addToBag(snapshot, character, event.item, -1);
+      break;
+    case 'fueled': {
+      const fuel = state.fireFuels[event.fire];
+      if (fuel !== undefined) {
+        addToBag(snapshot, character, fuel, -1);
       }
       break;
+    }
     case 'pieceBuilt':
       payFor(state, character, event.piece);
       break;
@@ -194,6 +226,7 @@ export const updateBags = (state: ServerState, event: LogEvent): void => {
       break;
     case 'tombstoneContents':
       snapshot.bags[character] = {};
+      snapshot.worn[character] = [];
       break;
     case 'tombstoneEmptied': {
       const tombstone = event.owner === null ? undefined : snapshot.deathItems[event.owner];
