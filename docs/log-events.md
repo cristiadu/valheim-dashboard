@@ -229,6 +229,8 @@ when the plugin does not know who it was.
 | Item stacks file written | `Item stacks written: C:\Valheim Server\item-stacks.txt` | `^Item stacks written: (?<path>.+)$` |
 | Piece costs file written | `Piece costs written: C:\Valheim Server\piece-costs.txt` | `^Piece costs written: (?<path>.+)$` |
 | Craft costs file written | `Craft costs written: C:\Valheim Server\craft-costs.txt` | `^Craft costs written: (?<path>.+)$` |
+| Foods file written | `Foods written: C:\Valheim Server\foods.txt` | `^Foods written: (?<path>.+)$` |
+| Fire fuels file written | `Fire fuels written: C:\Valheim Server\fire-fuels.txt` | `^Fire fuels written: (?<path>.+)$` |
 | Tombstone emptied | `Tombstone emptied: Ragnar by Bjorn` | `^Tombstone emptied: (?<owner>.+?) by (?<player>.+)$` |
 
 - **Chat** only reaches the server when another player is online to receive it. `said` is normal
@@ -285,6 +287,9 @@ when the plugin does not know who it was.
   one `wood_floor Wood x2` line per piece, crops and saplings included.
 - **Craft costs written** follows it, when the plugin writes what crafting takes next to `logs.txt`, one line per
   item and level with how many one craft makes: `ArrowWood 1 20 Wood x8`, or `SwordBronze 2 1 Bronze x4` for an upgrade.
+- **Foods written** and **Fire fuels written** follow it: one food per line (`CookedMeat`), and one line per fire
+  with the item it burns (`piece_groundtorch_wood Resin`).
+- **Fueled** is logged once for each item put on the fire, since plugin 2.18.0.
 
 To build it, install the .NET SDK and BepInExPack_Valheim on the server, run `dotnet build -c Release`
 in `plugins/event-log`, and copy `bin\Release\netstandard2.1\ValheimDashboard.EventLog.dll` to the

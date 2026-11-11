@@ -44,8 +44,9 @@
   /** True when the view already shows the whole world, so it cannot zoom out or move. */
   const isWholeWorld = $derived(box.width >= MAP_WORLD_BOX.width && box.height >= MAP_WORLD_BOX.height);
 
-  /** Width and height of the drawn map, in pixels. */
+  /** Width of the drawn map, in pixels. */
   let mapWidthPx = $state(1);
+  /** Height of the drawn map, in pixels. */
   let mapHeightPx = $state(1);
 
   /** Meters in one screen pixel, so marks keep the same size on screen at any zoom and map shape. */

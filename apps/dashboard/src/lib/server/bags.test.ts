@@ -183,4 +183,62 @@ describe('updateBags', () => {
     // THEN the worn sword is there and the helmet is not
     expect(bag).toEqual({ SwordBronze: 1, Stone: 2 });
   });
+
+  it('takes off worn gear on death, so the emptied tombstone does not bring it back twice', () => {
+    // GIVEN Ragnar holds a hammer, dies with it, builds a floor in the same second, then empties his tombstone
+    readLines(state, [
+      ...RUN_START,
+      logLine('03:00:00', 'Wearing: Ragnar has Hammer'),
+      logLine('03:01:00', 'Tombstone: Ragnar at 70 20 holds Hammer x1, Wood x10'),
+      logLine('03:01:00', 'Piece built: wood_floor by Ragnar'),
+      logLine('03:01:00', 'Wearing: Ragnar has nothing'),
+      logLine('03:02:00', 'Tombstone emptied: Ragnar by Ragnar'),
+    ]);
+
+    // WHEN his bag is read
+    const bag = state.snapshot.bags['Ragnar'];
+
+    // THEN the hammer is there once
+    expect(bag).toEqual({ Hammer: 1, Wood: 10 });
+  });
+
+  it('takes out the food carried most when the log does not say which, but not one still in effect', () => {
+    // GIVEN cooked meat and honey are foods, and Ragnar carries 5 meat and 3 honey, eats three times in a row, then
+    // once more 25 minutes later
+    state.foods = new Set(['CookedMeat', 'Honey']);
+    readLines(state, [
+      ...RUN_START,
+      logLine('03:00:00', 'Picked up: CookedMeat x5 by Ragnar'),
+      logLine('03:00:01', 'Picked up: Honey x3 by Ragnar'),
+      logLine('03:00:02', 'Picked up: Wood x10 by Ragnar'),
+      logLine('03:10:00', 'Ate something: Ragnar'),
+      logLine('03:10:05', 'Ate something: Ragnar'),
+      logLine('03:10:10', 'Ate something: Ragnar'),
+      logLine('03:35:00', 'Ate something: Ragnar'),
+    ]);
+
+    // WHEN his bag is read
+    const bag = state.snapshot.bags['Ragnar'];
+
+    // THEN one meat and one honey went in the first meal, the third bite found no food that was not in effect, and
+    // one more meat went later
+    expect(bag).toEqual({ CookedMeat: 3, Honey: 2, Wood: 10 });
+  });
+
+  it('takes out what a fire burns each time it is fueled', () => {
+    // GIVEN a ground torch burns resin, and Ragnar picks up 5 resin and puts 2 in a torch
+    state.fireFuels = { piece_groundtorch_wood: 'Resin' };
+    readLines(state, [
+      ...RUN_START,
+      logLine('03:00:00', 'Picked up: Resin x5 by Ragnar'),
+      logLine('03:00:01', 'Fueled: piece_groundtorch_wood by Ragnar'),
+      logLine('03:00:01', 'Fueled: piece_groundtorch_wood by Ragnar'),
+    ]);
+
+    // WHEN his bag is read
+    const bag = state.snapshot.bags['Ragnar'];
+
+    // THEN 3 resin are left
+    expect(bag).toEqual({ Resin: 3 });
+  });
 });

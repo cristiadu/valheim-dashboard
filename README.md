@@ -10,38 +10,37 @@ world last saved. It also has a recipe planner for working out what you still ne
 
 ## Run it
 
-You need [Node.js](https://nodejs.org) 26 or newer on the server PC, and the pnpm version in `package.json`.
-`scripts\install-startup.cmd` installs that pnpm for you.
+You need [Node.js](https://nodejs.org) 26 or newer on the server PC.
 
-1. Double-click `scripts\start-dashboard.cmd`. The first time, it installs and builds everything.
-2. Open http://localhost:3000. Only this PC can open that address. Friends use the shared link below.
+**Whenever anything is down, double-click `scripts\start-valheim.cmd`.** It starts whatever is not running
+and leaves the rest alone, so it is always safe to run:
 
-It reads `C:\Valheim Server\logs.txt` and writes its own output to `C:\Valheim Server\dashboard.log`. If it
-stops, it starts again after 5 seconds.
+| Part | Window | What it does |
+| --- | --- | --- |
+| Game server | `Valheim server` | `start_headless_server.bat` |
+| Dashboard | `Valheim dashboard` | Builds the dashboard the first time, runs it on http://localhost:3000, and starts it again 5 seconds after it stops |
+| Link | `Valheim dashboard link (zrok)` | Shares the dashboard with friends, and starts again 30 seconds after zrok stops |
+| Updater | `Valheim dashboard updater` | Checks `main` every 5 minutes. It pulls, rebuilds and restarts the dashboard, and installs a changed event log plugin when nobody is online. It only takes a commit once CI passed on it |
 
-To start it every time you log on to Windows, double-click `scripts\install-startup.cmd` once. It runs
-in its own window. It also checks `main` every 5 minutes: it pulls, rebuilds and restarts the
-dashboard, and installs a changed event log plugin when nobody is online. It only takes a commit once CI
-passed on it. Each check opens a window that closes when it is done, and writes what it did to `C:\Valheim Server\updater.log`. When `package.json` moves to a new
-pnpm version, run `install-startup.cmd` again.
+It also makes Windows run it at every logon, and installs the pnpm version in `package.json` and zrok when
+they are missing. Closing a window stops that part until the next run. `start-valheim.cmd -Remove` stops
+starting at logon. Logs go next to the server's `C:\Valheim Server\logs.txt`.
+
+Only this PC can open http://localhost:3000. Friends use the shared link.
 
 ## Share it with friends
 
-Friends open one link and type a password. They install nothing.
+Friends open one link and type a password. They install nothing. The first time, make a free account at
+[myzrok.io](https://myzrok.io), copy your account token, and run in PowerShell:
 
-1. Make a free account at [myzrok.io](https://myzrok.io) and copy your account token.
-2. In PowerShell, run once, with a name for the link:
-
-   ```powershell
-   .\scripts\share-dashboard.ps1 -Name "cotil-longhouse" -Token "<your token>"
-   ```
+```powershell
+.\scripts\start-valheim.ps1 -ZrokToken "<your token>"
+```
 
 Friends open `https://cotil-longhouse.shares.zrok.io`, click past zrok's notice the first time, and type the
 Valheim server's password on the dashboard's password page. The dashboard reads it from
 `start_headless_server.bat`, so change it there and restart the dashboard. The page remembers them for 30
-days. The link starts in its own window, titled `Valheim dashboard link (zrok)`, each time you log on. Closing that window stops the link. `share-dashboard.ps1 -Remove` stops sharing.
-
-After a manual `git pull`, start it with `scripts\start-dashboard.cmd -Rebuild`. Other settings are in
+days. Pass `-LinkName` for another name in the link. Other settings are in
 [apps/dashboard/README.md](apps/dashboard/README.md).
 
 ## Work on it

@@ -43,6 +43,22 @@ $TestKinds = @('unit', 'integration')
 # A URL with a user name or token before the host, such as https://<token>@github.com/...
 $UrlWithCredentialsPattern = '^[a-z][a-z0-9+.-]*://[^/]*@'
 
+# Windows calls that read and set a console's mode flags, as in the event log plugin's ConsoleWindow.cs.
+$ConsoleModeCalls = @'
+[DllImport("kernel32.dll")] public static extern IntPtr GetStdHandle(int handleNumber);
+[DllImport("kernel32.dll")] public static extern bool GetConsoleMode(IntPtr console, out uint mode);
+[DllImport("kernel32.dll")] public static extern bool SetConsoleMode(IntPtr console, uint mode);
+'@
+
+# Handle number of the console's input, as GetStdHandle takes it.
+$StdInputHandle = -10
+
+# Console mode flag that lets a click start a text selection.
+$QuickEditMode = 0x0040
+
+# Console mode flag that must be set for a change to QuickEditMode to apply.
+$ExtendedFlags = 0x0080
+
 <#
 .SYNOPSIS
   Writes [Message] with the local time to the screen and appends it to [Path].
@@ -96,7 +112,7 @@ function Invoke-Pnpm([string]$RepoRoot, [string[]]$Arguments) {
   $wantedVersion = Get-PnpmVersion $RepoRoot
   $installedVersion = Get-InstalledPnpmVersion
   if ($installedVersion -ne $wantedVersion) {
-    throw "pnpm $wantedVersion is needed, but the installed version is $installedVersion. Run scripts\install-startup.cmd again to install it."
+    throw "pnpm $wantedVersion is needed, but the installed version is $installedVersion. Run scripts\start-valheim.cmd to install it."
   }
   return Invoke-Checked 'pnpm' $Arguments
 }
@@ -202,6 +218,20 @@ function Start-GameServer([string]$ServerDir) {
   # conhost keeps it a classic console window, which Ctrl+C can reach, whatever the default terminal app is.
   $arguments = @('/c', 'start', "`"$GameServerWindowTitle`"", 'conhost.exe', 'cmd.exe', '/c', $GameServerStartFile)
   Start-Process -FilePath 'cmd.exe' -ArgumentList $arguments -WorkingDirectory $ServerDir -WindowStyle Hidden
+}
+
+<#
+.SYNOPSIS
+  Stops clicks from selecting text in this window. A selection pauses every write to the window, which would
+  freeze the loop running in it. Does nothing without a console.
+#>
+function Disable-ConsoleQuickEdit {
+  $console = Add-Type -Namespace 'ValheimDashboard' -Name 'ConsoleMode' -MemberDefinition $ConsoleModeCalls -PassThru
+  $inputHandle = $console::GetStdHandle($StdInputHandle)
+  $mode = [uint32]0
+  if ($console::GetConsoleMode($inputHandle, [ref]$mode)) {
+    [void]$console::SetConsoleMode($inputHandle, ($mode -band (-bnot $QuickEditMode)) -bor $ExtendedFlags)
+  }
 }
 
 <#

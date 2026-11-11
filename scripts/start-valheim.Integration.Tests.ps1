@@ -1,5 +1,5 @@
 BeforeAll {
-  $script:Updater = Join-Path $PSScriptRoot 'update-from-main.ps1'
+  $script:Updater = Join-Path $PSScriptRoot 'start-valheim.ps1'
   # Commits in the throwaway repos need an author.
   $env:GIT_AUTHOR_NAME = 'Test'
   $env:GIT_AUTHOR_EMAIL = 'test@example.com'
@@ -33,14 +33,14 @@ BeforeAll {
   function Invoke-Updater([string]$Folder) {
     Push-Location
     try {
-      & $Updater -RepoRoot (Join-Path $Folder 'checkout') -LogFile (Join-Path $Folder 'logs.txt')
+      & $Updater -Part UpdateOnce -RepoRoot (Join-Path $Folder 'checkout') -LogFile (Join-Path $Folder 'logs.txt')
     } finally {
       Pop-Location
     }
   }
 }
 
-Describe 'update-from-main.ps1' {
+Describe 'start-valheim.ps1 -Part UpdateOnce' {
   BeforeEach {
     $folder = Join-Path $TestDrive ([guid]::NewGuid())
     $first, $second = New-Checkout $folder
