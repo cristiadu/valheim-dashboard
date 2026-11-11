@@ -226,6 +226,22 @@ describe('server state', () => {
     expect(activities.map((activity) => activity.player)).toEqual(['Ragnar', 'Ragnar']);
   });
 
+  it('keeps who built a chest when a later line does not know them', () => {
+    // GIVEN Ragnar's chest is listed, then listed again while the plugin does not know who built it
+    readLines(state, [
+      ...RUN_START,
+      logLine('03:00:00', 'Chest: 1:10 piece_chest_wood at 12 18 built by Ragnar holds Wood x20'),
+      logLine('03:00:05', 'Chest: 1:10 piece_chest_wood at 12 18 built by an unknown player holds Wood x5'),
+    ]);
+
+    // WHEN the snapshot is read
+    const chest = state.snapshot.chests['1:10'];
+
+    // THEN the chest still belongs to Ragnar and holds what the newest line says
+    expect(chest?.builder).toBe('Ragnar');
+    expect(chest?.items).toEqual({ Wood: 5 });
+  });
+
   it('remembers every item players handled, once each, but not what a chest holds', () => {
     // GIVEN Ragnar picks up wood twice, stores it, a chest with stone is listed, and he wears an axe and eats meat
     readLines(state, [

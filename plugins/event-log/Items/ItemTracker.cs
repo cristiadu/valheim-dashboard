@@ -36,9 +36,9 @@ namespace ValheimDashboard.EventLog
         /// <summary>Width and height of the inventory chest contents are read into, larger than any chest.</summary>
         private const int ChestReadSize = 16;
 
-        /// <summary>Contents of each chest at the last scan, by object ID, kept with the data they came from.</summary>
-        private static readonly Dictionary<ZDOID, (byte[] Data, Dictionary<string, int> Counts)> ChestContents =
-            new Dictionary<ZDOID, (byte[] Data, Dictionary<string, int> Counts)>();
+        /// <summary>Contents of each chest at the last scan, by object ID, kept with the data they came from and the line last logged.</summary>
+        private static readonly Dictionary<ZDOID, (byte[] Data, Dictionary<string, int> Counts, string Line)> ChestContents =
+            new Dictionary<ZDOID, (byte[] Data, Dictionary<string, int> Counts, string Line)>();
 
         /// <summary>Tombstones that appeared since the server started, until their contents are logged.</summary>
         private static readonly HashSet<ZDOID> NewTombstones = new HashSet<ZDOID>();
@@ -167,9 +167,10 @@ namespace ValheimDashboard.EventLog
         }
 
         /// <summary>
-        /// Logs what [chest] holds and where it stands when the scan first sees it and whenever its contents change,
-        /// and each item that went into or out of it since the last scan. A chest, cart or ship that never held
-        /// anything has no contents yet.
+        /// Logs what [chest] holds and where it stands when the scan first sees it and whenever that line would change,
+        /// and each item that went into or out of it since the last scan. Ships and carts resend the same contents as
+        /// they move, so unchanged contents are not logged again. A chest, cart or ship that never held anything has
+        /// no contents yet.
         /// </summary>
         private static void SeeChest(ZDO chest)
         {
@@ -178,14 +179,18 @@ namespace ValheimDashboard.EventLog
             {
                 return;
             }
-            bool isKnown = ChestContents.TryGetValue(chest.m_uid, out (byte[] Data, Dictionary<string, int> Counts) before);
+            bool isKnown = ChestContents.TryGetValue(chest.m_uid, out (byte[] Data, Dictionary<string, int> Counts, string Line) before);
             if (isKnown && before.Data == data)
             {
                 return;
             }
             Dictionary<string, int> counts = CountItems(data);
-            ChestContents[chest.m_uid] = (data, counts);
-            LogContents(chest, counts);
+            string line = $"Chest: {chest.m_uid} {Names.PrefabName(chest)} at {Names.MapPosition(chest.GetPosition())} built by {Names.Builder(chest)} holds {ItemList(counts)}";
+            ChestContents[chest.m_uid] = (data, counts, line);
+            if (line != before.Line)
+            {
+                GameEventLog.Write(line);
+            }
             if (!isKnown)
             {
                 return;
@@ -259,13 +264,6 @@ namespace ValheimDashboard.EventLog
                 items.Add($"{item.Key} x{item.Value}");
             }
             return items.Count == 0 ? "nothing" : string.Join(", ", items);
-        }
-
-        /// <summary>Logs every item [chest] holds, with where it stands and who built it.</summary>
-        private static void LogContents(ZDO chest, Dictionary<string, int> counts)
-        {
-            string holds = ItemList(counts);
-            GameEventLog.Write($"Chest: {chest.m_uid} {Names.PrefabName(chest)} at {Names.MapPosition(chest.GetPosition())} built by {Names.Builder(chest)} holds {holds}");
         }
 
         /// <summary>Returns true when the chest, cart or ship [uid] has had its contents logged.</summary>

@@ -381,7 +381,8 @@ flowchart LR
 ```
 
 A position marks its whole 32 m square as explored. Chest IDs last until the server stops, and every run lists
-all chests again, so a new run starts the chest list over. The plugin writes the terrain file once per world
+all chests again, so a new run starts the chest list over. A chest keeps its builder when a later line doesn't
+know it. The plugin writes the terrain file once per world
 from the game's own world generator, and the map colors only squares someone walked.
 Nothing nobody has seen shows: a chest or Leviathan appears only on a square someone walked.
 The map uses the game's own coordinates: `x` east and `z` north of the world's center, the same numbers the
