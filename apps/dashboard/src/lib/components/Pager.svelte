@@ -1,39 +1,59 @@
 <script lang="ts" generics="T">
-  import type { Page } from '#/lib/models/pages';
+  import type { Snippet } from 'svelte';
+
+  import { pageOf } from '#/lib/pages';
 
   /**
-   * The page shown, how many things the whole list has, the list the pager moves through, what to do with a new
-   * page number, and the words on its buttons.
+   * The whole list, how many to show at a time, the words on the buttons, and how to draw the things on one page.
+   * Page one keeps showing new things as a live update adds them.
    */
   let {
-    page,
-    total,
-    list,
-    onpage,
+    items,
+    size,
     backText = 'Newer',
     nextText = 'Older',
-  }: { page: Page<T>; total: number; list?: HTMLElement; onpage: (index: number) => void; backText?: string; nextText?: string } = $props();
+    children,
+  }: { items: T[]; size: number; backText?: string; nextText?: string; children: Snippet<[T[]]> } = $props();
+
+  /** Page asked for, counted from 0. */
+  let index = $state(0);
+
+  /** Page shown. */
+  const page = $derived(pageOf(items, index, size));
+
+  /** The list and its buttons, so changing page can scroll back to its top. */
+  let box = $state<HTMLElement>();
 
   /** Moves to page [to] and brings the top of the list back into sight when it scrolled away. */
   const goTo = (to: number): void => {
-    onpage(to);
-    if (list !== undefined && list.getBoundingClientRect().top < 0) {
-      list.scrollIntoView({ block: 'start' });
+    index = to;
+    if (box !== undefined && box.getBoundingClientRect().top < 0) {
+      box.scrollIntoView({ block: 'start' });
     }
   };
 </script>
 
-{#if page.count > 1}
-  <nav class="pager" aria-label="Pages">
-    <button type="button" disabled={page.index === 0} onclick={() => goTo(page.index - 1)}>{backText}</button>
-    <span class="mono muted">{page.first}–{page.last} of {total.toLocaleString()}</span>
-    <button type="button" disabled={page.index === page.count - 1} onclick={() => goTo(page.index + 1)}>{nextText}</button>
-  </nav>
-{/if}
+<div class="paged" bind:this={box}>
+  {@render children(page.items)}
+  {#if page.count > 1}
+    <nav aria-label="Pages">
+      <button type="button" disabled={page.index === 0} onclick={() => goTo(page.index - 1)}>{backText}</button>
+      <span class="mono muted">{page.first}–{page.last} of {items.length.toLocaleString()}</span>
+      <button type="button" disabled={page.index === page.count - 1} onclick={() => goTo(page.index + 1)}>{nextText}</button>
+    </nav>
+  {/if}
+</div>
 
 <style>
+  /* The page, with its buttons under it */
+  .paged {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
   /* Buttons on each side of where the page sits in the list */
-  .pager {
+  nav {
     display: flex;
     align-items: center;
     justify-content: center;

@@ -5,8 +5,7 @@
   import Pager from '#/lib/components/Pager';
   import { live, useSnapshot } from '#/lib/live.svelte';
   import { SAGA_PAGE_SIZE } from '#/lib/models/pages';
-  import { SAGA_FILTERS, type SagaFilter, STORY_STYLES } from '#/lib/models/story';
-  import { pageOf } from '#/lib/pages';
+  import { SAGA_FILTERS, STORY_STYLES } from '#/lib/models/story';
   import { storyOf } from '#/lib/story';
   import { viewerTimeZone, whenLabel } from '#/lib/time';
 
@@ -24,21 +23,6 @@
 
   /** Lines the filter lets through. */
   const shown = $derived(story.filter((item) => filter.kinds.includes(item.kind)));
-
-  /** Page of the list shown, counted from 0. Page one keeps showing new events as they come in. */
-  let pageIndex = $state(0);
-
-  /** Lines on the page shown. */
-  const page = $derived(pageOf(shown, pageIndex, SAGA_PAGE_SIZE));
-
-  /** The list, so changing page can scroll back to its top. */
-  let listElement = $state<HTMLElement>();
-
-  /** Shows the lines of [option], from the newest. */
-  const pickFilter = (option: SagaFilter): void => {
-    filter = option;
-    pageIndex = 0;
-  };
 </script>
 
 {#if story.length === 0}
@@ -49,28 +33,33 @@
   <div class="saga">
     <div class="filters" role="group" aria-label="Filter events">
       {#each SAGA_FILTERS as option (option.label)}
-        <button type="button" aria-pressed={option === filter} onclick={() => pickFilter(option)}>
+        <button type="button" aria-pressed={option === filter} onclick={() => (filter = option)}>
           {option.label}
           <span class="mono muted">{story.filter((item) => option.kinds.includes(item.kind)).length}</span>
         </button>
       {/each}
     </div>
-    <ol bind:this={listElement}>
-      {#each page.items as item, i (i)}
-        <li>
-          <span class="rune" aria-hidden="true" style:color={STORY_STYLES[item.kind].color} style:border-color={STORY_STYLES[item.kind].color}>{STORY_STYLES[item.kind].rune}</span>
-          <LogLines title={item.text} source={item.source}>
-            <span class="row">
-              <span class="mono muted">{whenLabel(item.timeUtc, timeZone, nowMs)}</span>
-              <span class="what">{item.text}{#if item.things}<ItemList items={item.things} size={16} />{/if}</span>
-            </span>
-          </LogLines>
-        </li>
-      {:else}
-        <li class="muted">Nothing of this kind yet.</li>
-      {/each}
-    </ol>
-    <Pager {page} total={shown.length} list={listElement} onpage={(to) => (pageIndex = to)} />
+    {#key filter}
+      <Pager items={shown} size={SAGA_PAGE_SIZE}>
+        {#snippet children(items)}
+          <ol>
+            {#each items as item, i (i)}
+              <li>
+                <span class="rune" aria-hidden="true" style:color={STORY_STYLES[item.kind].color} style:border-color={STORY_STYLES[item.kind].color}>{STORY_STYLES[item.kind].rune}</span>
+                <LogLines title={item.text} source={item.source}>
+                  <span class="row">
+                    <span class="mono muted">{whenLabel(item.timeUtc, timeZone, nowMs)}</span>
+                    <span class="what">{item.text}{#if item.things}<ItemList items={item.things} size={16} />{/if}</span>
+                  </span>
+                </LogLines>
+              </li>
+            {:else}
+              <li class="muted">Nothing of this kind yet.</li>
+            {/each}
+          </ol>
+        {/snippet}
+      </Pager>
+    {/key}
   </div>
 {/if}
 
