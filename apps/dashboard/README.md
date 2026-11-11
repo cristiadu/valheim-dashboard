@@ -26,21 +26,16 @@ Then open `http://localhost:3000`.
 
 ### Keep it running
 
-`scripts/start-dashboard.ps1` builds the dashboard if there is no build yet, starts it, and starts it again 5 seconds after it stops. Its output goes to `dashboard.log`, in the same folder as the server's `logs.txt`.
+`scripts/start-valheim.ps1` starts the dashboard in its own window with the game server, the link and the
+updater. It builds the dashboard if there is no build yet, and starts it again 5 seconds after it stops. Its
+output goes to `dashboard.log`, in the same folder as the server's `logs.txt`.
 
 ```powershell
-.\scripts\start-dashboard.ps1
-.\scripts\start-dashboard.ps1 -Rebuild   # after a git pull
+.\scripts\start-valheim.ps1
+.\scripts\start-valheim.ps1 -LogFile "D:\Valheim\logs.txt" -Port 8080
 ```
 
-To start it each time you log on to Windows, run this once:
-
-```powershell
-.\scripts\install-startup.ps1
-.\scripts\install-startup.ps1 -Remove   # to stop that
-```
-
-Both scripts take `-LogFile` and `-Port`. If Windows blocks scripts, run `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` once.
+If Windows blocks scripts, run `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` once.
 
 | Setting | Default | What it is |
 | --- | --- | --- |

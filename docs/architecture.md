@@ -399,35 +399,42 @@ for shows a plain sack.
 BepInEx's own log file is turned off, so its messages land in
 `logs.txt` too. Every line is listed in [log-events.md](log-events.md).
 
-## Start scripts
+## Start script
+
+`start-valheim.ps1` is the one script that starts everything, by hand (`start-valheim.cmd`) or from the
+`Valheim` logon task it adds. Each part gets its own window, and a part that already runs is left alone.
 
 ```mermaid
 flowchart TD
-  click[Double-click start-dashboard.cmd] --> ps[start-dashboard.ps1]
-  task[Windows logon task, visible window] --> ps
-  ps --> built{Build exists?}
-  built -->|no| build[pnpm install and build]
-  built -->|yes| run[node apps/dashboard/build]
-  build --> run
-  run -->|stopped| wait[Wait 5 s] --> run
+  start[start-valheim.cmd or the Valheim logon task] --> server{Game server running?}
+  server -->|no| s[start_headless_server.bat in its window]
+  server -->|yes| dash
+  s --> dash{Dashboard window open?}
+  dash -->|no| d[Stop a dashboard without a window, open the Dashboard window]
+  dash -->|yes| link
+  d --> link{zrok running?}
+  link -->|no| l[Open the Link window]
+  link -->|yes| upd
+  l --> upd{Updater window open?}
+  upd -->|no| u[Open the Updater window]
 ```
 
-`install-startup.cmd` adds three logon tasks once: the game server, the dashboard and the updater.
-`share-dashboard.ps1` adds one more that starts zrok. Each one runs in its own window you can see.
+| Window | Loop |
+| --- | --- |
+| Dashboard | Build if there is none, run node, wait 5 s after it stops, run it again |
+| Link | Delete a leftover share on the link's name, run zrok, wait 30 s after it stops, run it again |
+| Updater | Run one update as its own PowerShell, wait 5 minutes, again |
 
-| Logon task | Script | Window |
-| --- | --- | --- |
-| `Valheim Server` | `start-game-server.ps1` starts `start_headless_server.bat`, unless the server already runs | The game server's console |
-| `Valheim Dashboard` | `start-dashboard.ps1` | Stays open while the dashboard runs |
-| `Valheim Dashboard Updater` | `watch-main.ps1` runs `update-from-main.ps1` every 5 minutes | One window that stays open |
-| `Valheim Dashboard Link` | `run-dashboard-link.ps1` runs zrok and starts it again 30 s after it stops | Stays open while the link runs |
+Run by hand, it also installs pnpm and zrok when they are missing and adds the logon task. From the logon task
+it installs nothing.
 
-A share zrok had when the PC shut down keeps the link's name, and zrok refuses a new share on that name. Before
-each start, `run-dashboard-link.ps1` deletes that leftover share when no other zrok is running.
+A share zrok had when the PC shut down keeps the link's name, and zrok refuses a new share on that name. With
+no other zrok running, that share is stale, so the Link window deletes it first.
 
 ## Updates from main
 
-`watch-main.ps1` runs `update-from-main.ps1` every 5 minutes inside its one window, each run as its own PowerShell so a failed run never stops the loop.
+The Updater window runs one update every 5 minutes. Each is its own PowerShell, so a failed update never
+stops the loop, and each reads the script as `main` has it now.
 
 ```mermaid
 flowchart TD
@@ -469,7 +476,7 @@ the plugin build and the plugin inside the game server. These keep that to revie
 | --- | --- |
 | CI check | A commit runs only after the `ci` job passed on GitHub, read from GitHub's public check-runs API. |
 | Fast-forward only | A rewritten `main` stops updates instead of being followed. |
-| Installed pnpm | Builds use the pnpm `install-startup.cmd` installed, and stop if `package.json` asks for another version. Nothing downloads pnpm unattended. |
+| Installed pnpm | Builds use the pnpm `start-valheim.cmd` installed, and stop if `package.json` asks for another version. Nothing downloads pnpm unattended. |
 | `--frozen-lockfile` | Installs exactly the lockfile's packages, checked against their hashes. pnpm does not run packages' install scripts. |
 | Dependabot cooldown | Upgrades are offered once a version has been out for 7 days. |
 | Plain origin URL | A token in the URL could end up in `updater.log`, so the run skips. |
@@ -483,9 +490,9 @@ Every log lives in `C:\Valheim Server`.
 | --- | --- |
 | `logs.txt` | The Valheim server, the event log plugin and BepInEx |
 | `log-history\*.txt` | The dashboard, one file per server run |
-| `dashboard.log` | The start script, with the dashboard's output |
-| `updater.log` | The update script: what it updated, skipped or is waiting for |
-| `updater-state.json` | The update script: commits of the running dashboard and the installed plugin |
+| `dashboard.log` | The Dashboard window, with the dashboard's output |
+| `updater.log` | The Updater window: what it updated, skipped or is waiting for |
+| `updater-state.json` | The Updater window: commits of the running dashboard and the installed plugin |
 | `zrok.log` | zrok's output while it shares the link |
 | `terrain-<world>.txt` | The event log plugin, once per world: the land type of every 32 m square |
 | `item-stacks.txt` | The event log plugin, once per start: the most of each item one slot holds |
