@@ -57,8 +57,11 @@ export const STORY_STYLES: Record<StoryKind, { rune: string; color: string; labe
   chat: { rune: 'ᚨ', color: 'var(--frost)', label: 'Chat' },
 };
 
+/** One filter on the Saga tab: its button text and the story kinds it shows. */
+export type SagaFilter = { label: string; kinds: readonly StoryKind[] };
+
 /** Filters on the Saga tab and the story kinds each one shows. */
-export const SAGA_FILTERS: readonly { label: string; kinds: readonly StoryKind[] }[] = [
+export const SAGA_FILTERS: readonly SagaFilter[] = [
   {
     label: 'All',
     kinds: ['joined', 'left', 'died', 'raid', 'night', 'world', 'stopped', 'built', 'wrecked', 'boss', 'fight', 'travel', 'items', 'tame', 'chat'],
