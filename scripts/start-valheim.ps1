@@ -60,7 +60,7 @@ $ZrokVersion = '2.0.9'
 $ZrokSha256 = '2780e799269d92e64da5c5bfda48e76d4464925bdfcb7a11deafb40c6f25ad84'
 
 # zrok2.exe, installed by this script.
-$Zrok = Join-Path $env:LOCALAPPDATA 'zrok2\zrok2.exe'
+$Zrok = Join-Path ([Environment]::GetFolderPath('LocalApplicationData')) 'zrok2\zrok2.exe'
 
 # Branch this PC runs.
 $Branch = 'main'
