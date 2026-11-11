@@ -173,7 +173,7 @@ the page gives nothing away.
 | Saga | Every game event and chat, with filters | Snapshot |
 | Map | Land each player walked, chests with what they hold, who is where, last deaths | Snapshot |
 | Recipes | Crafting plans and what is still missing, and what the chests can make. Only recipes whose ingredients someone has found | The viewer's browser, and chests and found items from the snapshot |
-| Server | Up or down, the world and in-game day, bosses met, uptime in the last 24 hours, the latest saves and backups, warnings | Snapshot |
+| Server | Up or down, the world and in-game day, bosses met, uptime in the last 24 hours, the latest saves and backups, warnings: crashes, lost Steam or crossplay connections, joins turned away (with who and why) and low disk | Snapshot |
 
 Recipe plans are saved in each viewer's browser (`localStorage`). The server stores nothing for them. Chest items are matched to recipe items through `itemName`, so `RoundLog` counts as `Core wood`. Only chests someone has found count.
 

@@ -68,6 +68,12 @@ const keepServerLines = (snapshot: Snapshot, event: LogEvent, line: string): voi
     case 'gameServer':
       keepServerLine(snapshot, line, timeUtc, event.isConnected ? 'world' : 'stopped', 'steam');
       break;
+    case 'crossplayError':
+      keepServerLine(snapshot, line, timeUtc, 'stopped', 'crossplay');
+      break;
+    case 'joinRefused':
+      keepServerLine(snapshot, line, timeUtc, 'left', 'refused');
+      break;
     case 'globalKey':
       if (event.isSet && event.key.startsWith(DEFEATED_KEY_PREFIX) && BOSS_NAMES[event.key] !== undefined) {
         keepServerLine(snapshot, line, timeUtc, 'boss', 'boss', BOSS_NAMES[event.key]);

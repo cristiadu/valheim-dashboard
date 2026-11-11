@@ -179,6 +179,36 @@ describe('parseMessage', () => {
     expect(events.map((event) => (event.type === 'joinRefused' ? event.reason : event.type))).toEqual(messages.map(([, r]) => r));
   });
 
+  it('reads the connection a refused join names, or null when it names none', () => {
+    // GIVEN a crossplay and a Steam player with a wrong password, and a refusal without a connection
+    const messages = [
+      'Peer playfab/6F6C3330B7FD733E has wrong password',
+      'Peer 76561198000000002 has wrong password',
+      'Peer diconnected due to server platform privileges disallowing crossplay. Server platform: Steam',
+    ];
+
+    // WHEN each message is read
+    const events = messages.map((message) => parseMessage(message, '2026-01-01T00:00:00.000Z'));
+
+    // THEN each names its connection
+    expect(events.map((event) => (event.type === 'joinRefused' ? event.connectionId : event.type))).toEqual([
+      '6F6C3330B7FD733E',
+      '76561198000000002',
+      null,
+    ]);
+  });
+
+  it('reads a lost link to PlayFab', () => {
+    // GIVEN the line crossplay writes when its network drops
+    const message = "PlayFab network error in session 'Cotil' and network 1a03782b-bae3|AwDdmjXQ";
+
+    // WHEN it is read
+    const event = parseMessage(message, '2026-01-01T00:00:00.000Z');
+
+    // THEN it is a crossplay error
+    expect(event).toEqual({ type: 'crossplayError', timeUtc: '2026-01-01T00:00:00.000Z' });
+  });
+
   it('reads piece lines, with null for an unknown builder', () => {
     // GIVEN a built piece and two destroyed pieces, one by an unknown builder
     const messages = [

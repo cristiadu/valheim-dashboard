@@ -318,6 +318,9 @@ line, since the start of the line differs by version.
 
 `diconnected` is spelled that way in the game.
 
+The line starts with `Peer` and the connection, a PlayFab or Steam ID (`Peer playfab/6F6C3330B7FD733E has wrong password`).
+The Server tab names the player through the `received local Platform ID` line of that connection.
+
 ## Steam-only servers
 
 Without crossplay, the server writes Steam IDs instead of PlayFab IDs:
@@ -354,6 +357,7 @@ flowchart LR
 | Backup replaced | `Replacing backup file: Cotil_backup_auto-20261029-031214` | `^Replacing backup file: (?<backup>\S+)$` |
 | Backup created | `Backup created in Cotil_backup_auto-20261029-051215 [23.522ms]` | `^Backup created in (?<backup>\S+) \[(?<ms>[\d.]+)ms\]$` |
 | Disk space | `Available space to current user: 278588960768. Saving is blocked if below: 14960956 bytes. Warnings are given if below: 29921912` | `^Available space to current user: (?<available>\d+)\. Saving is blocked if below: (?<blockedBelow>\d+) bytes\. Warnings are given if below: (?<warnBelow>\d+)$` |
+| Crossplay dropped | `PlayFab network error in session 'Cotil' and network 1a03782b-...` | `^PlayFab network error in session ` |
 
 - `World time` is in-game seconds. One in-game day is 1800 seconds, so day = `floor(worldTime / 1800) + 1`.
 - No save line for more than about 10 minutes means the server was down.

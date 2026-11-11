@@ -541,5 +541,25 @@ describe('server state', () => {
       steamName: 'New Player',
     });
   });
-});
 
+  it('names who a join was refused for and keeps crossplay drops', () => {
+    // GIVEN Ragnar plays, then his connection comes back with a wrong password, a stranger is refused, and crossplay drops
+    readLines(state, [
+      ...RUN_START,
+      logLine('03:00:00', 'PlayFab socket with remote ID playfab/B1B2C3D4E5F60718 received local Platform ID Steam_76561198000000001'),
+      logLine('03:00:04', 'Peer playfab/B1B2C3D4E5F60718 has wrong password'),
+      logLine('03:01:00', 'Peer playfab/C1B2C3D4E5F60718 has incompatible version, mine:41 remote 40'),
+      logLine('03:02:00', "PlayFab network error in session 'Cotil' and network 1a03782b-bae3"),
+    ]);
+
+    // WHEN the snapshot is read
+    const { refusedJoins, crossplayDropsUtc } = state.snapshot;
+
+    // THEN Ragnar's refusal names him, the stranger's names nobody, and the drop has its time
+    expect(refusedJoins).toEqual([
+      { timeUtc: '2026-10-29T10:00:04.000Z', player: 'Ragnar', reason: 'wrongPassword' },
+      { timeUtc: '2026-10-29T10:01:00.000Z', player: null, reason: 'incompatibleVersion' },
+    ]);
+    expect(crossplayDropsUtc).toEqual(['2026-10-29T10:02:00.000Z']);
+  });
+});

@@ -1,5 +1,5 @@
 import type { Matcher } from '#/models';
-import { NIGHT_SKIPPED_PATTERN, REFUSED_JOIN_PATTERN, REFUSED_JOIN_REASONS, SERVER_STOPPED_PATTERN } from '#/patterns';
+import { NIGHT_SKIPPED_PATTERN, REFUSED_JOIN_PATTERN, REFUSED_JOIN_REASONS, REFUSED_PEER_PATTERN, SERVER_STOPPED_PATTERN } from '#/patterns';
 
 /**
  * Messages found anywhere in a line instead of at its start: the server stopping, a refused join and a skipped night.
@@ -16,6 +16,7 @@ export const ANYWHERE_MATCHERS: readonly Matcher[] = [
       type: 'joinRefused',
       timeUtc,
       reason: REFUSED_JOIN_REASONS.get(REFUSED_JOIN_PATTERN.exec(message)![0])!,
+      connectionId: REFUSED_PEER_PATTERN.exec(message)?.groups?.connectionId ?? null,
       message,
     }),
   },

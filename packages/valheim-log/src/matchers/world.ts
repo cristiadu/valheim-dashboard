@@ -8,6 +8,7 @@ import {
   GAME_SERVER_PATTERN,
   GLOBAL_KEY_PATTERN,
   LEGACY_WORLD_SAVED_PATTERN,
+  PLAYFAB_ERROR_PATTERN,
   POSSIBLE_RAIDS_PATTERN,
   RAID_ENDED_PATTERN,
   RAID_PATTERN,
@@ -73,6 +74,10 @@ export const WORLD_MATCHERS: readonly Matcher[] = [
   {
     pattern: GAME_SERVER_PATTERN,
     toEvent: (groups, timeUtc) => ({ type: 'gameServer', timeUtc, isConnected: groups.state === 'connected' }),
+  },
+  {
+    pattern: PLAYFAB_ERROR_PATTERN,
+    toEvent: (_, timeUtc) => ({ type: 'crossplayError', timeUtc }),
   },
   {
     pattern: GLOBAL_KEY_PATTERN,

@@ -152,10 +152,21 @@
   /* One warning: time, kind pill, then the sentence */
   .line {
     display: grid;
-    grid-template-columns: 110px 70px minmax(0, 1fr);
+    grid-template-columns: 110px 96px minmax(0, 1fr);
     align-items: center;
     gap: 12px;
     padding: 9px 0;
     border-top: 1px solid var(--line-soft);
+  }
+
+  /* On a phone the sentence gets its own row under the time and pill, so it isn't squeezed into a thin column */
+  @media (max-width: 600px) {
+    .line {
+      grid-template-columns: 110px auto;
+    }
+
+    .line > :last-child {
+      grid-column: 1 / -1;
+    }
   }
 </style>

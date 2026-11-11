@@ -102,6 +102,8 @@ export const createServerState = (serverUtcOffsetMinutes: number): ServerState =
       diskSpace: null,
       runs: [],
       steamDropsUtc: [],
+      crossplayDropsUtc: [],
+      refusedJoins: [],
       activities: [],
       chat: [],
       visitedAreas: {},
@@ -212,6 +214,16 @@ export const readLogLine = (state: ServerState, line: string): void => {
         pushCapped(snapshot.steamDropsUtc, event.timeUtc, MAX_RUNS);
       }
       break;
+    case 'crossplayError':
+      pushCapped(snapshot.crossplayDropsUtc, event.timeUtc, MAX_RUNS);
+      break;
+    case 'joinRefused': {
+      const steamId = event.connectionId === null ? undefined : state.sessionState.connectionSteamIds.get(event.connectionId);
+      const character = snapshot.sessions.findLast((session) => steamId !== undefined && session.steamId === steamId)?.character;
+      const player = character ?? (steamId === undefined ? undefined : state.sessionState.steamNames.get(steamId)) ?? null;
+      pushCapped(snapshot.refusedJoins, { timeUtc: event.timeUtc, player, reason: event.reason }, MAX_RUNS);
+      break;
+    }
     case 'serverStopped':
       snapshot.stoppedUtc = event.timeUtc;
       snapshot.runs.at(-1)!.endReason = 'stopped';
