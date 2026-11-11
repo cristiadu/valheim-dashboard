@@ -1,0 +1,14 @@
+11/11/2026 00:00:00: Valheim version: 1.0.21 (network version 41)
+11/11/2026 00:00:03: ZNet.LoadWorld: Cotil (Cotil), save number 1300
+11/11/2026 00:00:04: Player history entry with index 0:  Tony Example (Steam_76561198000000001, 3C9D07E1B2A4F856)
+11/11/2026 00:00:05: Game server connected
+11/11/2026 00:01:00: PlayFab listen socket child connected to remote player A100000000000000
+11/11/2026 00:01:00: PlayFab socket with remote ID playfab/A100000000000000 received local Platform ID Steam_76561198000000001
+11/11/2026 00:01:00: Got handshake from client playfab/A100000000000000
+11/11/2026 00:01:00: Got character ZDOID from Ragnar : 549297300:1
+11/11/2026 00:30:00: PlayFab network error in session 'Cotil' and network 1a03782b-bae3
+11/11/2026 00:40:00: RPC_Disconnect
+11/11/2026 00:40:00: Player connection lost server "Cotil" that has join code 123456, now 0 player(s)
+11/11/2026 00:41:00: PlayFab socket with remote ID playfab/B100000000000000 received local Platform ID Steam_76561198000000001
+11/11/2026 00:41:04: Peer playfab/B100000000000000 has wrong password
+11/11/2026 00:42:00: Peer playfab/C100000000000000 has incompatible version, mine:41 remote 40
