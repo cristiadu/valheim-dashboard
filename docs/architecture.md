@@ -176,7 +176,7 @@ the page gives nothing away.
 | Recipes | Crafting plans and what is still missing, and what the chests can make. Only recipes whose ingredients someone has found | The viewer's browser, and chests and found items from the snapshot |
 | Server | Up or down, uptime in the last 24 hours, warnings | Snapshot |
 
-Long lists show one page at a time, with Newer and Older buttons under them. Page one shows new events as they arrive. A list that shrinks keeps its last page in view.
+The Saga pages its list with Newer and Older buttons. Page one shows new events as they arrive. A list that shrinks keeps its last page in view.
 
 Recipe plans are saved in each viewer's browser (`localStorage`). The server stores nothing for them. Chest items are matched to recipe items through `itemName`, so `RoundLog` counts as `Core wood`. Only chests someone has found count.
 

@@ -33,7 +33,7 @@
   <div class="saga">
     <div class="filters" role="group" aria-label="Filter events">
       {#each SAGA_FILTERS as option (option.label)}
-        <button type="button" aria-pressed={option === filter} onclick={() => (filter = option)}>
+        <button type="button" class="tap" aria-pressed={option === filter} onclick={() => (filter = option)}>
           {option.label}
           <span class="mono muted">{story.filter((item) => option.kinds.includes(item.kind)).length}</span>
         </button>
@@ -79,20 +79,8 @@
     gap: 8px;
   }
 
-  /* One filter, at least 44px tall for touch */
-  button {
-    min-height: 44px;
-    padding: 0 14px;
-    border: 1px solid var(--line);
-    background: transparent;
-    color: var(--text);
-    font: inherit;
-    font-size: 14px;
-    cursor: pointer;
-  }
-
   /* Selected filter */
-  button[aria-pressed='true'] {
+  .tap[aria-pressed='true'] {
     background: var(--selected);
     border-color: var(--ember);
   }
