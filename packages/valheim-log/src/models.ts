@@ -33,7 +33,7 @@ export type LogEvent = { timeUtc: string } & (
   | { type: 'playerCount'; players: number; isJoin: boolean }
   | { type: 'playerDisconnecting'; isTimeout: boolean }
   | { type: 'socketClosed'; steamId: string }
-  | { type: 'joinRefused'; reason: JoinRefusedReason; message: string }
+  | { type: 'joinRefused'; reason: JoinRefusedReason; connectionId: string | null; message: string }
   | { type: 'raidCheck'; possibleRaids: number }
   | { type: 'raidStarted'; raid: string }
   | { type: 'pieceBuilt'; piece: string; builder: string | null }
@@ -107,6 +107,7 @@ export type LogEvent = { timeUtc: string } & (
   | { type: 'serverVersion'; version: string; networkVersion: number }
   | { type: 'worldLoaded'; world: string; saveNumber: number | null }
   | { type: 'gameServer'; isConnected: boolean }
+  | { type: 'crossplayError' }
   | { type: 'serverStopped' }
   | { type: 'otherLine'; message: string; isEngineLine: boolean }
 );

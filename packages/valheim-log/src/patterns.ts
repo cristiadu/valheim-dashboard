@@ -52,6 +52,9 @@ export const REFUSED_JOIN_REASONS: ReadonlyMap<string, JoinRefusedReason> = new 
 /** A join the server refused, matched by the text that gives the reason. */
 export const REFUSED_JOIN_PATTERN = new RegExp([...REFUSED_JOIN_REASONS.keys()].join('|'));
 
+/** The connection a refused join names, a PlayFab or Steam ID, for example `Peer playfab/6F6C3330B7FD733E has wrong password`. */
+export const REFUSED_PEER_PATTERN = /^Peer (?:playfab\/)?(?<connectionId>[0-9A-F]+) /i;
+
 /** How many raids can start at this check. */
 export const POSSIBLE_RAIDS_PATTERN = /^Possible events:(?<count>\d+)$/;
 
@@ -290,6 +293,9 @@ export const WORLD_LOADED_PATTERN =
 
 /** The server's link to Steam went up or down. */
 export const GAME_SERVER_PATTERN = /^Game server (?<state>connected|disconnected)$/;
+
+/** Crossplay lost its link to PlayFab, such as when the internet went down. */
+export const PLAYFAB_ERROR_PATTERN = /^PlayFab network error in session /;
 
 /** The server stopped cleanly. This line may have no timestamp. */
 export const SERVER_STOPPED_PATTERN = /OnApplicationQuit/;

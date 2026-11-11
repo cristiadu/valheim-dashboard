@@ -1,4 +1,4 @@
-import type { ChatKind, LogEvent, PlayerSession } from 'valheim-log';
+import type { ChatKind, JoinRefusedReason, LogEvent, PlayerSession } from 'valheim-log';
 
 import type { ActivityKind, ActivityRecord } from '#/lib/models/activities';
 import type { ChestRecord } from '#/lib/models/chests';
@@ -75,6 +75,16 @@ export type DiskSpace = {
   blockedBelowBytes: number;
 };
 
+/** A join the server turned away. */
+export type RefusedJoinRecord = {
+  /** When it happened, as a UTC ISO string. */
+  timeUtc: string;
+  /** Who tried: their character, or their Steam name when they never played here, or null when the log doesn't say. */
+  player: string | null;
+  /** Why the server turned them away. */
+  reason: JoinRefusedReason;
+};
+
 /** One server run: from the first line of a `logs.txt` to its last. */
 export type RunRecord = {
   /** First line of the log, as a UTC ISO string. */
@@ -115,6 +125,10 @@ export type Snapshot = {
   runs: RunRecord[];
   /** Times the server lost its Steam connection, oldest first. */
   steamDropsUtc: string[];
+  /** Times crossplay lost its link to PlayFab, such as when the internet went down, oldest first. */
+  crossplayDropsUtc: string[];
+  /** Joins the server turned away, such as for a wrong password, oldest first. */
+  refusedJoins: RefusedJoinRecord[];
   /** Latest stretches of building, kills and items, from the event log plugin, oldest first. */
   activities: ActivityRecord[];
   /** Latest chat messages and map pings, oldest first. */
@@ -191,7 +205,19 @@ export type SourceKind = 'visits' | 'deaths' | 'kills' | 'killed' | 'area' | 'ge
  * Steam connection going up or down, `boss` one boss defeated, `latest` the newest line, and `crashes` the last
  * line before each crash.
  */
-export type ServerSourceKind = 'runs' | 'version' | 'day' | 'saves' | 'backups' | 'disk' | 'steam' | 'boss' | 'latest' | 'crashes';
+export type ServerSourceKind =
+  | 'runs'
+  | 'version'
+  | 'day'
+  | 'saves'
+  | 'backups'
+  | 'disk'
+  | 'steam'
+  | 'crossplay'
+  | 'refused'
+  | 'boss'
+  | 'latest'
+  | 'crashes';
 
 /** One line of `logs.txt`, as written. */
 export type LogLineRecord = {

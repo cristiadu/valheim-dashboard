@@ -18,13 +18,17 @@ export const steamPill = (isConnected: boolean | null): Pill => {
 /** A boss's state: `Defeated` in gold or `Not yet` in grey. */
 export const bossPill = (isDefeated: boolean): Pill => (isDefeated ? { text: 'Defeated', tone: 'gold' } : { text: 'Not yet', tone: 'quiet' });
 
-/** What kind of problem a warning is: a crash in red, or a Steam or disk problem in gold. */
+/** What kind of problem a warning is: a crash in red, or a connection, join or disk problem in gold. */
 export const warningPill = (kind: WarningKind): Pill => {
   switch (kind) {
     case 'crash':
       return { text: 'Crash', tone: 'bad' };
     case 'steam':
       return { text: 'Steam', tone: 'gold' };
+    case 'crossplay':
+      return { text: 'Crossplay', tone: 'gold' };
+    case 'refused':
+      return { text: 'Join', tone: 'gold' };
     case 'disk':
       return { text: 'Disk', tone: 'gold' };
   }

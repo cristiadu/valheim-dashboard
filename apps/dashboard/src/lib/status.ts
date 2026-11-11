@@ -1,7 +1,7 @@
 import type { PlayerSession } from 'valheim-log';
 
 import type { Snapshot } from '#/lib/models/snapshot';
-import { BYTES_PER_GB, ONLINE_WINDOW_MS, type ServerWarning } from '#/lib/models/status';
+import { BYTES_PER_GB, ONLINE_WINDOW_MS, REFUSED_REASON_TEXTS, type ServerWarning } from '#/lib/models/status';
 import { DAY_MS } from '#/lib/models/time';
 import { linesAt, serverSource } from '#/lib/sources';
 import { clip, clockTime, durationLabel, offsetLabel, offsetMinutesAt } from '#/lib/time';
@@ -35,7 +35,7 @@ export const statusLine = (snapshot: Snapshot, nowMs: number, timeZone: string):
 /** Free disk space in whole gigabytes, for example `278 GB`. */
 export const gigabytesLabel = (bytes: number): string => `${Math.round(bytes / BYTES_PER_GB)} GB`;
 
-/** Problems worth a look, newest first: crashes, lost Steam connections and low disk space. */
+/** Problems worth a look, newest first: crashes, lost Steam and crossplay connections, joins turned away and low disk space. */
 export const serverWarnings = (snapshot: Snapshot): ServerWarning[] => {
   const crashLines = serverSource(snapshot, 'crashes').lines;
   const steamLines = serverSource(snapshot, 'steam').lines;
@@ -52,6 +52,19 @@ export const serverWarnings = (snapshot: Snapshot): ServerWarning[] => {
   const drops = snapshot.steamDropsUtc.map(
     (timeUtc): ServerWarning => ({ kind: 'steam', timeUtc, text: 'Server lost its Steam connection', source: linesAt(steamLines, timeUtc) }),
   );
+  const crossplayLines = serverSource(snapshot, 'crossplay').lines;
+  const crossplayDrops = snapshot.crossplayDropsUtc.map(
+    (timeUtc): ServerWarning => ({ kind: 'crossplay', timeUtc, text: 'Crossplay lost its connection', source: linesAt(crossplayLines, timeUtc) }),
+  );
+  const refusedLines = serverSource(snapshot, 'refused').lines;
+  const refused = snapshot.refusedJoins.map(
+    ({ timeUtc, player, reason }): ServerWarning => ({
+      kind: 'refused',
+      timeUtc,
+      text: `${player ?? 'Someone'} couldn't join: ${REFUSED_REASON_TEXTS[reason]}`,
+      source: linesAt(refusedLines, timeUtc),
+    }),
+  );
   const disk = snapshot.diskSpace;
   const lowDisk: ServerWarning[] =
     disk !== null && disk.availableBytes < disk.warnBelowBytes
@@ -64,7 +77,7 @@ export const serverWarnings = (snapshot: Snapshot): ServerWarning[] => {
           },
         ]
       : [];
-  return [...crashes, ...drops, ...lowDisk].sort((a, b) => Date.parse(b.timeUtc) - Date.parse(a.timeUtc));
+  return [...crashes, ...drops, ...crossplayDrops, ...refused, ...lowDisk].sort((a, b) => Date.parse(b.timeUtc) - Date.parse(a.timeUtc));
 };
 
 /** Stretches of the last 24 hours when the server was up, from each run's first to last log line. */
