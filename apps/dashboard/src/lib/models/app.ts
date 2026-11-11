@@ -19,7 +19,7 @@ export const TABS: readonly Tab[] = [
   { path: '/saga', label: 'Saga', hint: 'Every game event', rune: 'ᚱ' },
   { path: '/map', label: 'Map', hint: 'Where everyone went', rune: 'ᛉ' },
   { path: '/recipes', label: 'Recipes', hint: 'Plan what to make', rune: 'ᚲ' },
-  { path: '/server', label: 'Server', hint: 'Status, bosses and saves', rune: 'ᚾ' },
+  { path: '/server', label: 'Server', hint: 'Status and bosses', rune: 'ᚾ' },
 ];
 
 /** Address of the page where friends type the password. */
