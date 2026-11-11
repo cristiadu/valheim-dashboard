@@ -1,7 +1,8 @@
 <script lang="ts">
   import LogLines from '#/lib/components/LogLines';
   import Pill from '#/lib/components/Pill';
-  import type { Pill as PillModel, SourceLines } from '#/lib/models';
+  import type { SourceLines } from '#/lib/models/snapshot';
+  import type { Pill as PillModel } from '#/lib/models/status';
 
   /**
    * Facts to show, each a label and a value. A status or state value shows as a pill. A fact with log lines

@@ -1,14 +1,7 @@
 import { getContext, setContext } from 'svelte';
 
-import {
-  CHANGE_EVENT,
-  CLOCK_TICK_MS,
-  type JsonValue,
-  type LiveConnection,
-  SNAPSHOT_KEY,
-  type Snapshot,
-  type SnapshotChange,
-} from '#/lib/models';
+import { CHANGE_EVENT, CLOCK_TICK_MS, type JsonValue, type LiveConnection, SNAPSHOT_KEY, type SnapshotChange } from '#/lib/models/app';
+import type { Snapshot } from '#/lib/models/snapshot';
 import { applyChange } from '#/lib/snapshot-change';
 
 /** Live data in the browser. Both stay null while the page renders on the server. */

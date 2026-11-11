@@ -6,7 +6,8 @@
   import LogLines from '#/lib/components/LogLines';
   import Pill from '#/lib/components/Pill';
   import VitalsBar from '#/lib/components/VitalsBar';
-  import { type Player, PLAYER_PREFAB, type PlayerStat, type Snapshot, STORY_STYLES } from '#/lib/models';
+  import { type Player, PLAYER_PREFAB, type PlayerStat, STORY_STYLES } from '#/lib/models';
+  import type { Snapshot } from '#/lib/models/snapshot';
   import { playerPill } from '#/lib/pills';
   import { playerStats } from '#/lib/players';
   import { playerSource } from '#/lib/sources';

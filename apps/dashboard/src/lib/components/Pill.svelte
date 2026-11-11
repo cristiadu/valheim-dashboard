@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Pill } from '#/lib/models';
+  import type { Pill } from '#/lib/models/status';
 
   /** Status or state to show. */
   let { pill }: { pill: Pill } = $props();

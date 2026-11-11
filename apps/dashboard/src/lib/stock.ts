@@ -1,6 +1,7 @@
 import { itemName } from '#/lib/items';
 import { foundChests } from '#/lib/map';
-import { type Craftable, type Player, type Snapshot } from '#/lib/models';
+import type { Craftable, Player } from '#/lib/models';
+import type { Snapshot } from '#/lib/models/snapshot';
 import { RECIPES, recipeItems } from '#/lib/recipes';
 
 /** Returns [name] with only its letters and digits, in lower case, for example `deerhide` for `Deer hide`. */

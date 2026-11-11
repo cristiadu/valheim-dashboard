@@ -1,4 +1,5 @@
-import type { LogLineRecord, Player, ServerSourceKind, Snapshot, SourceKind, SourceLines } from '#/lib/models';
+import type { Player } from '#/lib/models';
+import type { LogLineRecord, ServerSourceKind, Snapshot, SourceKind, SourceLines } from '#/lib/models/snapshot';
 
 /**
  * Key of the log lines of [kind], then who and what they are about, for example `killed:Ragnar:Troll` or `saves`.

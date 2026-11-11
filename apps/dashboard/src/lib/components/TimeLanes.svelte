@@ -1,7 +1,10 @@
 <script lang="ts">
-  import { clip, clockTime, dayPercent } from '#/lib/time';
-  import { DAY_MS, HOURS_PER_DAY, LANE_AXIS_STEP_HOURS, MS_PER_HOUR, type Player, type Snapshot } from '#/lib/models';
+  import type { Player } from '#/lib/models';
+  import type { Snapshot } from '#/lib/models/snapshot';
+  import { DAY_MS, HOURS_PER_DAY, MS_PER_HOUR } from '#/lib/models/time';
+  import { LANE_AXIS_STEP_HOURS } from '#/lib/models/wheel';
   import { sessionEndMs } from '#/lib/players';
+  import { clip, clockTime, dayPercent } from '#/lib/time';
 
   /** Players to draw, the snapshot, the clock and the viewer's time zone. */
   let { players, snapshot, nowMs, timeZone }: {

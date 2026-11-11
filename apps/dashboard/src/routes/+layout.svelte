@@ -7,11 +7,12 @@
   import Header from '#/lib/components/Header';
   import SideMenu from '#/lib/components/SideMenu';
   import { connectLive, live, provideSnapshot } from '#/lib/live.svelte';
-  import { PASSWORD_PATH, type Snapshot } from '#/lib/models';
+  import { PASSWORD_PATH } from '#/lib/models/app';
+  import type { Snapshot } from '#/lib/models/snapshot';
   import { serverPill } from '#/lib/pills';
   import { isServerOnline, statusLine } from '#/lib/status';
-  import { viewerTimeZone } from '#/lib/time';
   import { tabFor } from '#/lib/tabs';
+  import { viewerTimeZone } from '#/lib/time';
 
   /** Snapshot from the server render, and the page for the current tab. */
   let { data, children }: { data: { snapshot: Snapshot }; children: Snippet } = $props();

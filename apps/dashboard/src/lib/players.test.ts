@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { MS_PER_HOUR } from '#/lib/models';
+import { MS_PER_HOUR } from '#/lib/models/time';
 import { playersOf, playerStats, sessionEndMs } from '#/lib/players';
 import { sessionWith, snapshotWith, TEST_NOON_MS } from '#/lib/test-common';
 

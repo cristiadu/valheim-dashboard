@@ -1,6 +1,6 @@
 import { readFile, stat } from 'node:fs/promises';
 
-import type { Vitals } from '#/lib/models';
+import type { Vitals } from '#/lib/models/snapshot';
 import { PLAYER_VITALS_LINE_PATTERN } from '#/lib/server/models';
 import { matchingLines } from '#/lib/server/text-files';
 

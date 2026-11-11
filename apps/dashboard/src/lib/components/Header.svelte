@@ -1,6 +1,6 @@
 <script lang="ts">
   import Pill from '#/lib/components/Pill';
-  import type { Pill as PillModel } from '#/lib/models';
+  import type { Pill as PillModel } from '#/lib/models/status';
 
   /** Server status line and its Online or Offline pill (none before a log is read). Null until the page runs in the browser. */
   let { status }: { status: { text: string; pill: PillModel | null } | null } = $props();

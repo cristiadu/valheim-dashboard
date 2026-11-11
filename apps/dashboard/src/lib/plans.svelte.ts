@@ -1,4 +1,4 @@
-import { PLANS_STORAGE_KEY, type Plan } from '#/lib/models';
+import { type Plan, PLANS_STORAGE_KEY } from '#/lib/models';
 import { readPlans } from '#/lib/planner';
 
 /** The viewer's recipe plans. Empty until [loadPlans] runs in the browser. */

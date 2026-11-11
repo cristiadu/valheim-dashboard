@@ -5,13 +5,13 @@ import {
   type ActivityKind,
   MAP_SQUARE_METERS,
   OTHER_PLAYER_COLOR,
+  type Player,
   PLAYER_ACTIVITY_STATS,
   PLAYER_COLORS,
-  type Player,
   type PlayerStat,
-  type Snapshot,
   SQUARE_METERS_PER_KM2,
 } from '#/lib/models';
+import type { Snapshot } from '#/lib/models/snapshot';
 import { playerSource } from '#/lib/sources';
 import { isServerOnline } from '#/lib/status';
 import { durationLabel } from '#/lib/time';
