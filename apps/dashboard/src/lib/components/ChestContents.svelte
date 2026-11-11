@@ -1,7 +1,7 @@
 <script lang="ts">
   import ItemIcon from '#/lib/components/ItemIcon';
   import { containerGrid, stackSlots } from '#/lib/items';
-  import { CHEST_SLOT_ICON_PX } from '#/lib/models';
+  import { CHEST_SLOT_ICON_PX } from '#/lib/models/chests';
 
   /**
    * Prefab of the chest, cart, ship or player, which picks its slot grid, how many of each item it holds, the most of

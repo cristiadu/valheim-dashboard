@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Player } from '#/lib/models';
+  import type { Player } from '#/lib/models/players';
   import type { Snapshot } from '#/lib/models/snapshot';
   import { DAY_MS, HOURS_PER_DAY, MS_PER_HOUR } from '#/lib/models/time';
   import { LANE_AXIS_STEP_HOURS } from '#/lib/models/wheel';

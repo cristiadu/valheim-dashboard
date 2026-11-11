@@ -1,7 +1,8 @@
 import type { LogEvent, PlayerSession } from 'valheim-log';
 
-import { BOSS_NAMES, DEFEATED_KEY_PREFIX, type StoryKind } from '#/lib/models';
 import type { ServerSourceKind, Snapshot, SourceKind, SourceLines } from '#/lib/models/snapshot';
+import type { StoryKind } from '#/lib/models/story';
+import { BOSS_NAMES, DEFEATED_KEY_PREFIX } from '#/lib/models/world';
 import { MAX_SOURCE_LINES } from '#/lib/server/models';
 import { emptySource, sourceKey } from '#/lib/sources';
 

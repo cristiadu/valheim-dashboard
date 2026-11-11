@@ -1,4 +1,4 @@
-import { AREA_NAMES } from '#/lib/models';
+import { AREA_NAMES } from '#/lib/models/world';
 
 /** Returns `1 death` or `2 deaths` style text. */
 export const count = (amount: number, one: string, many: string): string => `${amount} ${amount === 1 ? one : many}`;

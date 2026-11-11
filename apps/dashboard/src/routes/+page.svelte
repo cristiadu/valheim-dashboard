@@ -6,7 +6,7 @@
   import NoData from '#/lib/components/NoData';
   import Pill from '#/lib/components/Pill';
   import { live, useSnapshot } from '#/lib/live.svelte';
-  import { LATEST_EVENT_COUNT, STORY_STYLES } from '#/lib/models';
+  import { LATEST_EVENT_COUNT, STORY_STYLES } from '#/lib/models/story';
   import { serverPill } from '#/lib/pills';
   import { playersOf } from '#/lib/players';
   import { playerSource } from '#/lib/sources';
