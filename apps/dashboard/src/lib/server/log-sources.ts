@@ -2,13 +2,18 @@ import type { LogEvent, PlayerSession } from 'valheim-log';
 
 import { BOSS_NAMES, DEFEATED_KEY_PREFIX, type ServerSourceKind, type Snapshot, type SourceKind, type SourceLines, type StoryKind } from '#/lib/models';
 import { MAX_SOURCE_LINES } from '#/lib/server/models';
-import { sourceKey } from '#/lib/sources';
+import { emptySource, sourceKey } from '#/lib/sources';
 
 /** Adds [line], written at [timeUtc] about [kind], to [source], and drops the oldest lines past the limit. */
 export const addSourceLine = (source: SourceLines, timeUtc: string, line: string, kind: StoryKind): void => {
   source.total += 1;
   source.lines.push({ timeUtc, line, kind });
   source.lines.splice(0, Math.max(0, source.lines.length - MAX_SOURCE_LINES));
+};
+
+/** Adds [line], written at [timeUtc] about [kind], to the group of lines [snapshot] keeps under [key]. */
+export const addLineUnder = (snapshot: Snapshot, key: string, timeUtc: string, line: string, kind: StoryKind): void => {
+  addSourceLine((snapshot.sources[key] ??= emptySource()), timeUtc, line, kind);
 };
 
 /** Keeps [line], written at [timeUtc] about [lineKind], behind the number of [kind] for [character]. */
@@ -21,14 +26,12 @@ const keepLine = (
   character: string,
   thing?: string,
 ): void => {
-  const key = thing === undefined ? sourceKey(kind, character) : sourceKey(kind, character, thing);
-  addSourceLine((snapshot.sources[key] ??= { total: 0, lines: [] }), timeUtc, line, lineKind);
+  addLineUnder(snapshot, sourceKey(kind, character, thing), timeUtc, line, lineKind);
 };
 
 /** Keeps [line], written at [timeUtc] about [lineKind], behind the server number of [kind], about [thing] when given. */
 export const keepServerLine = (snapshot: Snapshot, line: string, timeUtc: string, lineKind: StoryKind, kind: ServerSourceKind, thing?: string): void => {
-  const key = thing === undefined ? sourceKey(kind) : sourceKey(kind, thing);
-  addSourceLine((snapshot.sources[key] ??= { total: 0, lines: [] }), timeUtc, line, lineKind);
+  addLineUnder(snapshot, sourceKey(kind, thing), timeUtc, line, lineKind);
 };
 
 /** Keeps the log [line] behind [event] under the server numbers it changes, such as saves or the Steam connection. */
