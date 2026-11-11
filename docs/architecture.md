@@ -168,7 +168,7 @@ the page gives nothing away.
 
 | Tab | Shows | Data from |
 | --- | --- | --- |
-| Hall | Who is online and where, the last 24 hours on a day wheel, the latest events | Snapshot |
+| Hall | World facts (day, bosses, areas, land), who is online with their health, the day wheel, the latest events, and what each player did in the last 24 hours | Snapshot |
 | Vikings | Each player now: when they were online, health and stamina, their numbers, areas visited, gear laid out like a character sheet, and what is probably in their bag | Snapshot |
 | Saga | Every game event and chat, with filters | Snapshot |
 | Map | Land each player walked, chests with what they hold, who is where, last deaths | Snapshot |
@@ -299,6 +299,8 @@ The server numbers on Server and the Hall keep their lines the same way:
 | Last log line | The newest line |
 | Crash warning | The last line before the crash |
 | Hall summary | Joins and leaves, deaths, raids and pieces built in the last 24 hours |
+| Hall world facts | New days, boss defeats and areas entered |
+| What everyone did | Each player's deaths, kills and activity stretches in the last 24 hours |
 
 ## Event log plugin
 
