@@ -21,9 +21,11 @@
   /** Position in [recipes] of the highlighted recipe while the list is open. */
   let highlighted = $state(0);
 
-  /** The whole picker, the button that opens it and the open list. */
+  /** The whole picker. */
   let root: HTMLDivElement;
+  /** The button that opens the list. */
   let button: HTMLButtonElement;
+  /** The open list. */
   let list = $state<HTMLDivElement>();
 
   /** Full recipe for [value]. */
