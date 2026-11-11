@@ -2,6 +2,8 @@
   import LogLines from '#/lib/components/LogLines';
   import NoData from '#/lib/components/NoData';
   import Pill from '#/lib/components/Pill';
+  import BossProgress from '#/lib/components/status/BossProgress';
+  import SaveHistory from '#/lib/components/status/SaveHistory';
   import StatGrid from '#/lib/components/StatGrid';
   import { live, useSnapshot } from '#/lib/live.svelte';
   import { DAY_MS } from '#/lib/models/time';
@@ -48,6 +50,8 @@
               .map((player) => playerSource(snapshot, player, 'visits')),
           ),
         },
+        { label: 'World', value: snapshot.world ?? 'Not in this log', source: serverSource(snapshot, 'runs') },
+        { label: 'In-game day', value: snapshot.day === null ? '–' : String(snapshot.day), source: serverSource(snapshot, 'day') },
         { label: 'Last log line', value: whenLabel(snapshot.lastLineUtc, timeZone, nowMs), source: serverSource(snapshot, 'latest') },
         {
           label: 'Last save',
@@ -59,6 +63,8 @@
         { label: 'Steam', value: steamPill(snapshot.isGameServerConnected), source: serverSource(snapshot, 'steam') },
       ]}
     />
+
+    <BossProgress {snapshot} />
 
     <section class="panel" aria-labelledby="uptime-title">
       <h2 id="uptime-title" class="panel-title">UPTIME, LAST 24 HOURS</h2>
@@ -73,6 +79,8 @@
       </div>
       <p class="muted"><span class="swatch" aria-hidden="true"></span>Up. Gaps mean no log lines, or before the dashboard started.</p>
     </section>
+
+    <SaveHistory {snapshot} {timeZone} {nowMs} />
 
     <section class="panel" aria-labelledby="warnings-title">
       <h2 id="warnings-title" class="panel-title">WARNINGS</h2>

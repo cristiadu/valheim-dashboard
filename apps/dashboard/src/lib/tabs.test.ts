@@ -14,12 +14,12 @@ describe('tabFor', () => {
   });
 
   it('ignores a trailing slash', () => {
-    // GIVEN the World path with a trailing slash
+    // GIVEN the Server path with a trailing slash
     // WHEN its tab is looked up
-    const tab = tabFor('/world/');
+    const tab = tabFor('/server/');
 
-    // THEN it is World
-    expect(tab.label).toBe('World');
+    // THEN it is Server
+    expect(tab.label).toBe('Server');
   });
 
   it('falls back to Hall for an unknown path', () => {
@@ -33,12 +33,12 @@ describe('tabFor', () => {
 });
 
 describe('TABS', () => {
-  it('lists the seven tabs in menu order', () => {
+  it('lists the six tabs in menu order', () => {
     // GIVEN the tab list
     // WHEN the labels are read
     const labels = TABS.map((tab) => tab.label);
 
     // THEN they are in menu order
-    expect(labels).toEqual(['Hall', 'Vikings', 'Saga', 'World', 'Map', 'Recipes', 'Server']);
+    expect(labels).toEqual(['Hall', 'Vikings', 'Saga', 'Map', 'Recipes', 'Server']);
   });
 });
