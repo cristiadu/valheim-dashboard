@@ -1,5 +1,7 @@
 <script lang="ts">
-  import { tick } from 'svelte';
+  import { onMount, tick } from 'svelte';
+
+  import { page } from '$app/state';
 
   import NoData from '#/lib/components/NoData';
   import ChestList from '#/lib/components/map/ChestList';
@@ -9,7 +11,7 @@
   import WorldMap from '#/lib/components/map/WorldMap';
   import { live, useSnapshot } from '#/lib/live.svelte';
   import { mapOf } from '#/lib/map';
-  import { MAP_SQUARE_METERS } from '#/lib/models/map';
+  import { CHEST_QUERY, MAP_SQUARE_METERS } from '#/lib/models/map';
   import { playersOf } from '#/lib/players';
   import { viewerTimeZone } from '#/lib/time';
 
@@ -43,6 +45,13 @@
     await tick();
     pickedPanel?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   };
+
+  onMount(async () => {
+    const linkedId = page.url.searchParams.get(CHEST_QUERY);
+    if (linkedId !== null) {
+      await pick(linkedId);
+    }
+  });
 </script>
 
 {#if map === null}

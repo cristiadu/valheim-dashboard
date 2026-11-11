@@ -1,19 +1,31 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
+  import { resolve } from '$app/paths';
+
   import ItemIcon from '#/lib/components/ItemIcon';
   import Pill from '#/lib/components/Pill';
   import RecipePicker from '#/lib/components/RecipePicker';
   import { live, useSnapshot } from '#/lib/live.svelte';
-  import { foundChests } from '#/lib/map';
-  import { BAG_SOURCE, CHESTS_SOURCE, MAX_CRAFTS, type Plan, RECIPE_ICON_PX } from '#/lib/models/recipes';
+  import { builtByShortLabel, chestTitle } from '#/lib/items';
+  import { foundChests, mapOf } from '#/lib/map';
+  import { CHEST_QUERY } from '#/lib/models/map';
+  import {
+    BAG_SOURCE,
+    CHESTS_SOURCE,
+    type ItemPlace,
+    MAX_CRAFTS,
+    PLACES_SHOWN,
+    type Plan,
+    RECIPE_ICON_PX,
+  } from '#/lib/models/recipes';
   import { knownRecipes } from '#/lib/picker';
   import { planPill } from '#/lib/pills';
   import { clampCrafts, newPlan, planItems, stillNeeded, withHave } from '#/lib/planner';
   import { loadPlans, planner, savePlans } from '#/lib/plans.svelte';
   import { playersOf } from '#/lib/players';
   import { madeAt, recipeById } from '#/lib/recipes';
-  import { bagStock, builderNames, chestStock, craftables } from '#/lib/stock';
+  import { bagStock, builderNames, chestStock, craftables, itemPlacesOf } from '#/lib/stock';
 
   onMount(loadPlans);
 
@@ -40,6 +52,9 @@
     const owner = players.find((player) => `${CHESTS_SOURCE}${player.key}` === source);
     return chestStock(snapshot, owner === undefined ? null : builderNames(owner));
   });
+
+  /** Where each item sits: chests found on the map and the bags the server guesses, most first. */
+  const places = $derived(itemPlacesOf(mapOf(snapshot, players)?.chests ?? [], snapshot.bags));
 
   /** Recipes the picked chests or bag have enough for. */
   const canMake = $derived(craftables(stock));
@@ -72,11 +87,25 @@
     savePlans(planner.plans.map((candidate) => (candidate.id === plan.id ? changed : candidate)));
   };
 
+  /** Returns a key for [place] that no other place of the same item has. */
+  const placeKey = (place: ItemPlace): string => (place.kind === 'bag' ? `bag:${place.character}` : place.chest.id);
+
   /** Removes [plan]. */
   const removePlan = (plan: Plan): void => {
     savePlans(planner.plans.filter((candidate) => candidate.id !== plan.id));
   };
 </script>
+
+{#snippet placeLink(place: ItemPlace)}
+  {#if place.kind === 'bag'}
+    <span class="amount">{place.count.toLocaleString()}</span>in {place.character}'s bag
+  {:else}
+    <a href="{resolve('/map')}?{CHEST_QUERY}={encodeURIComponent(place.chest.id)}">
+      <span class="amount">{place.count.toLocaleString()}</span>in {chestTitle(place.chest.record)}
+    </a>
+    <span class="muted">{builtByShortLabel(place.chest.record.builder)}</span>
+  {/if}
+{/snippet}
 
 <div class="recipes">
   <section class="panel" aria-labelledby="new-title">
@@ -206,7 +235,31 @@
                     onchange={(event) => updatePlan(plan, withHave(plan, line.item, event.currentTarget.checked ? line.need : 0))}
                   />
                 </td>
-                <td><span class="item"><ItemIcon item={line.item} />{line.item}</span></td>
+                <td>
+                  <span class="item"><ItemIcon item={line.item} />{line.item}</span>
+                  {#if line.missing > 0}
+                    {@const itemPlaces = places[line.item] ?? []}
+                    {#if itemPlaces.length === 0}
+                      <p class="muted where">Not in any chest or bag yet.</p>
+                    {:else}
+                      <ul class="places" aria-label="Where to find {line.item}">
+                        {#each itemPlaces.slice(0, PLACES_SHOWN) as place (placeKey(place))}
+                          <li>{@render placeLink(place)}</li>
+                        {/each}
+                      </ul>
+                      {#if itemPlaces.length > PLACES_SHOWN}
+                        <details class="more">
+                          <summary class="muted">{itemPlaces.length - PLACES_SHOWN} more</summary>
+                          <ul class="places">
+                            {#each itemPlaces.slice(PLACES_SHOWN) as place (placeKey(place))}
+                              <li>{@render placeLink(place)}</li>
+                            {/each}
+                          </ul>
+                        </details>
+                      {/if}
+                    {/if}
+                  {/if}
+                </td>
                 <td class="have">
                   <input
                     type="number"
@@ -401,6 +454,44 @@
   /* Have fields are narrower so rows fit on phones */
   .have input {
     width: 68px;
+  }
+
+  /* Places that hold a missing item sit under its name, one per line */
+  .places {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: 6px 0 0;
+    padding: 0 0 0 32px;
+    list-style: none;
+    font-size: 13px;
+  }
+
+  /* A place reads as count, where, and who built it */
+  .places li,
+  .places a {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 2px 6px;
+  }
+
+  /* Chest links keep the text color and show they open the map */
+  .places a {
+    color: var(--text);
+  }
+
+  /* Missing item that nobody has stored or carried */
+  .where {
+    margin: 6px 0 0 32px;
+    font-size: 13px;
+  }
+
+  /* The rest of the places fold away under a short toggle */
+  .more summary {
+    margin: 2px 0 0 32px;
+    font-size: 13px;
+    cursor: pointer;
   }
 
   /* Bigger checkbox for touch */
