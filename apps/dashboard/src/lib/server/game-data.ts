@@ -7,6 +7,7 @@ import {
   type CraftCost,
   FIRE_FUEL_LINE_PATTERN,
   FOOD_LINE_PATTERN,
+  GAME_NAME_LINE_PATTERN,
   ITEM_STACK_LINE_PATTERN,
   PIECE_COST_LINE_PATTERN,
 } from '#/lib/server/models';
@@ -56,6 +57,10 @@ export const fireFuelsOf = (text: string): Record<string, string> => {
   return fuels;
 };
 
+/** Reads the plugin's game names file [text], one `AtgeirIron Iron atgeir` line per thing, into each thing's name. */
+export const gameNamesOf = (text: string): Record<string, string> =>
+  Object.fromEntries(matchingLines(text, GAME_NAME_LINE_PATTERN).map(({ id, name }) => [id!, name!]));
+
 /** Reads the item stacks file at [path]. */
 export const readItemStacks = async (path: string): Promise<Record<string, number>> => itemStacksOf(await readFile(path, 'utf8'));
 
@@ -72,3 +77,6 @@ export const readFoods = async (path: string): Promise<Set<string>> => foodsOf(a
 
 /** Reads the fire fuels file at [path]. */
 export const readFireFuels = async (path: string): Promise<Record<string, string>> => fireFuelsOf(await readFile(path, 'utf8'));
+
+/** Reads the game names file at [path]. */
+export const readGameNames = async (path: string): Promise<Record<string, string>> => gameNamesOf(await readFile(path, 'utf8'));

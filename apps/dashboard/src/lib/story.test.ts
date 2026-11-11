@@ -20,7 +20,7 @@ describe('storyOf', () => {
     // THEN every line reads plainly, newest first
     expect(story.map((item) => [item.kind, item.text])).toEqual([
       ['left', 'Ragnar lost connection'],
-      ['raid', 'A raid started: army eikthyr'],
+      ['raid', 'A raid started: "army eikthyr"'],
       ['died', 'Ragnar died'],
       ['joined', 'Ragnar joined'],
     ]);

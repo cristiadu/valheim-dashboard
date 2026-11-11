@@ -521,6 +521,7 @@ Every log lives in `C:\Valheim Server`.
 | `craft-costs.txt` | The event log plugin, once per start: what crafting or upgrading each item takes |
 | `foods.txt` | The event log plugin, once per start: every item that is food |
 | `fire-fuels.txt` | The event log plugin, once per start: the item each fire burns |
+| `game-names.txt` | The event log plugin, once per start: the English name the game shows for each item, piece, creature and raid. Every name on the page uses it first, so `AtgeirIron` reads `Iron atgeir` and `army_theelder` reads `The ground is shaking` |
 | `player-vitals.txt` | The event log plugin, when a number changes: health, max health, stamina and eitr of each player online |
 
 The dashboard also reads the world save, `worlds_local\Cotil\_main.<save number>.db2`, and never writes to it.
