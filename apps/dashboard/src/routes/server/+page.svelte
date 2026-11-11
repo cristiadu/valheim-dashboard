@@ -2,8 +2,8 @@
   import LogLines from '#/lib/components/LogLines';
   import NoData from '#/lib/components/NoData';
   import Pill from '#/lib/components/Pill';
-  import BossProgress from '#/lib/components/server/BossProgress';
-  import SaveHistory from '#/lib/components/server/SaveHistory';
+  import BossProgress from '#/lib/components/status/BossProgress';
+  import SaveHistory from '#/lib/components/status/SaveHistory';
   import StatGrid from '#/lib/components/StatGrid';
   import { live, useSnapshot } from '#/lib/live.svelte';
   import { DAY_MS } from '#/lib/models/time';
