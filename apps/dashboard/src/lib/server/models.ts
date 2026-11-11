@@ -174,6 +174,12 @@ export type ServerState = {
   craftCosts: Record<string, Record<number, CraftCost>>;
   /** IDs of the items on the ground whose pickup already went into a bag this run, so each counts once. */
   pickedUpItemIds: Set<string>;
+  /** Every item that is food, from the plugin's foods file, for example `CookedMeat`. */
+  foods: Set<string>;
+  /** The item each fire burns, by fire prefab, from the plugin's fire fuels file, for example `{ piece_groundtorch_wood: 'Resin' }`. */
+  fireFuels: Record<string, string>;
+  /** When each character last ate each food, as UTC ISO times, by character and food. */
+  lastMeals: Record<string, Record<string, string>>;
 };
 
 /** What one craft of an item at one level makes and takes, for example 20 wood arrows from `{ Wood: 8 }`. */
@@ -218,6 +224,24 @@ export const CRAFT_COSTS_FILE_NAME = 'craft-costs.txt';
 
 /** One line of the craft costs file, for example `ArrowWood 1 20 Wood x8`: item, level, how many one craft makes, cost. */
 export const CRAFT_COST_LINE_PATTERN = /^(?<item>\S+) (?<level>\d+) (?<yields>\d+) (?<items>.+)$/;
+
+/** Name of the plugin's file next to the log with every food, one per line. */
+export const FOODS_FILE_NAME = 'foods.txt';
+
+/** One line of the foods file, for example `CookedMeat`. */
+export const FOOD_LINE_PATTERN = /^(?<item>\S+)$/;
+
+/** Name of the plugin's file next to the log with the item each fire burns. */
+export const FIRE_FUELS_FILE_NAME = 'fire-fuels.txt';
+
+/** One line of the fire fuels file, for example `piece_groundtorch_wood Resin`. */
+export const FIRE_FUEL_LINE_PATTERN = /^(?<fire>\S+) (?<item>\S+)$/;
+
+/**
+ * How long a food stays in effect after it is eaten, in minutes, about the shortest any food lasts. A player can not
+ * eat the same food again while it is in effect.
+ */
+export const MEAL_MINUTES = 20;
 
 /** Name of the plugin's file next to the log with each player's health, stamina and eitr now. */
 export const PLAYER_VITALS_FILE_NAME = 'player-vitals.txt';

@@ -1,11 +1,12 @@
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace ValheimDashboard.EventLog
 {
     /// <summary>
-    /// Logs fuel put on fires, built pieces repaired and maps shared on a map table. A fire's fuel only goes down
-    /// by itself, a piece's health only goes back up by a repair, and a table's map only changes when someone adds
-    /// theirs. Each player is found like a smelter's.
+    /// Logs fuel put on fires, one line per item, built pieces repaired and maps shared on a map table. A fire's
+    /// fuel only goes down by itself, a piece's health only goes back up by a repair, and a table's map only
+    /// changes when someone adds theirs. Each player is found like a smelter's.
     /// </summary>
     internal static class UpkeepTracker
     {
@@ -24,9 +25,11 @@ namespace ValheimDashboard.EventLog
             if (Names.Has<Fireplace>(zdo))
             {
                 float fuel = zdo.GetFloat(ZDOVars.s_fuel);
-                if (Fuels.TryGetValue(zdo.m_uid, out float before) && fuel > before)
+                int added = Fuels.TryGetValue(zdo.m_uid, out float before) && fuel > before ? Mathf.Max(1, Mathf.RoundToInt(fuel - before)) : 0;
+                string doer = WorkTracker.Doer(zdo);
+                for (int i = 0; i < added; i++)
                 {
-                    GameEventLog.Write($"Fueled: {Names.PrefabName(zdo)} by {WorkTracker.Doer(zdo)}");
+                    GameEventLog.Write($"Fueled: {Names.PrefabName(zdo)} by {doer}");
                 }
                 Fuels[zdo.m_uid] = fuel;
             }
