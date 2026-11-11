@@ -73,7 +73,8 @@ namespace ValheimDashboard.EventLog
 
         /// <summary>
         /// Returns who built the piece [zdo]: the character name when that player was online since the server
-        /// started, or else the Steam name the world keeps for every player who joined it.
+        /// started, or else the Steam name the world keeps for every player who joined it. That name is blank while
+        /// the player is joining again, so the builder is unknown then.
         /// </summary>
         public static string Builder(ZDO zdo)
         {
@@ -84,7 +85,8 @@ namespace ValheimDashboard.EventLog
             {
                 return character;
             }
-            return history[historyIndex].m_displayName;
+            string steamName = history[historyIndex].m_displayName;
+            return string.IsNullOrEmpty(steamName) ? UnknownPlayer : steamName;
         }
 
         /// <summary>Returns the character name of the player on connection [peerId].</summary>

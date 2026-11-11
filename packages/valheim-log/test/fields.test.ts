@@ -24,4 +24,9 @@ describe('playerOf', () => {
     expect(playerOf('Ragnar')).toBe('Ragnar');
     expect(playerOf('an unknown player')).toBeNull();
   });
+
+  it('reads the blank name older plugins wrote for a player joining again as nobody known', () => {
+    // WHEN / THEN
+    expect(playerOf('')).toBeNull();
+  });
 });
