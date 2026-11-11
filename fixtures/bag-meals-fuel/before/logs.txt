@@ -1,0 +1,20 @@
+11/10/2026 10:00:00: Valheim version: 1.0.21 (network version 41)
+11/10/2026 10:00:03: ZNet.LoadWorld: Cotil (Cotil), save number 1300
+11/10/2026 10:00:05: Game server connected
+11/10/2026 10:01:00: PlayFab listen socket child connected to remote player A100000000000000
+11/10/2026 10:01:00: PlayFab socket with remote ID playfab/A100000000000000 received local Platform ID Steam_76561198000000001
+11/10/2026 10:01:00: Got handshake from client playfab/A100000000000000
+11/10/2026 10:01:00: Got character ZDOID from wynnyarD : 549297300:1
+11/10/2026 10:03:00: Wearing: wynnyarD has ArmorBronzeChest, ArmorBronzeLegs, CapeTrollHide, Hammer, HelmetBronze
+11/10/2026 10:04:00: Picked up: Honey x10 by wynnyarD (item 549297300:101)
+11/10/2026 10:04:05: Picked up: CookedDeerMeat x6 by wynnyarD (item 549297300:102)
+11/10/2026 10:04:10: Picked up: Resin x20 by wynnyarD (item 549297300:103)
+11/10/2026 10:05:00: Tombstone: wynnyarD at -352 -128 holds ArmorBronzeChest x1, ArmorBronzeLegs x1, CapeTrollHide x1, Hammer x1, HelmetBronze x1, Honey x10, CookedDeerMeat x6, Resin x20
+11/10/2026 10:05:00: Player died: wynnyarD in Meadows
+11/10/2026 10:05:00: Piece built: wood_fence by wynnyarD
+11/10/2026 10:05:00: Wearing: wynnyarD has nothing
+11/10/2026 10:06:00: Tombstone emptied: wynnyarD by wynnyarD
+11/10/2026 10:06:10: Wearing: wynnyarD has ArmorBronzeChest, ArmorBronzeLegs, CapeTrollHide, Hammer, HelmetBronze
+11/10/2026 10:07:00: Ate something: wynnyarD
+11/10/2026 10:07:05: Ate something: wynnyarD
+11/10/2026 10:08:00: Fueled: piece_groundtorch_wood by wynnyarD

@@ -1,0 +1,2 @@
+piece_groundtorch_wood Resin
+fire_pit Wood

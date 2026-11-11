@@ -1,0 +1,1053 @@
+ArmorBerserkerChest 1 1 BjornHide x5, BjornPaw x2, Blueberries x4, Upgrader1Armor x1
+ArmorBerserkerChest 2 1 BjornHide x2, Blueberries x1, Upgrader1Armor x1
+ArmorBerserkerChest 3 1 BjornHide x4, Blueberries x2, Upgrader1Armor x1
+ArmorBerserkerChest 4 1 BjornHide x8, Blueberries x4, Upgrader1Armor x1
+ArmorBerserkerLegs 1 1 BjornHide x5, Blueberries x4, Upgrader1Armor x1
+ArmorBerserkerLegs 2 1 BjornHide x2, Blueberries x1, Upgrader1Armor x1
+ArmorBerserkerLegs 3 1 BjornHide x4, Blueberries x2, Upgrader1Armor x1
+ArmorBerserkerLegs 4 1 BjornHide x8, Blueberries x4, Upgrader1Armor x1
+ArmorBerserkerUndeadChest 1 1 BjornHide x4, UndeadBjornRibcage x3, LinenThread x4, Upgrader4Armor x1
+ArmorBerserkerUndeadChest 2 1 BjornHide x2, UndeadBjornRibcage x1, LinenThread x1, Upgrader4Armor x1
+ArmorBerserkerUndeadChest 3 1 BjornHide x4, UndeadBjornRibcage x2, LinenThread x2, Upgrader4Armor x1
+ArmorBerserkerUndeadChest 4 1 BjornHide x8, UndeadBjornRibcage x4, LinenThread x4, Upgrader4Armor x1
+ArmorBerserkerUndeadLegs 1 1 BjornHide x10, UndeadBjornRibcage x1, LinenThread x4, Upgrader4Armor x1
+ArmorBerserkerUndeadLegs 2 1 BjornHide x5, UndeadBjornRibcage x1, LinenThread x1, Upgrader4Armor x1
+ArmorBerserkerUndeadLegs 3 1 BjornHide x10, UndeadBjornRibcage x2, LinenThread x2, Upgrader4Armor x1
+ArmorBerserkerUndeadLegs 4 1 BjornHide x20, UndeadBjornRibcage x4, LinenThread x4, Upgrader4Armor x1
+ArmorBronzeChest 1 1 Bronze x5, DeerHide x2, Upgrader1Armor x1
+ArmorBronzeChest 2 1 Bronze x3, Upgrader1Armor x1
+ArmorBronzeChest 3 1 Bronze x6, Upgrader1Armor x1
+ArmorBronzeChest 4 1 Bronze x12, Upgrader1Armor x1
+ArmorBronzeLegs 1 1 Bronze x5, DeerHide x2, Upgrader1Armor x1
+ArmorBronzeLegs 2 1 Bronze x3, Upgrader1Armor x1
+ArmorBronzeLegs 3 1 Bronze x6, Upgrader1Armor x1
+ArmorBronzeLegs 4 1 Bronze x12, Upgrader1Armor x1
+ArmorCarapaceChest 1 1 Carapace x20, ScaleHide x3, Iron x5, Eitr x4, Upgrader5Armor x1
+ArmorCarapaceChest 2 1 Carapace x10, ScaleHide x1, Eitr x2, Upgrader5Armor x1
+ArmorCarapaceChest 3 1 Carapace x20, ScaleHide x2, Eitr x4, Upgrader5Armor x1
+ArmorCarapaceChest 4 1 Carapace x40, ScaleHide x4, Eitr x8, Upgrader5Armor x1
+ArmorCarapaceLegs 1 1 Carapace x20, ScaleHide x3, Iron x5, Eitr x4, Upgrader5Armor x1
+ArmorCarapaceLegs 2 1 Carapace x10, ScaleHide x1, Eitr x2, Upgrader5Armor x1
+ArmorCarapaceLegs 3 1 Carapace x20, ScaleHide x2, Eitr x4, Upgrader5Armor x1
+ArmorCarapaceLegs 4 1 Carapace x40, ScaleHide x4, Eitr x8, Upgrader5Armor x1
+ArmorFenringChest 1 1 WolfHairBundle x20, WolfPelt x5, LeatherScraps x10, Upgrader3Armor x1
+ArmorFenringChest 2 1 WolfHairBundle x5, WolfPelt x3, LeatherScraps x4, Upgrader3Armor x1
+ArmorFenringChest 3 1 WolfHairBundle x10, WolfPelt x6, LeatherScraps x8, Upgrader3Armor x1
+ArmorFenringChest 4 1 WolfHairBundle x20, WolfPelt x12, LeatherScraps x16, Upgrader3Armor x1
+ArmorFenringLegs 1 1 WolfHairBundle x20, WolfPelt x5, LeatherScraps x10, Upgrader3Armor x1
+ArmorFenringLegs 2 1 WolfHairBundle x5, WolfPelt x3, LeatherScraps x4, Upgrader3Armor x1
+ArmorFenringLegs 3 1 WolfHairBundle x10, WolfPelt x6, LeatherScraps x8, Upgrader3Armor x1
+ArmorFenringLegs 4 1 WolfHairBundle x20, WolfPelt x12, LeatherScraps x16, Upgrader3Armor x1
+ArmorFlametalChest 1 1 FlametalNew x20, AskHide x3, CharredBone x5, MorgenHeart x1, Upgrader6Armor x1
+ArmorFlametalChest 2 1 FlametalNew x10, AskHide x1, Upgrader6Armor x1
+ArmorFlametalChest 3 1 FlametalNew x20, AskHide x2, Upgrader6Armor x1
+ArmorFlametalChest 4 1 FlametalNew x40, AskHide x4, Upgrader6Armor x1
+ArmorFlametalLegs 1 1 FlametalNew x20, AskHide x3, CharredBone x5, Upgrader6Armor x1
+ArmorFlametalLegs 2 1 FlametalNew x10, AskHide x1, Upgrader6Armor x1
+ArmorFlametalLegs 3 1 FlametalNew x20, AskHide x2, Upgrader6Armor x1
+ArmorFlametalLegs 4 1 FlametalNew x40, AskHide x4, Upgrader6Armor x1
+ArmorDeepNorthHeavyChest 2 1 Gold x15, MooseHide x3, Leatherstraps x3, Upgrader7Armor x1
+ArmorDeepNorthHeavyChest 3 1 Gold x30, MooseHide x6, Leatherstraps x6, Upgrader7Armor x1
+ArmorDeepNorthHeavyChest 4 1 Gold x60, MooseHide x12, Leatherstraps x12, Upgrader7Armor x1
+ArmorGoldHeavyChestUncooked 1 1 Gold x20, MoldArmorGoldChest x1, MooseHide x8, Leatherstraps x4
+ArmorDeepNorthHeavylegs 2 1 Gold x15, MooseHide x3, Leatherstraps x3, Upgrader7Armor x1
+ArmorDeepNorthHeavylegs 3 1 Gold x30, MooseHide x6, Leatherstraps x6, Upgrader7Armor x1
+ArmorDeepNorthHeavylegs 4 1 Gold x60, MooseHide x12, Leatherstraps x12, Upgrader7Armor x1
+ArmorGoldHeavyLegsUncooked 1 1 Gold x20, MoldArmorGoldLegs x1, MooseHide x8, Leatherstraps x4
+ArmorDeepNorthMageChest 2 1 Gold x3, MooseHide x3, NornThread x3, Upgrader7Armor x1
+ArmorDeepNorthMageChest 3 1 Gold x6, MooseHide x6, NornThread x6, Upgrader7Armor x1
+ArmorDeepNorthMageChest 4 1 Gold x12, MooseHide x12, NornThread x12, Upgrader7Armor x1
+ArmorGoldMageChestUncooked 1 1 Gold x6, MoldArmorMageChest x1, MooseHide x6, NornThread x5
+ArmorDeepNorthMagelegs 2 1 Gold x3, MooseHide x3, NornThread x3, Upgrader7Armor x1
+ArmorDeepNorthMagelegs 3 1 Gold x6, MooseHide x6, NornThread x6, Upgrader7Armor x1
+ArmorDeepNorthMagelegs 4 1 Gold x12, MooseHide x12, NornThread x12, Upgrader7Armor x1
+ArmorGoldMageLegsUncooked 1 1 Gold x6, MoldArmorMageLegs x1, MooseHide x6, NornThread x5
+ArmorDeepNorthMediumChest 2 1 Gold x6, ElakingHairBundle x4, Leatherstraps x2, Upgrader7Armor x1
+ArmorDeepNorthMediumChest 3 1 Gold x12, ElakingHairBundle x8, Leatherstraps x4, Upgrader7Armor x1
+ArmorDeepNorthMediumChest 4 1 Gold x24, ElakingHairBundle x16, Leatherstraps x8, Upgrader7Armor x1
+ArmorGoldMediumChestUncooked 1 1 Gold x12, MoldArmormediumChest x1, ElakingHairBundle x8, Leatherstraps x4
+ArmorDeepNorthMediumlegs 2 1 Gold x6, ElakingHairBundle x4, SealHide x2, Upgrader7Armor x1
+ArmorDeepNorthMediumlegs 3 1 Gold x12, ElakingHairBundle x8, SealHide x4, Upgrader7Armor x1
+ArmorDeepNorthMediumlegs 4 1 Gold x24, ElakingHairBundle x16, SealHide x8, Upgrader7Armor x1
+ArmorGoldMediumLegsUncooked 1 1 Gold x12, MoldArmorMediumLegs x1, ElakingHairBundle x8, SealHide x4
+ArmorIronChest 1 1 Iron x20, DeerHide x2, Upgrader2Armor x1
+ArmorIronChest 2 1 Iron x5, Upgrader2Armor x1
+ArmorIronChest 3 1 Iron x10, Upgrader2Armor x1
+ArmorIronChest 4 1 Iron x20, Upgrader2Armor x1
+ArmorIronLegs 1 1 Iron x20, DeerHide x2, Upgrader2Armor x1
+ArmorIronLegs 2 1 Iron x5, Upgrader2Armor x1
+ArmorIronLegs 3 1 Iron x10, Upgrader2Armor x1
+ArmorIronLegs 4 1 Iron x20, Upgrader2Armor x1
+ArmorLeatherChest 1 1 DeerHide x6, Upgrader0Armor x1
+ArmorLeatherChest 2 1 DeerHide x6, BoneFragments x5, Upgrader0Armor x1
+ArmorLeatherChest 3 1 DeerHide x12, BoneFragments x10, Upgrader0Armor x1
+ArmorLeatherChest 4 1 DeerHide x24, BoneFragments x20, Upgrader0Armor x1
+ArmorLeatherLegs 1 1 DeerHide x6, Upgrader0Armor x1
+ArmorLeatherLegs 2 1 DeerHide x6, BoneFragments x5, Upgrader0Armor x1
+ArmorLeatherLegs 3 1 DeerHide x12, BoneFragments x10, Upgrader0Armor x1
+ArmorLeatherLegs 4 1 DeerHide x24, BoneFragments x20, Upgrader0Armor x1
+ArmorLoxChest 1 1 LoxPelt x5, BoneFragments x8, Root x2, Upgrader4Armor x1
+ArmorLoxChest 2 1 LoxPelt x6, BoneFragments x4, Root x1, Upgrader4Armor x1
+ArmorLoxChest 3 1 LoxPelt x12, BoneFragments x8, Root x2, Upgrader4Armor x1
+ArmorLoxChest 4 1 LoxPelt x24, BoneFragments x16, Root x4, Upgrader4Armor x1
+ArmorLoxLegs 1 1 LoxPelt x5, BoneFragments x8, Root x2, Upgrader4Armor x1
+ArmorLoxLegs 2 1 LoxPelt x3, BoneFragments x4, Root x1, Upgrader4Armor x1
+ArmorLoxLegs 3 1 LoxPelt x6, BoneFragments x8, Root x2, Upgrader4Armor x1
+ArmorLoxLegs 4 1 LoxPelt x12, BoneFragments x16, Root x4, Upgrader4Armor x1
+ArmorMageChest 1 1 LinenThread x20, Eitr x20, Feathers x10, ScaleHide x5, Upgrader5Armor x1
+ArmorMageChest 2 1 LinenThread x10, Eitr x5, Upgrader5Armor x1
+ArmorMageChest 3 1 LinenThread x20, Eitr x10, Upgrader5Armor x1
+ArmorMageChest 4 1 LinenThread x40, Eitr x20, Upgrader5Armor x1
+ArmorMageChest_Ashlands 1 1 LinenThread x20, Eitr x20, AskHide x10, FlametalNew x5, Upgrader6Armor x1
+ArmorMageChest_Ashlands 2 1 LinenThread x10, Eitr x5, FlametalNew x2, Upgrader6Armor x1
+ArmorMageChest_Ashlands 3 1 LinenThread x20, Eitr x10, FlametalNew x4, Upgrader6Armor x1
+ArmorMageChest_Ashlands 4 1 LinenThread x40, Eitr x20, FlametalNew x8, Upgrader6Armor x1
+ArmorMageLegs 1 1 LinenThread x20, Eitr x20, ScaleHide x10, Upgrader5Armor x1
+ArmorMageLegs 2 1 LinenThread x10, Eitr x5, Upgrader5Armor x1
+ArmorMageLegs 3 1 LinenThread x20, Eitr x10, Upgrader5Armor x1
+ArmorMageLegs 4 1 LinenThread x40, Eitr x20, Upgrader5Armor x1
+ArmorMageLegs_Ashlands 1 1 LinenThread x20, Eitr x20, AskHide x10, Upgrader6Armor x1
+ArmorMageLegs_Ashlands 2 1 LinenThread x10, Eitr x5, Upgrader6Armor x1
+ArmorMageLegs_Ashlands 3 1 LinenThread x20, Eitr x10, Upgrader6Armor x1
+ArmorMageLegs_Ashlands 4 1 LinenThread x40, Eitr x20, Upgrader6Armor x1
+ArmorAshlandsMediumChest 1 1 LinenThread x15, LoxPelt x4, AskHide x10, Upgrader6Armor x1
+ArmorAshlandsMediumChest 2 1 LinenThread x10, LoxPelt x2, AskHide x5, Upgrader6Armor x1
+ArmorAshlandsMediumChest 3 1 LinenThread x20, LoxPelt x4, AskHide x10, Upgrader6Armor x1
+ArmorAshlandsMediumChest 4 1 LinenThread x40, LoxPelt x8, AskHide x20, Upgrader6Armor x1
+ArmorAshlandsMediumlegs 1 1 LinenThread x15, LoxPelt x4, AskHide x10, Upgrader6Armor x1
+ArmorAshlandsMediumlegs 2 1 LinenThread x10, LoxPelt x2, AskHide x5, Upgrader6Armor x1
+ArmorAshlandsMediumlegs 3 1 LinenThread x20, LoxPelt x4, AskHide x10, Upgrader6Armor x1
+ArmorAshlandsMediumlegs 4 1 LinenThread x40, LoxPelt x8, AskHide x20, Upgrader6Armor x1
+ArmorPaddedCuirass 1 1 Iron x10, LinenThread x20, Upgrader4Armor x1
+ArmorPaddedCuirass 2 1 Iron x3, LinenThread x10, Upgrader4Armor x1
+ArmorPaddedCuirass 3 1 Iron x6, LinenThread x20, Upgrader4Armor x1
+ArmorPaddedCuirass 4 1 Iron x12, LinenThread x40, Upgrader4Armor x1
+ArmorPaddedGreaves 1 1 Iron x10, LinenThread x20, Upgrader4Armor x1
+ArmorPaddedGreaves 2 1 Iron x3, LinenThread x10, Upgrader4Armor x1
+ArmorPaddedGreaves 3 1 Iron x6, LinenThread x20, Upgrader4Armor x1
+ArmorPaddedGreaves 4 1 Iron x12, LinenThread x40, Upgrader4Armor x1
+ArmorRagsChest 1 1 LeatherScraps x5, Upgrader0Armor x1
+ArmorRagsChest 2 1 LeatherScraps x5, Upgrader0Armor x1
+ArmorRagsLegs 1 1 LeatherScraps x5, Upgrader0Armor x1
+ArmorRagsLegs 2 1 LeatherScraps x5, Upgrader0Armor x1
+ArmorRootChest 1 1 Root x10, ElderBark x10, DeerHide x2, Upgrader2Armor x1
+ArmorRootChest 2 1 Root x2, ElderBark x5, Upgrader2Armor x1
+ArmorRootChest 3 1 Root x4, ElderBark x10, Upgrader2Armor x1
+ArmorRootChest 4 1 Root x8, ElderBark x20, Upgrader2Armor x1
+ArmorRootLegs 1 1 Root x10, ElderBark x10, DeerHide x2, Upgrader2Armor x1
+ArmorRootLegs 2 1 Root x2, ElderBark x5, Upgrader2Armor x1
+ArmorRootLegs 3 1 Root x4, ElderBark x10, Upgrader2Armor x1
+ArmorRootLegs 4 1 Root x8, ElderBark x20, Upgrader2Armor x1
+ArmorTrollLeatherChest 1 1 TrollHide x5, Upgrader1Armor x1
+ArmorTrollLeatherChest 2 1 TrollHide x2, Upgrader1Armor x1
+ArmorTrollLeatherChest 3 1 TrollHide x4, Upgrader1Armor x1
+ArmorTrollLeatherChest 4 1 TrollHide x8, Upgrader1Armor x1
+ArmorTrollLeatherLegs 1 1 TrollHide x5, Upgrader1Armor x1
+ArmorTrollLeatherLegs 2 1 TrollHide x2, Upgrader1Armor x1
+ArmorTrollLeatherLegs 3 1 TrollHide x4, Upgrader1Armor x1
+ArmorTrollLeatherLegs 4 1 TrollHide x8, Upgrader1Armor x1
+ArmorWolfChest 1 1 Silver x20, WolfPelt x5, Chain x1, Upgrader3Armor x1
+ArmorWolfChest 2 1 Silver x5, WolfPelt x2, Upgrader3Armor x1
+ArmorWolfChest 3 1 Silver x10, WolfPelt x4, Upgrader3Armor x1
+ArmorWolfChest 4 1 Silver x20, WolfPelt x8, Upgrader3Armor x1
+ArmorWolfLegs 1 1 Silver x20, WolfPelt x5, WolfFang x4, Upgrader3Armor x1
+ArmorWolfLegs 2 1 Silver x5, WolfPelt x2, WolfFang x1, Upgrader3Armor x1
+ArmorWolfLegs 3 1 Silver x10, WolfPelt x4, WolfFang x2, Upgrader3Armor x1
+ArmorWolfLegs 4 1 Silver x20, WolfPelt x8, WolfFang x4, Upgrader3Armor x1
+ArrowBloodGold 1 20 Gold x1, Feathers x2, Frostwood x8
+ArrowBronze 1 20 Wood x8, Bronze x1, Feathers x2
+ArrowCarapace 1 20 Carapace x4, Feathers x2, Wood x8
+ArrowCharred 1 20 CharredBone x4, Feathers x2, Blackwood x8
+ArrowFire 1 20 Wood x8, Resin x8, Feathers x2
+ArrowFlint 1 20 Wood x8, Flint x2, Feathers x2
+ArrowFrost 1 20 Wood x8, Obsidian x4, Feathers x2, FreezeGland x1
+ArrowIron 1 20 Wood x8, Iron x1, Feathers x2
+ArrowNeedle 1 20 Needle x4, Feathers x2
+ArrowObsidian 1 20 Wood x8, Obsidian x4, Feathers x2
+ArrowPoison 1 20 Wood x8, Obsidian x4, Feathers x2, Ooze x2
+ArrowSilver 1 20 Wood x8, Silver x1, Feathers x2
+ArrowWood 1 20 Wood x8
+AtgeirBlackmetal 1 1 FineWood x10, BlackMetal x30, LinenThread x5, Upgrader4Weapon x1
+AtgeirBlackmetal 2 1 BlackMetal x15, LinenThread x5, Upgrader4Weapon x1
+AtgeirBlackmetal 3 1 BlackMetal x30, LinenThread x10, Upgrader4Weapon x1
+AtgeirBlackmetal 4 1 BlackMetal x60, LinenThread x20, Upgrader4Weapon x1
+AtgeirBronze 1 1 Wood x10, Bronze x8, LeatherScraps x2, Upgrader1Weapon x1
+AtgeirBronze 2 1 Bronze x4, Upgrader1Weapon x1
+AtgeirBronze 3 1 Bronze x8, Upgrader1Weapon x1
+AtgeirBronze 4 1 Bronze x16, Upgrader1Weapon x1
+AtgeirGold 2 1 Gold x10, Frostwood x5, Upgrader1Weapon x1
+AtgeirGold 3 1 Gold x20, Frostwood x10, Upgrader1Weapon x1
+AtgeirGold 4 1 Gold x40, Frostwood x20, Upgrader1Weapon x1
+AtgeirGold_BloodLightning 1 1 AtgeirGold x1, Gold x20, OrbThunderBlood x1, Upgrader7Weapon x1
+AtgeirGold_BloodLightning 2 1 Gold x10, OrbThunderBlood x1, Upgrader7Weapon x1
+AtgeirGold_BloodLightning 3 1 Gold x20, OrbThunderBlood x2, Upgrader7Weapon x1
+AtgeirGold_BloodLightning 4 1 Gold x40, OrbThunderBlood x4, Upgrader7Weapon x1
+AtgeirGold_FrostFire 1 1 AtgeirGold x1, Gold x20, OrbFrostFire x1, Upgrader7Weapon x1
+AtgeirGold_FrostFire 2 1 Gold x10, OrbFrostFire x1, Upgrader7Weapon x1
+AtgeirGold_FrostFire 3 1 Gold x20, OrbFrostFire x2, Upgrader7Weapon x1
+AtgeirGold_FrostFire 4 1 Gold x40, OrbFrostFire x4, Upgrader7Weapon x1
+AtgeirGoldUncooked 1 1 Gold x20, MoldAtgeir x1, Frostwood x10
+AtgeirHimminAfl 1 1 YggdrasilWood x10, Eitr x15, Silver x5, Mandible x2, Upgrader5Weapon x1
+AtgeirHimminAfl 2 1 Eitr x15, Silver x5, Mandible x2, Upgrader5Weapon x1
+AtgeirHimminAfl 3 1 Eitr x30, Silver x10, Mandible x4, Upgrader5Weapon x1
+AtgeirHimminAfl 4 1 Eitr x60, Silver x20, Mandible x8, Upgrader5Weapon x1
+AtgeirIron 1 1 Wood x10, Iron x30, LeatherScraps x2, Upgrader2Weapon x1
+AtgeirIron 2 1 Iron x15, LeatherScraps x1, Upgrader2Weapon x1
+AtgeirIron 3 1 Iron x30, LeatherScraps x2, Upgrader2Weapon x1
+AtgeirIron 4 1 Iron x60, LeatherScraps x4, Upgrader2Weapon x1
+AxeBerzerkr 1 1 CharredBone x15, FlametalNew x24, AskHide x3, Upgrader6Weapon x1
+AxeBerzerkr 2 1 FlametalNew x15, AskHide x1, Upgrader6Weapon x1
+AxeBerzerkr 3 1 FlametalNew x30, AskHide x2, Upgrader6Weapon x1
+AxeBerzerkr 4 1 FlametalNew x60, AskHide x4, Upgrader6Weapon x1
+AxeBerzerkrBlood 1 1 AxeBerzerkr x1, FlametalNew x5, GemstoneRed x1, Upgrader6Weapon x1
+AxeBerzerkrBlood 2 1 FlametalNew x5, GemstoneRed x1, Upgrader6Weapon x1
+AxeBerzerkrBlood 3 1 FlametalNew x10, GemstoneRed x2, Upgrader6Weapon x1
+AxeBerzerkrBlood 4 1 FlametalNew x20, GemstoneRed x4, Upgrader6Weapon x1
+AxeBerzerkrLightning 1 1 AxeBerzerkr x1, FlametalNew x5, GemstoneBlue x1, Upgrader6Weapon x1
+AxeBerzerkrLightning 2 1 FlametalNew x5, GemstoneBlue x1, Upgrader6Weapon x1
+AxeBerzerkrLightning 3 1 FlametalNew x10, GemstoneBlue x2, Upgrader6Weapon x1
+AxeBerzerkrLightning 4 1 FlametalNew x20, GemstoneBlue x4, Upgrader6Weapon x1
+AxeBerzerkrNature 1 1 AxeBerzerkr x1, FlametalNew x5, GemstoneGreen x1, Upgrader6Weapon x1
+AxeBerzerkrNature 2 1 FlametalNew x5, GemstoneGreen x1, Upgrader6Weapon x1
+AxeBerzerkrNature 3 1 FlametalNew x10, GemstoneGreen x2, Upgrader6Weapon x1
+AxeBerzerkrNature 4 1 FlametalNew x20, GemstoneGreen x4, Upgrader6Weapon x1
+AxeBlackMetal 1 1 FineWood x6, BlackMetal x20, LinenThread x5, Upgrader4Weapon x1
+AxeBlackMetal 2 1 BlackMetal x10, LinenThread x5, Upgrader4Weapon x1
+AxeBlackMetal 3 1 BlackMetal x20, LinenThread x10, Upgrader4Weapon x1
+AxeBlackMetal 4 1 BlackMetal x40, LinenThread x20, Upgrader4Weapon x1
+AxeBronze 1 1 Wood x4, Bronze x8, LeatherScraps x2, Upgrader2Weapon x1
+AxeBronze 2 1 Bronze x4, LeatherScraps x1, Upgrader2Weapon x1
+AxeBronze 3 1 Bronze x8, LeatherScraps x2, Upgrader2Weapon x1
+AxeBronze 4 1 Bronze x16, LeatherScraps x4, Upgrader2Weapon x1
+AxeEarly 1 1 Wood x4, AxeHead1 x1, AxeHead2 x1, Upgrader2Weapon x1
+AxeEarly 2 1 Wood x2, LeatherScraps x2, Upgrader2Weapon x1
+AxeEarly 3 1 Wood x4, LeatherScraps x4, Upgrader2Weapon x1
+AxeEarly 4 1 Wood x8, LeatherScraps x8, Upgrader2Weapon x1
+AxeFlint 1 1 Wood x4, Flint x6, Upgrader1Weapon x1
+AxeFlint 2 1 Flint x3, LeatherScraps x2, Upgrader1Weapon x1
+AxeFlint 3 1 Flint x6, LeatherScraps x4, Upgrader1Weapon x1
+AxeFlint 4 1 Flint x12, LeatherScraps x8, Upgrader1Weapon x1
+AxeGold 2 1 Gold x10, Frostwood x5, Upgrader4Weapon x1
+AxeGold 3 1 Gold x20, Frostwood x10, Upgrader4Weapon x1
+AxeGold 4 1 Gold x40, Frostwood x20, Upgrader4Weapon x1
+AxeGold_BloodLightning 1 1 AxeGold x1, Gold x20, OrbThunderBlood x1, Upgrader7Weapon x1
+AxeGold_BloodLightning 2 1 Gold x10, OrbThunderBlood x1, Upgrader7Weapon x1
+AxeGold_BloodLightning 3 1 Gold x20, OrbThunderBlood x2, Upgrader7Weapon x1
+AxeGold_BloodLightning 4 1 Gold x40, OrbThunderBlood x4, Upgrader7Weapon x1
+AxeGold_FrostFire 1 1 AxeGold x1, Gold x20, OrbFrostFire x1, Upgrader4Weapon x1
+AxeGold_FrostFire 2 1 Gold x10, OrbFrostFire x1, Upgrader4Weapon x1
+AxeGold_FrostFire 3 1 Gold x20, OrbFrostFire x2, Upgrader4Weapon x1
+AxeGold_FrostFire 4 1 Gold x40, OrbFrostFire x4, Upgrader4Weapon x1
+AxeGoldUncooked 1 1 Gold x20, MoldAxe x1, Frostwood x10
+AxeIron 1 1 Wood x4, Iron x20, LeatherScraps x2, Upgrader3Weapon x1
+AxeIron 2 1 Iron x10, LeatherScraps x1, Upgrader3Weapon x1
+AxeIron 3 1 Iron x20, LeatherScraps x2, Upgrader3Weapon x1
+AxeIron 4 1 Iron x40, LeatherScraps x4, Upgrader3Weapon x1
+AxeJotunBane 1 1 YggdrasilWood x5, Iron x15, Bilebag x3, Eitr x10, Upgrader4Weapon x1
+AxeJotunBane 2 1 Iron x10, Bilebag x1, Eitr x1, Upgrader4Weapon x1
+AxeJotunBane 3 1 Iron x20, Bilebag x2, Eitr x2, Upgrader4Weapon x1
+AxeJotunBane 4 1 Iron x40, Bilebag x4, Eitr x4, Upgrader4Weapon x1
+AxeStone 1 1 Wood x5, Stone x4, Upgrader0Weapon x1
+AxeStone 2 1 Stone x2, Upgrader0Weapon x1
+AxeStone 3 1 Stone x4, Upgrader0Weapon x1
+AxeStone 4 1 Stone x8, Upgrader0Weapon x1
+BakedPoteitrUncooked 1 1 SealBlubber x1, Kale x2, Poteitr x1, OatFlour x2
+BarleyWineBase 1 1 Barley x10, Cloudberry x10
+Battleaxe 1 1 ElderBark x30, Iron x35, LeatherScraps x4, Upgrader2Weapon x1
+Battleaxe 2 1 ElderBark x5, Iron x15, Upgrader2Weapon x1
+Battleaxe 3 1 ElderBark x10, Iron x30, Upgrader2Weapon x1
+Battleaxe 4 1 ElderBark x20, Iron x60, Upgrader2Weapon x1
+BattleaxeBlackmetal 1 1 FineWood x10, BlackMetal x30, LinenThread x5, Upgrader4Weapon x1
+BattleaxeBlackmetal 2 1 BlackMetal x15, LinenThread x5, Upgrader4Weapon x1
+BattleaxeBlackmetal 3 1 BlackMetal x30, LinenThread x10, Upgrader4Weapon x1
+BattleaxeBlackmetal 4 1 BlackMetal x60, LinenThread x20, Upgrader4Weapon x1
+BattleaxeCrystal 1 1 ElderBark x40, Silver x30, Crystal x10, Upgrader3Weapon x1
+BattleaxeCrystal 2 1 ElderBark x5, Silver x15, Upgrader3Weapon x1
+BattleaxeCrystal 3 1 ElderBark x10, Silver x30, Upgrader3Weapon x1
+BattleaxeCrystal 4 1 ElderBark x20, Silver x60, Upgrader3Weapon x1
+BattleaxeSkullSplittur 1 1 Iron x30, YggdrasilWood x15, Eitr x10, Upgrader5Weapon x1
+BattleaxeSkullSplittur 2 1 Iron x15, YggdrasilWood x5, Upgrader5Weapon x1
+BattleaxeSkullSplittur 3 1 Iron x30, YggdrasilWood x10, Upgrader5Weapon x1
+BattleaxeSkullSplittur 4 1 Iron x60, YggdrasilWood x20, Upgrader5Weapon x1
+BattleaxeGold 2 1 Gold x10, Frostwood x5, Upgrader7Weapon x1
+BattleaxeGold 3 1 Gold x20, Frostwood x10, Upgrader7Weapon x1
+BattleaxeGold 4 1 Gold x40, Frostwood x20, Upgrader7Weapon x1
+BattleaxeGold_BloodLightning 1 1 BattleaxeGold x1, Gold x20, OrbThunderBlood x1, Upgrader7Weapon x1
+BattleaxeGold_BloodLightning 2 1 Gold x10, OrbThunderBlood x1, Upgrader7Weapon x1
+BattleaxeGold_BloodLightning 3 1 Gold x20, OrbThunderBlood x2, Upgrader7Weapon x1
+BattleaxeGold_BloodLightning 4 1 Gold x40, OrbThunderBlood x4, Upgrader7Weapon x1
+BattleaxeGold_FrostFire 1 1 BattleaxeGold x1, Gold x20, OrbFrostFire x1, Upgrader7Weapon x1
+BattleaxeGold_FrostFire 2 1 Gold x10, OrbFrostFire x1, Upgrader7Weapon x1
+BattleaxeGold_FrostFire 3 1 Gold x20, OrbFrostFire x2, Upgrader7Weapon x1
+BattleaxeGold_FrostFire 4 1 Gold x40, OrbFrostFire x4, Upgrader7Weapon x1
+BattleaxeGoldUncooked 1 1 Gold x20, MoldAxe2H x1, Frostwood x10
+Bell 1 1 BellFragment x3
+BlackSoup 1 1 Bloodbag x1, Honey x1, Turnip x1
+KeysGoldUncooked 1 1 Gold x5, MoldKeys x1
+BloodPudding 1 1 Thistle x2, Bloodbag x2, BarleyFlour x4
+BoarJerky 1 2 RawMeat x1, Honey x1
+BoltBlackmetal 1 20 BlackMetal x2, Wood x8, Feathers x2
+BoltBloodGold 1 20 Gold x1, Frostwood x8, Feathers x2
+BoltBone 1 20 BoneFragments x8, Feathers x2
+BoltCarapace 1 20 Carapace x2, Wood x8, Feathers x2
+BoltCharred 1 20 CharredBone x2, Blackwood x8, Feathers x2
+BoltIron 1 20 Wood x8, Iron x1, Feathers x2
+BombBile 1 3 Sap x1, Bilebag x1, Resin x3
+BombBlob_Frost 1 1 BlobVial x1, TrophyHatchling x1, Resin x3
+BombBlob_Lava 1 1 BlobVial x1, SulfurStone x10, ProustitePowder x10
+BombBlob_Morkhalla 1 1 BlobVial x1, TrophyBlob_Morkhalla x1, OozeMork x3
+BombBlob_Poison 1 1 BlobVial x1, TrophyBlob x1, Resin x3
+BombBlob_PoisonElite 1 1 BlobVial x1, TrophyBlob x3, Resin x3
+BombBlob_Tar 1 1 BlobVial x1, TrophyGrowth x1, Tar x3
+BombDynamite 1 10 SealHide x2, FaderEmber x1
+BombLava 1 5 AskHide x1, AskBladder x1, ProustitePowder x3
+BombOoze 1 5 LeatherScraps x5, Ooze x5, Resin x3
+BombSiege 1 5 AskHide x2, SulfurStone x2, ProustitePowder x3
+BombSmoke 1 10 MushroomSmokePuff x1, AskBladder x1
+Bow 1 1 Wood x10, LeatherScraps x8, Upgrader0Weapon x1
+Bow 2 1 Wood x5, LeatherScraps x4, DeerHide x1, Upgrader0Weapon x1
+Bow 3 1 Wood x10, LeatherScraps x8, DeerHide x2, Upgrader0Weapon x1
+Bow 4 1 Wood x20, LeatherScraps x16, DeerHide x4, Upgrader0Weapon x1
+BowAshlands 1 1 Blackwood x10, CharredBone x16, FlametalNew x5, BonemawSerpentTooth x5, Upgrader6Weapon x1
+BowAshlands 2 1 Blackwood x5, CharredBone x10, FlametalNew x5, BonemawSerpentTooth x5, Upgrader6Weapon x1
+BowAshlands 3 1 Blackwood x10, CharredBone x20, FlametalNew x10, BonemawSerpentTooth x10, Upgrader6Weapon x1
+BowAshlands 4 1 Blackwood x20, CharredBone x40, FlametalNew x20, BonemawSerpentTooth x20, Upgrader6Weapon x1
+BowAshlandsBlood 1 1 BowAshlands x1, FlametalNew x5, GemstoneRed x1, Upgrader6Weapon x1
+BowAshlandsBlood 2 1 FlametalNew x5, GemstoneRed x1, Upgrader6Weapon x1
+BowAshlandsBlood 3 1 FlametalNew x10, GemstoneRed x2, Upgrader6Weapon x1
+BowAshlandsBlood 4 1 FlametalNew x20, GemstoneRed x4, Upgrader6Weapon x1
+BowAshlandsStorm 1 1 BowAshlands x1, FlametalNew x5, GemstoneBlue x1, Upgrader6Weapon x1
+BowAshlandsStorm 2 1 FlametalNew x5, GemstoneBlue x1, Upgrader6Weapon x1
+BowAshlandsStorm 3 1 FlametalNew x10, GemstoneBlue x2, Upgrader6Weapon x1
+BowAshlandsStorm 4 1 FlametalNew x20, GemstoneBlue x4, Upgrader6Weapon x1
+BowAshlandsRoot 1 1 BowAshlands x1, FlametalNew x5, GemstoneGreen x1, Upgrader6Weapon x1
+BowAshlandsRoot 2 1 FlametalNew x5, GemstoneGreen x1, Upgrader6Weapon x1
+BowAshlandsRoot 3 1 FlametalNew x10, GemstoneGreen x2, Upgrader6Weapon x1
+BowAshlandsRoot 4 1 FlametalNew x20, GemstoneGreen x4, Upgrader6Weapon x1
+BowDraugrFang 1 1 ElderBark x10, Silver x20, DeerHide x2, Guck x10, Upgrader2Weapon x1
+BowDraugrFang 2 1 ElderBark x5, Silver x10, DeerHide x2, Guck x2, Upgrader2Weapon x1
+BowDraugrFang 3 1 ElderBark x10, Silver x20, DeerHide x4, Guck x4, Upgrader2Weapon x1
+BowDraugrFang 4 1 ElderBark x20, Silver x40, DeerHide x8, Guck x8, Upgrader2Weapon x1
+BowFineWood 1 1 FineWood x10, RoundLog x10, DeerHide x2, Upgrader1Weapon x1
+BowFineWood 2 1 FineWood x5, RoundLog x5, DeerHide x2, Upgrader1Weapon x1
+BowFineWood 3 1 FineWood x10, RoundLog x10, DeerHide x4, Upgrader1Weapon x1
+BowFineWood 4 1 FineWood x20, RoundLog x20, DeerHide x8, Upgrader1Weapon x1
+BowGold 2 1 Gold x10, Frostwood x5, Upgrader7Weapon x1
+BowGold 3 1 Gold x20, Frostwood x10, Upgrader7Weapon x1
+BowGold 4 1 Gold x40, Frostwood x20, Upgrader7Weapon x1
+BowGold_BloodLightning 1 1 BowGold x1, Gold x20, OrbThunderBlood x1, Upgrader7Weapon x1
+BowGold_BloodLightning 2 1 Gold x10, OrbThunderBlood x1, Upgrader7Weapon x1
+BowGold_BloodLightning 3 1 Gold x20, OrbThunderBlood x2, Upgrader7Weapon x1
+BowGold_BloodLightning 4 1 Gold x40, OrbThunderBlood x4, Upgrader7Weapon x1
+BowGold_FrostFire 1 1 BowGold x1, Gold x20, OrbFrostFire x1, Upgrader7Weapon x1
+BowGold_FrostFire 2 1 Gold x10, OrbFrostFire x1, Upgrader7Weapon x1
+BowGold_FrostFire 3 1 Gold x20, OrbFrostFire x2, Upgrader7Weapon x1
+BowGold_FrostFire 4 1 Gold x40, OrbFrostFire x4, Upgrader7Weapon x1
+BowGoldUncooked 1 1 Gold x20, MoldBow x1, Frostwood x10
+BowHuntsman 1 1 FineWood x10, Iron x20, Feathers x10, DeerHide x2, Upgrader2Weapon x1
+BowHuntsman 2 1 FineWood x5, Iron x10, Feathers x5, DeerHide x2, Upgrader2Weapon x1
+BowHuntsman 3 1 FineWood x10, Iron x20, Feathers x10, DeerHide x4, Upgrader2Weapon x1
+BowHuntsman 4 1 FineWood x20, Iron x40, Feathers x20, DeerHide x8, Upgrader2Weapon x1
+BowSpineSnap 1 1 FineWood x10, BoneFragments x40, Eitr x10, Upgrader5Weapon x1
+BowSpineSnap 2 1 FineWood x5, BoneFragments x20, Upgrader5Weapon x1
+BowSpineSnap 3 1 FineWood x10, BoneFragments x40, Upgrader5Weapon x1
+BowSpineSnap 4 1 FineWood x20, BoneFragments x80, Upgrader5Weapon x1
+BreadDough 1 2 BarleyFlour x10
+Bronze 1 1 Copper x2, Tin x1
+Bronze 1 5 Copper x10, Tin x5
+BronzeNails 1 20 Bronze x1
+CapeAsh 1 1 AskHide x6, MorgenSinew x2, FlametalNew x5, Upgrader6Armor x1
+CapeAsh 2 1 AskHide x2, Upgrader6Armor x1
+CapeAsh 3 1 AskHide x4, Upgrader6Armor x1
+CapeAsh 4 1 AskHide x8, Upgrader6Armor x1
+CapeAsksvin 1 1 AskHide x6, MorgenSinew x2, Upgrader6Armor x1
+CapeAsksvin 2 1 AskHide x2, Upgrader6Armor x1
+CapeAsksvin 3 1 AskHide x4, Upgrader6Armor x1
+CapeAsksvin 4 1 AskHide x8, Upgrader6Armor x1
+CapeDeepNorth 1 1 MooseHide x6, MooseSinew x2, Gold x5, Upgrader7Armor x1
+CapeDeepNorth 2 1 MooseHide x3, MooseSinew x1, Gold x2, Upgrader7Armor x1
+CapeDeepNorth 3 1 MooseHide x6, MooseSinew x2, Gold x4, Upgrader7Armor x1
+CapeDeepNorth 4 1 MooseHide x12, MooseSinew x4, Gold x8, Upgrader7Armor x1
+CapeDeepNorthMage 1 1 SealHide x6, NornThread x2, Gold x5, Eitr x15, Upgrader7Armor x1
+CapeDeepNorthMage 2 1 SealHide x3, NornThread x1, Gold x2, Eitr x5, Upgrader7Armor x1
+CapeDeepNorthMage 3 1 SealHide x6, NornThread x2, Gold x4, Eitr x10, Upgrader7Armor x1
+CapeDeepNorthMage 4 1 SealHide x12, NornThread x4, Gold x8, Eitr x20, Upgrader7Armor x1
+CapeDeerHide 1 1 DeerHide x4, BoneFragments x5, Upgrader0Armor x1
+CapeDeerHide 2 1 DeerHide x4, BoneFragments x5, Upgrader0Armor x1
+CapeDeerHide 3 1 DeerHide x8, BoneFragments x10, Upgrader0Armor x1
+CapeDeerHide 4 1 DeerHide x16, BoneFragments x20, Upgrader0Armor x1
+CapeFeather 1 1 Feathers x10, ScaleHide x5, Eitr x20, Upgrader5Armor x1
+CapeFeather 2 1 Feathers x2, ScaleHide x5, Eitr x3, Upgrader5Armor x1
+CapeFeather 3 1 Feathers x4, ScaleHide x10, Eitr x6, Upgrader5Armor x1
+CapeFeather 4 1 Feathers x8, ScaleHide x20, Eitr x12, Upgrader5Armor x1
+CapeLinen 1 1 LinenThread x20, Silver x1, Upgrader4Armor x1
+CapeLinen 2 1 LinenThread x4, Upgrader4Armor x1
+CapeLinen 3 1 LinenThread x8, Upgrader4Armor x1
+CapeLinen 4 1 LinenThread x16, Upgrader4Armor x1
+CapeLox 1 1 LoxPelt x6, Silver x2, Upgrader4Armor x1
+CapeLox 2 1 LoxPelt x2, Upgrader4Armor x1
+CapeLox 3 1 LoxPelt x4, Upgrader4Armor x1
+CapeLox 4 1 LoxPelt x8, Upgrader4Armor x1
+CapeOdin 1 1 LeatherScraps x10, Coal x4, Upgrader1Armor x1
+CapeOdin 2 1 LeatherScraps x5, Coal x2, Upgrader1Armor x1
+CapeOdin 3 1 LeatherScraps x10, Coal x4, Upgrader1Armor x1
+CapeOdin 4 1 LeatherScraps x20, Coal x8, Upgrader1Armor x1
+CapeTrollHide 1 1 TrollHide x10, BoneFragments x10, Upgrader1Armor x1
+CapeTrollHide 2 1 TrollHide x5, BoneFragments x5, Upgrader1Armor x1
+CapeTrollHide 3 1 TrollHide x10, BoneFragments x10, Upgrader1Armor x1
+CapeTrollHide 4 1 TrollHide x20, BoneFragments x20, Upgrader1Armor x1
+CapeWolf 1 1 WolfPelt x6, Silver x4, TrophyWolf x1, Upgrader3Armor x1
+CapeWolf 2 1 WolfPelt x4, Silver x2, Upgrader3Armor x1
+CapeWolf 3 1 WolfPelt x8, Silver x4, Upgrader3Armor x1
+CapeWolf 4 1 WolfPelt x16, Silver x8, Upgrader3Armor x1
+CarrotSoup 1 1 Mushroom x1, Carrot x3
+Catapult_Ammo_BloodGold 1 5 Ice x2, Gold x2, ProustitePowder x3
+Catapult_ammo 1 5 Grausten x10
+CeramicPlate 1 5 BlackMarble x5
+Club 1 1 Wood x6, Upgrader0Weapon x1
+Club 2 1 BoneFragments x5, Upgrader0Weapon x1
+Club 3 1 BoneFragments x10, Upgrader0Weapon x1
+Club 4 1 BoneFragments x20, Upgrader0Weapon x1
+CookedEgg 1 1 ChickenEgg x1
+CrossbowArbalest 1 1 Wood x10, Iron x8, Root x4, Upgrader5Weapon x1
+CrossbowArbalest 2 1 Wood x5, Iron x4, Root x1, Upgrader5Weapon x1
+CrossbowArbalest 3 1 Wood x10, Iron x8, Root x2, Upgrader5Weapon x1
+CrossbowArbalest 4 1 Wood x20, Iron x16, Root x4, Upgrader5Weapon x1
+CrossbowGold 2 1 Gold x10, Frostwood x5, Upgrader7Weapon x1
+CrossbowGold 3 1 Gold x20, Frostwood x10, Upgrader7Weapon x1
+CrossbowGold 4 1 Gold x40, Frostwood x20, Upgrader7Weapon x1
+CrossbowGold_BloodLightning 1 1 CrossbowGold x1, Gold x20, OrbThunderBlood x1, Upgrader7Weapon x1
+CrossbowGold_BloodLightning 2 1 Gold x10, OrbThunderBlood x1, Upgrader7Weapon x1
+CrossbowGold_BloodLightning 3 1 Gold x20, OrbThunderBlood x2, Upgrader7Weapon x1
+CrossbowGold_BloodLightning 4 1 Gold x40, OrbThunderBlood x4, Upgrader7Weapon x1
+CrossbowGold_FrostFire 1 1 CrossbowGold x1, Gold x20, OrbFrostFire x1, Upgrader7Weapon x1
+CrossbowGold_FrostFire 2 1 Gold x10, OrbFrostFire x1, Upgrader7Weapon x1
+CrossbowGold_FrostFire 3 1 Gold x20, OrbFrostFire x2, Upgrader7Weapon x1
+CrossbowGold_FrostFire 4 1 Gold x40, OrbFrostFire x4, Upgrader7Weapon x1
+CrossbowGoldUncooked 1 1 Gold x20, MoldCrossbow x1, Frostwood x10
+CrossbowRipper 1 1 Blackwood x10, FlametalNew x8, MorgenSinew x2, BonemawSerpentTooth x4, Upgrader6Weapon x1
+CrossbowRipper 2 1 Blackwood x5, FlametalNew x4, MorgenSinew x1, BonemawSerpentTooth x4, Upgrader6Weapon x1
+CrossbowRipper 3 1 Blackwood x10, FlametalNew x8, MorgenSinew x2, BonemawSerpentTooth x8, Upgrader6Weapon x1
+CrossbowRipper 4 1 Blackwood x20, FlametalNew x16, MorgenSinew x4, BonemawSerpentTooth x16, Upgrader6Weapon x1
+CrossbowRipperBlood 1 1 CrossbowRipper x1, FlametalNew x8, GemstoneRed x1, Upgrader6Weapon x1
+CrossbowRipperBlood 2 1 FlametalNew x8, GemstoneRed x1, Upgrader6Weapon x1
+CrossbowRipperBlood 3 1 FlametalNew x16, GemstoneRed x2, Upgrader6Weapon x1
+CrossbowRipperBlood 4 1 FlametalNew x32, GemstoneRed x4, Upgrader6Weapon x1
+CrossbowRipperLightning 1 1 CrossbowRipper x1, FlametalNew x8, GemstoneBlue x1, Upgrader6Weapon x1
+CrossbowRipperLightning 2 1 FlametalNew x8, GemstoneBlue x1, Upgrader6Weapon x1
+CrossbowRipperLightning 3 1 FlametalNew x16, GemstoneBlue x2, Upgrader6Weapon x1
+CrossbowRipperLightning 4 1 FlametalNew x32, GemstoneBlue x4, Upgrader6Weapon x1
+CrossbowRipperNature 1 1 CrossbowRipper x1, FlametalNew x8, GemstoneGreen x1, Upgrader6Weapon x1
+CrossbowRipperNature 2 1 FlametalNew x8, GemstoneGreen x1, Upgrader6Weapon x1
+CrossbowRipperNature 3 1 FlametalNew x16, GemstoneGreen x2, Upgrader6Weapon x1
+CrossbowRipperNature 4 1 FlametalNew x32, GemstoneGreen x4, Upgrader6Weapon x1
+Cultivator 1 1 RoundLog x5, Bronze x5, Upgrader0Weapon x1
+Cultivator 2 1 RoundLog x1, Bronze x1, Upgrader0Weapon x1
+Cultivator 3 1 RoundLog x2, Bronze x2, Upgrader0Weapon x1
+DeerStew 1 1 CookedDeerMeat x1, Blueberries x1, Carrot x1
+Demister 1 1 Silver x1, Wisp x1
+DvergrKey 1 1 DvergrKeyFragment x9
+Eyescream 1 1 GreydwarfEye x3, FreezeGland x1
+FeastAshlands_Material 1 1 CookedAsksvinMeat x3, Vineberry x5, ScorchingMedley x2, SpiceAshlands x1
+FeastBlackforest_Material 1 1 DeerStew x3, Thistle x5, QueensJam x4, SpiceForests x1
+FeastDeepNorth_Material 1 1 CookedMooseMeat x3, Poteitr x5, OatFlour x2, SpiceDeepNorth x1
+FeastMeadows_Material 1 1 CookedDeerMeat x2, CookedMeat x5, Dandelion x4, SpiceForests x1
+FeastMistlands_Material 1 1 MisthareSupreme x1, CookedBugMeat x3, YggdrasilPorridge x1, SpiceMistlands x1
+FeastMountains_Material 1 1 WolfMeatSkewer x2, OnionSoup x3, Carrot x4, SpiceMountains x1
+FeastOceans_Material 1 1 FishCooked x5, Thistle x4, SerpentMeatCooked x2, SpiceOceans x1
+FeastPlains_Material 1 1 Bread x3, LoxPie x2, Cloudberry x5, SpicePlains x1
+FeastSwamps_Material 1 1 Sausages x8, Bloodbag x4, TurnipStew x2, SpiceForests x1
+FierySvinstew 1 1 AsksvinMeat x1, Vineberry x2, MushroomSmokePuff x1
+FireworksRocket_Blue 1 1 FireworksRocket_White x1, Blueberries x1
+FireworksRocket_Cyan 1 1 FireworksRocket_White x1, GreydwarfEye x1
+FireworksRocket_Green 1 1 FireworksRocket_White x1, Guck x1
+FireworksRocket_Purple 1 1 FireworksRocket_White x1, Turnip x1
+FireworksRocket_Red 1 1 FireworksRocket_White x1, Raspberry x1
+FireworksRocket_Yellow 1 1 FireworksRocket_White x1, Dandelion x1
+FishAndBreadUncooked 1 1 Fish9 x1, BreadDough x2
+FishingBaitAshlands 1 20 FishingBait x20, TrophyCharredMelee x1
+FishingBaitCave 1 20 FishingBait x20, TrophyFenring x1
+FishingBaitDeepNorth 1 20 FishingBait x20, TrophyHatchling x1
+FishingBaitForest 1 20 FishingBait x20, TrophyFrostTroll x1
+FishingBaitMistlands 1 20 FishingBait x20, TrophyLox x1
+FishingBaitOcean 1 20 FishingBait x20, TrophySerpent x1
+FishingBaitPlains 1 20 FishingBait x20, TrophyGoblin x1
+FishingBaitSwamp 1 20 FishingBait x20, TrophyAbomination x1
+FishSoup 1 1 FishRaw x3, Kale x2, Ice x2
+FishWraps 1 1 FishCooked x2, BarleyFlour x4
+FistBjornClaw 1 1 BjornHide x2, BjornPaw x2, LeatherScraps x4, Upgrader1Weapon x1
+FistBjornClaw 2 1 BjornHide x2, LeatherScraps x2, Upgrader1Weapon x1
+FistBjornClaw 3 1 BjornHide x4, LeatherScraps x4, Upgrader1Weapon x1
+FistBjornClaw 4 1 BjornHide x8, LeatherScraps x8, Upgrader1Weapon x1
+FistFenrirClaw 1 1 WolfHairBundle x10, WolfClaw x6, Silver x10, Upgrader3Weapon x1
+FistFenrirClaw 2 1 WolfHairBundle x1, WolfClaw x1, Silver x1, Upgrader3Weapon x1
+FistFenrirClaw 3 1 WolfHairBundle x2, WolfClaw x2, Silver x2, Upgrader3Weapon x1
+FistFenrirClaw 4 1 WolfHairBundle x4, WolfClaw x4, Silver x4, Upgrader3Weapon x1
+FistGold_BloodLightning 1 1 FistGold x1, Gold x20, OrbThunderBlood x1, Upgrader7Weapon x1
+FistGold_BloodLightning 2 1 Gold x10, OrbThunderBlood x1, Upgrader7Weapon x1
+FistGold_BloodLightning 3 1 Gold x20, OrbThunderBlood x2, Upgrader7Weapon x1
+FistGold_BloodLightning 4 1 Gold x40, OrbThunderBlood x4, Upgrader7Weapon x1
+FistGold_FrostFire 1 1 FistGold x1, Gold x20, OrbFrostFire x1, Upgrader7Weapon x1
+FistGold_FrostFire 2 1 Gold x10, OrbFrostFire x1, Upgrader7Weapon x1
+FistGold_FrostFire 3 1 Gold x20, OrbFrostFire x2, Upgrader7Weapon x1
+FistGold_FrostFire 4 1 Gold x40, OrbFrostFire x4, Upgrader7Weapon x1
+FistBjornUndeadClaw 1 1 BjornHide x2, UndeadBjornRibcage x2, BlackMetal x2, LinenThread x4, Upgrader4Weapon x1
+FistBjornUndeadClaw 2 1 BjornHide x1, UndeadBjornRibcage x1, BlackMetal x1, LinenThread x2, Upgrader4Weapon x1
+FistBjornUndeadClaw 3 1 BjornHide x2, UndeadBjornRibcage x2, BlackMetal x2, LinenThread x4, Upgrader4Weapon x1
+FistBjornUndeadClaw 4 1 BjornHide x4, UndeadBjornRibcage x4, BlackMetal x4, LinenThread x8, Upgrader4Weapon x1
+FistGold 2 1 Gold x10, Frostwood x5, Upgrader2Armor x1
+FistGold 3 1 Gold x20, Frostwood x10, Upgrader2Armor x1
+FistGold 4 1 Gold x40, Frostwood x20, Upgrader2Armor x1
+FistGoldUncooked 1 1 Gold x20, MoldFistweapon x1, MoleClaws x2
+GrapplingHook 1 1 YggdrasilWood x10, Eitr x10, Mandible x4, Hook x1
+Hammer 1 1 Wood x3, Stone x2, Upgrader0Weapon x1
+Hammer 2 1 Wood x1, Stone x1, Upgrader0Weapon x1
+Hammer 3 1 Wood x2, Stone x2, Upgrader0Weapon x1
+HelmetBerserkerHood 1 1 BjornHide x5, TrophyBjorn x1, Upgrader5Armor x1
+HelmetBerserkerHood 2 1 BjornHide x2, Upgrader5Armor x1
+HelmetBerserkerHood 3 1 BjornHide x4, Upgrader5Armor x1
+HelmetBerserkerHood 4 1 BjornHide x8, Upgrader5Armor x1
+HelmetBerserkerUndead 1 1 BjornHide x5, TrophyBjornUndead x1, Upgrader4Armor x1
+HelmetBerserkerUndead 2 1 BjornHide x2, Upgrader4Armor x1
+HelmetBerserkerUndead 3 1 BjornHide x4, Upgrader4Armor x1
+HelmetBerserkerUndead 4 1 BjornHide x8, Upgrader4Armor x1
+HelmetBronze 1 1 Bronze x5, DeerHide x2, Upgrader1Armor x1
+HelmetBronze 2 1 Bronze x3, Upgrader1Armor x1
+HelmetBronze 3 1 Bronze x6, Upgrader1Armor x1
+HelmetBronze 4 1 Bronze x12, Upgrader1Armor x1
+HelmetCarapace 1 1 Carapace x16, ScaleHide x3, Mandible x2, Eitr x4, Upgrader5Armor x1
+HelmetCarapace 2 1 Carapace x8, ScaleHide x1, Eitr x2, Upgrader5Armor x1
+HelmetCarapace 3 1 Carapace x16, ScaleHide x2, Eitr x4, Upgrader5Armor x1
+HelmetCarapace 4 1 Carapace x32, ScaleHide x4, Eitr x8, Upgrader5Armor x1
+HelmetCelebration 1 1 DeerHide x2, Bronze x1, BjornHide x1, AmberPearl x1, Upgrader0Armor x1
+HelmetCelebration 2 1 DeerHide x1, Bronze x1, Upgrader0Armor x1
+HelmetCelebration 3 1 DeerHide x2, Bronze x2, Upgrader0Armor x1
+HelmetCelebration 4 1 DeerHide x4, Bronze x4, Upgrader0Armor x1
+HelmetCrownofValheim 1 1 Gold x5, CrownJewel x1
+HelmetDrake 1 1 Silver x20, WolfPelt x2, TrophyHatchling x2, Upgrader3Armor x1
+HelmetDrake 2 1 Silver x5, Upgrader3Armor x1
+HelmetDrake 3 1 Silver x10, Upgrader3Armor x1
+HelmetDrake 4 1 Silver x20, Upgrader3Armor x1
+HelmetFenring 1 1 WolfHairBundle x20, WolfPelt x2, TrophyCultist x1, Upgrader3Armor x1
+HelmetFenring 2 1 WolfHairBundle x5, WolfPelt x4, Upgrader3Armor x1
+HelmetFenring 3 1 WolfHairBundle x10, WolfPelt x8, Upgrader3Armor x1
+HelmetFenring 4 1 WolfHairBundle x20, WolfPelt x16, Upgrader3Armor x1
+HelmetFishingHat 1 1 Fish1 x1, Fish2 x1, Fish3 x1, Fish4_cave x1, Fish5 x1, Fish6 x1, Fish7 x1, Fish8 x1, Fish9 x1, Fish10 x1, Fish11 x1, Fish12 x1, Upgrader1Armor x1
+HelmetFishingHat 2 1 Fish1 x1, Fish2 x1, Fish3 x1, Fish4_cave x1, Fish5 x1, Fish6 x1, Fish7 x1, Fish8 x1, Fish9 x1, Fish10 x1, Fish11 x1, Fish12 x1, Upgrader1Armor x1
+HelmetFishingHat 3 1 Fish1 x2, Fish2 x2, Fish3 x2, Fish4_cave x2, Fish5 x2, Fish6 x2, Fish7 x2, Fish8 x2, Fish9 x2, Fish10 x2, Fish11 x2, Fish12 x2, Upgrader1Armor x1
+HelmetFishingHat 4 1 Fish1 x4, Fish2 x4, Fish3 x4, Fish4_cave x4, Fish5 x4, Fish6 x4, Fish7 x4, Fish8 x4, Fish9 x4, Fish10 x4, Fish11 x4, Fish12 x4, Upgrader1Armor x1
+HelmetFlametal 1 1 FlametalNew x16, AskHide x3, CharredBone x2, Eitr x4, Upgrader6Armor x1
+HelmetFlametal 2 1 FlametalNew x8, AskHide x1, Eitr x2, Upgrader6Armor x1
+HelmetFlametal 3 1 FlametalNew x16, AskHide x2, Eitr x4, Upgrader6Armor x1
+HelmetFlametal 4 1 FlametalNew x32, AskHide x4, Eitr x8, Upgrader6Armor x1
+HelmetDNHeavy 2 1 Gold x15, MooseHide x3
+HelmetDNHeavy 3 1 Gold x30, MooseHide x6
+HelmetDNHeavy 4 1 Gold x60, MooseHide x12
+HelmetDNMage 2 1 MooseSinew x1, NornThread x2, Upgrader7Armor x1
+HelmetDNMage 3 1 MooseSinew x2, NornThread x4, Upgrader7Armor x1
+HelmetDNMage 4 1 MooseSinew x4, NornThread x8, Upgrader7Armor x1
+ArmorGoldMageHelmetUncooked 1 1 MooseSinew x2, MoldArmorMageHelmet x1, TrophyMoose x1, NornThread x3
+HelmetDNMediumHood 2 1 SealHide x3, MooseHide x3, MooseSinew x1, Upgrader7Armor x1
+HelmetDNMediumHood 3 1 SealHide x6, MooseHide x6, MooseSinew x2, Upgrader7Armor x1
+HelmetDNMediumHood 4 1 SealHide x12, MooseHide x12, MooseSinew x4, Upgrader7Armor x1
+ArmorGoldMediumHelmetUncooked 1 1 SealHide x5, MoldArmorMediumHelmet x1, MooseHide x5, MooseSinew x1
+ArmorGoldHeavyHelmetUncooked 1 1 Gold x20, MoldArmorGoldHelmet x1, MooseHide x4
+HelmetIron 1 1 Iron x20, DeerHide x2, Upgrader2Armor x1
+HelmetIron 2 1 Iron x5, Upgrader2Armor x1
+HelmetIron 3 1 Iron x10, Upgrader2Armor x1
+HelmetIron 4 1 Iron x20, Upgrader2Armor x1
+HelmetLeather 1 1 DeerHide x6, Upgrader0Armor x1
+HelmetLeather 2 1 DeerHide x6, BoneFragments x5, Upgrader0Armor x1
+HelmetLeather 3 1 DeerHide x12, BoneFragments x10, Upgrader0Armor x1
+HelmetLeather 4 1 DeerHide x24, BoneFragments x20, Upgrader0Armor x1
+HelmetLox 1 1 LoxPelt x4, BoneFragments x4, WrithanRoots x2, Upgrader4Armor x1
+HelmetLox 2 1 LoxPelt x2, BoneFragments x2, WrithanRoots x1, Upgrader4Armor x1
+HelmetLox 3 1 LoxPelt x4, BoneFragments x4, WrithanRoots x2, Upgrader4Armor x1
+HelmetLox 4 1 LoxPelt x8, BoneFragments x8, WrithanRoots x4, Upgrader4Armor x1
+HelmetMage 1 1 LinenThread x16, Eitr x15, Iron x2, Upgrader5Armor x1
+HelmetMage 2 1 LinenThread x8, Eitr x5, Upgrader5Armor x1
+HelmetMage 3 1 LinenThread x16, Eitr x10, Upgrader5Armor x1
+HelmetMage 4 1 LinenThread x32, Eitr x20, Upgrader5Armor x1
+HelmetMage_Ashlands 1 1 LinenThread x16, Eitr x15, AskHide x2, Upgrader6Armor x1
+HelmetMage_Ashlands 2 1 LinenThread x8, Eitr x5, Upgrader6Armor x1
+HelmetMage_Ashlands 3 1 LinenThread x16, Eitr x10, Upgrader6Armor x1
+HelmetMage_Ashlands 4 1 LinenThread x32, Eitr x20, Upgrader6Armor x1
+HelmetAshlandsMediumHood 1 1 LinenThread x15, LoxPelt x4, AskHide x10, Upgrader6Armor x1
+HelmetAshlandsMediumHood 2 1 LinenThread x10, LoxPelt x2, AskHide x5, Upgrader6Armor x1
+HelmetAshlandsMediumHood 3 1 LinenThread x20, LoxPelt x4, AskHide x10, Upgrader6Armor x1
+HelmetAshlandsMediumHood 4 1 LinenThread x40, LoxPelt x8, AskHide x20, Upgrader6Armor x1
+HelmetOdin 1 1 LeatherScraps x10, Coal x4, Upgrader1Armor x1
+HelmetOdin 2 1 LeatherScraps x5, Coal x2, Upgrader1Armor x1
+HelmetOdin 3 1 LeatherScraps x10, Coal x4, Upgrader1Armor x1
+HelmetOdin 4 1 LeatherScraps x20, Coal x8, Upgrader1Armor x1
+HelmetPadded 1 1 Iron x10, LinenThread x15, Upgrader4Armor x1
+HelmetPadded 2 1 Iron x5, LinenThread x10, Upgrader4Armor x1
+HelmetPadded 3 1 Iron x10, LinenThread x20, Upgrader4Armor x1
+HelmetPadded 4 1 Iron x20, LinenThread x40, Upgrader4Armor x1
+HelmetRoot 1 1 Root x10, ElderBark x10, LeatherScraps x4, Upgrader2Armor x1
+HelmetRoot 2 1 Root x2, ElderBark x5, Upgrader2Armor x1
+HelmetRoot 3 1 Root x4, ElderBark x10, Upgrader2Armor x1
+HelmetRoot 4 1 Root x8, ElderBark x20, Upgrader2Armor x1
+HelmetTrollLeather 1 1 TrollHide x5, BoneFragments x3, Upgrader1Armor x1
+HelmetTrollLeather 2 1 TrollHide x2, BoneFragments x1, Upgrader1Armor x1
+HelmetTrollLeather 3 1 TrollHide x4, BoneFragments x2, Upgrader1Armor x1
+HelmetTrollLeather 4 1 TrollHide x8, BoneFragments x4, Upgrader1Armor x1
+Hoe 1 1 Wood x5, Stone x2, Upgrader0Weapon x1
+Hoe 2 1 Wood x1, Stone x1, Upgrader0Weapon x1
+Hoe 3 1 Wood x2, Stone x2, Upgrader0Weapon x1
+HoneyGlazedChickenUncooked 1 1 ChickenMeat x1, Honey x3, MushroomJotunPuffs x2
+IronNails 1 10 Iron x1
+KaleChipsUncooked 1 4 Kale x12
+KnifeBlackMetal 1 1 FineWood x4, BlackMetal x10, LinenThread x5, Upgrader4Weapon x1
+KnifeBlackMetal 2 1 BlackMetal x4, LinenThread x5, Upgrader4Weapon x1
+KnifeBlackMetal 3 1 BlackMetal x8, LinenThread x10, Upgrader4Weapon x1
+KnifeBlackMetal 4 1 BlackMetal x16, LinenThread x20, Upgrader4Weapon x1
+KnifeButcher 1 1 Wood x2, Tin x4
+KnifeChitin 1 1 FineWood x4, Chitin x20, LeatherScraps x2, Upgrader3Weapon x1
+KnifeChitin 2 1 Chitin x10, Upgrader3Weapon x1
+KnifeChitin 3 1 Chitin x20, Upgrader3Weapon x1
+KnifeChitin 4 1 Chitin x40, Upgrader3Weapon x1
+KnifeCopper 1 1 Wood x2, Copper x8, Upgrader1Weapon x1
+KnifeCopper 2 1 Copper x4, GreydwarfEye x8, Upgrader1Weapon x1
+KnifeCopper 3 1 Copper x8, GreydwarfEye x16, Upgrader1Weapon x1
+KnifeCopper 4 1 Copper x16, GreydwarfEye x32, Upgrader1Weapon x1
+KnifeFlint 1 1 Wood x2, Flint x4, LeatherScraps x2, Upgrader0Weapon x1
+KnifeFlint 2 1 Flint x2, Upgrader0Weapon x1
+KnifeFlint 3 1 Flint x4, Upgrader0Weapon x1
+KnifeFlint 4 1 Flint x8, Upgrader0Weapon x1
+KnifeGold 2 1 Gold x10, Frostwood x5, Upgrader7Weapon x1
+KnifeGold 3 1 Gold x20, Frostwood x10, Upgrader7Weapon x1
+KnifeGold 4 1 Gold x40, Frostwood x20, Upgrader7Weapon x1
+KnifeGold_BloodLightning 1 1 KnifeGold x1, Gold x20, OrbThunderBlood x1, Upgrader7Weapon x1
+KnifeGold_BloodLightning 2 1 Gold x10, OrbThunderBlood x1, Upgrader7Weapon x1
+KnifeGold_BloodLightning 3 1 Gold x20, OrbThunderBlood x2, Upgrader7Weapon x1
+KnifeGold_BloodLightning 4 1 Gold x40, OrbThunderBlood x4, Upgrader7Weapon x1
+KnifeGold_FrostFire 1 1 KnifeGold x1, Gold x20, OrbFrostFire x1, Upgrader7Weapon x1
+KnifeGold_FrostFire 2 1 Gold x10, OrbFrostFire x1, Upgrader7Weapon x1
+KnifeGold_FrostFire 3 1 Gold x20, OrbFrostFire x2, Upgrader7Weapon x1
+KnifeGold_FrostFire 4 1 Gold x40, OrbFrostFire x4, Upgrader7Weapon x1
+KnifeGoldUncooked 1 1 Gold x20, MoldKnife x1, Frostwood x10
+KnifeSilver 1 1 Wood x2, Silver x10, LeatherScraps x3, Iron x2, Upgrader3Weapon x1
+KnifeSilver 2 1 Wood x1, Silver x5, LeatherScraps x1, Iron x1, Upgrader3Weapon x1
+KnifeSilver 3 1 Wood x2, Silver x10, LeatherScraps x2, Iron x2, Upgrader3Weapon x1
+KnifeSilver 4 1 Wood x4, Silver x20, LeatherScraps x4, Iron x4, Upgrader3Weapon x1
+KnifeSkollAndHati 1 1 FineWood x4, Iron x10, BlackMetal x10, Upgrader4Weapon x1
+KnifeSkollAndHati 2 1 Iron x4, BlackMetal x4, Upgrader4Weapon x1
+KnifeSkollAndHati 3 1 Iron x8, BlackMetal x8, Upgrader4Weapon x1
+KnifeSkollAndHati 4 1 Iron x16, BlackMetal x16, Upgrader4Weapon x1
+Lantern 1 1 Bronze x2, SurtlingCore x1, Crystal x1
+Lingondricka 1 1 Lingonberry x5, Ice x5
+LoxPieUncooked 1 1 Cloudberry x2, LoxMeat x2, BarleyFlour x4
+MaceBronze 1 1 Wood x4, Bronze x8, LeatherScraps x3, Upgrader1Weapon x1
+MaceBronze 2 1 Bronze x4, Upgrader1Weapon x1
+MaceBronze 3 1 Bronze x8, Upgrader1Weapon x1
+MaceBronze 4 1 Bronze x16, Upgrader1Weapon x1
+MaceEldner 1 1 CharredBone x10, FlametalNew x15, SulfurStone x5, AskHide x3, Upgrader6Weapon x1
+MaceEldner 2 1 CharredBone x5, FlametalNew x8, SulfurStone x3, AskHide x2, Upgrader6Weapon x1
+MaceEldner 3 1 CharredBone x10, FlametalNew x16, SulfurStone x6, AskHide x4, Upgrader6Weapon x1
+MaceEldner 4 1 CharredBone x20, FlametalNew x32, SulfurStone x12, AskHide x8, Upgrader6Weapon x1
+MaceEldnerBlood 1 1 MaceEldner x1, FlametalNew x8, GemstoneRed x1, Upgrader6Weapon x1
+MaceEldnerBlood 2 1 FlametalNew x8, GemstoneRed x1, Upgrader6Weapon x1
+MaceEldnerBlood 3 1 FlametalNew x16, GemstoneRed x2, Upgrader6Weapon x1
+MaceEldnerBlood 4 1 FlametalNew x32, GemstoneRed x4, Upgrader6Weapon x1
+MaceEldnerLightning 1 1 MaceEldner x1, FlametalNew x8, GemstoneBlue x1, Upgrader6Weapon x1
+MaceEldnerLightning 2 1 FlametalNew x8, GemstoneBlue x1, Upgrader6Weapon x1
+MaceEldnerLightning 3 1 FlametalNew x16, GemstoneBlue x2, Upgrader6Weapon x1
+MaceEldnerLightning 4 1 FlametalNew x32, GemstoneBlue x4, Upgrader6Weapon x1
+MaceEldnerNature 1 1 MaceEldner x1, FlametalNew x8, GemstoneGreen x1, Upgrader6Weapon x1
+MaceEldnerNature 2 1 FlametalNew x8, GemstoneGreen x1, Upgrader6Weapon x1
+MaceEldnerNature 3 1 FlametalNew x16, GemstoneGreen x2, Upgrader6Weapon x1
+MaceEldnerNature 4 1 FlametalNew x32, GemstoneGreen x4, Upgrader6Weapon x1
+MaceGold 2 1 Gold x10, Frostwood x5, Upgrader7Weapon x1
+MaceGold 3 1 Gold x20, Frostwood x10, Upgrader7Weapon x1
+MaceGold 4 1 Gold x40, Frostwood x20, Upgrader7Weapon x1
+MaceGold_BloodLightning 1 1 MaceGold x1, Gold x20, OrbThunderBlood x1, Upgrader7Weapon x1
+MaceGold_BloodLightning 2 1 Gold x10, OrbThunderBlood x1, Upgrader7Weapon x1
+MaceGold_BloodLightning 3 1 Gold x20, OrbThunderBlood x2, Upgrader7Weapon x1
+MaceGold_BloodLightning 4 1 Gold x40, OrbThunderBlood x4, Upgrader7Weapon x1
+MaceGold_FrostFire 1 1 MaceGold x1, Gold x20, OrbFrostFire x1, Upgrader7Weapon x1
+MaceGold_FrostFire 2 1 Gold x10, OrbFrostFire x1, Upgrader7Weapon x1
+MaceGold_FrostFire 3 1 Gold x20, OrbFrostFire x2, Upgrader7Weapon x1
+MaceGold_FrostFire 4 1 Gold x40, OrbFrostFire x4, Upgrader7Weapon x1
+MaceGoldUncooked 1 1 Gold x20, MoldMace x1, Frostwood x10
+MaceIron 1 1 Wood x4, Iron x20, LeatherScraps x3, Upgrader2Weapon x1
+MaceIron 2 1 Iron x10, Upgrader2Weapon x1
+MaceIron 3 1 Iron x20, Upgrader2Weapon x1
+MaceIron 4 1 Iron x40, Upgrader2Weapon x1
+MaceNeedle 1 1 FineWood x5, Iron x20, Needle x5, LinenThread x10, Upgrader4Weapon x1
+MaceNeedle 2 1 Iron x2, Needle x2, Upgrader4Weapon x1
+MaceNeedle 3 1 Iron x4, Needle x4, Upgrader4Weapon x1
+MaceNeedle 4 1 Iron x8, Needle x8, Upgrader4Weapon x1
+MaceSilver 1 1 ElderBark x10, Silver x30, YmirRemains x5, FreezeGland x5, Upgrader3Weapon x1
+MaceSilver 2 1 Silver x15, Upgrader3Weapon x1
+MaceSilver 3 1 Silver x30, Upgrader3Weapon x1
+MaceSilver 4 1 Silver x60, Upgrader3Weapon x1
+MagicallyStuffedShroomUncooked 1 1 MushroomMagecap x3, GiantBloodSack x1, Turnip x2
+MarinatedGreens 1 1 Sap x3, MushroomMagecap x2, Fiddleheadfern x2, MushroomSmokePuff x2
+MashedMeat 1 1 AsksvinMeat x1, VoltureMeat x1, Fiddleheadfern x1
+MeadBaseBugRepellent 1 1 Cloudberry x10, Fish7 x3, FragrantBundle x1
+MeadBaseBzerker 1 1 Mushroom x10, MushroomYellow x10, MushroomBzerker x1
+MeadBaseEitrLingering 1 1 Sap x10, Vineberry x10, MushroomMagecap x10
+MeadBaseEitrMinor 1 1 Honey x10, Sap x5, MushroomJotunPuffs x2, MushroomMagecap x5
+MeadBaseFrostResist 1 1 Honey x10, Thistle x5, Bloodbag x2, GreydwarfEye x1
+MeadBaseHasty 1 1 Honey x10, Blueberries x10, CuredSquirrelHamstring x1
+MeadBaseHealthLingering 1 1 Sap x10, Vineberry x10, MushroomSmokePuff x10
+MeadBaseHealthMajor 1 1 Honey x10, GiantBloodSack x4, RoyalJelly x5
+MeadBaseHealthMedium 1 1 Honey x10, Bloodbag x4, Raspberry x10, Dandelion x1
+MeadBaseHealthMinor 1 1 Honey x10, Blueberries x5, Raspberry x10, Dandelion x1
+MeadBaseLightFoot 1 1 ScaleHide x2, Feathers x5, MushroomMagecap x5
+MeadBasePoisonResist 1 1 Honey x10, Thistle x5, NeckTail x1, Coal x10
+MeadBaseStaminaLingering 1 1 Sap x10, Cloudberry x10, MushroomJotunPuffs x10
+MeadBaseStaminaMedium 1 1 Honey x10, Cloudberry x10, MushroomYellow x10
+MeadBaseStaminaMinor 1 1 Honey x10, Raspberry x10, MushroomYellow x10
+MeadBaseStrength 1 1 Fish5 x2, Honey x10, PowderedDragonEgg x1
+MeadBaseSwimmer 1 1 Dandelion x10, Fish1 x2, FreshSeaweed x1
+MeadBaseTamer 1 1 Onion x5, Carrot x10, PungentPebbles x1
+MeadBaseTasty 1 1 Honey x10, Raspberry x10, Blueberries x5
+MeatballsMashedPoteitr 1 1 MooseMeat x1, Lingonberry x2, Poteitr x2
+MeatPlatterUncooked 1 1 BugMeat x1, LoxMeat x1, HareMeat x1
+MechanicalSpring 1 1 Eitr x1, Iron x3
+MinceMeatSauce 1 1 RawMeat x1, NeckTail x1, Carrot x1
+MisthareSupremeUncooked 1 1 HareMeat x1, MushroomJotunPuffs x3, Carrot x2
+MooseKebab 1 2 MooseMeat x1, Kale x2, OatFlour x1, Lingonberry x2
+MushroomOmelette 1 1 ChickenEgg x3, MushroomJotunPuffs x3
+OatmealLingonberryJam 1 1 Oat x2, Lingonberry x2, OatMilk x1
+OatMilk 1 1 Oat x5, Ice x5
+OnionSoup 1 1 Onion x3
+OvenPancakeUncooked 1 1 MooseMeat x1, Poteitr x2, Lingonberry x2, OatFlour x2
+Pancakes 1 3 OatMilk x1, OatFlour x2, ChickenEgg x2, Blueberries x2
+PickaxeAntler 1 1 Wood x10, HardAntler x1
+PickaxeBlackMetal 1 1 YggdrasilWood x3, BlackMetal x25, Upgrader4Weapon x1
+PickaxeBlackMetal 2 1 YggdrasilWood x1, BlackMetal x15, Upgrader4Weapon x1
+PickaxeBlackMetal 3 1 YggdrasilWood x2, BlackMetal x30, Upgrader4Weapon x1
+PickaxeBlackMetal 4 1 YggdrasilWood x4, BlackMetal x60, Upgrader4Weapon x1
+PickaxeBronze 1 1 RoundLog x3, Bronze x10, Upgrader1Weapon x1
+PickaxeBronze 2 1 RoundLog x1, Bronze x5, Upgrader1Weapon x1
+PickaxeBronze 3 1 RoundLog x2, Bronze x10, Upgrader1Weapon x1
+PickaxeBronze 4 1 RoundLog x4, Bronze x20, Upgrader1Weapon x1
+PickaxeIron 1 1 RoundLog x3, Iron x20, Upgrader2Weapon x1
+PickaxeIron 2 1 RoundLog x1, Iron x10, Upgrader2Weapon x1
+PickaxeIron 3 1 RoundLog x2, Iron x20, Upgrader2Weapon x1
+PickaxeIron 4 1 RoundLog x4, Iron x40, Upgrader2Weapon x1
+PiquantPieUncooked 1 1 Vineberry x2, AsksvinMeat x2, BarleyFlour x4
+PulledBear 1 1 CookedBjornMeat x1, Carrot x2, Blueberries x1
+QueensJam 1 4 Raspberry x8, Blueberries x6
+RoastedCrustPieUncooked 1 1 Vineberry x2, VoltureEgg x1, BarleyFlour x4
+SaddleAsksvin 1 1 FlametalNew x6, LinenThread x20, MorgenSinew x4
+SaddleMoose 1 1 Gold x4, SealHide x5, Frostwood x5, LinenThread x15
+SaddleLox 1 1 LeatherScraps x10, LinenThread x20, BlackMetal x15
+Salad 1 3 MushroomJotunPuffs x3, Onion x3, Cloudberry x3
+Sausages 1 4 Entrails x4, RawMeat x1, Thistle x1
+ScorchingMedley 1 3 MushroomJotunPuffs x3, Onion x3, Fiddleheadfern x3
+Scythe 1 1 ScytheHandle x1, Silver x6, Upgrader0Weapon x1
+Scythe 2 1 Silver x5, Upgrader0Weapon x1
+Scythe 3 1 Silver x10, Upgrader0Weapon x1
+SealSoup 1 1 SealBlubber x2, Kale x2, Ice x2
+SeekerAspic 1 2 BugMeat x2, MushroomMagecap x2, RoyalJelly x2
+SerpentStew 1 1 Mushroom x1, SerpentMeatCooked x1, Honey x2
+SharpeningStone 1 1 Stone x5
+ShieldBanded 1 1 FineWood x10, Iron x8, Upgrader2Armor x1
+ShieldBanded 2 1 FineWood x10, Iron x4, Upgrader2Armor x1
+ShieldBanded 3 1 FineWood x20, Iron x8, Upgrader2Armor x1
+ShieldBlackmetal 1 1 FineWood x10, BlackMetal x8, Chain x5, Upgrader4Armor x1
+ShieldBlackmetal 2 1 FineWood x10, BlackMetal x4, Chain x2, Upgrader4Armor x1
+ShieldBlackmetal 3 1 FineWood x20, BlackMetal x8, Chain x4, Upgrader4Armor x1
+ShieldBlackmetalTower 1 1 FineWood x15, BlackMetal x10, Chain x7, Upgrader4Armor x1
+ShieldBlackmetalTower 2 1 FineWood x10, BlackMetal x4, Chain x2, Upgrader4Armor x1
+ShieldBlackmetalTower 3 1 FineWood x20, BlackMetal x8, Chain x4, Upgrader4Armor x1
+ShieldBoneTower 1 1 Wood x10, BoneFragments x10, TrophySkeleton x3, Upgrader1Armor x1
+ShieldBoneTower 2 1 Wood x5, BoneFragments x5, Upgrader1Armor x1
+ShieldBoneTower 3 1 Wood x10, BoneFragments x10, Upgrader1Armor x1
+ShieldBronzeBuckler 1 1 Bronze x10, Wood x4, Upgrader1Armor x1
+ShieldBronzeBuckler 2 1 Bronze x5, Wood x1, Upgrader1Armor x1
+ShieldBronzeBuckler 3 1 Bronze x10, Wood x2, Upgrader1Armor x1
+ShieldGoldBuckler 2 1 Gold x5, Frostwood x5, Upgrader7Armor x1
+ShieldGoldBuckler 3 1 Gold x10, Frostwood x10, Upgrader7Armor x1
+ShieldBucklerGoldUncooked 1 1 Gold x10, MoldShieldBuckler x1, Frostwood x10
+ShieldCarapace 1 1 Carapace x20, ScaleHide x3, Eitr x10, Upgrader5Armor x1
+ShieldCarapace 2 1 Carapace x10, ScaleHide x3, Eitr x3, Upgrader5Armor x1
+ShieldCarapace 3 1 Carapace x20, ScaleHide x6, Eitr x6, Upgrader5Armor x1
+ShieldCarapaceBuckler 1 1 Carapace x16, ScaleHide x3, Eitr x10, Upgrader5Armor x1
+ShieldCarapaceBuckler 2 1 Carapace x8, ScaleHide x3, Eitr x3, Upgrader5Armor x1
+ShieldCarapaceBuckler 3 1 Carapace x16, ScaleHide x6, Eitr x6, Upgrader5Armor x1
+ShieldCore 1 1 BlackCore x1, SurtlingCore x1, CeramicPlate x5
+ShieldFlametal 1 1 Blackwood x10, FlametalNew x8, AskHide x2, Upgrader6Armor x1
+ShieldFlametal 2 1 Blackwood x10, FlametalNew x4, AskHide x2, Upgrader6Armor x1
+ShieldFlametal 3 1 Blackwood x20, FlametalNew x8, AskHide x4, Upgrader6Armor x1
+ShieldFlametalTower 1 1 Blackwood x15, FlametalNew x10, AskHide x5, Upgrader6Armor x1
+ShieldFlametalTower 2 1 Blackwood x10, FlametalNew x4, AskHide x2, Upgrader6Armor x1
+ShieldFlametalTower 3 1 Blackwood x20, FlametalNew x8, AskHide x4, Upgrader6Armor x1
+ShieldIronBuckler 1 1 Iron x10, ElderBark x4, Upgrader2Armor x1
+ShieldIronBuckler 2 1 Iron x5, ElderBark x1, Upgrader2Armor x1
+ShieldIronBuckler 3 1 Iron x10, ElderBark x2, Upgrader2Armor x1
+ShieldIronTower 1 1 FineWood x15, Iron x10, Upgrader2Armor x1
+ShieldIronTower 2 1 FineWood x10, Iron x5, Upgrader2Armor x1
+ShieldIronTower 3 1 FineWood x20, Iron x10, Upgrader2Armor x1
+ShieldRoots 1 1 FineWood x10, WrithanRoots x1, Upgrader2Armor x1
+ShieldRoots 2 1 FineWood x5, WrithanRoots x2, Upgrader2Armor x1
+ShieldRoots 3 1 FineWood x10, WrithanRoots x4, Upgrader2Armor x1
+ShieldGold 2 1 Gold x8, Frostwood x5, Upgrader7Armor x1
+ShieldGold 3 1 Gold x16, Frostwood x10, Upgrader7Armor x1
+ShieldRoundGoldUncooked 1 1 Gold x15, MoldShieldRound x1, Frostwood x10
+ShieldSerpentscale 1 1 FineWood x10, Iron x4, SerpentScale x8, Upgrader3Armor x1
+ShieldSerpentscale 2 1 FineWood x10, Iron x2, SerpentScale x4, Upgrader3Armor x1
+ShieldSerpentscale 3 1 FineWood x20, Iron x4, SerpentScale x8, Upgrader3Armor x1
+ShieldSilver 1 1 FineWood x10, Silver x8, Upgrader3Armor x1
+ShieldSilver 2 1 FineWood x10, Silver x4, Upgrader3Armor x1
+ShieldSilver 3 1 FineWood x20, Silver x8, Upgrader3Armor x1
+ShieldGoldTower 2 1 Gold x10, Frostwood x10, Upgrader7Armor x1
+ShieldGoldTower 3 1 Gold x20, Frostwood x20, Upgrader7Armor x1
+ShieldTowerGoldUncooked 1 1 Gold x20, MoldShieldTower x1, Frostwood x20
+ShieldWood 1 1 Wood x10, Resin x4, LeatherScraps x4, Upgrader0Armor x1
+ShieldWood 2 1 Wood x5, Resin x2, LeatherScraps x2, Upgrader0Armor x1
+ShieldWood 3 1 Wood x10, Resin x4, LeatherScraps x4, Upgrader0Armor x1
+ShieldWoodTower 1 1 Wood x10, LeatherScraps x6, Upgrader0Armor x1
+ShieldWoodTower 2 1 Wood x5, LeatherScraps x3, Upgrader0Armor x1
+ShieldWoodTower 3 1 Wood x10, LeatherScraps x6, Upgrader0Armor x1
+ShocklateSmoothie 1 1 Ooze x1, Raspberry x2, Blueberries x2
+SizzlingBerryBroth 1 1 Sap x3, Fiddleheadfern x2, Vineberry x2
+SledgeDemolisher 1 1 YggdrasilWood x10, Iron x20, Eitr x10, Upgrader5Weapon x1
+SledgeDemolisher 2 1 YggdrasilWood x2, Iron x15, Eitr x2, Upgrader5Weapon x1
+SledgeDemolisher 3 1 YggdrasilWood x4, Iron x30, Eitr x4, Upgrader5Weapon x1
+SledgeDemolisher 4 1 YggdrasilWood x8, Iron x60, Eitr x8, Upgrader5Weapon x1
+SledgeGold 2 1 Gold x10, Frostwood x5, Upgrader7Weapon x1
+SledgeGold 3 1 Gold x20, Frostwood x10, Upgrader7Weapon x1
+SledgeGold 4 1 Gold x40, Frostwood x20, Upgrader7Weapon x1
+SledgeGold_BloodLightning 1 1 SledgeGold x1, Gold x20, OrbThunderBlood x1, Upgrader7Weapon x1
+SledgeGold_BloodLightning 2 1 Gold x10, OrbThunderBlood x1, Upgrader7Weapon x1
+SledgeGold_BloodLightning 3 1 Gold x20, OrbThunderBlood x2, Upgrader7Weapon x1
+SledgeGold_BloodLightning 4 1 Gold x40, OrbThunderBlood x4, Upgrader7Weapon x1
+SledgeGold_FrostFire 1 1 SledgeGold x1, Gold x20, OrbFrostFire x1, Upgrader7Weapon x1
+SledgeGold_FrostFire 2 1 Gold x10, OrbFrostFire x1, Upgrader7Weapon x1
+SledgeGold_FrostFire 3 1 Gold x20, OrbFrostFire x2, Upgrader7Weapon x1
+SledgeGold_FrostFire 4 1 Gold x40, OrbFrostFire x4, Upgrader7Weapon x1
+SledgeGoldUncooked 1 1 Gold x20, MoldMace2H x1, Frostwood x10
+SledgeIron 1 1 ElderBark x10, Iron x30, YmirRemains x4, TrophyDraugrElite x1, Upgrader2Weapon x1
+SledgeIron 2 1 ElderBark x2, Iron x15, YmirRemains x2, Upgrader2Weapon x1
+SledgeIron 3 1 ElderBark x4, Iron x30, YmirRemains x4, Upgrader2Weapon x1
+SledgeIron 4 1 ElderBark x8, Iron x60, YmirRemains x8, Upgrader2Weapon x1
+SledgeStagbreaker 1 1 RoundLog x20, TrophyDeer x5, LeatherScraps x2, Upgrader0Weapon x1
+SledgeStagbreaker 2 1 RoundLog x5, TrophyDeer x2, LeatherScraps x1, BoneFragments x10, Upgrader0Weapon x1
+SledgeStagbreaker 3 1 RoundLog x10, TrophyDeer x4, LeatherScraps x2, BoneFragments x20, Upgrader0Weapon x1
+SledgeStagbreaker 4 1 RoundLog x20, TrophyDeer x8, LeatherScraps x4, BoneFragments x40, Upgrader0Weapon x1
+SmokedFish 1 1 FishRaw x1, Kale x1, Poteitr x1
+SmokedMooseMeat 1 1 MooseMeat x1, Kale x2
+Snowball 1 10 Ice x5
+Shovel 1 1 FineWood x5, FlametalNew x4, FaderEmber x2, Upgrader0Weapon x1
+Shovel 2 1 FineWood x1, FlametalNew x10, Upgrader0Weapon x1
+Shovel 3 1 FineWood x2, FlametalNew x20, Upgrader0Weapon x1
+SparklingShroomshake 1 1 Sap x4, Vineberry x2, MushroomSmokePuff x2, MushroomMagecap x2
+SpearBronze 1 1 Wood x5, Bronze x6, DeerHide x2, Upgrader1Weapon x1
+SpearBronze 2 1 Wood x3, Bronze x4, DeerHide x1, Upgrader1Weapon x1
+SpearBronze 3 1 Wood x6, Bronze x8, DeerHide x2, Upgrader1Weapon x1
+SpearBronze 4 1 Wood x12, Bronze x16, DeerHide x4, Upgrader1Weapon x1
+SpearCarapace 1 1 YggdrasilWood x10, Carapace x4, Mandible x2, Upgrader5Weapon x1
+SpearCarapace 2 1 YggdrasilWood x5, Carapace x4, Mandible x1, Upgrader5Weapon x1
+SpearCarapace 3 1 YggdrasilWood x10, Carapace x8, Mandible x2, Upgrader5Weapon x1
+SpearCarapace 4 1 YggdrasilWood x20, Carapace x16, Mandible x4, Upgrader5Weapon x1
+SpearChitin 1 1 FineWood x8, Chitin x30, LeatherScraps x3
+SpearElderbark 1 1 TrollHide x4, Iron x10, ElderBark x10, Upgrader2Weapon x1
+SpearElderbark 2 1 TrollHide x1, Iron x5, ElderBark x5, Upgrader2Weapon x1
+SpearElderbark 3 1 TrollHide x2, Iron x10, ElderBark x10, Upgrader2Weapon x1
+SpearElderbark 4 1 TrollHide x4, Iron x20, ElderBark x20, Upgrader2Weapon x1
+SpearFlint 1 1 Wood x5, Flint x10, LeatherScraps x2, Upgrader0Weapon x1
+SpearFlint 2 1 Wood x3, Flint x5, LeatherScraps x1, Upgrader0Weapon x1
+SpearFlint 3 1 Wood x6, Flint x10, LeatherScraps x2, Upgrader0Weapon x1
+SpearFlint 4 1 Wood x12, Flint x20, LeatherScraps x4, Upgrader0Weapon x1
+SpearGold 2 1 Gold x10, Frostwood x5, Upgrader7Weapon x1
+SpearGold 3 1 Gold x20, Frostwood x10, Upgrader7Weapon x1
+SpearGold 4 1 Gold x40, Frostwood x20, Upgrader7Weapon x1
+SpearGold_BloodLightning 1 1 SpearGold x1, Gold x20, OrbThunderBlood x1, Upgrader7Weapon x1
+SpearGold_BloodLightning 2 1 Gold x10, OrbThunderBlood x1, Upgrader7Weapon x1
+SpearGold_BloodLightning 3 1 Gold x20, OrbThunderBlood x2, Upgrader7Weapon x1
+SpearGold_BloodLightning 4 1 Gold x40, OrbThunderBlood x4, Upgrader7Weapon x1
+SpearGold_FrostFire 1 1 SpearGold x1, Gold x20, OrbFrostFire x1, Upgrader7Weapon x1
+SpearGold_FrostFire 2 1 Gold x10, OrbFrostFire x1, Upgrader7Weapon x1
+SpearGold_FrostFire 3 1 Gold x20, OrbFrostFire x2, Upgrader7Weapon x1
+SpearGold_FrostFire 4 1 Gold x40, OrbFrostFire x4, Upgrader7Weapon x1
+SpearGoldUncooked 1 1 Gold x20, MoldSpear x1, Frostwood x10
+SpearSplitner 1 1 Blackwood x10, FlametalNew x6, AskHide x2, BonemawSerpentTooth x3, Upgrader5Weapon x1
+SpearSplitner 2 1 Blackwood x5, FlametalNew x6, AskHide x1, BonemawSerpentTooth x3, Upgrader5Weapon x1
+SpearSplitner 3 1 Blackwood x10, FlametalNew x12, AskHide x2, BonemawSerpentTooth x6, Upgrader5Weapon x1
+SpearSplitner 4 1 Blackwood x20, FlametalNew x24, AskHide x4, BonemawSerpentTooth x12, Upgrader5Weapon x1
+SpearSplitner_Blood 1 1 SpearSplitner x1, FlametalNew x6, GemstoneRed x1, Upgrader5Weapon x1
+SpearSplitner_Blood 2 1 FlametalNew x6, GemstoneRed x1, Upgrader5Weapon x1
+SpearSplitner_Blood 3 1 FlametalNew x12, GemstoneRed x2, Upgrader5Weapon x1
+SpearSplitner_Blood 4 1 FlametalNew x24, GemstoneRed x4, Upgrader5Weapon x1
+SpearSplitner_Lightning 1 1 SpearSplitner x1, FlametalNew x6, GemstoneBlue x1, Upgrader5Weapon x1
+SpearSplitner_Lightning 2 1 FlametalNew x6, GemstoneBlue x1, Upgrader5Weapon x1
+SpearSplitner_Lightning 3 1 FlametalNew x12, GemstoneBlue x2, Upgrader5Weapon x1
+SpearSplitner_Lightning 4 1 FlametalNew x24, GemstoneBlue x4, Upgrader5Weapon x1
+SpearSplitner_Nature 1 1 SpearSplitner x1, FlametalNew x6, GemstoneGreen x1, Upgrader5Weapon x1
+SpearSplitner_Nature 2 1 FlametalNew x6, GemstoneGreen x1, Upgrader5Weapon x1
+SpearSplitner_Nature 3 1 FlametalNew x12, GemstoneGreen x2, Upgrader5Weapon x1
+SpearSplitner_Nature 4 1 FlametalNew x24, GemstoneGreen x4, Upgrader5Weapon x1
+SpearWolfFang 1 1 ElderBark x10, WolfFang x4, LeatherScraps x2, Silver x2, Upgrader3Weapon x1
+SpearWolfFang 2 1 ElderBark x5, WolfFang x2, LeatherScraps x1, Silver x1, Upgrader3Weapon x1
+SpearWolfFang 3 1 ElderBark x10, WolfFang x4, LeatherScraps x2, Silver x2, Upgrader3Weapon x1
+SpearWolfFang 4 1 ElderBark x20, WolfFang x8, LeatherScraps x4, Silver x4, Upgrader3Weapon x1
+SpicyMarmalade 1 1 Vineberry x3, Honey x1, Fiddleheadfern x1
+StaffClusterbomb 1 1 CharredBone x15, Blackwood x5, ProustitePowder x8, Upgrader6Weapon x1
+StaffClusterbomb 2 1 CharredBone x5, Blackwood x3, ProustitePowder x1, Upgrader6Weapon x1
+StaffClusterbomb 3 1 CharredBone x10, Blackwood x6, ProustitePowder x2, Upgrader6Weapon x1
+StaffClusterbomb 4 1 CharredBone x20, Blackwood x12, ProustitePowder x4, Upgrader6Weapon x1
+StaffFireball 1 1 YggdrasilWood x20, SurtlingCore x4, Eitr x16, Upgrader5Weapon x1
+StaffFireball 2 1 YggdrasilWood x10, SurtlingCore x2, Eitr x8, Upgrader5Weapon x1
+StaffFireball 3 1 YggdrasilWood x20, SurtlingCore x4, Eitr x16, Upgrader5Weapon x1
+StaffFireball 4 1 YggdrasilWood x40, SurtlingCore x8, Eitr x32, Upgrader5Weapon x1
+StaffFrostOrbsUncooked 1 1 Ice x10, NornThread x5, TrophyJotunWitch x1, MoldStafffrostorbs x1
+StaffFrostOrbs 2 1 Ice x5, NornThread x2, Upgrader7Weapon x1
+StaffFrostOrbs 3 1 Ice x10, NornThread x4, Upgrader7Weapon x1
+StaffFrostOrbs 4 1 Ice x20, NornThread x8, Upgrader7Weapon x1
+StaffGreenRoots 1 1 Blackwood x15, Fiddleheadfern x10, CelestialFeather x3, GemstoneGreen x1, Upgrader6Weapon x1
+StaffGreenRoots 2 1 Blackwood x5, Fiddleheadfern x2, CelestialFeather x3, GemstoneGreen x1, Upgrader6Weapon x1
+StaffGreenRoots 3 1 Blackwood x10, Fiddleheadfern x4, CelestialFeather x6, GemstoneGreen x2, Upgrader6Weapon x1
+StaffGreenRoots 4 1 Blackwood x20, Fiddleheadfern x8, CelestialFeather x12, GemstoneGreen x4, Upgrader6Weapon x1
+StaffIceShards 1 1 YggdrasilWood x20, FreezeGland x4, Eitr x16, Upgrader5Weapon x1
+StaffIceShards 2 1 YggdrasilWood x10, FreezeGland x2, Eitr x8, Upgrader5Weapon x1
+StaffIceShards 3 1 YggdrasilWood x20, FreezeGland x4, Eitr x16, Upgrader5Weapon x1
+StaffIceShards 4 1 YggdrasilWood x40, FreezeGland x8, Eitr x32, Upgrader5Weapon x1
+StaffLightning 1 1 Blackwood x10, FlametalNew x4, CelestialFeather x3, GemstoneRed x1, Upgrader6Weapon x1
+StaffLightning 2 1 Blackwood x5, FlametalNew x2, CelestialFeather x3, GemstoneRed x1, Upgrader6Weapon x1
+StaffLightning 3 1 Blackwood x10, FlametalNew x4, CelestialFeather x6, GemstoneRed x2, Upgrader6Weapon x1
+StaffLightning 4 1 Blackwood x20, FlametalNew x8, CelestialFeather x12, GemstoneRed x4, Upgrader6Weapon x1
+StaffOrbofAhriUncooked 1 1 Gold x10, NornThread x4, OrbFrostFire x1, MoldStaffOrbofAhri x1
+StaffOrbofAhri 2 1 Gold x5, NornThread x2, OrbFrostFire x1, Upgrader7Weapon x1
+StaffOrbofAhri 3 1 Gold x10, NornThread x4, OrbFrostFire x2, Upgrader7Weapon x1
+StaffOrbofAhri 4 1 Gold x20, NornThread x8, OrbFrostFire x4, Upgrader7Weapon x1
+StaffRedTroll 1 1 CharredBone x15, TrophyFrostTroll x1, FlametalNew x3, GemstoneRed x1, Upgrader6Weapon x1
+StaffRedTroll 2 1 CharredBone x5, TrophyFrostTroll x1, FlametalNew x3, GemstoneRed x1, Upgrader6Weapon x1
+StaffRedTroll 3 1 CharredBone x10, TrophyFrostTroll x2, FlametalNew x6, GemstoneRed x2, Upgrader6Weapon x1
+StaffRedTroll 4 1 CharredBone x20, TrophyFrostTroll x4, FlametalNew x12, GemstoneRed x4, Upgrader6Weapon x1
+StaffShield 1 1 YggdrasilWood x20, GiantBloodSack x4, Eitr x16, Upgrader5Weapon x1
+StaffShield 2 1 YggdrasilWood x10, GiantBloodSack x2, Eitr x8, Upgrader5Weapon x1
+StaffShield 3 1 YggdrasilWood x20, GiantBloodSack x4, Eitr x16, Upgrader5Weapon x1
+StaffShield 4 1 YggdrasilWood x40, GiantBloodSack x8, Eitr x32, Upgrader5Weapon x1
+StaffSkeleton 1 1 BoneFragments x10, Eitr x16, TrophySkeleton x4, Upgrader5Weapon x1
+StaffSkeleton 2 1 BoneFragments x5, Eitr x8, TrophySkeleton x2, Upgrader5Weapon x1
+StaffSkeleton 3 1 BoneFragments x10, Eitr x16, TrophySkeleton x4, Upgrader5Weapon x1
+StaffSkeleton 4 1 BoneFragments x20, Eitr x32, TrophySkeleton x8, Upgrader5Weapon x1
+StaffSpiritCallerUncooked 1 1 BarkaBranch x8, NornThread x5, TrophyMoose x1, MoldStaffspiritcaller x1
+StaffSpiritCaller 2 1 BarkaBranch x4, NornThread x2, Upgrader7Weapon x1
+StaffSpiritCaller 3 1 BarkaBranch x8, NornThread x4, Upgrader7Weapon x1
+StaffSpiritCaller 4 1 BarkaBranch x16, NornThread x8, Upgrader7Weapon x1
+StaffThunderbloodUncooked 1 1 Gold x10, NornThread x5, OrbThunderBlood x1, MoldStaffthunderblood x1
+StaffThunderBlood 2 1 Gold x5, NornThread x2, OrbThunderBlood x1, Upgrader7Weapon x1
+StaffThunderBlood 3 1 Gold x10, NornThread x4, OrbThunderBlood x2, Upgrader7Weapon x1
+StaffThunderBlood 4 1 Gold x20, NornThread x8, OrbThunderBlood x4, Upgrader7Weapon x1
+SwordBlackmetal 1 1 FineWood x2, BlackMetal x20, LinenThread x5, Upgrader4Weapon x1
+SwordBlackmetal 2 1 BlackMetal x10, LinenThread x5, Upgrader4Weapon x1
+SwordBlackmetal 3 1 BlackMetal x20, LinenThread x10, Upgrader4Weapon x1
+SwordBlackmetal 4 1 BlackMetal x40, LinenThread x20, Upgrader4Weapon x1
+SwordBronze 1 1 Wood x2, Bronze x8, LeatherScraps x2, Upgrader1Weapon x1
+SwordBronze 2 1 Wood x1, Bronze x4, LeatherScraps x1, Upgrader1Weapon x1
+SwordBronze 3 1 Wood x2, Bronze x8, LeatherScraps x2, Upgrader1Weapon x1
+SwordBronze 4 1 Wood x4, Bronze x16, LeatherScraps x4, Upgrader1Weapon x1
+SwordDyrnwyn 1 1 DyrnwynHiltFragment x1, DyrnwynBladeFragment x1, DyrnwynTipFragment x1, FlametalNew x20, GemstoneRed x1, Upgrader6Weapon x1
+SwordDyrnwyn 2 1 FlametalNew x10, GemstoneRed x1, Upgrader6Weapon x1
+SwordDyrnwyn 3 1 FlametalNew x20, GemstoneRed x2, Upgrader6Weapon x1
+SwordDyrnwyn 4 1 FlametalNew x40, GemstoneRed x4, Upgrader6Weapon x1
+SwordGold 2 1 Gold x10, Frostwood x5, Upgrader7Weapon x1
+SwordGold 3 1 Gold x20, Frostwood x10, Upgrader7Weapon x1
+SwordGold 4 1 Gold x40, Frostwood x20, Upgrader7Weapon x1
+SwordGold_BloodLightning 1 1 SwordGold x1, Gold x20, OrbThunderBlood x1, Upgrader7Weapon x1
+SwordGold_BloodLightning 2 1 Gold x10, OrbThunderBlood x1, Upgrader7Weapon x1
+SwordGold_BloodLightning 3 1 Gold x20, OrbThunderBlood x2, Upgrader7Weapon x1
+SwordGold_BloodLightning 4 1 Gold x40, OrbThunderBlood x4, Upgrader7Weapon x1
+SwordGold_FrostFire 1 1 SwordGold x1, Gold x20, OrbFrostFire x1, Upgrader7Weapon x1
+SwordGold_FrostFire 2 1 Gold x10, OrbFrostFire x1, Upgrader7Weapon x1
+SwordGold_FrostFire 3 1 Gold x20, OrbFrostFire x2, Upgrader7Weapon x1
+SwordGold_FrostFire 4 1 Gold x40, OrbFrostFire x4, Upgrader7Weapon x1
+SwordGoldUncooked 1 1 Gold x20, MoldSword x1, Frostwood x10
+SwordIron 1 1 Wood x2, Iron x20, LeatherScraps x3, Upgrader2Weapon x1
+SwordIron 2 1 Wood x1, Iron x10, LeatherScraps x2, Upgrader2Weapon x1
+SwordIron 3 1 Wood x2, Iron x20, LeatherScraps x4, Upgrader2Weapon x1
+SwordIron 4 1 Wood x4, Iron x40, LeatherScraps x8, Upgrader2Weapon x1
+THSwordKrom 1 1 Iron x30, Bronze x20, ScaleHide x5, Upgrader5Weapon x1
+THSwordKrom 2 1 Iron x15, Bronze x10, ScaleHide x5, Upgrader5Weapon x1
+THSwordKrom 3 1 Iron x30, Bronze x20, ScaleHide x10, Upgrader5Weapon x1
+THSwordKrom 4 1 Iron x60, Bronze x40, ScaleHide x20, Upgrader5Weapon x1
+SwordMistwalker 1 1 FineWood x3, Iron x15, Eitr x10, Wisp x3, Upgrader5Weapon x1
+SwordMistwalker 2 1 Iron x10, Eitr x5, Wisp x1, Upgrader5Weapon x1
+SwordMistwalker 3 1 Iron x20, Eitr x10, Wisp x2, Upgrader5Weapon x1
+SwordMistwalker 4 1 Iron x40, Eitr x20, Wisp x4, Upgrader5Weapon x1
+SwordNiedhogg 1 1 CharredBone x3, FlametalNew x12, AskHide x2, Upgrader6Weapon x1
+SwordNiedhogg 2 1 FlametalNew x10, AskHide x2, Upgrader6Weapon x1
+SwordNiedhogg 3 1 FlametalNew x20, AskHide x4, Upgrader6Weapon x1
+SwordNiedhogg 4 1 FlametalNew x40, AskHide x8, Upgrader6Weapon x1
+SwordNiedhoggBlood 1 1 SwordNiedhogg x1, FlametalNew x6, GemstoneRed x1, Upgrader6Weapon x1
+SwordNiedhoggBlood 2 1 FlametalNew x6, GemstoneRed x1, Upgrader6Weapon x1
+SwordNiedhoggBlood 3 1 FlametalNew x12, GemstoneRed x2, Upgrader6Weapon x1
+SwordNiedhoggBlood 4 1 FlametalNew x24, GemstoneRed x4, Upgrader6Weapon x1
+SwordNiedhoggLightning 1 1 SwordNiedhogg x1, FlametalNew x6, GemstoneBlue x1, Upgrader6Weapon x1
+SwordNiedhoggLightning 2 1 FlametalNew x6, GemstoneBlue x1, Upgrader6Weapon x1
+SwordNiedhoggLightning 3 1 FlametalNew x12, GemstoneBlue x2, Upgrader6Weapon x1
+SwordNiedhoggLightning 4 1 FlametalNew x24, GemstoneBlue x4, Upgrader6Weapon x1
+SwordNiedhoggNature 1 1 SwordNiedhogg x1, FlametalNew x6, GemstoneGreen x1, Upgrader6Weapon x1
+SwordNiedhoggNature 2 1 FlametalNew x6, GemstoneGreen x1, Upgrader6Weapon x1
+SwordNiedhoggNature 3 1 FlametalNew x12, GemstoneGreen x2, Upgrader6Weapon x1
+SwordNiedhoggNature 4 1 FlametalNew x24, GemstoneGreen x4, Upgrader6Weapon x1
+SwordSilver 1 1 Wood x2, Silver x40, LeatherScraps x3, Iron x5, Upgrader3Weapon x1
+SwordSilver 2 1 Wood x1, Silver x20, LeatherScraps x1, Iron x3, Upgrader3Weapon x1
+SwordSilver 3 1 Wood x2, Silver x40, LeatherScraps x2, Iron x6, Upgrader3Weapon x1
+SwordSilver 4 1 Wood x4, Silver x80, LeatherScraps x4, Iron x12, Upgrader3Weapon x1
+THSwordSlayer 1 1 FlametalNew x30, AskHide x5, MorgenSinew x3, Upgrader6Weapon x1
+THSwordSlayer 2 1 FlametalNew x15, AskHide x5, MorgenSinew x3, Upgrader6Weapon x1
+THSwordSlayer 3 1 FlametalNew x30, AskHide x10, MorgenSinew x6, Upgrader6Weapon x1
+THSwordSlayer 4 1 FlametalNew x60, AskHide x20, MorgenSinew x12, Upgrader6Weapon x1
+THSwordSlayerBlood 1 1 THSwordSlayer x1, FlametalNew x15, GemstoneRed x1, Upgrader6Weapon x1
+THSwordSlayerBlood 2 1 FlametalNew x15, GemstoneRed x1, Upgrader6Weapon x1
+THSwordSlayerBlood 3 1 FlametalNew x30, GemstoneRed x2, Upgrader6Weapon x1
+THSwordSlayerBlood 4 1 FlametalNew x60, GemstoneRed x4, Upgrader6Weapon x1
+THSwordSlayerLightning 1 1 THSwordSlayer x1, FlametalNew x15, GemstoneBlue x1, Upgrader6Weapon x1
+THSwordSlayerLightning 2 1 FlametalNew x15, GemstoneBlue x1, Upgrader6Weapon x1
+THSwordSlayerLightning 3 1 FlametalNew x30, GemstoneBlue x2, Upgrader6Weapon x1
+THSwordSlayerLightning 4 1 FlametalNew x60, GemstoneBlue x4, Upgrader6Weapon x1
+THSwordSlayerNature 1 1 THSwordSlayer x1, FlametalNew x15, GemstoneGreen x1, Upgrader6Weapon x1
+THSwordSlayerNature 2 1 FlametalNew x15, GemstoneGreen x1, Upgrader6Weapon x1
+THSwordSlayerNature 3 1 FlametalNew x30, GemstoneGreen x2, Upgrader6Weapon x1
+THSwordSlayerNature 4 1 FlametalNew x60, GemstoneGreen x4, Upgrader6Weapon x1
+SwordWood 1 1 Wood x5, FineWood x3, RoundLog x2, Upgrader1Weapon x1
+SwordWood 2 1 Wood x1, FineWood x10, RoundLog x2, Upgrader1Weapon x1
+SwordWood 3 1 Wood x2, FineWood x20, RoundLog x4, Upgrader1Weapon x1
+SwordWood 4 1 Wood x4, FineWood x40, RoundLog x8, Upgrader1Weapon x1
+Tankard 1 1 FineWood x5, Resin x2
+TankardAnniversary 1 1 Bronze x2, TrollHide x2, Iron x2
+TankardOdin 1 1 FineWood x4, TrophyDeer x1, Resin x2
+THSwordGold 2 1 Gold x10, BarkaBranch x1, Upgrader7Weapon x1
+THSwordGold 3 1 Gold x20, BarkaBranch x2, Upgrader7Weapon x1
+THSwordGold 4 1 Gold x40, BarkaBranch x4, Upgrader7Weapon x1
+THSwordGold_BloodLightning 1 1 THSwordGold x1, Gold x20, OrbThunderBlood x1, Upgrader7Weapon x1
+THSwordGold_BloodLightning 2 1 Gold x10, OrbThunderBlood x1, Upgrader7Weapon x1
+THSwordGold_BloodLightning 3 1 Gold x20, OrbThunderBlood x2, Upgrader7Weapon x1
+THSwordGold_BloodLightning 4 1 Gold x40, OrbThunderBlood x4, Upgrader7Weapon x1
+THSwordGold_FrostFire 1 1 THSwordGold x1, Gold x20, OrbFrostFire x1, Upgrader7Weapon x1
+THSwordGold_FrostFire 2 1 Gold x10, OrbFrostFire x1, Upgrader7Weapon x1
+THSwordGold_FrostFire 3 1 Gold x20, OrbFrostFire x2, Upgrader7Weapon x1
+THSwordGold_FrostFire 4 1 Gold x40, OrbFrostFire x4, Upgrader7Weapon x1
+THSwordGoldUncooked 1 1 Gold x20, MoldSword2H x1, BarkaBranch x2
+Torch 1 1 Wood x1, Resin x1
+TrinketBlackDamageHealth 1 1 BlackMetal x5, LoxPelt x5, TrophyLox x1
+TrinketBlackStamina 1 1 BlackMetal x5, TrophyGoblinBrute x1, LinenThread x10
+TrinketBloodGoldHealth 1 1 Gold x5, MoleClaws x5, TrophyMoose x1
+TrinketBloodGoldStamina 1 1 Gold x5, NornThread x5, TrophyJotunWitch x1
+TrinketBronzeHealth 1 1 Bronze x5, AncientSeed x5, TrophyGreydwarfShaman x1
+TrinketBronzeStamina 1 1 Bronze x5, TrophyBjorn x1, Ruby x3
+TrinketCarapaceEitr 1 1 Carapace x5, Eitr x5, TrophyGjall x1
+TrinketChitinSwim 1 1 Chitin x5, SerpentScale x5, TrophySerpent x1
+TrinketFlametalEitr 1 1 FlametalNew x5, Eitr x5, GemstoneRed x1, TrophyFallenValkyrie x1
+TrinketFlametalStaminaHealth 1 1 FlametalNew x5, SulfurStone x5, MoltenCore x1, TrophyMorgen x1
+TrinketIronHealth 1 1 Iron x5, ElderBark x5, TrophyLeech x1
+TrinketIronStamina 1 1 Iron x5, WitheredBone x5, TrophySurtling x1
+TrinketScaleStaminaDamage 1 1 Eitr x5, ScaleHide x5, Mandible x1, TrophySeeker x1
+TrinketSilverDamage 1 1 Silver x5, WolfFang x5, TrophyFenring x1
+TrinketSilverResist 1 1 Silver x5, Crystal x5, TrophySGolem x1
+TurnipStew 1 1 RawMeat x1, Turnip x3
+TurretBolt 1 20 Wood x10, BlackMetal x1
+TurretBoltBloodgold 1 20 Frostwood x10, Gold x1
+TurretBoltFlametal 1 20 Blackwood x10, FlametalNew x1
+TurretBoltWood 1 20 RoundLog x5, Feathers x2
+VikingCupcakeUncooked 1 1 Cloudberry x2, ChickenEgg x1, BarleyFlour x1, Honey x1
+WolfJerky 1 2 WolfMeat x1, Honey x1
+WolfMeatSkewer 1 1 WolfMeat x1, Mushroom x2, Onion x1
+YggdrasilPorridge 1 1 Sap x4, Barley x3, RoyalJelly x2
