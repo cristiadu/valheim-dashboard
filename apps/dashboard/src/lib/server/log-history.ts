@@ -3,10 +3,16 @@ import { join } from 'node:path';
 
 import { runKeyOf } from 'valheim-log';
 
-import type { TailListener } from '#/lib/server/models';
+import { logger } from '#/lib/server/logger';
+import { RUN_FILE_EXTENSION, type TailListener } from '#/lib/server/models';
 
-/** File extension of a run's copy in the history folder. */
-const RUN_FILE_EXTENSION = '.txt';
+/** Returns [fallback] for a [path] that does not exist yet, after logging any other [error] that kept it from being read. */
+const missingOr = <T>(path: string, error: unknown, fallback: T): T => {
+  if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+    logger.error(`Could not read ${path}: ${String(error)}`);
+  }
+  return fallback;
+};
 
 /**
  * Keeps a copy of the current run's log in the history folder, so the run survives the server writing a new
@@ -61,7 +67,7 @@ export class LogHistory {
 
 /** Returns the first run key in the log at [logFile], or null when it is missing or has no timestamp yet. */
 export const firstRunKey = async (logFile: string): Promise<string | null> => {
-  const text = await readFile(logFile, 'utf8').catch(() => '');
+  const text = await readFile(logFile, 'utf8').catch((error: unknown) => missingOr(logFile, error, ''));
   for (const line of text.split(/\r?\n/)) {
     const runKey = runKeyOf(line);
     if (runKey !== null) {
@@ -76,7 +82,7 @@ export const firstRunKey = async (logFile: string): Promise<string | null> => {
  * because the live `logs.txt` has it. Each run after the first starts with `onNewFile`, like a server restart.
  */
 export const readHistory = async (folder: string, currentRunKey: string | null, listener: TailListener): Promise<void> => {
-  const names = await readdir(folder).catch(() => []);
+  const names = await readdir(folder).catch((error: unknown) => missingOr(folder, error, []));
   const runFiles = names
     .filter((name) => name.endsWith(RUN_FILE_EXTENSION) && name !== `${currentRunKey}${RUN_FILE_EXTENSION}`)
     .sort();
