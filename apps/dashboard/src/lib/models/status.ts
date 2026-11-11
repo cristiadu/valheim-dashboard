@@ -9,9 +9,6 @@ export const ONLINE_WINDOW_MS = 15 * MS_PER_MINUTE;
 /** Bytes in a gigabyte, as disks count them. */
 export const BYTES_PER_GB = 1e9;
 
-/** How many saves, and how many backups, the Server tab lists. */
-export const LATEST_SAVE_COUNT = 5;
-
 /** Why the server turned a join away, as the Server tab says it. */
 export const REFUSED_REASON_TEXTS: Record<JoinRefusedReason, string> = {
   wrongPassword: 'wrong password',

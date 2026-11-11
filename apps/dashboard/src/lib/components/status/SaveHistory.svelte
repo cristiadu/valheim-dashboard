@@ -1,49 +1,62 @@
 <script lang="ts">
   import LogLines from '#/lib/components/LogLines';
   import type { Snapshot } from '#/lib/models/snapshot';
-  import { LATEST_SAVE_COUNT } from '#/lib/models/status';
+  import Pager from '#/lib/components/Pager';
+  import { SAVE_PAGE_SIZE } from '#/lib/models/pages';
   import { linesAt, serverSource } from '#/lib/sources';
   import { whenLabel } from '#/lib/time';
 
   /** The snapshot the saves come from, the viewer's time zone, and the page clock. */
   let { snapshot, timeZone, nowMs }: { snapshot: Snapshot; timeZone: string; nowMs: number } = $props();
 
-  /** Latest saves, newest first. */
-  const saves = $derived(snapshot.saves.slice(-LATEST_SAVE_COUNT).toReversed());
+  /** Saves, newest first. */
+  const saves = $derived(snapshot.saves.toReversed());
 
-  /** Latest backups, newest first. */
-  const backups = $derived(snapshot.backups.slice(-LATEST_SAVE_COUNT).toReversed());
+  /** Backups, newest first. */
+  const backups = $derived(snapshot.backups.toReversed());
 </script>
 
 <div class="columns">
   <section class="panel" aria-labelledby="saves-title">
-    <h2 id="saves-title" class="panel-title">LATEST SAVES</h2>
+    <h2 id="saves-title" class="panel-title">SAVES</h2>
     <p class="muted">The server saves the world every 10 minutes.</p>
-    {#each saves as save (save.timeUtc)}
-      <LogLines title="Save at {whenLabel(save.timeUtc, timeZone, nowMs)}" source={linesAt(serverSource(snapshot, 'saves').lines, save.timeUtc)}>
-        <span class="line">
-          <span>{whenLabel(save.timeUtc, timeZone, nowMs)}</span>
-          <span class="mono muted">{save.saveNumber === null ? '' : `save ${save.saveNumber} · `}{save.durationMs} ms</span>
-        </span>
-      </LogLines>
-    {:else}
-      <p class="muted">No save yet in this log.</p>
-    {/each}
+    <Pager items={saves} size={SAVE_PAGE_SIZE}>
+      {#snippet children(items)}
+        <div>
+          {#each items as save (save.timeUtc)}
+            <LogLines title="Save at {whenLabel(save.timeUtc, timeZone, nowMs)}" source={linesAt(serverSource(snapshot, 'saves').lines, save.timeUtc)}>
+              <span class="line">
+                <span>{whenLabel(save.timeUtc, timeZone, nowMs)}</span>
+                <span class="mono muted">{save.saveNumber === null ? '' : `save ${save.saveNumber} · `}{save.durationMs} ms</span>
+              </span>
+            </LogLines>
+          {:else}
+            <p class="muted">No save yet in this log.</p>
+          {/each}
+        </div>
+      {/snippet}
+    </Pager>
   </section>
 
   <section class="panel" aria-labelledby="backups-title">
     <h2 id="backups-title" class="panel-title">AUTO BACKUPS</h2>
     <p class="muted">The game keeps a few older copies of the world.</p>
-    {#each backups as backup (backup.timeUtc)}
-      <LogLines title="Backup {backup.backup}" source={linesAt(serverSource(snapshot, 'backups').lines, backup.timeUtc)}>
-        <span class="line">
-          <span>{whenLabel(backup.timeUtc, timeZone, nowMs)}</span>
-          <code class="mono muted">{backup.backup}</code>
-        </span>
-      </LogLines>
-    {:else}
-      <p class="muted">No backup yet in this log.</p>
-    {/each}
+    <Pager items={backups} size={SAVE_PAGE_SIZE}>
+      {#snippet children(items)}
+        <div>
+          {#each items as backup (backup.timeUtc)}
+            <LogLines title="Backup {backup.backup}" source={linesAt(serverSource(snapshot, 'backups').lines, backup.timeUtc)}>
+              <span class="line">
+                <span>{whenLabel(backup.timeUtc, timeZone, nowMs)}</span>
+                <code class="mono muted">{backup.backup}</code>
+              </span>
+            </LogLines>
+          {:else}
+            <p class="muted">No backup yet in this log.</p>
+          {/each}
+        </div>
+      {/snippet}
+    </Pager>
   </section>
 </div>
 

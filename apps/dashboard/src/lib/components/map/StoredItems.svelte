@@ -1,7 +1,9 @@
 <script lang="ts">
   import ItemIcon from '#/lib/components/ItemIcon';
+  import Pager from '#/lib/components/Pager';
   import { builtByShortLabel, chestName, chestTitle, stockOf } from '#/lib/items';
   import type { MapChest } from '#/lib/models/map';
+  import { PANEL_PAGE_SIZE } from '#/lib/models/pages';
   import { count } from '#/lib/text';
 
   /** Chests on the map, and what to do when one is tapped. */
@@ -29,28 +31,36 @@
     <span class="muted">Find an item or chest</span>
     <input bind:value={query} type="search" placeholder="Wood, cart…" />
   </label>
-  {#each visibleStock as row (row.prefab)}
-    <details class="stock-row">
-      <summary>
-        <span class="stock-item"><ItemIcon item={row.name} size={24} />{row.name}</span>
-        <span class="amount">{row.count.toLocaleString()}</span>
-        <span class="muted">in {count(row.chests.length, 'chest', 'chests')}</span>
-      </summary>
-      <ul>
-        {#each row.chests as { chest, count: amount } (chest.id)}
-          <li>
-            <button type="button" class="link" onclick={() => onpick(chest.id)}>
-              <span class="amount">{amount.toLocaleString()}</span>
-              {chestTitle(chest.record)}
-              <span class="muted">{builtByShortLabel(chest.record.builder)}</span>
-            </button>
-          </li>
-        {/each}
-      </ul>
-    </details>
-  {:else}
-    <p class="muted">{stock.length === 0 ? 'Nothing stored in the chests found so far.' : 'No item or chest has that name.'}</p>
-  {/each}
+  {#key query}
+    <Pager items={visibleStock} size={PANEL_PAGE_SIZE} backText="Previous" nextText="Next">
+      {#snippet children(items)}
+        <div>
+          {#each items as row (row.prefab)}
+            <details class="stock-row">
+              <summary>
+                <span class="stock-item"><ItemIcon item={row.name} size={24} />{row.name}</span>
+                <span class="amount">{row.count.toLocaleString()}</span>
+                <span class="muted">in {count(row.chests.length, 'chest', 'chests')}</span>
+              </summary>
+              <ul>
+                {#each row.chests as { chest, count: amount } (chest.id)}
+                  <li>
+                    <button type="button" class="link" onclick={() => onpick(chest.id)}>
+                      <span class="amount">{amount.toLocaleString()}</span>
+                      {chestTitle(chest.record)}
+                      <span class="muted">{builtByShortLabel(chest.record.builder)}</span>
+                    </button>
+                  </li>
+                {/each}
+              </ul>
+            </details>
+          {:else}
+            <p class="muted">{stock.length === 0 ? 'Nothing stored in the chests found so far.' : 'No item or chest has that name.'}</p>
+          {/each}
+        </div>
+      {/snippet}
+    </Pager>
+  {/key}
 </section>
 
 <style>
