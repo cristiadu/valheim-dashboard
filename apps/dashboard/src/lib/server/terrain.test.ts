@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { type Terrain } from '#/lib/server/models';
 import { terrainOf } from '#/lib/server/terrain';
 
 describe('terrainOf', () => {
@@ -19,7 +20,7 @@ describe('terrainOf', () => {
     const text = 'MB\n~S\n';
 
     // WHEN it is read
-    const read = (): unknown => terrainOf(text);
+    const read = (): Terrain => terrainOf(text);
 
     // THEN it says what the first line should be
     expect(read).toThrow('The terrain file starts with "MB", not "squareMeters <meters> first <square>".');
