@@ -170,10 +170,12 @@ the page gives nothing away.
 | --- | --- | --- |
 | Hall | World facts (day, bosses, areas, land), who is online with their health, the day wheel, the latest events, and what each player did in the last 24 hours | Snapshot |
 | Vikings | Each player now: when they were online, health and stamina, their numbers, areas visited, gear laid out like a character sheet, and what is probably in their bag | Snapshot |
-| Saga | Every game event and chat, with filters | Snapshot |
+| Saga | Every game event and chat, with filters, 25 at a time | Snapshot |
 | Map | Land each player walked, chests with what they hold, who is where, last deaths | Snapshot |
 | Recipes | Crafting plans and what is still missing, where to find it, and what the chests can make. Only recipes whose ingredients someone has found | The viewer's browser, and chests and found items from the snapshot |
 | Server | Up or down, the world and in-game day, bosses met, uptime in the last 24 hours, the latest saves and backups, warnings | Snapshot |
+
+The Saga pages its list with Newer and Older buttons. Page one shows new events as they arrive. A list that shrinks keeps its last page in view.
 
 Recipe plans are saved in each viewer's browser (`localStorage`). The server stores nothing for them. Chest items are matched to recipe items through `itemName`, so `RoundLog` counts as `Core wood`. Only chests someone has found count.
 
