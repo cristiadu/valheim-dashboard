@@ -184,14 +184,19 @@ kept in the snapshot:
 ```mermaid
 flowchart LR
   in["Picked up, taken from a chest, tombstone emptied, gear worn"] --> bag[Bag per character]
-  bag --> out["Dropped, stored, smelted, cooked, put in a fermenter, eaten, hung on a stand, built with, planted, crafted with"]
-  death["Tombstone made"] -->|empties| bag
+  bag --> out["Dropped, stored, smelted, cooked, put in a fermenter, eaten, burnt in a fire, hung on a stand, built with, planted, crafted with"]
+  death["Tombstone made"] -->|empties, takes off worn gear| bag
 ```
 
 Building and planting take out what the piece costs, from `piece-costs.txt` (`wood_floor Wood x2`). Crafting takes
 out what the recipe costs, from `craft-costs.txt` (`ArrowWood 1 20 Wood x8`). The plugin writes both next to
 `logs.txt` on each start. A craft is only seen once the made item reaches a chest or the ground, so the guess can
 be off. Gear worn now always stays in the bag.
+
+A meal takes one food out. When the log only says `Ate something`, it is the food the player carries most of,
+skipping foods eaten in the last 20 minutes, since a food still in effect can't be eaten again. Each `Fueled`
+line takes out one of what that fire burns. Both lists come from the plugin: `foods.txt` and `fire-fuels.txt`
+(`piece_groundtorch_wood Resin`).
 
 Items on the ground have an ID, the game's object ID. The same ID is on the drop and the pickup, so an item
 counts once however often it is seen:
@@ -498,6 +503,8 @@ Every log lives in `C:\Valheim Server`.
 | `item-stacks.txt` | The event log plugin, once per start: the most of each item one slot holds |
 | `piece-costs.txt` | The event log plugin, once per start: what building each piece takes |
 | `craft-costs.txt` | The event log plugin, once per start: what crafting or upgrading each item takes |
+| `foods.txt` | The event log plugin, once per start: every item that is food |
+| `fire-fuels.txt` | The event log plugin, once per start: the item each fire burns |
 | `player-vitals.txt` | The event log plugin, when a number changes: health, max health, stamina and eitr of each player online |
 
 The dashboard also reads the world save, `worlds_local\Cotil\_main.<save number>.db2`, and never writes to it.

@@ -6,7 +6,8 @@ namespace ValheimDashboard.EventLog
 {
     /// <summary>
     /// Writes game data the dashboard needs to guess a bag to files next to the server's log, once per server
-    /// start: how many of each item fit in one slot, what each buildable piece costs, and what crafting takes.
+    /// start: how many of each item fit in one slot, what each buildable piece costs, what crafting takes, which
+    /// items are food, and what each fire burns.
     /// </summary>
     internal static class GameDataFiles
     {
@@ -19,6 +20,12 @@ namespace ValheimDashboard.EventLog
         /// <summary>Name of the craft costs file, next to the server's log.</summary>
         private const string CraftCostsFileName = "craft-costs.txt";
 
+        /// <summary>Name of the foods file, next to the server's log.</summary>
+        private const string FoodsFileName = "foods.txt";
+
+        /// <summary>Name of the fire fuels file, next to the server's log.</summary>
+        private const string FireFuelsFileName = "fire-fuels.txt";
+
         /// <summary>True once the files were written since the server started.</summary>
         private static bool isWritten;
 
@@ -28,6 +35,8 @@ namespace ValheimDashboard.EventLog
         /// per piece with what building it takes, for example <c>wood_floor Wood x2</c>. The craft costs file has
         /// one line per item and level with how many one craft makes and what it takes, for example
         /// <c>ArrowWood 1 20 Wood x8</c>, or <c>SwordBronze 2 1 Bronze x4, LeatherScraps x1</c> for an upgrade.
+        /// The foods file has one food per line, for example <c>CookedMeat</c>. The fire fuels file has one line per
+        /// fire with the item it burns, for example <c>piece_groundtorch_wood Resin</c>.
         /// </summary>
         public static void WriteOnce()
         {
@@ -38,17 +47,30 @@ namespace ValheimDashboard.EventLog
             }
             isWritten = true;
             StringBuilder stacks = new StringBuilder();
+            StringBuilder foods = new StringBuilder();
             foreach (GameObject prefab in ObjectDB.instance.m_items)
             {
                 ItemDrop item = prefab == null ? null : prefab.GetComponent<ItemDrop>();
-                if (item != null)
+                if (item == null)
                 {
-                    stacks.Append($"{prefab.name} {item.m_itemData.m_shared.m_maxStackSize}\n");
+                    continue;
+                }
+                ItemDrop.ItemData.SharedData shared = item.m_itemData.m_shared;
+                stacks.Append($"{prefab.name} {shared.m_maxStackSize}\n");
+                if (shared.m_food > 0f || shared.m_foodStamina > 0f || shared.m_foodEitr > 0f)
+                {
+                    foods.Append($"{prefab.name}\n");
                 }
             }
             StringBuilder costs = new StringBuilder();
+            StringBuilder fuels = new StringBuilder();
             foreach (GameObject prefab in ZNetScene.instance.m_prefabs)
             {
+                Fireplace fire = prefab == null ? null : prefab.GetComponent<Fireplace>();
+                if (fire != null && fire.m_fuelItem != null)
+                {
+                    fuels.Append($"{prefab.name} {fire.m_fuelItem.name}\n");
+                }
                 Piece piece = prefab == null ? null : prefab.GetComponent<Piece>();
                 if (piece == null)
                 {
@@ -79,6 +101,8 @@ namespace ValheimDashboard.EventLog
             Write(logPath, ItemStacksFileName, stacks, "Item stacks");
             Write(logPath, PieceCostsFileName, costs, "Piece costs");
             Write(logPath, CraftCostsFileName, crafts, "Craft costs");
+            Write(logPath, FoodsFileName, foods, "Foods");
+            Write(logPath, FireFuelsFileName, fuels, "Fire fuels");
         }
 
         /// <summary>Returns what [requirements] take at item level [level], for example <c>Wood x2, Stone x3</c>, or nothing.</summary>

@@ -17,7 +17,7 @@ namespace ValheimDashboard.EventLog
         public const string PluginName = "Valheim Dashboard Event Log";
 
         /// <summary>Plugin version.</summary>
-        public const string PluginVersion = "2.17.0";
+        public const string PluginVersion = "2.18.0";
 
         /// <summary>
         /// Keeps clicks from freezing the console, sends BepInEx messages to the server's log and applies the
