@@ -100,9 +100,8 @@
   {#if place.kind === 'bag'}
     <span class="amount">{place.count.toLocaleString()}</span>in {place.character}'s bag
   {:else}
-    <a href="{resolve('/map')}?{CHEST_QUERY}={encodeURIComponent(place.chest.id)}">
-      <span class="amount">{place.count.toLocaleString()}</span>in {chestTitle(place.chest.record)}
-    </a>
+    <span class="amount">{place.count.toLocaleString()}</span>in
+    <a href="{resolve('/map')}?{CHEST_QUERY}={encodeURIComponent(place.chest.id)}">{chestTitle(place.chest.record)}</a>
     <span class="muted">{builtByShortLabel(place.chest.record.builder)}</span>
   {/if}
 {/snippet}
@@ -235,10 +234,25 @@
                     onchange={(event) => updatePlan(plan, withHave(plan, line.item, event.currentTarget.checked ? line.need : 0))}
                   />
                 </td>
-                <td>
-                  <span class="item"><ItemIcon item={line.item} />{line.item}</span>
-                  {#if line.missing > 0}
-                    {@const itemPlaces = places[line.item] ?? []}
+                <td><span class="item"><ItemIcon item={line.item} />{line.item}</span></td>
+                <td class="have">
+                  <input
+                    type="number"
+                    min="0"
+                    max={line.need}
+                    aria-label="How much {line.item} you have"
+                    value={line.have}
+                    onchange={(event) => updatePlan(plan, withHave(plan, line.item, event.currentTarget.valueAsNumber))}
+                  />
+                  <span class="muted">of {line.need}{#if stock[line.item]}&nbsp;· {stock[line.item]} on hand{/if}</span>
+                </td>
+                <td class="mono">{line.missing === 0 ? '–' : line.missing}</td>
+              </tr>
+              {#if line.missing > 0}
+                {@const itemPlaces = places[line.item] ?? []}
+                <tr class="where-row">
+                  <td></td>
+                  <td colspan="3">
                     {#if itemPlaces.length === 0}
                       <p class="muted where">Not in any chest or bag yet.</p>
                     {:else}
@@ -258,21 +272,9 @@
                         </details>
                       {/if}
                     {/if}
-                  {/if}
-                </td>
-                <td class="have">
-                  <input
-                    type="number"
-                    min="0"
-                    max={line.need}
-                    aria-label="How much {line.item} you have"
-                    value={line.have}
-                    onchange={(event) => updatePlan(plan, withHave(plan, line.item, event.currentTarget.valueAsNumber))}
-                  />
-                  <span class="muted">of {line.need}{#if stock[line.item]}&nbsp;· {stock[line.item]} on hand{/if}</span>
-                </td>
-                <td class="mono">{line.missing === 0 ? '–' : line.missing}</td>
-              </tr>
+                  </td>
+                </tr>
+              {/if}
             {/each}
           </tbody>
         </table>
@@ -456,6 +458,12 @@
     width: 68px;
   }
 
+  /* Places sit in their own row under the item, so they get the width of the row */
+  .where-row td {
+    padding-top: 0;
+    border-top: 0;
+  }
+
   /* Places that hold a missing item sit under its name, one per line */
   .places {
     display: flex;
@@ -468,8 +476,7 @@
   }
 
   /* A place reads as count, where, and who built it */
-  .places li,
-  .places a {
+  .places li {
     display: inline-flex;
     flex-wrap: wrap;
     align-items: baseline;

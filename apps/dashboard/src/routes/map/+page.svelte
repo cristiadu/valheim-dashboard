@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte';
 
+  import { afterNavigate } from '$app/navigation';
   import { page } from '$app/state';
 
   import NoData from '#/lib/components/NoData';
@@ -46,10 +47,18 @@
     pickedPanel?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   };
 
-  onMount(async () => {
-    const linkedId = page.url.searchParams.get(CHEST_QUERY);
-    if (linkedId !== null) {
-      await pick(linkedId);
+  /** Whether the chest opened from a link still needs its panel brought into view. */
+  let isLinkedChestUnseen = false;
+
+  onMount(() => {
+    pickedId = page.url.searchParams.get(CHEST_QUERY);
+    isLinkedChestUnseen = pickedId !== null;
+  });
+
+  afterNavigate(() => {
+    if (isLinkedChestUnseen && pickedPanel !== undefined) {
+      isLinkedChestUnseen = false;
+      pickedPanel.scrollIntoView({ block: 'center' });
     }
   });
 </script>
