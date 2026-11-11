@@ -365,11 +365,12 @@ describe('parseMessage', () => {
   });
 
   it('reads positions, chest contents and tombstones from the event log plugin', () => {
-    // GIVEN a position, a full chest, an empty cart, a removed chest, a chest label set and cleared, and a tombstone
+    // GIVEN a position, a full chest, an empty cart, a chest with a blank builder, a removed chest, a chest label set and cleared, and a tombstone
     const messages = [
       'Position: Ragnar 120 -340',
       'Chest: 52731986:1203 piece_chest_wood at 118 -336 built by Ragnar holds Wood x20, Stone x3',
       'Chest: 52731986:1300 Cart at -5 12 built by Tony Example holds nothing',
+      'Chest: 52731986:1301 piece_chest_wood at -5 14 built by  holds RoundLog x19',
       'Chest removed: 52731986:1203',
       'Chest label: 52731986:1300 Ores and metal',
       'Chest unlabeled: 52731986:1300',
@@ -396,6 +397,7 @@ describe('parseMessage', () => {
         items: { Wood: 20, Stone: 3 },
       },
       { type: 'chestContents', timeUtc, id: '52731986:1300', chest: 'Cart', x: -5, z: 12, builder: 'Tony Example', items: {} },
+      { type: 'chestContents', timeUtc, id: '52731986:1301', chest: 'piece_chest_wood', x: -5, z: 14, builder: null, items: { RoundLog: 19 } },
       { type: 'chestRemoved', timeUtc, id: '52731986:1203' },
       { type: 'chestLabeled', timeUtc, id: '52731986:1300', label: 'Ores and metal' },
       { type: 'chestUnlabeled', timeUtc, id: '52731986:1300' },

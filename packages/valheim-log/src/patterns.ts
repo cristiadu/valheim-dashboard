@@ -224,7 +224,7 @@ export const POSITION_PATTERN = /^Position: (?<character>.+) (?<x>-?\d+) (?<z>-?
  * it stops. Written by the event log plugin.
  */
 export const CHEST_CONTENTS_PATTERN =
-  /^Chest: (?<id>\S+) (?<chest>\S+) at (?<x>-?\d+) (?<z>-?\d+) built by (?<builder>.+?) holds (?<items>.+)$/;
+  /^Chest: (?<id>\S+) (?<chest>\S+) at (?<x>-?\d+) (?<z>-?\d+) built by (?<builder>.*?) holds (?<items>.+)$/;
 
 /** A chest, cart or ship was destroyed. Written by the event log plugin. */
 export const CHEST_REMOVED_PATTERN = /^Chest removed: (?<id>\S+)$/;

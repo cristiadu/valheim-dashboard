@@ -218,7 +218,7 @@ when the plugin does not know who it was.
 | A player gave themselves access to a ward that was off, or took it away | `Ward access given: Ragnar on guard_stone built by Bjorn` | `^Ward access (?<change>given\|removed): (?<player>.+) on (?<ward>\S+) built by (?<builder>.+)$` |
 | Tree cut down or rock mined out | `Tree cut: Beech1 by Ragnar`, `Rock mined: rock4_copper by Ragnar` | `^(?<kind>Tree cut\|Rock mined): (?<thing>\S+) by (?<player>.+)$` |
 | Where a player stands | `Position: Ragnar 120 -340` | `^Position: (?<character>.+) (?<x>-?\d+) (?<z>-?\d+)$` |
-| What a chest, cart or ship holds | `Chest: 52731986:1203 piece_chest_wood at 118 -336 built by Ragnar holds Wood x20, Stone x3` | `^Chest: (?<id>\S+) (?<chest>\S+) at (?<x>-?\d+) (?<z>-?\d+) built by (?<builder>.+?) holds (?<items>.+)$` |
+| What a chest, cart or ship holds | `Chest: 52731986:1203 piece_chest_wood at 118 -336 built by Ragnar holds Wood x20, Stone x3` | `^Chest: (?<id>\S+) (?<chest>\S+) at (?<x>-?\d+) (?<z>-?\d+) built by (?<builder>.*?) holds (?<items>.+)$` |
 | Chest, cart or ship destroyed | `Chest removed: 52731986:1203` | `^Chest removed: (?<id>\S+)$` |
 | A sign right against a chest names it | `Chest label: 52731986:1203 Ores` | `^Chest label: (?<id>\S+) (?<label>.+)$` |
 | The sign that named a chest is gone or blank | `Chest unlabeled: 52731986:1203` | `^Chest unlabeled: (?<id>\S+)$` |
@@ -290,6 +290,8 @@ when the plugin does not know who it was.
 - **Foods written** and **Fire fuels written** follow it: one food per line (`CookedMeat`), and one line per fire
   with the item it burns (`piece_groundtorch_wood Resin`).
 - **Fueled** is logged once for each item put on the fire, since plugin 2.18.0.
+- **Chest** is logged only when its line changes, since plugin 2.19.0. Before that, ships and carts repeated the
+  same line every few seconds. Older plugins left the builder blank for a player who was joining again.
 
 To build it, install the .NET SDK and BepInExPack_Valheim on the server, run `dotnet build -c Release`
 in `plugins/event-log`, and copy `bin\Release\netstandard2.1\ValheimDashboard.EventLog.dll` to the

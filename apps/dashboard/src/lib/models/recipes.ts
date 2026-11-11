@@ -1,3 +1,5 @@
+import type { MapChest } from '#/lib/models/map';
+
 /** Where a recipe is made in the game. `Hand` means the crafting menu, with no station. */
 export type CraftingStation = 'Hand' | 'Workbench' | 'Forge' | 'Cauldron' | 'Mead ketill';
 
@@ -77,3 +79,9 @@ export type Craftable = {
   /** How many crafts the stock covers. */
   times: number;
 };
+
+/** A place that holds some of an item: a chest found on the map, or the bag the server guesses for a character. */
+export type ItemPlace = { kind: 'chest'; chest: MapChest; count: number } | { kind: 'bag'; character: string; count: number };
+
+/** Places shown under a missing plan item before the rest fold away. */
+export const PLACES_SHOWN = 3;
