@@ -184,14 +184,19 @@ kept in the snapshot:
 ```mermaid
 flowchart LR
   in["Picked up, taken from a chest, tombstone emptied, gear worn"] --> bag[Bag per character]
-  bag --> out["Dropped, stored, smelted, cooked, put in a fermenter, eaten, hung on a stand, built with, planted, crafted with"]
-  death["Tombstone made"] -->|empties| bag
+  bag --> out["Dropped, stored, smelted, cooked, put in a fermenter, eaten, burnt in a fire, hung on a stand, built with, planted, crafted with"]
+  death["Tombstone made"] -->|empties, takes off worn gear| bag
 ```
 
 Building and planting take out what the piece costs, from `piece-costs.txt` (`wood_floor Wood x2`). Crafting takes
 out what the recipe costs, from `craft-costs.txt` (`ArrowWood 1 20 Wood x8`). The plugin writes both next to
 `logs.txt` on each start. A craft is only seen once the made item reaches a chest or the ground, so the guess can
 be off. Gear worn now always stays in the bag.
+
+A meal takes one food out. When the log only says `Ate something`, it is the food the player carries most of,
+skipping foods eaten in the last 20 minutes, since a food still in effect can't be eaten again. Each `Fueled`
+line takes out one of what that fire burns. Both lists come from the plugin: `foods.txt` and `fire-fuels.txt`
+(`piece_groundtorch_wood Resin`).
 
 Items on the ground have an ID, the game's object ID. The same ID is on the drop and the pickup, so an item
 counts once however often it is seen:
@@ -399,25 +404,42 @@ for shows a plain sack.
 BepInEx's own log file is turned off, so its messages land in
 `logs.txt` too. Every line is listed in [log-events.md](log-events.md).
 
-## Start scripts
+## Start script
+
+`start-valheim.ps1` is the one script that starts everything, by hand (`start-valheim.cmd`) or from the
+`Valheim` logon task it adds. Each part gets its own window, and a part that already runs is left alone.
 
 ```mermaid
 flowchart TD
-  click[Double-click start-dashboard.cmd] --> ps[start-dashboard.ps1]
-  task[Windows logon task, visible window] --> ps
-  ps --> built{Build exists?}
-  built -->|no| build[pnpm install and build]
-  built -->|yes| run[node apps/dashboard/build]
-  build --> run
-  run -->|stopped| wait[Wait 5 s] --> run
+  start[start-valheim.cmd or the Valheim logon task] --> server{Game server running?}
+  server -->|no| s[start_headless_server.bat in its window]
+  server -->|yes| dash
+  s --> dash{Dashboard window open?}
+  dash -->|no| d[Stop a dashboard without a window, open the Dashboard window]
+  dash -->|yes| link
+  d --> link{zrok running?}
+  link -->|no| l[Open the Link window]
+  link -->|yes| upd
+  l --> upd{Updater window open?}
+  upd -->|no| u[Open the Updater window]
 ```
 
-`install-startup.cmd` adds the logon task and the update task once. `share-dashboard.ps1` adds one more
-that starts zrok. Each one runs in its own window you can see.
+| Window | Loop |
+| --- | --- |
+| Dashboard | Build if there is none, run node, wait 5 s after it stops, run it again |
+| Link | Delete a leftover share on the link's name, run zrok, wait 30 s after it stops, run it again |
+| Updater | Run one update as its own PowerShell, wait 5 minutes, again |
+
+Run by hand, it also installs pnpm and zrok when they are missing and adds the logon task. From the logon task
+it installs nothing.
+
+A share zrok had when the PC shut down keeps the link's name, and zrok refuses a new share on that name. With
+no other zrok running, that share is stale, so the Link window deletes it first.
 
 ## Updates from main
 
-The update task runs `update-from-main.ps1` every 5 minutes, each run in its own window that closes when it ends.
+The Updater window runs one update every 5 minutes. Each is its own PowerShell, so a failed update never
+stops the loop, and each reads the script as `main` has it now.
 
 ```mermaid
 flowchart TD
@@ -459,7 +481,7 @@ the plugin build and the plugin inside the game server. These keep that to revie
 | --- | --- |
 | CI check | A commit runs only after the `ci` job passed on GitHub, read from GitHub's public check-runs API. |
 | Fast-forward only | A rewritten `main` stops updates instead of being followed. |
-| Installed pnpm | Builds use the pnpm `install-startup.cmd` installed, and stop if `package.json` asks for another version. Nothing downloads pnpm unattended. |
+| Installed pnpm | Builds use the pnpm `start-valheim.cmd` installed, and stop if `package.json` asks for another version. Nothing downloads pnpm unattended. |
 | `--frozen-lockfile` | Installs exactly the lockfile's packages, checked against their hashes. pnpm does not run packages' install scripts. |
 | Dependabot cooldown | Upgrades are offered once a version has been out for 7 days. |
 | Plain origin URL | A token in the URL could end up in `updater.log`, so the run skips. |
@@ -473,14 +495,16 @@ Every log lives in `C:\Valheim Server`.
 | --- | --- |
 | `logs.txt` | The Valheim server, the event log plugin and BepInEx |
 | `log-history\*.txt` | The dashboard, one file per server run |
-| `dashboard.log` | The start script, with the dashboard's output |
-| `updater.log` | The update script: what it updated, skipped or is waiting for |
-| `updater-state.json` | The update script: commits of the running dashboard and the installed plugin |
+| `dashboard.log` | The Dashboard window, with the dashboard's output |
+| `updater.log` | The Updater window: what it updated, skipped or is waiting for |
+| `updater-state.json` | The Updater window: commits of the running dashboard and the installed plugin |
 | `zrok.log` | zrok's output while it shares the link |
 | `terrain-<world>.txt` | The event log plugin, once per world: the land type of every 32 m square |
 | `item-stacks.txt` | The event log plugin, once per start: the most of each item one slot holds |
 | `piece-costs.txt` | The event log plugin, once per start: what building each piece takes |
 | `craft-costs.txt` | The event log plugin, once per start: what crafting or upgrading each item takes |
+| `foods.txt` | The event log plugin, once per start: every item that is food |
+| `fire-fuels.txt` | The event log plugin, once per start: the item each fire burns |
 | `player-vitals.txt` | The event log plugin, when a number changes: health, max health, stamina and eitr of each player online |
 
 The dashboard also reads the world save, `worlds_local\Cotil\_main.<save number>.db2`, and never writes to it.

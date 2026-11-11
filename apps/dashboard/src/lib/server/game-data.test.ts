@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { craftCostsOf, itemStacksOf, pieceCostsOf } from '#/lib/server/game-data';
+import { craftCostsOf, fireFuelsOf, foodsOf, itemStacksOf, pieceCostsOf } from '#/lib/server/game-data';
 
 describe('itemStacksOf', () => {
   it('reads the most of each item one slot holds, with Windows line ends, and skips lines it does not know', () => {
@@ -45,5 +45,31 @@ describe('craftCostsOf', () => {
       ArrowWood: { 1: { yields: 20, items: { Wood: 8 } } },
       SwordBronze: { 1: { yields: 1, items: { Bronze: 8, Wood: 2 } }, 2: { yields: 1, items: { Bronze: 4 } } },
     });
+  });
+});
+
+describe('foodsOf', () => {
+  it('reads every food, with Windows line ends, and skips lines it does not know', () => {
+    // GIVEN a foods file with two foods, a blank line and a broken line
+    const text = 'CookedMeat\r\nHoney\r\n\r\nbroken line\r\n';
+
+    // WHEN it is read
+    const foods = foodsOf(text);
+
+    // THEN only the two foods are there
+    expect([...foods]).toEqual(['CookedMeat', 'Honey']);
+  });
+});
+
+describe('fireFuelsOf', () => {
+  it('reads what each fire burns, with Windows line ends, and skips lines it does not know', () => {
+    // GIVEN a fire fuels file with two fires and a broken line
+    const text = 'piece_groundtorch_wood Resin\r\nfire_pit Wood\r\nbroken\r\n';
+
+    // WHEN it is read
+    const fuels = fireFuelsOf(text);
+
+    // THEN each fire has its fuel
+    expect(fuels).toEqual({ piece_groundtorch_wood: 'Resin', fire_pit: 'Wood' });
   });
 });
