@@ -7,9 +7,6 @@ export const ONLINE_WINDOW_MS = 15 * MS_PER_MINUTE;
 /** Bytes in a gigabyte, as disks count them. */
 export const BYTES_PER_GB = 1e9;
 
-/** How many saves, and how many backups, the Server tab lists. */
-export const LATEST_SAVE_COUNT = 5;
-
 /** Kind of problem on the Server tab: the server crashed, lost Steam, or is low on disk. */
 export type WarningKind = 'crash' | 'steam' | 'disk';
 

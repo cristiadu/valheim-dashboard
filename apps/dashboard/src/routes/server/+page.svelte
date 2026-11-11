@@ -1,11 +1,13 @@
 <script lang="ts">
   import LogLines from '#/lib/components/LogLines';
   import NoData from '#/lib/components/NoData';
+  import Pager from '#/lib/components/Pager';
   import Pill from '#/lib/components/Pill';
   import BossProgress from '#/lib/components/status/BossProgress';
   import SaveHistory from '#/lib/components/status/SaveHistory';
   import StatGrid from '#/lib/components/StatGrid';
   import { live, useSnapshot } from '#/lib/live.svelte';
+  import { PANEL_PAGE_SIZE } from '#/lib/models/pages';
   import { DAY_MS } from '#/lib/models/time';
   import { serverPill, steamPill, warningPill } from '#/lib/pills';
   import { playersOf } from '#/lib/players';
@@ -84,17 +86,23 @@
 
     <section class="panel" aria-labelledby="warnings-title">
       <h2 id="warnings-title" class="panel-title">WARNINGS</h2>
-      {#each warnings as warning (warning.timeUtc + warning.text)}
-        <LogLines title={warning.text} source={warning.source}>
-          <span class="line">
-            <span class="mono muted">{whenLabel(warning.timeUtc, timeZone, nowMs)}</span>
-            <span><Pill pill={warningPill(warning.kind)} /></span>
-            <span>{warning.text}</span>
-          </span>
-        </LogLines>
-      {:else}
-        <p class="muted">No warnings.</p>
-      {/each}
+      <Pager items={warnings} size={PANEL_PAGE_SIZE}>
+        {#snippet children(items)}
+          <div>
+            {#each items as warning (warning.timeUtc + warning.text)}
+              <LogLines title={warning.text} source={warning.source}>
+                <span class="line">
+                  <span class="mono muted">{whenLabel(warning.timeUtc, timeZone, nowMs)}</span>
+                  <span><Pill pill={warningPill(warning.kind)} /></span>
+                  <span>{warning.text}</span>
+                </span>
+              </LogLines>
+            {:else}
+              <p class="muted">No warnings.</p>
+            {/each}
+          </div>
+        {/snippet}
+      </Pager>
     </section>
   </div>
 {/if}

@@ -4,10 +4,16 @@
   import { pageOf } from '#/lib/pages';
 
   /**
-   * The whole list, how many to show at a time, and how to draw the things on one page.
+   * The whole list, how many to show at a time, the words on the buttons, and how to draw the things on one page.
    * Page one keeps showing new things as a live update adds them.
    */
-  let { items, size, children }: { items: T[]; size: number; children: Snippet<[T[]]> } = $props();
+  let {
+    items,
+    size,
+    backText = 'Newer',
+    nextText = 'Older',
+    children,
+  }: { items: T[]; size: number; backText?: string; nextText?: string; children: Snippet<[T[]]> } = $props();
 
   /** Page asked for, counted from 0. */
   let index = $state(0);
@@ -31,9 +37,9 @@
   {@render children(page.items)}
   {#if page.count > 1}
     <nav aria-label="Pages">
-      <button type="button" class="tap" disabled={page.index === 0} onclick={() => goTo(page.index - 1)}>Newer</button>
+      <button type="button" class="tap" disabled={page.index === 0} onclick={() => goTo(page.index - 1)}>{backText}</button>
       <span class="mono muted">{page.first}–{page.last} of {items.length.toLocaleString()}</span>
-      <button type="button" class="tap" disabled={page.index === page.count - 1} onclick={() => goTo(page.index + 1)}>Older</button>
+      <button type="button" class="tap" disabled={page.index === page.count - 1} onclick={() => goTo(page.index + 1)}>{nextText}</button>
     </nav>
   {/if}
 </div>

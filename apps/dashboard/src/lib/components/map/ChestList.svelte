@@ -1,6 +1,8 @@
 <script lang="ts">
+  import Pager from '#/lib/components/Pager';
   import { builtByShortLabel, chestName, chestTitle, itemTotal } from '#/lib/items';
   import type { MapChest } from '#/lib/models/map';
+  import { PANEL_PAGE_SIZE } from '#/lib/models/pages';
   import { count } from '#/lib/text';
 
   /** Chests on the map, the open one's ID, and what to do when one is tapped. */
@@ -18,17 +20,23 @@
 
 <section class="panel" aria-labelledby="chests-title">
   <h2 id="chests-title" class="panel-title">CHESTS</h2>
-  {#each byMostKinds as chest (chest.id)}
-    {@const kinds = Object.keys(chest.record.items).length}
-    <button type="button" class="line" class:picked={chest.id === pickedId} onclick={() => onpick(chest.id)}>
-      <span><strong>{chestTitle(chest.record)}</strong> <span class="muted">{chest.record.label === undefined ? '' : `${chestName(chest.record.chest)} `}{builtByShortLabel(chest.record.builder)}</span></span>
-      <span class="muted">
-        {kinds === 0 ? 'Empty' : `${count(kinds, 'kind', 'kinds')} · ${itemTotal(chest.record.items).toLocaleString()} items`}
-      </span>
-    </button>
-  {:else}
-    <p class="muted">No chest found yet.</p>
-  {/each}
+  <Pager items={byMostKinds} size={PANEL_PAGE_SIZE} backText="Previous" nextText="Next">
+    {#snippet children(items)}
+      <div>
+        {#each items as chest (chest.id)}
+          {@const kinds = Object.keys(chest.record.items).length}
+          <button type="button" class="line" class:picked={chest.id === pickedId} onclick={() => onpick(chest.id)}>
+            <span><strong>{chestTitle(chest.record)}</strong> <span class="muted">{chest.record.label === undefined ? '' : `${chestName(chest.record.chest)} `}{builtByShortLabel(chest.record.builder)}</span></span>
+            <span class="muted">
+              {kinds === 0 ? 'Empty' : `${count(kinds, 'kind', 'kinds')} · ${itemTotal(chest.record.items).toLocaleString()} items`}
+            </span>
+          </button>
+        {:else}
+          <p class="muted">No chest found yet.</p>
+        {/each}
+      </div>
+    {/snippet}
+  </Pager>
 </section>
 
 <style>
