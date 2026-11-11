@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { craftCostsOf, fireFuelsOf, foodsOf, itemStacksOf, pieceCostsOf } from '#/lib/server/game-data';
+import { craftCostsOf, fireFuelsOf, foodsOf, gameNamesOf, itemStacksOf, pieceCostsOf } from '#/lib/server/game-data';
 
 describe('itemStacksOf', () => {
   it('reads the most of each item one slot holds, with Windows line ends, and skips lines it does not know', () => {
@@ -71,5 +71,18 @@ describe('fireFuelsOf', () => {
 
     // THEN each fire has its fuel
     expect(fuels).toEqual({ piece_groundtorch_wood: 'Resin', fire_pit: 'Wood' });
+  });
+});
+
+describe('gameNamesOf', () => {
+  it('reads the name the game shows for each thing, with Windows line ends, and skips lines it does not know', () => {
+    // GIVEN a game names file with an item, a creature, a raid and a broken line
+    const text = 'AtgeirIron Iron atgeir\r\nGreydwarf_Elite Greydwarf brute\r\narmy_theelder The ground is shaking\r\nbroken\r\n';
+
+    // WHEN it is read
+    const names = gameNamesOf(text);
+
+    // THEN each thing has its name
+    expect(names).toEqual({ AtgeirIron: 'Iron atgeir', Greydwarf_Elite: 'Greydwarf brute', army_theelder: 'The ground is shaking' });
   });
 });

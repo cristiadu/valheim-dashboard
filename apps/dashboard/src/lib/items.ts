@@ -9,13 +9,15 @@ import {
 import { GEAR_NAMES } from '#/lib/models/gear';
 import { ITEM_NAMES } from '#/lib/models/items';
 import type { MapChest } from '#/lib/models/map';
-import { capitalized, thingName } from '#/lib/text';
+import { capitalized, gameName, thingName } from '#/lib/text';
 
 /**
  * Returns the name the game shows for the item the plugin logs as [prefab], which also picks its icon. For
- * example `Deer trophy` for `TrophyDeer`, or `Copper ore` for `CopperOre`, which only needs spaces.
+ * example `Deer trophy` for `TrophyDeer`, `Iron atgeir` for `AtgeirIron` from the game names file, or `Copper ore`
+ * for `CopperOre`, which only needs spaces.
  */
-export const itemName = (prefab: string): string => GEAR_NAMES[prefab] ?? ITEM_NAMES[prefab] ?? capitalized(thingName(prefab));
+export const itemName = (prefab: string): string =>
+  GEAR_NAMES[prefab] ?? ITEM_NAMES[prefab] ?? gameName(prefab) ?? capitalized(thingName(prefab));
 
 /** Returns the name the game shows for the chest, cart or ship the plugin logs as [prefab], such as `Wood chest`. */
 export const chestName = (prefab: string): string =>

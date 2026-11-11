@@ -352,7 +352,7 @@ describe('server state', () => {
   });
 
   it('keeps areas, gear and global keys in the story only when they are news', () => {
-    // GIVEN two visits to the Swamp, two trips into a dungeon, the same gear twice, a boss defeat and another key
+    // GIVEN two visits to the Swamp, two trips into a dungeon, the same gear twice, a boss defeat, a Serpent kill and another key
     readLines(state, [
       ...RUN_START,
       logLine('03:00:00', 'Area entered: Ragnar Swamp'),
@@ -362,13 +362,14 @@ describe('server state', () => {
       logLine('03:40:00', 'Gear: Ragnar SwordIron'),
       logLine('03:50:00', 'Gear: Ragnar SwordIron'),
       logLine('04:00:00', 'Global key set: defeated_eikthyr'),
+      logLine('04:05:00', 'Global key set: defeated_serpent'),
       logLine('04:10:00', 'Global key set: nomap'),
     ]);
 
     // WHEN the story events are listed
     const events = state.snapshot.events.map((event) => event.type);
 
-    // THEN only the first Swamp visit, both dungeon trips, the gear once and the boss defeat are kept
+    // THEN only the first Swamp visit, both dungeon trips, the gear once and the boss defeat are kept, since a Serpent is no boss
     expect(events).toEqual(['worldLoaded', 'areaEntered', 'areaEntered', 'areaEntered', 'gearSeen', 'globalKey']);
     expect(state.snapshot.visitedAreas).toEqual({ Ragnar: ['Swamp', 'Dungeon'] });
     expect(state.snapshot.gear).toEqual({ Ragnar: ['SwordIron'] });

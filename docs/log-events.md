@@ -231,6 +231,7 @@ when the plugin does not know who it was.
 | Craft costs file written | `Craft costs written: C:\Valheim Server\craft-costs.txt` | `^Craft costs written: (?<path>.+)$` |
 | Foods file written | `Foods written: C:\Valheim Server\foods.txt` | `^Foods written: (?<path>.+)$` |
 | Fire fuels file written | `Fire fuels written: C:\Valheim Server\fire-fuels.txt` | `^Fire fuels written: (?<path>.+)$` |
+| Game names file written | `Game names written: C:\Valheim Server\game-names.txt` | `^Game names written: (?<path>.+)$` |
 | Tombstone emptied | `Tombstone emptied: Ragnar by Bjorn` | `^Tombstone emptied: (?<owner>.+?) by (?<player>.+)$` |
 
 - **Chat** only reaches the server when another player is online to receive it. `said` is normal
@@ -289,6 +290,8 @@ when the plugin does not know who it was.
   item and level with how many one craft makes: `ArrowWood 1 20 Wood x8`, or `SwordBronze 2 1 Bronze x4` for an upgrade.
 - **Foods written** and **Fire fuels written** follow it: one food per line (`CookedMeat`), and one line per fire
   with the item it burns (`piece_groundtorch_wood Resin`).
+- **Game names written** follows them, since plugin 2.20.0: one line per item, piece, creature and raid with
+  the English name the game shows (`AtgeirIron Iron atgeir`, `army_theelder The ground is shaking`).
 - **Fueled** is logged once for each item put on the fire, since plugin 2.18.0.
 - **Chest** is logged only when its line changes, since plugin 2.19.0. Before that, ships and carts repeated the
   same line every few seconds. Older plugins left the builder blank for a player who was joining again.

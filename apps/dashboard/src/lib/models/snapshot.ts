@@ -170,6 +170,8 @@ export type Snapshot = {
   bags: Record<string, Record<string, number>>;
   /** Most of each item that fits in one slot, by prefab, from the plugin's item stacks file, for example `{ Wood: 50 }`. */
   itemStacks: Record<string, number>;
+  /** English name the game shows for each item, piece, creature and raid, from the plugin's game names file, for example `{ AtgeirIron: 'Iron atgeir' }`. */
+  gameNames: Record<string, string>;
   /** Terrain letter of each explored square, by `x,z` square number, once the plugin's terrain file was read. */
   terrain: Record<string, string>;
   /** Health, stamina and eitr each character had when the plugin last saw them, by character name. */
