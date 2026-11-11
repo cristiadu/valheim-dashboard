@@ -2,7 +2,8 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import { logLine, readLines, RUN_START, TEST_OFFSET_MINUTES } from '#/lib/test-common';
 import type { ServerState } from '#/lib/server/models';
-import { addSavedBosses, createServerState, setTerrain, startNewLog } from '#/lib/server/server-state';
+import { addSavedBosses, createServerState, startNewLog } from '#/lib/server/server-state';
+import { setTerrain } from '#/lib/server/terrain';
 
 describe('server state', () => {
   let state: ServerState;

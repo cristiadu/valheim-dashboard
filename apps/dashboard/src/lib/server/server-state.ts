@@ -2,92 +2,25 @@ import { applyEvent, createLogReader, createSessionState, endAllSessions, online
 
 import type { LogEvent } from 'valheim-log';
 
+import { gearEntryOf } from '#/lib/gear';
+import { squareKeyOf } from '#/lib/map';
 import {
-  ACTIVITY_STORY_KINDS,
-  type ActivityKind,
   BOSS_NAMES,
   BOSS_ORDER,
   DEFEATED_KEY_PREFIX,
   DUNGEON_AREA,
-  MAP_SQUARE_METERS,
   type Snapshot,
   STORY_EVENT_TYPES,
   type StoryEvent,
-  UNKNOWN_FOOD,
 } from '#/lib/models';
+import { characterOfSteamName } from '#/lib/players';
+import { addActivityOf } from '#/lib/server/activities';
 import { updateBags } from '#/lib/server/bags';
-import { addSourceLine, keepServerLine, keepSourceLines } from '#/lib/server/log-sources';
-import {
-  ACTIVITY_GAP_MS,
-  MAX_ACTIVITIES,
-  MAX_BACKUPS,
-  MAX_CHAT,
-  MAX_EVENTS,
-  MAX_RUNS,
-  MAX_SAVES,
-  type ServerState,
-  type Terrain,
-} from '#/lib/server/models';
+import { pushCapped } from '#/lib/server/lists';
+import { keepServerLine, keepSourceLines } from '#/lib/server/log-sources';
+import { MAX_BACKUPS, MAX_CHAT, MAX_EVENTS, MAX_RUNS, MAX_SAVES, type ServerState } from '#/lib/server/models';
+import { addTerrainOf } from '#/lib/server/terrain';
 import { sourceKey } from '#/lib/sources';
-
-/** Adds [item] to the end of [list] and drops the oldest items past [max]. */
-const pushCapped = <T>(list: T[], item: T, max: number): void => {
-  list.push(item);
-  list.splice(0, Math.max(0, list.length - max));
-};
-
-/**
- * Adds [count] of [thing] and its log [line] to the player's latest stretch of the same [kind] in [snapshot], or
- * starts a new stretch when the player paused longer than [ACTIVITY_GAP_MS]. Also adds them to the player's totals.
- */
-const addActivity = (
-  snapshot: Snapshot,
-  line: string,
-  timeUtc: string,
-  player: string | null,
-  kind: ActivityKind,
-  thing: string,
-  count: number,
-): void => {
-  if (player !== null) {
-    const totals = (snapshot.activityTotals[player] ??= {});
-    totals[kind] = (totals[kind] ?? 0) + count;
-    addSourceLine((snapshot.sources[sourceKey('activity', player, kind)] ??= { total: 0, lines: [] }), timeUtc, line, ACTIVITY_STORY_KINDS[kind]);
-  }
-  const { activities } = snapshot;
-  const stretch = activities.findLast((activity) => activity.player === player && activity.kind === kind);
-  if (stretch && Date.parse(timeUtc) - Date.parse(stretch.endUtc) <= ACTIVITY_GAP_MS) {
-    stretch.endUtc = timeUtc;
-    stretch.things[thing] = (stretch.things[thing] ?? 0) + count;
-    addSourceLine(stretch.source, timeUtc, line, ACTIVITY_STORY_KINDS[kind]);
-    return;
-  }
-  const source = { total: 1, lines: [{ timeUtc, line, kind: ACTIVITY_STORY_KINDS[kind] }] };
-  pushCapped(activities, { player, kind, startUtc: timeUtc, endUtc: timeUtc, things: { [thing]: count }, source }, MAX_ACTIVITIES);
-};
-
-/** Returns the terrain letter of the square with [key], such as `3,-11`, or null when [terrain] has none there. */
-const terrainLetter = (terrain: Terrain, key: string): string | null => {
-  const [column, row] = key.split(',').map(Number);
-  const letter = terrain.rows[-terrain.first - 1 - row!]?.[column! - terrain.first];
-  return letter === undefined ? null : letter;
-};
-
-/** Adds the terrain letter of the explored square [key] to [snapshot], when [terrain] is known and has one. */
-const addTerrainOf = (snapshot: Snapshot, terrain: Terrain | null, key: string): void => {
-  const letter = terrain === null ? null : terrainLetter(terrain, key);
-  if (letter !== null) {
-    snapshot.terrain[key] = letter;
-  }
-};
-
-/** Keeps [terrain] in [state] and adds its letter for every square explored so far. */
-export const setTerrain = (state: ServerState, terrain: Terrain): void => {
-  state.terrain = terrain;
-  for (const key of new Set(Object.values(state.snapshot.explored).flat())) {
-    addTerrainOf(state.snapshot, terrain, key);
-  }
-};
 
 /** Adds [value] to the list of [key] in [lists] and returns true when it was not there yet. */
 const addNew = (lists: Record<string, string[]>, key: string, value: string): boolean => {
@@ -118,103 +51,32 @@ const itemsSeenIn = (event: LogEvent): string[] => {
   }
 };
 
-/**
- * Returns true when [event] belongs in the story. An area is news on a first visit or a trip into a dungeon,
- * gear when it is new, and a global key when it is a boss defeat.
- */
-const isStoryNews = (snapshot: Snapshot, event: LogEvent): boolean => {
+/** Adds the area [event] enters or the gear it shows to what its character has seen, and returns true when it was new. */
+const addFirstSeen = (snapshot: Snapshot, event: LogEvent): boolean => {
   switch (event.type) {
     case 'areaEntered':
-      return addNew(snapshot.visitedAreas, event.character, event.area) || event.area === DUNGEON_AREA;
+      return addNew(snapshot.visitedAreas, event.character, event.area);
     case 'gearSeen':
-      return addNew(snapshot.gear, event.character, event.quality > 1 ? `${event.item} quality ${event.quality}` : event.item);
-    case 'globalKey':
-      return event.isSet && event.key.startsWith(DEFEATED_KEY_PREFIX);
+      return addNew(snapshot.gear, event.character, gearEntryOf(event.item, event.quality));
     default:
-      return (STORY_EVENT_TYPES as readonly string[]).includes(event.type);
+      return false;
   }
 };
 
 /**
- * Returns the character of the player whose Steam name is [name], since the plugin names a builder by Steam name
- * when they have not been online since the server started. Any other name is returned as it is.
+ * Returns true when [event] belongs in the story, where [isFirstSeen] tells whether its area or gear is new. An area
+ * is news on a first visit or a trip into a dungeon, gear when it is new, and a global key when it is a boss defeat.
  */
-const characterOf = (snapshot: Snapshot, name: string | null): string | null =>
-  snapshot.sessions.findLast((session) => session.steamName !== null && session.steamName === name)?.character ?? name;
-
-/**
- * Adds the activity [event] stands for, such as a piece built or a creature killed, read from [line], to the
- * activities of [snapshot]. An item counts as gathered only the first time anyone picks it up.
- */
-const addActivityOf = (snapshot: Snapshot, event: LogEvent, line: string): void => {
-  const { timeUtc } = event;
+const isStoryNews = (event: LogEvent, isFirstSeen: boolean): boolean => {
   switch (event.type) {
-    case 'pieceBuilt':
-      addActivity(snapshot, line, timeUtc, characterOf(snapshot, event.builder), 'built', event.piece, 1);
-      break;
-    case 'pieceDestroyed':
-      addActivity(snapshot, line, timeUtc, characterOf(snapshot, event.builder), 'destroyed', event.piece, 1);
-      break;
-    case 'creatureKilled':
-      for (const attacker of event.attackers) {
-        addActivity(snapshot, line, timeUtc, attacker, 'killed', event.creature, 1);
-      }
-      break;
-    case 'itemPickedUp':
-      if (event.isFirstPickup) {
-        addActivity(snapshot, line, timeUtc, event.player, 'gathered', event.item, event.count);
-      }
-      break;
-    case 'chestChanged':
-      addActivity(snapshot, line, timeUtc, event.player, event.isStored ? 'stored' : 'taken', event.item, event.count);
-      break;
-    case 'planted':
-      addActivity(snapshot, line, timeUtc, event.player, 'planted', event.plant, 1);
-      break;
-    case 'ate':
-      addActivity(snapshot, line, timeUtc, event.character, 'ate', event.item ?? UNKNOWN_FOOD, 1);
-      break;
-    case 'smelting':
-      addActivity(snapshot, line, timeUtc, event.player, 'smelted', event.item, event.count);
-      break;
-    case 'foodStarted':
-      addActivity(snapshot, line, timeUtc, event.player, event.kind === 'cooking' ? 'cooked' : 'brewed', event.item, 1);
-      break;
-    case 'sailing':
-      addActivity(snapshot, line, timeUtc, event.character, 'sailed', event.ship, 1);
-      break;
-    case 'crafting':
-      addActivity(snapshot, line, timeUtc, event.character, 'crafted', event.station, 1);
-      break;
-    case 'emote':
-      addActivity(snapshot, line, timeUtc, event.character, 'emoted', event.emote, 1);
-      break;
-    case 'itemMade':
-      addActivity(snapshot, line, timeUtc, event.crafter, event.level === 1 ? 'made' : 'upgraded', event.item, event.count);
-      break;
-    case 'riding':
-      addActivity(snapshot, line, timeUtc, event.player, 'rode', event.creature, 1);
-      break;
-    case 'powerUsed':
-      addActivity(snapshot, line, timeUtc, event.character, 'powered', 'power', 1);
-      break;
-    case 'obliterated':
-      addActivity(snapshot, line, timeUtc, event.player, 'obliterated', event.item, event.count);
-      break;
-    case 'fueled':
-      addActivity(snapshot, line, timeUtc, event.player, 'fueled', event.fire, 1);
-      break;
-    case 'repaired':
-      addActivity(snapshot, line, timeUtc, event.player, 'repaired', event.piece, 1);
-      break;
-    case 'cartPulled':
-      addActivity(snapshot, line, timeUtc, event.player, 'pulled', event.cart, 1);
-      break;
-    case 'depleted':
-      addActivity(snapshot, line, timeUtc, event.player, event.kind === 'tree' ? 'cut' : 'mined', event.thing, 1);
-      break;
+    case 'areaEntered':
+      return isFirstSeen || event.area === DUNGEON_AREA;
+    case 'gearSeen':
+      return isFirstSeen;
+    case 'globalKey':
+      return event.isSet && event.key.startsWith(DEFEATED_KEY_PREFIX);
     default:
-      break;
+      return (STORY_EVENT_TYPES as readonly string[]).includes(event.type);
   }
 };
 
@@ -334,7 +196,7 @@ export const readLogLine = (state: ServerState, line: string): void => {
   applyEvent(state.sessionState, event);
   const endedSessions = openSessions.filter((session) => session.endUtc !== null);
   keepSourceLines(snapshot, event, line, [...endedSessions, ...snapshot.sessions.slice(sessionCount)]);
-  if (isStoryNews(snapshot, event)) {
+  if (isStoryNews(event, addFirstSeen(snapshot, event))) {
     pushCapped(snapshot.events, { ...event, line } as StoryEvent, MAX_EVENTS);
   }
   addActivityOf(snapshot, event, line);
@@ -403,7 +265,7 @@ export const readLogLine = (state: ServerState, line: string): void => {
     case 'position': {
       const { character, x, z, timeUtc } = event;
       snapshot.positions[character] = { x, z, timeUtc };
-      const key = `${Math.floor(x / MAP_SQUARE_METERS)},${Math.floor(z / MAP_SQUARE_METERS)}`;
+      const key = squareKeyOf(x, z);
       addNew(snapshot.explored, character, key);
       addTerrainOf(snapshot, state.terrain, key);
       break;
@@ -411,7 +273,7 @@ export const readLogLine = (state: ServerState, line: string): void => {
     case 'chestContents': {
       const { id, chest, x, z, builder, items, timeUtc } = event;
       const label = snapshot.chests[id]?.label;
-      snapshot.chests[id] = { chest, x, z, builder: characterOf(snapshot, builder), items, timeUtc };
+      snapshot.chests[id] = { chest, x, z, builder: characterOfSteamName(snapshot.sessions, builder), items, timeUtc };
       if (label !== undefined) {
         snapshot.chests[id].label = label;
       }

@@ -134,7 +134,7 @@ const movedItemOf = (event: LogEvent): string | null => {
 };
 
 /** Returns the character whose bag [event] changes, or null when it changes none. */
-const characterOf = (event: LogEvent): string | null => {
+const bagOwnerOf = (event: LogEvent): string | null => {
   switch (event.type) {
     case 'ate':
     case 'gearSeen':
@@ -171,7 +171,7 @@ const characterOf = (event: LogEvent): string | null => {
  */
 export const updateBags = (state: ServerState, event: LogEvent): void => {
   const { snapshot } = state;
-  const character = characterOf(event);
+  const character = bagOwnerOf(event);
   if (character === null) {
     return;
   }

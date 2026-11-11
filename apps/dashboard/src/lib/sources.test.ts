@@ -10,6 +10,12 @@ describe('sourceKey', () => {
     expect(sourceKey('deaths', 'Ragnar')).toBe('deaths:Ragnar');
     expect(sourceKey('killed', 'Ragnar', 'Troll')).toBe('killed:Ragnar:Troll');
   });
+
+  it('leaves out the parts that are not given', () => {
+    // WHEN / THEN
+    expect(sourceKey('saves', undefined)).toBe('saves');
+    expect(sourceKey('gear', 'Ragnar', undefined)).toBe('gear:Ragnar');
+  });
 });
 
 describe('playerSource', () => {
