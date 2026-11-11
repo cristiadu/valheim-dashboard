@@ -9,5 +9,6 @@ export type {
   SessionState,
   TameChange,
 } from '#/models';
-export { createLogReader, heldItemsOf, parseLog, parseMessage, readLine, runKeyOf } from '#/logReader';
+export { heldItemsOf } from '#/fields';
+export { createLogReader, parseLog, parseMessage, readLine, runKeyOf } from '#/logReader';
 export { applyEvent, buildSessions, createSessionState, endAllSessions, onlineSessions } from '#/sessions';
