@@ -1,0 +1,16 @@
+11/10/2026 10:00:00: Valheim version: 1.0.21 (network version 41)
+11/10/2026 10:00:03: ZNet.LoadWorld: Cotil (Cotil), save number 1300
+11/10/2026 10:00:05: Game server connected
+11/10/2026 10:01:00: PlayFab listen socket child connected to remote player A100000000000000
+11/10/2026 10:01:00: PlayFab socket with remote ID playfab/A100000000000000 received local Platform ID Steam_76561198000000001
+11/10/2026 10:01:00: Got handshake from client playfab/A100000000000000
+11/10/2026 10:01:00: Got character ZDOID from Inge Dragonchow : 549297300:1
+11/10/2026 10:02:00: Gear: Inge Dragonchow AtgeirIron quality 3
+11/10/2026 10:02:00: Wearing: Inge Dragonchow has AtgeirIron, ArmorIronChest, ArmorIronLegs, HelmetIron
+11/10/2026 10:03:00: Creature killed: Greydwarf_Elite level 1 by Inge Dragonchow
+11/10/2026 10:03:10: Creature killed: Greydwarf_Elite level 2 by Inge Dragonchow
+11/10/2026 10:03:20: Creature killed: Skeleton_Poison level 1 by Inge Dragonchow
+11/10/2026 10:04:00: Random event set:army_theelder
+11/10/2026 10:06:00: Raid ended: army_theelder
+11/10/2026 10:07:00: Global key set: defeated_serpent
+11/10/2026 10:07:00: Creature killed: Serpent level 1 by Inge Dragonchow
