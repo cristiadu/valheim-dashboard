@@ -430,8 +430,9 @@ flowchart TD
 | Link | Delete a leftover share on the link's name, run zrok, wait 30 s after it stops, run it again |
 | Updater | Run one update as its own PowerShell, wait 5 minutes, again |
 
-Run by hand, it also installs pnpm and zrok when they are missing and adds the logon task. From the logon task
-it installs nothing.
+Run by hand, it installs pnpm and zrok when they are missing, adds the logon task, and then starts that task
+instead of the windows. The windows then belong to Task Scheduler, not to whatever ran the script: windows
+started from an app's shell close when that app quits or updates. From the task it installs nothing.
 
 A share zrok had when the PC shut down keeps the link's name, and zrok refuses a new share on that name. With
 no other zrok running, that share is stale, so the Link window deletes it first.
