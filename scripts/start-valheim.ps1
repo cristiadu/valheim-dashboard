@@ -25,7 +25,8 @@ param(
   [string]$RepoRoot = (Split-Path -Parent $PSScriptRoot),
   # Stop starting everything at logon. Nothing that runs is stopped.
   [switch]$Remove,
-  # Set by the logon task: only start what is not running, and install nothing while nobody watches.
+  # Set by the Valheim task, at logon or when a run by hand starts it: only start what is not running, and
+  # install nothing while nobody watches.
   [switch]$AtLogon,
   # Which window this run is. All starts the others; each of the rest is one window's job, started by All.
   [ValidateSet('All', 'Dashboard', 'Link', 'Updater', 'UpdateOnce')]
@@ -166,6 +167,12 @@ switch ($Part) {
       foreach ($name in $OldTaskNames) {
         Unregister-ScheduledTask -TaskName $name -Confirm:$false -ErrorAction SilentlyContinue
       }
+
+      # The task starts the windows, so they belong to Task Scheduler. Windows started from here would belong to
+      # whatever ran this script, and close when it quits or updates.
+      Start-ScheduledTask -TaskName $TaskName
+      Write-Host "Started the '$TaskName' task. It starts whatever is not running, each in its own window."
+      return
     }
 
     if (Get-GameServer) {
