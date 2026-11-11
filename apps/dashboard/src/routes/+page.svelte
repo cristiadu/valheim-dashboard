@@ -5,6 +5,10 @@
   import LogLines from '#/lib/components/LogLines';
   import NoData from '#/lib/components/NoData';
   import Pill from '#/lib/components/Pill';
+  import PlayerStats from '#/lib/components/PlayerStats';
+  import StatGrid from '#/lib/components/StatGrid';
+  import VitalsBar from '#/lib/components/VitalsBar';
+  import { playerDays, worldFacts } from '#/lib/hall';
   import { live, useSnapshot } from '#/lib/live.svelte';
   import { LATEST_EVENT_COUNT, STORY_STYLES } from '#/lib/models/story';
   import { serverPill } from '#/lib/pills';
@@ -43,6 +47,9 @@
       .sort((first, second) => second.lastSeenUtc!.localeCompare(first.lastSeenUtc!))[0],
   );
 
+  /** What each player did in the last 24 hours, most time online first. */
+  const days = $derived(live.nowMs === null ? [] : playerDays(snapshot, players, live.nowMs));
+
   /** Newest world save. */
   const lastSave = $derived(snapshot.saves.at(-1));
 
@@ -64,6 +71,8 @@
       {/each}
     </p>
 
+    <StatGrid stats={worldFacts(snapshot, players)} />
+
     <div class="grid">
       <section class="panel" aria-labelledby="wheel-title">
         <h2 id="wheel-title" class="panel-title">LAST 24 HOURS</h2>
@@ -82,6 +91,9 @@
                 <span class="mono muted">since {at(player.sinceUtc!)} · {durationLabel(nowMs - Date.parse(player.sinceUtc!))}</span>
               </span>
             </LogLines>
+            {#if snapshot.vitals[player.character]}
+              <div class="vitals"><VitalsBar vitals={snapshot.vitals[player.character]} isOnline /></div>
+            {/if}
           {:else}
             <p class="muted">
               Nobody is online.{#if lastOut}{` Last to leave: ${lastOut.character} at ${at(lastOut.lastSeenUtc!)}.`}{/if}
@@ -108,6 +120,28 @@
         </section>
       </div>
     </div>
+
+    <section class="panel" aria-labelledby="days-title">
+      <div class="heading">
+        <h2 id="days-title" class="panel-title">WHAT EVERYONE DID</h2>
+        <a href={resolve('/vikings')}>See all Vikings</a>
+      </div>
+      <p class="muted">In the last 24 hours, for everyone who came by.</p>
+      <div class="days">
+        {#each days as day (day.player.key)}
+          <article class="day">
+            <h3>
+              <span class="diamond" aria-hidden="true" style:background={day.player.color}></span>
+              <span class="grow">{day.player.character}</span>
+              <span class="mono muted">{durationLabel(day.playedMs)} online</span>
+            </h3>
+            <PlayerStats stats={day.stats} character={day.player.character} />
+          </article>
+        {:else}
+          <p class="muted">Nobody played in the last 24 hours.</p>
+        {/each}
+      </div>
+    </section>
 
     <a class="strip" href={resolve('/server')}>
       <strong>SERVER</strong>
@@ -188,6 +222,37 @@
     display: flex;
     flex-direction: column;
     gap: 6px;
+  }
+
+  /* Health bar of an online player, lined up with the name */
+  .vitals {
+    padding: 0 0 8px 22px;
+  }
+
+  /* One card per player, as many side by side as fit */
+  .days {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+    gap: 14px;
+    margin-top: 12px;
+  }
+
+  /* One player's day, framed like the other panels */
+  .day {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px 14px;
+    border: 1px solid var(--line-soft);
+  }
+
+  /* Player name, color and time online on one line */
+  .day h3 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    font-size: 15px;
   }
 
   /* Name takes the free space */

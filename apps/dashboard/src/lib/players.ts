@@ -90,6 +90,9 @@ export const playersOf = (snapshot: Snapshot, nowMs: number): Player[] => {
   });
 };
 
+/** Area of [squares] map squares in square kilometers, for example `0.21 km²`. */
+export const landLabel = (squares: number): string => `${((squares * MAP_SQUARE_METERS ** 2) / SQUARE_METERS_PER_KM2).toFixed(2)} km²`;
+
 /**
  * Numbers on [player]'s card, each with the log lines in [snapshot] behind it: time played, visits, deaths, kills,
  * every activity they did at least once, and the land they explored.
@@ -105,10 +108,5 @@ export const playerStats = (snapshot: Snapshot, player: Player): PlayerStat[] =>
     kind: ACTIVITY_STORY_KINDS[kind],
     source: playerSource(snapshot, player, 'activity', kind),
   })),
-  {
-    label: 'Land explored',
-    value: `${((player.exploredSquares * MAP_SQUARE_METERS ** 2) / SQUARE_METERS_PER_KM2).toFixed(2)} km²`,
-    kind: 'travel',
-    source: null,
-  },
+  { label: 'Land explored', value: landLabel(player.exploredSquares), kind: 'travel', source: null },
 ];
