@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Vitals } from '#/lib/models';
+  import type { Vitals } from '#/lib/models/snapshot';
 
   /** Numbers to show, and whether the player is online, so offline numbers say they are from when last seen. */
   let { vitals, isOnline }: { vitals: Vitals; isOnline: boolean } = $props();

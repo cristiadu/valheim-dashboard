@@ -1,4 +1,5 @@
-import { BOSS_NAMES, BOSS_ORDER, type Snapshot } from '#/lib/models';
+import { BOSS_NAMES, BOSS_ORDER } from '#/lib/models';
+import type { Snapshot } from '#/lib/models/snapshot';
 
 /** Bosses someone has fought or summoned, in game order. A boss nobody has met yet stays hidden. */
 export const seenBosses = (snapshot: Snapshot): string[] => {

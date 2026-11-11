@@ -1,23 +1,23 @@
 import {
   CHEST_MARK_KINDS,
   type ChestMarkKind,
+  type ChestRecord,
+  LEVIATHAN_COLOR,
   MAP_CHEST_STEP,
   MAP_MARGIN_METERS,
   MAP_SQUARE_METERS,
   MAP_TRAIL_METERS,
-  type ChestRecord,
-  LEVIATHAN_COLOR,
   type MapChest,
   type MapChestSpot,
   type MapView,
+  METERS_PER_KM,
   OTHER_PLAYER_COLOR,
   type Player,
-  type Snapshot,
   TERRAIN_STYLES,
   TREASURE_CHEST_PREFIX,
   UNKNOWN_TERRAIN_COLOR,
-  METERS_PER_KM,
 } from '#/lib/models';
+import type { Snapshot } from '#/lib/models/snapshot';
 
 /** Returns the color of [character], from the player it belongs to among [players]. */
 const colorOf = (players: Player[], character: string): string =>

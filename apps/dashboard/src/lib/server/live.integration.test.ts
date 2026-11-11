@@ -5,7 +5,7 @@ import { constants, gunzipSync } from 'node:zlib';
 
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
-import type { Snapshot } from '#/lib/models';
+import type { Snapshot } from '#/lib/models/snapshot';
 import { currentSnapshot } from '#/lib/server/live';
 import { logLine, RUN_START, TEST_OFFSET_MINUTES } from '#/lib/test-common';
 import { GET as getStatus } from '#/routes/api/status/+server';

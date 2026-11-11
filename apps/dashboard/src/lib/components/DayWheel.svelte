@@ -1,11 +1,8 @@
 <script lang="ts">
-  import { clockTime, dayParts, hourOfDay } from '#/lib/time';
-  import { arcPath, wedgePath, wheelPoint } from '#/lib/wheel';
+  import { type Player, PLAYER_COLORS } from '#/lib/models';
+  import type { Snapshot } from '#/lib/models/snapshot';
+  import { HOURS_PER_DAY } from '#/lib/models/time';
   import {
-    HOURS_PER_DAY,
-    PLAYER_COLORS,
-    type Player,
-    type Snapshot,
     WHEEL_CENTER,
     WHEEL_DAY_LABEL_RADIUS,
     WHEEL_HAND_RADIUS,
@@ -16,8 +13,10 @@
     WHEEL_RING_STEP,
     WHEEL_SHORT_TICK_RADIUS,
     WHEEL_SIZE,
-  } from '#/lib/models';
+  } from '#/lib/models/wheel';
   import { sessionEndMs } from '#/lib/players';
+  import { clockTime, dayParts, hourOfDay } from '#/lib/time';
+  import { arcPath, wedgePath, wheelPoint } from '#/lib/wheel';
 
   /** Players to draw, the snapshot, the clock and the viewer's time zone. */
   let { players, snapshot, nowMs, timeZone }: {

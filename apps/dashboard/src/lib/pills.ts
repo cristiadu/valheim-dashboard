@@ -1,4 +1,4 @@
-import type { Pill, WarningKind } from '#/lib/models';
+import type { Pill, WarningKind } from '#/lib/models/status';
 import { count } from '#/lib/text';
 
 /** Whether the server is up: `Online` in green or `Offline` in red. */

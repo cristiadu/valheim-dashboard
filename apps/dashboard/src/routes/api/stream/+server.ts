@@ -1,6 +1,6 @@
 import { createGzip, type Gzip } from 'node:zlib';
 
-import { CHANGE_EVENT } from '#/lib/models';
+import { CHANGE_EVENT } from '#/lib/models/app';
 import { sentSnapshot, subscribe } from '#/lib/server/live';
 import { KEEP_ALIVE_MS } from '#/lib/server/models';
 

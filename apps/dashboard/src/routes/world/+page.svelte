@@ -5,7 +5,7 @@
   import Pill from '#/lib/components/Pill';
   import StatGrid from '#/lib/components/StatGrid';
   import { live, useSnapshot } from '#/lib/live.svelte';
-  import { LATEST_SAVE_COUNT } from '#/lib/models';
+  import { LATEST_SAVE_COUNT } from '#/lib/models/status';
   import { bossPill } from '#/lib/pills';
   import { linesAt, serverSource } from '#/lib/sources';
   import { viewerTimeZone, whenLabel } from '#/lib/time';

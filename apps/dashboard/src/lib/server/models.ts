@@ -1,6 +1,6 @@
 import type { LogReader, SessionState } from 'valheim-log';
 
-import type { Snapshot } from '#/lib/models';
+import type { Snapshot } from '#/lib/models/snapshot';
 import type { LogHistory } from '#/lib/server/log-history';
 import type { LogTail } from '#/lib/server/log-tail';
 

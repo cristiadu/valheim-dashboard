@@ -6,12 +6,12 @@
   import RecipePicker from '#/lib/components/RecipePicker';
   import { live, useSnapshot } from '#/lib/live.svelte';
   import { foundChests } from '#/lib/map';
-  import { BAG_SOURCE, CHESTS_SOURCE, MAX_CRAFTS, RECIPE_ICON_PX, type Plan } from '#/lib/models';
+  import { BAG_SOURCE, CHESTS_SOURCE, MAX_CRAFTS, type Plan, RECIPE_ICON_PX } from '#/lib/models';
   import { knownRecipes } from '#/lib/picker';
   import { planPill } from '#/lib/pills';
   import { clampCrafts, newPlan, planItems, stillNeeded, withHave } from '#/lib/planner';
-  import { playersOf } from '#/lib/players';
   import { loadPlans, planner, savePlans } from '#/lib/plans.svelte';
+  import { playersOf } from '#/lib/players';
   import { madeAt, recipeById } from '#/lib/recipes';
   import { bagStock, builderNames, chestStock, craftables } from '#/lib/stock';
 

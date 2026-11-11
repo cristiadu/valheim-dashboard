@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { TABS } from '#/lib/models';
+import { TABS } from '#/lib/models/app';
 import { tabFor } from '#/lib/tabs';
 
 describe('tabFor', () => {

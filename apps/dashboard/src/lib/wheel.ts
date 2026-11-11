@@ -1,4 +1,5 @@
-import { HOURS_PER_DAY, WHEEL_CENTER, WHEEL_MAX_ARC_HOURS, WHEEL_MIN_ARC_HOURS } from '#/lib/models';
+import { HOURS_PER_DAY } from '#/lib/models/time';
+import { WHEEL_CENTER, WHEEL_MAX_ARC_HOURS, WHEEL_MIN_ARC_HOURS } from '#/lib/models/wheel';
 
 /** Point on the wheel at [hour] and [radius]. Midnight is at the top and time runs clockwise. */
 export const wheelPoint = (hour: number, radius: number): [number, number] => {
