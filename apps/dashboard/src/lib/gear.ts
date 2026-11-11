@@ -1,4 +1,5 @@
-import { GEAR_NAMES, GEAR_QUALITY_PATTERN, GEAR_SLOT_PATTERNS, type GearPiece, type GearSheet, ITEM_NAMES } from '#/lib/models';
+import { GEAR_NAMES, GEAR_QUALITY_PATTERN, GEAR_SLOT_PATTERNS, type GearPiece, type GearSheet } from '#/lib/models/gear';
+import { ITEM_NAMES } from '#/lib/models/items';
 import { recipeItems } from '#/lib/recipes';
 import { capitalized, thingName } from '#/lib/text';
 

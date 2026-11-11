@@ -1,4 +1,4 @@
-import { type Recipe, RECIPE_BIOMES } from '#/lib/models';
+import { type Recipe, RECIPE_BIOMES } from '#/lib/models/recipes';
 import { RECIPES } from '#/lib/recipes';
 import { recipeItemName } from '#/lib/stock';
 

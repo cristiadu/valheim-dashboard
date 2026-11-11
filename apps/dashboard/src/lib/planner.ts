@@ -1,4 +1,4 @@
-import { type ItemAmount, MAX_CRAFTS, type Plan, type PlanItem } from '#/lib/models';
+import { type ItemAmount, MAX_CRAFTS, type Plan, type PlanItem } from '#/lib/models/recipes';
 import { recipeById } from '#/lib/recipes';
 
 /** Returns [crafts] as a whole number from 1 to [MAX_CRAFTS]. Anything that is not a number becomes 1. */

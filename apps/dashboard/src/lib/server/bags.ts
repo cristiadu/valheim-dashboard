@@ -2,8 +2,8 @@ import type { LogEvent } from 'valheim-log';
 
 import { gearPiece } from '#/lib/gear';
 import { containerGrid, slotsUsed } from '#/lib/items';
-import { MIN_STACKABLE } from '#/lib/models';
 import { PLAYER_PREFAB } from '#/lib/models/chests';
+import { MIN_STACKABLE } from '#/lib/models/items';
 import type { Snapshot } from '#/lib/models/snapshot';
 import type { ServerState } from '#/lib/server/models';
 

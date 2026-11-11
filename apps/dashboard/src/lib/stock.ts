@@ -1,7 +1,7 @@
 import { itemName } from '#/lib/items';
 import { foundChests } from '#/lib/map';
-import type { Craftable } from '#/lib/models';
 import type { Player } from '#/lib/models/players';
+import type { Craftable } from '#/lib/models/recipes';
 import type { Snapshot } from '#/lib/models/snapshot';
 import { RECIPES, recipeItems } from '#/lib/recipes';
 

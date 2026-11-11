@@ -1,6 +1,6 @@
 import type { PlayerSession } from 'valheim-log';
 
-import { ACTIVITY_STORY_KINDS, ACTIVITY_WORDS, type ActivityRecord, UNKNOWN_FOOD } from '#/lib/models';
+import { ACTIVITY_STORY_KINDS, ACTIVITY_WORDS, type ActivityRecord, UNKNOWN_FOOD } from '#/lib/models/activities';
 import { type ChatRecord, DEATH_DETAILS_WINDOW_MS, type Snapshot, type SourceLines, type StoryEvent } from '#/lib/models/snapshot';
 import type { StoryItem, StoryKind, StoryText } from '#/lib/models/story';
 import { DAY_MS, MS_PER_MINUTE } from '#/lib/models/time';
