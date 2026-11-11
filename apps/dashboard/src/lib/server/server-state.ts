@@ -59,6 +59,7 @@ const addFirstSeen = (snapshot: Snapshot, event: LogEvent): boolean => {
 /**
  * Returns true when [event] belongs in the story, where [isFirstSeen] tells whether its area or gear is new. An area
  * is news on a first visit or a trip into a dungeon, gear when it is new, and a global key when it is a boss defeat.
+ * Other `defeated_` keys, such as `defeated_serpent`, are not bosses.
  */
 const isStoryNews = (event: LogEvent, isFirstSeen: boolean): boolean => {
   switch (event.type) {
@@ -67,7 +68,7 @@ const isStoryNews = (event: LogEvent, isFirstSeen: boolean): boolean => {
     case 'gearSeen':
       return isFirstSeen;
     case 'globalKey':
-      return event.isSet && event.key.startsWith(DEFEATED_KEY_PREFIX);
+      return event.isSet && event.key.startsWith(DEFEATED_KEY_PREFIX) && BOSS_NAMES[event.key] !== undefined;
     default:
       return (STORY_EVENT_TYPES as readonly string[]).includes(event.type);
   }
@@ -121,6 +122,7 @@ export const createServerState = (serverUtcOffsetMinutes: number): ServerState =
       seenItems: [],
       bags: {},
       itemStacks: {},
+      gameNames: {},
       terrain: {},
       vitals: {},
     },

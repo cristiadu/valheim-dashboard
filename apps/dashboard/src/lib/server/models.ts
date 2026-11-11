@@ -240,6 +240,12 @@ export const FIRE_FUELS_FILE_NAME = 'fire-fuels.txt';
 /** One line of the fire fuels file, for example `piece_groundtorch_wood Resin`. */
 export const FIRE_FUEL_LINE_PATTERN = /^(?<fire>\S+) (?<item>\S+)$/;
 
+/** Name of the plugin's file next to the log with the English name the game shows for each item, piece, creature and raid. */
+export const GAME_NAMES_FILE_NAME = 'game-names.txt';
+
+/** One line of the game names file, for example `AtgeirIron Iron atgeir` or `army_theelder The ground is shaking`. */
+export const GAME_NAME_LINE_PATTERN = /^(?<id>\S+) (?<name>.+)$/;
+
 /**
  * How long a food stays in effect after it is eaten, in minutes, about the shortest any food lasts. A player can not
  * eat the same food again while it is in effect.

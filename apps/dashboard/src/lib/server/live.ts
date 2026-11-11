@@ -3,7 +3,7 @@ import { dirname, join } from 'node:path';
 import type { SnapshotChange } from '#/lib/models/app';
 import type { Snapshot } from '#/lib/models/snapshot';
 import { readConfig } from '#/lib/server/config';
-import { readCraftCosts, readFireFuels, readFoods, readItemStacks, readPieceCosts } from '#/lib/server/game-data';
+import { readCraftCosts, readFireFuels, readFoods, readGameNames, readItemStacks, readPieceCosts } from '#/lib/server/game-data';
 import { firstRunKey, LogHistory, readHistory } from '#/lib/server/log-history';
 import { LogTail } from '#/lib/server/log-tail';
 import { logger } from '#/lib/server/logger';
@@ -11,6 +11,7 @@ import {
   CRAFT_COSTS_FILE_NAME,
   FIRE_FUELS_FILE_NAME,
   FOODS_FILE_NAME,
+  GAME_NAMES_FILE_NAME,
   HISTORY_FOLDER_NAME,
   ITEM_STACKS_FILE_NAME,
   PLAYER_VITALS_FILE_NAME,
@@ -24,6 +25,7 @@ import {
 import { readVitals } from '#/lib/server/player-vitals';
 import { addSavedBosses, createServerState, readLogLine, startNewLog } from '#/lib/server/server-state';
 import { readTerrain, setTerrain } from '#/lib/server/terrain';
+import { setGameNames } from '#/lib/text';
 import { readSavedGlobalKeys } from '#/lib/server/world-save';
 import { changeBetween } from '#/lib/snapshot-change';
 
@@ -91,6 +93,8 @@ const loadGameData = async (state: ServerState, folder: string): Promise<void> =
   state.craftCosts = await readCraftCosts(join(folder, CRAFT_COSTS_FILE_NAME));
   state.foods = await readFoods(join(folder, FOODS_FILE_NAME));
   state.fireFuels = await readFireFuels(join(folder, FIRE_FUELS_FILE_NAME));
+  state.snapshot.gameNames = await readGameNames(join(folder, GAME_NAMES_FILE_NAME));
+  setGameNames(state.snapshot.gameNames);
 };
 
 /**
