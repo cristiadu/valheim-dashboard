@@ -208,6 +208,7 @@ switch ($Part) {
 
   'Dashboard' {
     $Host.UI.RawUI.WindowTitle = $DashboardWindowTitle
+    Disable-ConsoleQuickEdit
     Set-Location $RepoRoot
     if (-not (Test-Path $DashboardEntry)) {
       Write-LogLine $DashboardLog 'Installing packages and building the dashboard'
@@ -238,6 +239,7 @@ switch ($Part) {
 
   'Link' {
     $Host.UI.RawUI.WindowTitle = $LinkWindowTitle
+    Disable-ConsoleQuickEdit
     while ($true) {
       # A share left from before a restart or crash keeps the name, and zrok then refuses to share on it. With no
       # other zrok running, that share is stale, so delete it. zrok answers 2 when no share has the name.
@@ -256,6 +258,7 @@ switch ($Part) {
 
   'Updater' {
     $Host.UI.RawUI.WindowTitle = $UpdaterWindowTitle
+    Disable-ConsoleQuickEdit
     while ($true) {
       # Each check is its own PowerShell inside this window, so a failed check never ends the loop, and each
       # check reads this script as main has it now.
