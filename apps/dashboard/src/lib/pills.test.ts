@@ -48,12 +48,14 @@ describe('bossPill', () => {
 });
 
 describe('warningPill', () => {
-  it('shows crashes in red and Steam or disk problems in gold', () => {
+  it('shows crashes in red and connection, join or disk problems in gold', () => {
     // GIVEN each kind of warning
     // WHEN / THEN each has a short name and color
-    expect([warningPill('crash'), warningPill('steam'), warningPill('disk')]).toEqual([
+    expect([warningPill('crash'), warningPill('steam'), warningPill('crossplay'), warningPill('refused'), warningPill('disk')]).toEqual([
       { text: 'Crash', tone: 'bad' },
       { text: 'Steam', tone: 'gold' },
+      { text: 'Crossplay', tone: 'gold' },
+      { text: 'Join', tone: 'gold' },
       { text: 'Disk', tone: 'gold' },
     ]);
   });

@@ -173,7 +173,7 @@ the page gives nothing away.
 | Saga | Every game event and chat, with filters, 25 at a time | Snapshot |
 | Map | Land each player walked, chests with what they hold, who is where, last deaths | Snapshot |
 | Recipes | Crafting plans and what is still missing, where to find it, and what the chests can make. Only recipes whose ingredients someone has found | The viewer's browser, and chests and found items from the snapshot |
-| Server | Up or down, the world and in-game day, bosses met, uptime in the last 24 hours, saves and backups 5 at a time, warnings 10 at a time | Snapshot |
+| Server | Up or down, the world and in-game day, bosses met, uptime in the last 24 hours, saves and backups 5 at a time, warnings 10 at a time: crashes, lost Steam or crossplay connections, joins turned away (with who and why) and low disk | Snapshot |
 
 Long lists show one page at a time, through one shared pager:
 
@@ -530,6 +530,7 @@ Every log lives in `C:\Valheim Server`.
 | `craft-costs.txt` | The event log plugin, once per start: what crafting or upgrading each item takes |
 | `foods.txt` | The event log plugin, once per start: every item that is food |
 | `fire-fuels.txt` | The event log plugin, once per start: the item each fire burns |
+| `game-names.txt` | The event log plugin, once per start: the English name the game shows for each item, piece, creature and raid. Every name on the page uses it first, so `AtgeirIron` reads `Iron atgeir` and `army_theelder` reads `The ground is shaking` |
 | `player-vitals.txt` | The event log plugin, when a number changes: health, max health, stamina and eitr of each player online |
 
 The dashboard also reads the world save, `worlds_local\Cotil\_main.<save number>.db2`, and never writes to it.

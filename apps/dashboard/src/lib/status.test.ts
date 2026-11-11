@@ -72,11 +72,16 @@ describe('gigabytesLabel', () => {
 });
 
 describe('serverWarnings', () => {
-  it('lists crashes, Steam drops and low disk, newest first', () => {
-    // GIVEN a crashed run, a Steam drop and a disk under the warning size
+  it('lists crashes, Steam and crossplay drops, refused joins and low disk, newest first', () => {
+    // GIVEN a crashed run, a Steam drop, a crossplay drop, two refused joins and a disk under the warning size
     const snapshot = snapshotWith({
       runs: [{ startUtc: '2026-10-29T01:00:00.000Z', lastLineUtc: '2026-10-29T03:00:00.000Z', endReason: 'crashed' }],
       steamDropsUtc: ['2026-10-29T05:00:00.000Z'],
+      crossplayDropsUtc: ['2026-10-29T04:00:00.000Z'],
+      refusedJoins: [
+        { timeUtc: '2026-10-29T03:30:00.000Z', player: 'Ragnar', reason: 'wrongPassword' },
+        { timeUtc: '2026-10-29T03:40:00.000Z', player: null, reason: 'serverFull' },
+      ],
       diskSpace: { timeUtc: '2026-10-29T06:00:00.000Z', availableBytes: 20e6, warnBelowBytes: 29e6, blockedBelowBytes: 15e6 },
     });
 
@@ -87,6 +92,9 @@ describe('serverWarnings', () => {
     expect(warnings).toEqual([
       ['disk', 'Disk almost full: 0.0 GB free'],
       ['steam', 'Server lost its Steam connection'],
+      ['crossplay', 'Crossplay lost its connection'],
+      ['refused', "Someone couldn't join: the server was full"],
+      ['refused', "Ragnar couldn't join: wrong password"],
       ['crash', 'Server went down without a clean stop'],
     ]);
   });

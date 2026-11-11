@@ -16,6 +16,7 @@ import {
 import { mapOf } from '#/lib/map';
 import { playersOf } from '#/lib/players';
 import { snapshotWith, TEST_NOON_MS } from '#/lib/test-common';
+import { setGameNames } from '#/lib/text';
 
 describe('itemName', () => {
   it('names gear, listed items and other items as the game shows them', () => {
@@ -27,6 +28,14 @@ describe('itemName', () => {
 
     // THEN each has the name the game shows
     expect(names).toEqual(['Flint spear', 'Deer trophy', 'Boar meat', 'Greydwarf eye']);
+  });
+
+  it('uses the name from the game names file for an item the dashboard does not list', () => {
+    // GIVEN the game names file names the iron atgeir
+    setGameNames({ AtgeirIron: 'Iron atgeir' });
+
+    // WHEN / THEN it has the game's name, not its prefab in words
+    expect(itemName('AtgeirIron')).toBe('Iron atgeir');
   });
 });
 

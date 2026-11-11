@@ -1,7 +1,7 @@
 <script lang="ts">
   import '#/app.css';
 
-  import { onMount, type Snippet } from 'svelte';
+  import { onMount, type Snippet, untrack } from 'svelte';
 
   import { page } from '$app/state';
   import Header from '#/lib/components/Header';
@@ -12,6 +12,7 @@
   import { serverPill } from '#/lib/pills';
   import { isServerOnline, statusLine } from '#/lib/status';
   import { tabFor } from '#/lib/tabs';
+  import { setGameNames } from '#/lib/text';
   import { viewerTimeZone } from '#/lib/time';
 
   /** Snapshot from the server render, and the page for the current tab. */
@@ -34,6 +35,8 @@
   const isPasswordPage = $derived(page.url.pathname === PASSWORD_PATH);
 
   provideSnapshot(() => snapshot);
+  setGameNames(untrack(() => data.snapshot.gameNames));
+  $effect.pre(() => setGameNames(snapshot.gameNames));
   onMount(() => (isPasswordPage ? undefined : connectLive()));
 
   /** Tab that matches the current address. */

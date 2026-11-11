@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { areaLabel, areaName, count, listText, thingList, thingName, withArticle } from '#/lib/text';
+import { areaLabel, areaName, count, listText, raidName, setGameNames, thingList, thingName, withArticle } from '#/lib/text';
 
 describe('count', () => {
   it('uses the single word only for one', () => {
@@ -15,6 +15,24 @@ describe('thingName', () => {
     // GIVEN a building piece, an item and a pickable
     // WHEN / THEN each reads in lowercase words
     expect(['piece_workbench', 'SwordIron', 'Pickable_Mushroom'].map(thingName)).toEqual(['workbench', 'sword iron', 'mushroom']);
+  });
+
+  it('uses the name from the game names file when it has one', () => {
+    // GIVEN the game names file names the Greydwarf brute
+    setGameNames({ Greydwarf_Elite: 'Greydwarf brute' });
+
+    // WHEN / THEN it reads in lowercase words, as the game names it
+    expect(thingName('Greydwarf_Elite')).toBe('greydwarf brute');
+  });
+});
+
+describe('raidName', () => {
+  it('uses what the game says when a raid starts, or else the raid in plain words', () => {
+    // GIVEN the game names file has the Elder's raid but not the skeletons'
+    setGameNames({ army_theelder: 'The ground is shaking' });
+
+    // WHEN / THEN the Elder's raid reads as the game says it and the other in plain words
+    expect(['army_theelder', 'skeletons_night'].map(raidName)).toEqual(['The ground is shaking', 'skeletons night']);
   });
 });
 

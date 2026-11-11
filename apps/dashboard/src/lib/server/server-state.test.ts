@@ -352,7 +352,7 @@ describe('server state', () => {
   });
 
   it('keeps areas, gear and global keys in the story only when they are news', () => {
-    // GIVEN two visits to the Swamp, two trips into a dungeon, the same gear twice, a boss defeat and another key
+    // GIVEN two visits to the Swamp, two trips into a dungeon, the same gear twice, a boss defeat, a Serpent kill and another key
     readLines(state, [
       ...RUN_START,
       logLine('03:00:00', 'Area entered: Ragnar Swamp'),
@@ -362,13 +362,14 @@ describe('server state', () => {
       logLine('03:40:00', 'Gear: Ragnar SwordIron'),
       logLine('03:50:00', 'Gear: Ragnar SwordIron'),
       logLine('04:00:00', 'Global key set: defeated_eikthyr'),
+      logLine('04:05:00', 'Global key set: defeated_serpent'),
       logLine('04:10:00', 'Global key set: nomap'),
     ]);
 
     // WHEN the story events are listed
     const events = state.snapshot.events.map((event) => event.type);
 
-    // THEN only the first Swamp visit, both dungeon trips, the gear once and the boss defeat are kept
+    // THEN only the first Swamp visit, both dungeon trips, the gear once and the boss defeat are kept, since a Serpent is no boss
     expect(events).toEqual(['worldLoaded', 'areaEntered', 'areaEntered', 'areaEntered', 'gearSeen', 'globalKey']);
     expect(state.snapshot.visitedAreas).toEqual({ Ragnar: ['Swamp', 'Dungeon'] });
     expect(state.snapshot.gear).toEqual({ Ragnar: ['SwordIron'] });
@@ -557,5 +558,25 @@ describe('server state', () => {
       steamName: 'New Player',
     });
   });
-});
 
+  it('names who a join was refused for and keeps crossplay drops', () => {
+    // GIVEN Ragnar plays, then his connection comes back with a wrong password, a stranger is refused, and crossplay drops
+    readLines(state, [
+      ...RUN_START,
+      logLine('03:00:00', 'PlayFab socket with remote ID playfab/B1B2C3D4E5F60718 received local Platform ID Steam_76561198000000001'),
+      logLine('03:00:04', 'Peer playfab/B1B2C3D4E5F60718 has wrong password'),
+      logLine('03:01:00', 'Peer playfab/C1B2C3D4E5F60718 has incompatible version, mine:41 remote 40'),
+      logLine('03:02:00', "PlayFab network error in session 'Cotil' and network 1a03782b-bae3"),
+    ]);
+
+    // WHEN the snapshot is read
+    const { refusedJoins, crossplayDropsUtc } = state.snapshot;
+
+    // THEN Ragnar's refusal names him, the stranger's names nobody, and the drop has its time
+    expect(refusedJoins).toEqual([
+      { timeUtc: '2026-10-29T10:00:04.000Z', player: 'Ragnar', reason: 'wrongPassword' },
+      { timeUtc: '2026-10-29T10:01:00.000Z', player: null, reason: 'incompatibleVersion' },
+    ]);
+    expect(crossplayDropsUtc).toEqual(['2026-10-29T10:02:00.000Z']);
+  });
+});

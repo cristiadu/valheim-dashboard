@@ -6,7 +6,7 @@ import type { StoryItem, StoryKind, StoryText } from '#/lib/models/story';
 import { DAY_MS, MS_PER_MINUTE } from '#/lib/models/time';
 import { BOSS_ALTAR_NAMES, BOSS_NAMES, DUNGEON_AREA } from '#/lib/models/world';
 import { mergedSource, sourceKey } from '#/lib/sources';
-import { areaName, capitalized, count, listText, thingList, thingName, withArticle } from '#/lib/text';
+import { areaName, capitalized, count, listText, raidName, thingList, thingName, withArticle } from '#/lib/text';
 import { durationLabel } from '#/lib/time';
 
 /** Total things in a stretch of activity. */
@@ -102,9 +102,9 @@ const eventItem = (event: StoryEvent, players: Set<string>): StoryText => {
     case 'deathDetails':
       return { timeUtc, kind: 'died', text: `${event.character} died in ${areaName(event.area)}${fightingText(event.fighting, players)}` };
     case 'raidStarted':
-      return { timeUtc, kind: 'raid', text: `A raid started: ${event.raid.replaceAll('_', ' ')}` };
+      return { timeUtc, kind: 'raid', text: `A raid started: "${raidName(event.raid)}"` };
     case 'raidEnded':
-      return { timeUtc, kind: 'raid', text: `The raid ended: ${event.raid.replaceAll('_', ' ')}` };
+      return { timeUtc, kind: 'raid', text: `The raid ended: "${raidName(event.raid)}"` };
     case 'wentToBed':
       return { timeUtc, kind: 'night', text: `${event.character} went to bed` };
     case 'bossSummoned':

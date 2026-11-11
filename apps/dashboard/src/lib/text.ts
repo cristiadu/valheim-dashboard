@@ -1,15 +1,34 @@
 import { AREA_NAMES } from '#/lib/models/world';
 
+/** English name the game shows for each item, piece, creature and raid, set from the snapshot's game names. */
+const gameNames: Record<string, string> = {};
+
+/** Uses [names] from the plugin's game names file for every name the page shows. */
+export const setGameNames = (names: Record<string, string>): void => {
+  Object.assign(gameNames, names);
+};
+
+/** Returns the English name the game shows for [id], such as `Iron atgeir` for `AtgeirIron`, or undefined when the game names file has none. */
+export const gameName = (id: string): string | undefined => gameNames[id];
+
 /** Returns `1 death` or `2 deaths` style text. */
 export const count = (amount: number, one: string, many: string): string => `${amount} ${amount === 1 ? one : many}`;
 
-/** Readable name of a prefab, for example `wood floor 1x1`, `sword iron`, `turnip` or `greydwarf elite`. */
+/**
+ * Readable name of a prefab, for example `greydwarf brute` for `Greydwarf_Elite`: the game's name when the game names
+ * file has one, or else the prefab split into words, such as `wood floor 1x1`.
+ */
 export const thingName = (prefab: string): string =>
-  prefab
-    .replace(/^(piece|Pickable)_/, '')
-    .replaceAll('_', ' ')
-    .replace(/([a-z])([A-Z])/g, '$1 $2')
-    .toLowerCase();
+  (
+    gameNames[prefab] ??
+    prefab
+      .replace(/^(piece|Pickable)_/, '')
+      .replaceAll('_', ' ')
+      .replace(/([a-z])([A-Z])/g, '$1 $2')
+  ).toLowerCase();
+
+/** What the game says when the raid [raid] starts, such as `The ground is shaking` for `army_theelder`. */
+export const raidName = (raid: string): string => gameNames[raid] ?? raid.replaceAll('_', ' ');
 
 /** [text] with its first letter in capitals. */
 export const capitalized = (text: string): string => `${text.charAt(0).toUpperCase()}${text.slice(1)}`;

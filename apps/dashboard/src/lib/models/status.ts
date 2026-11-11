@@ -1,3 +1,5 @@
+import type { JoinRefusedReason } from 'valheim-log';
+
 import type { SourceLines } from '#/lib/models/snapshot';
 import { MS_PER_MINUTE } from '#/lib/models/time';
 
@@ -7,8 +9,23 @@ export const ONLINE_WINDOW_MS = 15 * MS_PER_MINUTE;
 /** Bytes in a gigabyte, as disks count them. */
 export const BYTES_PER_GB = 1e9;
 
-/** Kind of problem on the Server tab: the server crashed, lost Steam, or is low on disk. */
-export type WarningKind = 'crash' | 'steam' | 'disk';
+/** Why the server turned a join away, as the Server tab says it. */
+export const REFUSED_REASON_TEXTS: Record<JoinRefusedReason, string> = {
+  wrongPassword: 'wrong password',
+  incompatibleVersion: "their game version doesn't match",
+  notPermitted: 'not on the allowed list',
+  invalidSessionTicket: "Steam couldn't confirm who they are",
+  serverFull: 'the server was full',
+  blockedByHost: 'blocked by the host',
+  notAuthenticated: "they weren't signed in",
+  crossplayNotAllowed: 'crossplay is off',
+};
+
+/**
+ * Kind of problem on the Server tab: the server crashed, lost Steam, lost crossplay, turned a join away, or is low
+ * on disk.
+ */
+export type WarningKind = 'crash' | 'steam' | 'crossplay' | 'refused' | 'disk';
 
 /** One problem on the Server tab. */
 export type ServerWarning = {
