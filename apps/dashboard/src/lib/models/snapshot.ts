@@ -1,6 +1,6 @@
 import type { ChatKind, LogEvent, PlayerSession } from 'valheim-log';
 
-import type { ActivityKind, ActivityRecord } from '#/lib/models';
+import type { ActivityKind, ActivityRecord } from '#/lib/models/activities';
 import type { ChestRecord } from '#/lib/models/chests';
 import type { DeathItems, MapPoint } from '#/lib/models/map';
 import type { StoryKind } from '#/lib/models/story';

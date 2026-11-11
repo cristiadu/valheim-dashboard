@@ -2,7 +2,7 @@
   import ItemIcon from '#/lib/components/ItemIcon';
   import LogLines from '#/lib/components/LogLines';
   import { gearLabel, gearSheet } from '#/lib/gear';
-  import { GEAR_ICON_PX, GEAR_SLOT_NAMES, GEAR_SLOTS, type GearPiece } from '#/lib/models';
+  import { GEAR_ICON_PX, GEAR_SLOT_NAMES, GEAR_SLOTS, type GearPiece } from '#/lib/models/gear';
   import type { SourceLines } from '#/lib/models/snapshot';
 
   /**
