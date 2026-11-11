@@ -33,9 +33,6 @@ $ZrokSha256 = '2780e799269d92e64da5c5bfda48e76d4464925bdfcb7a11deafb40c6f25ad84'
 # Folder zrok2.exe is installed in.
 $ZrokFolder = Join-Path $env:LOCALAPPDATA 'zrok2'
 
-# Title of the window zrok runs in.
-$WindowTitle = 'Valheim dashboard link (zrok)'
-
 if ($Remove) {
   Unregister-ScheduledTask -TaskName $TaskName -Confirm:$false
   Stop-Process -Name 'zrok2' -ErrorAction SilentlyContinue
@@ -74,17 +71,12 @@ if ($names -notmatch [regex]::Escape($Name)) {
   throw "zrok could not keep the name $Name. Someone else may have it; try another -Name."
 }
 
-$zrokLog = Join-Path (Split-Path -Parent $LogFile) 'zrok.log'
-# zrok runs in a normal window you can see, titled below. Its --headless flag only swaps its full-screen view for
-# plain lines, which the window shows and the log keeps.
-$command = "`$Host.UI.RawUI.WindowTitle = '$WindowTitle'; " +
-  "& '$zrok' share public http://127.0.0.1:$Port --name-selection public:$Name --open --headless 2>&1 | " +
-  "ForEach-Object { `$_; Add-Content -LiteralPath '$zrokLog' -Value `$_ -Encoding UTF8 }"
-$arguments = "-NoProfile -ExecutionPolicy Bypass -NoExit -Command `"$command`""
+# run-dashboard-link.ps1 keeps zrok running in a window you can see, and clears a share an earlier run left behind.
+$linkScript = Join-Path $PSScriptRoot 'run-dashboard-link.ps1'
+$arguments = "-NoProfile -ExecutionPolicy Bypass -File `"$linkScript`" -Name $Name -Zrok `"$zrok`" -LogFile `"$LogFile`" -Port $Port"
 $action = New-ScheduledTaskAction -Execute 'powershell.exe' -Argument $arguments
 $trigger = New-ScheduledTaskTrigger -AtLogOn -User $env:USERNAME
-$settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit ([TimeSpan]::Zero) `
-  -RestartCount 999 -RestartInterval (New-TimeSpan -Minutes 1)
+$settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit ([TimeSpan]::Zero)
 Register-ScheduledTask -TaskName $TaskName -Action $action -Trigger $trigger -Settings $settings -Force | Out-Null
 Start-ScheduledTask -TaskName $TaskName
 

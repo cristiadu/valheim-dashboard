@@ -1,7 +1,7 @@
 <#
 .SYNOPSIS
-  Starts the dashboard at Windows logon, and updates this PC from main every few minutes, each in a window you can see.
-  Run it once. Pass -Remove to stop both.
+  Starts the game server and the dashboard at Windows logon, and updates this PC from main every few minutes,
+  each in a window you can see. Run it once. Pass -Remove to stop all three.
 
 .EXAMPLE
   .\scripts\install-startup.ps1
@@ -23,19 +23,17 @@ Import-Module (Join-Path $PSScriptRoot 'Shared.psm1') -Force
 # Name of the logon task in Task Scheduler.
 $TaskName = 'Valheim Dashboard'
 
-# Name of the task that runs update-from-main.ps1.
+# Name of the logon task that runs watch-main.ps1.
 $UpdaterTaskName = 'Valheim Dashboard Updater'
 
-# Minutes between update runs.
-$UpdateIntervalMinutes = 5
-
-# Longest an update run may take, such as a build plus waiting for the game server to save, in minutes.
-$UpdateTimeLimitMinutes = 30
+# Name of the logon task that starts the game server.
+$GameServerTaskName = 'Valheim Server'
 
 if ($Remove) {
   Unregister-ScheduledTask -TaskName $TaskName -Confirm:$false
   Unregister-ScheduledTask -TaskName $UpdaterTaskName -Confirm:$false
-  Write-Host "Removed the '$TaskName' and '$UpdaterTaskName' tasks."
+  Unregister-ScheduledTask -TaskName $GameServerTaskName -Confirm:$false
+  Write-Host "Removed the '$TaskName', '$UpdaterTaskName' and '$GameServerTaskName' tasks."
   return
 }
 
@@ -53,14 +51,17 @@ $trigger = New-ScheduledTaskTrigger -AtLogOn -User $env:USERNAME
 $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit ([TimeSpan]::Zero)
 Register-ScheduledTask -TaskName $TaskName -Action $action -Trigger $trigger -Settings $settings -Force | Out-Null
 
-# Each run opens its own window, which closes when the run ends.
-$updateScript = Join-Path $PSScriptRoot 'update-from-main.ps1'
-$updateArguments = "-NoProfile -ExecutionPolicy Bypass -File `"$updateScript`" -LogFile `"$LogFile`" -Port $Port"
-$updateAction = New-ScheduledTaskAction -Execute 'powershell.exe' -Argument $updateArguments
-$updateTrigger = New-ScheduledTaskTrigger -Once -At (Get-Date) -RepetitionInterval (New-TimeSpan -Minutes $UpdateIntervalMinutes)
-$updateSettings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable `
-  -MultipleInstances IgnoreNew -ExecutionTimeLimit (New-TimeSpan -Minutes $UpdateTimeLimitMinutes)
-Register-ScheduledTask -TaskName $UpdaterTaskName -Action $updateAction -Trigger $updateTrigger -Settings $updateSettings -Force | Out-Null
+# One window stays open and checks main every few minutes.
+$watchScript = Join-Path $PSScriptRoot 'watch-main.ps1'
+$watchArguments = "-NoProfile -ExecutionPolicy Bypass -File `"$watchScript`" -LogFile `"$LogFile`" -Port $Port"
+$watchAction = New-ScheduledTaskAction -Execute 'powershell.exe' -Argument $watchArguments
+Register-ScheduledTask -TaskName $UpdaterTaskName -Action $watchAction -Trigger $trigger -Settings $settings -Force | Out-Null
+Start-ScheduledTask -TaskName $UpdaterTaskName
 
-Write-Host "The dashboard now starts when $env:USERNAME logs on. Start it now with: Start-ScheduledTask -TaskName '$TaskName'"
-Write-Host "'$UpdaterTaskName' checks main every $UpdateIntervalMinutes minutes. Its log is updater.log next to $LogFile."
+$gameServerScript = Join-Path $PSScriptRoot 'start-game-server.ps1'
+$gameServerArguments = "-NoProfile -ExecutionPolicy Bypass -File `"$gameServerScript`""
+$gameServerAction = New-ScheduledTaskAction -Execute 'powershell.exe' -Argument $gameServerArguments
+Register-ScheduledTask -TaskName $GameServerTaskName -Action $gameServerAction -Trigger $trigger -Settings $settings -Force | Out-Null
+
+Write-Host "The game server and the dashboard now start when $env:USERNAME logs on. Start the dashboard now with: Start-ScheduledTask -TaskName '$TaskName'"
+Write-Host "'$UpdaterTaskName' checks main every few minutes in its own window. Its log is updater.log next to $LogFile."

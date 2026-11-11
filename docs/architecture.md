@@ -412,12 +412,22 @@ flowchart TD
   run -->|stopped| wait[Wait 5 s] --> run
 ```
 
-`install-startup.cmd` adds the logon task and the update task once. `share-dashboard.ps1` adds one more
-that starts zrok. Each one runs in its own window you can see.
+`install-startup.cmd` adds three logon tasks once: the game server, the dashboard and the updater.
+`share-dashboard.ps1` adds one more that starts zrok. Each one runs in its own window you can see.
+
+| Logon task | Script | Window |
+| --- | --- | --- |
+| `Valheim Server` | `start-game-server.ps1` starts `start_headless_server.bat`, unless the server already runs | The game server's console |
+| `Valheim Dashboard` | `start-dashboard.ps1` | Stays open while the dashboard runs |
+| `Valheim Dashboard Updater` | `watch-main.ps1` runs `update-from-main.ps1` every 5 minutes | One window that stays open |
+| `Valheim Dashboard Link` | `run-dashboard-link.ps1` runs zrok and starts it again 30 s after it stops | Stays open while the link runs |
+
+A share zrok had when the PC shut down keeps the link's name, and zrok refuses a new share on that name. Before
+each start, `run-dashboard-link.ps1` deletes that leftover share when no other zrok is running.
 
 ## Updates from main
 
-The update task runs `update-from-main.ps1` every 5 minutes, each run in its own window that closes when it ends.
+`watch-main.ps1` runs `update-from-main.ps1` every 5 minutes inside its one window, each run as its own PowerShell so a failed run never stops the loop.
 
 ```mermaid
 flowchart TD
