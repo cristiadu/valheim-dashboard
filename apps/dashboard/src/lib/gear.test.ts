@@ -1,6 +1,20 @@
 import { describe, expect, it } from 'vitest';
 
-import { gearLabel, gearPiece, gearSheet, iconItems } from '#/lib/gear';
+import { gearEntryOf, gearLabel, gearPiece, gearSheet, iconItems } from '#/lib/gear';
+
+describe('gearEntryOf', () => {
+  it('adds the level only past level 1, and reads back as the same piece', () => {
+    // GIVEN a spear at level 1 and one at level 4
+    const entries = [gearEntryOf('SpearFlint', 1), gearEntryOf('SpearFlint', 4)];
+
+    // WHEN they are read back
+    const pieces = entries.map((entry) => gearPiece(entry).quality);
+
+    // THEN the level shows only on the second, and both read back at their level
+    expect(entries).toEqual(['SpearFlint', 'SpearFlint quality 4']);
+    expect(pieces).toEqual([1, 4]);
+  });
+});
 
 describe('gearPiece', () => {
   it('reads the name, level and slot of a logged piece', () => {

@@ -2,6 +2,9 @@ import { GEAR_NAMES, GEAR_QUALITY_PATTERN, GEAR_SLOT_PATTERNS, type GearPiece, t
 import { recipeItems } from '#/lib/recipes';
 import { capitalized, thingName } from '#/lib/text';
 
+/** Returns how the snapshot keeps a piece of gear: [item] alone at level 1, else with its level, for example `SpearFlint quality 4`. */
+export const gearEntryOf = (item: string, quality: number): string => (quality > 1 ? `${item} quality ${quality}` : item);
+
 /** Reads one piece of gear the snapshot keeps, for example `SpearFlint quality 4`. */
 export const gearPiece = (entry: string): GearPiece => {
   const match = GEAR_QUALITY_PATTERN.exec(entry);

@@ -13,6 +13,9 @@ export const DEFAULT_LOG_FILE = 'C:\\Valheim Server\\logs.txt';
  */
 export const HISTORY_FOLDER_NAME = 'log-history';
 
+/** File extension of a run's copy in the history folder. */
+export const RUN_FILE_EXTENSION = '.txt';
+
 /** Folder next to the server's log that holds one folder per world, for example `worlds_local\Cotil`. */
 export const WORLDS_FOLDER_NAME = 'worlds_local';
 
@@ -225,13 +228,12 @@ export const PLAYER_VITALS_FILE_NAME = 'player-vitals.txt';
 /** One line of the player vitals file, tab separated, for example `Ragnar\t45\t110\t60\t0`. */
 export const PLAYER_VITALS_LINE_PATTERN = /^(?<character>[^\t]+)\t(?<health>\d+)\t(?<maxHealth>\d+)\t(?<stamina>\d+)\t(?<eitr>\d+)$/;
 
-/** File change time kept for a file that was missing, so it is reported once. No real file has it. */
-export const MISSING_FILE_MS = -1;
-
 /** A log being followed and what was read from it. */
 export type Follower = {
   /** Path of the log, for error messages. */
   logFile: string;
+  /** Folder of the log, where the plugin writes its files and the history is kept. */
+  folder: string;
   /** Reads the new lines. */
   tail: LogTail;
   /** Keeps a copy of the run in the history folder. */
@@ -244,12 +246,14 @@ export type Follower = {
   sentSnapshot: Snapshot;
   /** World and time of the save whose global keys were read last, for example `Cotil 2026-10-31T23:30:45.000Z`. */
   worldSaveRead: string | null;
-  /** World and run start whose terrain file was read or reported missing, for example `Cotil 2026-11-01T10:43:52.000Z`. */
+  /** World and run start whose terrain file was read, for example `Cotil 2026-11-01T10:43:52.000Z`. */
   terrainRead: string | null;
-  /** Run start whose item stacks and piece costs files were read or reported missing, for example `2026-11-01T10:43:52.000Z`. */
+  /** Run start whose item stacks, piece costs and craft costs files were read, for example `2026-11-01T10:43:52.000Z`. */
   gameDataRead: string | null;
-  /** Time the player vitals file was last changed when it was read, in milliseconds, [MISSING_FILE_MS] while it is missing, or null before the first read. */
+  /** Time the player vitals file was last changed when it was read, in milliseconds, or null before a read or while it is missing. */
   vitalsChangedMs: number | null;
+  /** Missing files already reported, by a key such as `terrain Cotil 2026-11-01T10:43:52.000Z`, so each is reported once. */
+  reportedMissing: Set<string>;
 };
 
 /** Part of the wiki API's answer to an image address query, for example for `File:Deer_hide.png`. */

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { chestMarkKindOf, chestSpotsOf, foundChests, mapOf, spotLabelOf } from '#/lib/map';
+import { chestMarkKindOf, chestSpotsOf, foundChests, mapOf, spotLabelOf, squareKeyOf, squareOf } from '#/lib/map';
 import { playersOf } from '#/lib/players';
 import { sessionWith, snapshotWith, TEST_NOON_MS } from '#/lib/test-common';
 
@@ -160,5 +160,19 @@ describe('mapOf Leviathans', () => {
     expect(map?.marks).toEqual([
       { key: 'leviathan:1:20', kind: 'leviathan', label: 'Leviathan', x: 10, y: -20, color: 'var(--frost)' },
     ]);
+  });
+});
+
+describe('squareOf', () => {
+  it('reads back the square a spot falls in, west and south of the center too', () => {
+    // GIVEN spots on both sides of the center
+    const keys = [squareKeyOf(10, 20), squareKeyOf(-10, -40)];
+
+    // WHEN the keys are read back
+    const squares = keys.map(squareOf);
+
+    // THEN each gives its column and row
+    expect(keys).toEqual(['0,0', '-1,-2']);
+    expect(squares).toEqual([[0, 0], [-1, -2]]);
   });
 });
