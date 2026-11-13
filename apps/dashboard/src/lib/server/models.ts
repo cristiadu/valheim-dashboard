@@ -184,6 +184,11 @@ export type ServerState = {
   /** When each character last ate each food, as UTC ISO times, by character and food. */
   lastMeals: Record<string, Record<string, string>>;
   /**
+   * What each character took back from their tombstone, whose contents the log gives exactly, by character: how many
+   * of each item and when, as a UTC ISO time. Trusted over counted pickups for [SURE_ITEMS_MINUTES].
+   */
+  sureItems: Record<string, { timeUtc: string; items: Record<string, number> }>;
+  /**
    * How many of each item each character was guessed to have crafted unseen, by character and item, so a later
    * `Made` line for them does not take the cost out again.
    */
@@ -262,6 +267,12 @@ export const MEAL_MINUTES = 20;
  * rounds and food already eaten wears off a little while the player eats.
  */
 export const MEAL_HEALTH_TOLERANCE = 2;
+
+/**
+ * Minutes after a player empties their tombstone during which its exact items are kept over guessed ones when the
+ * bag guess is too full. Later, crafting the server never saw has likely used some of them up.
+ */
+export const SURE_ITEMS_MINUTES = 60;
 
 /** Name of the plugin's file next to the log with each player's health, stamina and eitr now. */
 export const PLAYER_VITALS_FILE_NAME = 'player-vitals.txt';
