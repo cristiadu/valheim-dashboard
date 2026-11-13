@@ -1,0 +1,31 @@
+11/13/2026 00:42:15: Valheim version: 1.0.21 (network version 41)
+11/13/2026 00:42:18: ZNet.LoadWorld: Cotil (Cotil), save number 1183
+11/13/2026 00:42:19: Player history entry with index 0:  Tony Example (Steam_76561198000000001, 3C9D07E1B2A4F856)
+11/13/2026 00:42:23: Game server connected
+11/13/2026 00:42:45: PlayFab listen socket child connected to remote player A1B2C3D4E5F60718
+11/13/2026 00:42:45: PlayFab socket with remote ID playfab/A1B2C3D4E5F60718 received local Platform ID Steam_76561198000000001
+11/13/2026 00:42:45: Got handshake from client playfab/A1B2C3D4E5F60718
+11/13/2026 00:43:13: Got character ZDOID from Ragnar : 549297305:1
+11/13/2026 00:43:14: Wearing: Ragnar has ArmorBronzeChest, ArmorBronzeLegs, CapeTrollHide, HelmetBronze, ShieldBronzeBuckler, SwordBronze
+11/13/2026 00:44:00: Picked up: ArrowFlint x40 by Ragnar (item 549297305:10)
+11/13/2026 00:44:05: Picked up: ArrowFire x20 by Ragnar (item 549297305:11)
+11/13/2026 00:44:10: Picked up: Coal x30 by Ragnar (item 549297305:12)
+11/13/2026 00:45:50: Picked up: CopperOre x10 by Ragnar (item 549297305:13)
+11/13/2026 00:46:00: Smelting: CopperOre x10 in smelter by Ragnar
+11/13/2026 00:46:02: Smelting: Coal x10 in smelter by Ragnar
+11/13/2026 00:50:10: Shot: ArrowFlint by Ragnar
+11/13/2026 00:50:11: Shot: ArrowFlint by Ragnar
+11/13/2026 00:50:12: Shot: ArrowFlint by Ragnar
+11/13/2026 00:50:13: Shot: ArrowFlint by Ragnar
+11/13/2026 00:50:14: Shot: ArrowFlint by Ragnar
+11/13/2026 00:50:15: Shot: ArrowFlint by Ragnar
+11/13/2026 00:50:16: Shot: ArrowFlint by Ragnar
+11/13/2026 00:50:17: Shot: ArrowFlint by Ragnar
+11/13/2026 00:50:18: Shot: ArrowFlint by Ragnar
+11/13/2026 00:50:19: Shot: ArrowFlint by Ragnar
+11/13/2026 00:50:20: Shot: ArrowFlint by Ragnar
+11/13/2026 00:50:21: Shot: ArrowFlint by Ragnar
+11/13/2026 00:50:30: Shot: ArrowFire by Ragnar
+11/13/2026 00:50:33: Shot: ArrowFire by Ragnar
+11/13/2026 00:50:36: Shot: ArrowFire by Ragnar
+11/13/2026 00:51:00: Creature killed: Troll level 1 by Ragnar
