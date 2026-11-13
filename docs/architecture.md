@@ -205,7 +205,7 @@ kept in the snapshot:
 ```mermaid
 flowchart LR
   in["Picked up, taken from a chest, tombstone emptied, gear worn"] --> bag[Bag per character]
-  bag --> out["Dropped, stored, smelted, cooked, put in a fermenter, eaten, burnt in a fire, hung on a stand, built with, planted, crafted with"]
+  bag --> out["Dropped, stored, smelted or burnt in a smelter, cooked, put in a fermenter, eaten, shot, burnt in a fire, hung on a stand, built with, planted, crafted with"]
   death["Tombstone made"] -->|empties, takes off worn gear| bag
 ```
 
@@ -217,7 +217,8 @@ be off. Gear worn now always stays in the bag.
 A meal takes one food out. When the log only says `Ate something`, it is the food the player carries most of,
 skipping foods eaten in the last 20 minutes, since a food still in effect can't be eaten again. Each `Fueled`
 line takes out one of what that fire burns. Both lists come from the plugin: `foods.txt` and `fire-fuels.txt`
-(`piece_groundtorch_wood Resin`).
+(`piece_groundtorch_wood Resin`). Each `Shot` line takes out one arrow or bolt, and coal put in a smelter comes
+out through its `Smelting` line.
 
 Items on the ground have an ID, the game's object ID. The same ID is on the drop and the pickup, so an item
 counts once however often it is seen:
@@ -242,9 +243,14 @@ flowchart LR
   stacks --> slots
 ```
 
-The guess never needs more than 32 slots. When it would, the stackable material touched longest ago is taken out,
-as it most likely went into crafting. Gear and tools go only when no material is left, and what a player wears
-now never does.
+The guess never needs more than 32 slots. When it would, one slot at a time is taken from the stackable material
+filling the most slots, as a big pile most likely went into crafting the server did not see. Gear and tools go only
+when no material is left, and what a player wears now never does.
+
+```mermaid
+flowchart LR
+  full["Bag guess needs 33 slots: Wood 130, Honey 20, ..."] -->|biggest pile loses its part-filled slot| fit["Wood 100, Honey 20, ...: 32 slots"]
+```
 
 The plugin logs everything a player wears, holds or carries on the back whenever it changes (`Wearing:`). The
 Vikings character sheet puts each of those pieces in its slot, at the newest level seen in the gear lines, and

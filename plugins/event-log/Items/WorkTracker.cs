@@ -4,8 +4,8 @@ using UnityEngine;
 namespace ValheimDashboard.EventLog
 {
     /// <summary>
-    /// Logs trees cut down, rocks mined out and ore or wood put into smelters, kilns and other stations that turn
-    /// one item into another. A player hitting or filling an object another player's game owns asks that game
+    /// Logs trees cut down, rocks mined out, and ore, wood or fuel put into smelters, kilns and other stations that
+    /// turn one item into another. A player hitting or filling an object another player's game owns asks that game
     /// through the server, so the server sees who asked. Otherwise the player is the one whose game owns it.
     /// </summary>
     internal static class WorkTracker
@@ -45,6 +45,9 @@ namespace ValheimDashboard.EventLog
         /// <summary>Items queued in each station at the last scan, by object ID.</summary>
         private static readonly Dictionary<ZDOID, List<string>> Queues = new Dictionary<ZDOID, List<string>>();
 
+        /// <summary>Fuel in each station that burns one, such as coal in a smelter, at the last scan, by object ID.</summary>
+        private static readonly Dictionary<ZDOID, float> Fuels = new Dictionary<ZDOID, float>();
+
         /// <summary>
         /// Remembers who asked when [data] is a hit, an item put into a station or a fermenter, a portal name, a
         /// saddle, fuel, a repair or a map shared.
@@ -58,13 +61,14 @@ namespace ValheimDashboard.EventLog
             }
         }
 
-        /// <summary>Logs the items put into a station since the last scan.</summary>
+        /// <summary>Logs the items and the fuel put into a station since the last scan.</summary>
         public static void See(ZDO zdo)
         {
             if (!Names.Has<Smelter>(zdo))
             {
                 return;
             }
+            SeeFuel(zdo);
             List<string> queue = new List<string>();
             int queued = zdo.GetInt(ZDOVars.s_queued);
             for (int i = 0; i < queued; i++)
@@ -78,10 +82,31 @@ namespace ValheimDashboard.EventLog
             Queues[zdo.m_uid] = queue;
         }
 
+        /// <summary>
+        /// Logs the fuel put into [station] since the last scan, such as coal in a smelter, one per unit of fuel. Fuel
+        /// only goes up when a player adds it. A kiln burns no fuel.
+        /// </summary>
+        private static void SeeFuel(ZDO station)
+        {
+            ItemDrop fuelItem = Names.Prefab(station).GetComponent<Smelter>().m_fuelItem;
+            if (fuelItem == null)
+            {
+                return;
+            }
+            float fuel = station.GetFloat(ZDOVars.s_fuel);
+            if (Fuels.TryGetValue(station.m_uid, out float before) && fuel > before)
+            {
+                int added = Mathf.Max(1, Mathf.RoundToInt(fuel - before));
+                GameEventLog.Write($"Smelting: {fuelItem.gameObject.name} x{added} in {Names.PrefabName(station)} by {Doer(station)}");
+            }
+            Fuels[station.m_uid] = fuel;
+        }
+
         /// <summary>Logs a tree cut down or a rock mined out as the server destroys it.</summary>
         public static void Destroyed(ZDO zdo)
         {
             Queues.Remove(zdo.m_uid);
+            Fuels.Remove(zdo.m_uid);
             if (Names.Has<TreeBase>(zdo))
             {
                 GameEventLog.Write($"Tree cut: {Names.PrefabName(zdo)} by {Doer(zdo)}");

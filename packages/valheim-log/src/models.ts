@@ -81,6 +81,7 @@ export type LogEvent = { timeUtc: string } & (
   | { type: 'tameFollowing'; creature: string; player: string }
   | { type: 'cartPulled'; player: string | null; cart: string }
   | { type: 'obliterated'; item: string; count: number; player: string | null }
+  | { type: 'shot'; item: string; player: string | null }
   | { type: 'fueled'; fire: string; player: string | null }
   | { type: 'repaired'; piece: string; player: string | null }
   | { type: 'mapShared'; player: string | null; table: string }

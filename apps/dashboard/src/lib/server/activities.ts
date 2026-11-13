@@ -97,6 +97,9 @@ export const addActivityOf = (snapshot: Snapshot, event: LogEvent, line: string)
     case 'obliterated':
       addActivity(snapshot, line, timeUtc, event.player, 'obliterated', event.item, event.count);
       break;
+    case 'shot':
+      addActivity(snapshot, line, timeUtc, event.player, 'shot', event.item, 1);
+      break;
     case 'fueled':
       addActivity(snapshot, line, timeUtc, event.player, 'fueled', event.fire, 1);
       break;

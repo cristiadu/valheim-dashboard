@@ -6,7 +6,7 @@ import type { StoryKind } from '#/lib/models/story';
  * from the world, items stored in or taken from chests, crops planted, food eaten, items put into smelters, food
  * put on to cook, mead bases put into fermenters, ships steered, crafting stations opened, emotes, items made or
  * upgraded, tames ridden, forsaken powers used, carts pulled, fires fueled, pieces repaired, items obliterated,
- * trees cut down or rocks mined out.
+ * arrows and bolts shot, trees cut down or rocks mined out.
  */
 export type ActivityKind =
   | 'built'
@@ -31,6 +31,7 @@ export type ActivityKind =
   | 'fueled'
   | 'repaired'
   | 'obliterated'
+  | 'shot'
   | 'cut'
   | 'mined';
 
@@ -74,6 +75,7 @@ export const ACTIVITY_STORY_KINDS: Record<ActivityKind, StoryKind> = {
   fueled: 'built',
   repaired: 'built',
   obliterated: 'items',
+  shot: 'items',
   cut: 'items',
   mined: 'items',
 };
@@ -104,6 +106,7 @@ export const ACTIVITY_WORDS: Record<Exclude<ActivityKind, 'destroyed'>, { verb: 
   fueled: { verb: 'fueled', one: 'fire', many: 'fires', ending: '' },
   repaired: { verb: 'repaired', one: 'piece', many: 'pieces', ending: '' },
   obliterated: { verb: 'obliterated', one: 'item', many: 'items', ending: '' },
+  shot: { verb: 'shot', one: 'arrow or bolt', many: 'arrows and bolts', ending: '' },
   cut: { verb: 'cut down', one: 'tree', many: 'trees', ending: '' },
   mined: { verb: 'mined out', one: 'rock', many: 'rocks', ending: '' },
 };
@@ -116,7 +119,7 @@ export const PLAYER_ACTIVITY_STATS: { kind: ActivityKind; label: string }[] = [
   { kind: 'mined', label: 'Rocks mined' },
   { kind: 'planted', label: 'Crops planted' },
   { kind: 'ate', label: 'Meals eaten' },
-  { kind: 'smelted', label: 'Ores smelted' },
+  { kind: 'smelted', label: 'Put in smelters' },
   { kind: 'cooked', label: 'Food cooked' },
   { kind: 'brewed', label: 'Meads brewed' },
   { kind: 'crafted', label: 'Crafting visits' },
@@ -129,6 +132,7 @@ export const PLAYER_ACTIVITY_STATS: { kind: ActivityKind; label: string }[] = [
   { kind: 'fueled', label: 'Fires fueled' },
   { kind: 'repaired', label: 'Pieces repaired' },
   { kind: 'obliterated', label: 'Items obliterated' },
+  { kind: 'shot', label: 'Arrows shot' },
 ];
 
 /** Thing a meal counts as when the server never learned what the player ate, left out of the item list. */

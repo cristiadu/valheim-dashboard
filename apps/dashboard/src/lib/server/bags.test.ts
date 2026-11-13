@@ -50,6 +50,24 @@ describe('updateBags', () => {
     expect(bag).toEqual({ RawMeat: 1 });
   });
 
+  it('takes out each arrow shot and the coal put in a smelter', () => {
+    // GIVEN Ragnar picks up fire arrows and coal, shoots two arrows and puts 5 coal in a smelter
+    readLines(state, [
+      ...RUN_START,
+      logLine('03:00:00', 'Picked up: ArrowFire x20 by Ragnar'),
+      logLine('03:00:01', 'Picked up: Coal x12 by Ragnar'),
+      logLine('03:00:02', 'Shot: ArrowFire by Ragnar'),
+      logLine('03:00:03', 'Shot: ArrowFire by Ragnar'),
+      logLine('03:00:04', 'Smelting: Coal x5 in smelter by Ragnar'),
+    ]);
+
+    // WHEN his bag is read
+    const bag = state.snapshot.bags['Ragnar'];
+
+    // THEN 18 arrows and 7 coal are left
+    expect(bag).toEqual({ ArrowFire: 18, Coal: 7 });
+  });
+
   it('empties the bag into the tombstone on death and fills it again when the tombstone is emptied', () => {
     // GIVEN Ragnar carries stone, dies with a sword and coins, then empties his tombstone
     readLines(state, [
@@ -103,28 +121,28 @@ describe('updateBags', () => {
     expect(bag).toEqual({ Wood: 6, CarrotSeeds: 2 });
   });
 
-  it('keeps the bag within 32 slots by taking out the oldest materials first, never gear or what is worn', () => {
-    // GIVEN wood stacks to 50 and a hammer to 1, Ragnar wears a spear and was seen with a hammer, picks up 30 kinds of
-    // trophies, then 150 wood
-    state.snapshot.itemStacks = { Wood: 50, Hammer: 1 };
+  it('keeps the bag within 32 slots by taking slots from the biggest pile of material, never gear or what is worn', () => {
+    // GIVEN wood stacks to 50, trophies to 20 and a hammer to 1, Ragnar wears a spear and was seen with a hammer,
+    // picks up 28 kinds of trophies, then 130 wood, one slot more than he has
+    const trophies = Array.from({ length: 28 }, (_, index) => `Trophy${index}`);
+    state.snapshot.itemStacks = { Wood: 50, Hammer: 1, ...Object.fromEntries(trophies.map((trophy) => [trophy, 20])) };
     readLines(state, [
       ...RUN_START,
       logLine('02:58:00', 'Gear: Ragnar Hammer quality 3'),
       logLine('02:59:00', 'Wearing: Ragnar has SpearFlint'),
-      ...Array.from({ length: 30 }, (_, index) => logLine('03:00:00', `Picked up: Trophy${index} x1 by Ragnar`)),
-      logLine('03:01:00', 'Picked up: Wood x150 by Ragnar'),
+      ...trophies.map((trophy) => logLine('03:00:00', `Picked up: ${trophy} x1 by Ragnar`)),
+      logLine('03:01:00', 'Picked up: Wood x130 by Ragnar'),
     ]);
 
     // WHEN his bag is read
     const bag = state.snapshot.bags['Ragnar']!;
 
-    // THEN the hammer, the spear and the wood stay, and the three oldest trophies are gone to make room
-    expect(Object.keys(bag)).toHaveLength(30);
+    // THEN the part-filled wood slot of 30 is gone, and the hammer, the spear and every trophy stay
+    expect(bag['Wood']).toBe(100);
     expect(bag['Hammer']).toBe(1);
     expect(bag['SpearFlint']).toBe(1);
-    expect(bag['Wood']).toBe(150);
-    expect(bag['Trophy2']).toBeUndefined();
-    expect(bag['Trophy3']).toBe(1);
+    expect(bag['Trophy0']).toBe(1);
+    expect(Object.keys(bag)).toHaveLength(31);
   });
 
   it('moves a dropped item to whoever picks it up, and counts each item ID once', () => {

@@ -174,8 +174,9 @@ describe('server state', () => {
     ]);
   });
 
-  it('keeps items made, upgrades, powers, rides, carts, meals, fuel, repairs and obliterating as activities per player', () => {
-    // GIVEN Yan makes arrows, upgrades a sword, uses his power twice, rides, pulls a cart, eats, fuels, repairs and obliterates
+  it('keeps items made, upgrades, powers, rides, carts, meals, fuel, repairs, obliterating and shots as activities per player', () => {
+    // GIVEN Yan makes arrows, upgrades a sword, uses his power twice, rides, pulls a cart, eats, fuels, repairs,
+    // obliterates and shoots three arrows
     readLines(state, [
       ...RUN_START,
       logLine('03:00:00', 'Made: ArrowFlint x20 by Yan'),
@@ -190,6 +191,9 @@ describe('server state', () => {
       logLine('03:02:10', 'Repaired: wood_wall by Yan'),
       logLine('03:02:20', 'Repaired: wood_wall by Yan'),
       logLine('03:02:30', 'Obliterated: Resin x20 in incinerator by Yan'),
+      logLine('03:02:40', 'Shot: ArrowFlint by Yan'),
+      logLine('03:02:41', 'Shot: ArrowFlint by Yan'),
+      logLine('03:02:42', 'Shot: ArrowFire by Yan'),
     ]);
 
     // WHEN the activities are listed
@@ -206,6 +210,7 @@ describe('server state', () => {
       ['Yan', 'fueled', { fire_pit: 1 }],
       ['Yan', 'repaired', { wood_wall: 2 }],
       ['Yan', 'obliterated', { Resin: 20 }],
+      ['Yan', 'shot', { ArrowFlint: 2, ArrowFire: 1 }],
     ]);
   });
 

@@ -99,10 +99,26 @@ const payFor = (state: ServerState, character: string, piece: string): void => {
   }
 };
 
+/** Returns how many slots the [item] in [bag] fill, in stacks of the most one slot holds in [stacks]. */
+const slotsOf = (bag: Record<string, number>, item: string, stacks: Record<string, number>): number =>
+  Math.ceil(bag[item]! / (stacks[item] ?? bag[item]!));
+
+/** Takes one slot of [item] out of [bag]: the part-filled slot when there is one, or else a full stack of [stack]. */
+const takeOneSlot = (bag: Record<string, number>, item: string, stack: number): void => {
+  const rest = bag[item]! % stack;
+  const taken = rest > 0 ? rest : stack;
+  if (bag[item]! <= taken) {
+    delete bag[item];
+  } else {
+    bag[item]! -= taken;
+  }
+};
+
 /**
- * Keeps [character]'s bag in [snapshot] within the slots a player has. Crafting and dropping are not in the log, so
- * while the guess needs more slots, an item is taken out: first the stackable material touched longest ago, as it
- * most likely went into crafting, then the oldest piece of gear or tool. What is worn now is never taken out.
+ * Keeps [character]'s bag in [snapshot] within the slots a player has. Crafting is only seen once a made item reaches
+ * the world, so materials pile up in the guess. While it needs more slots, one slot at a time is taken from the
+ * stackable material filling the most slots, oldest touched first on a tie, so a big pile of guessed wood shrinks
+ * before a small real stack goes. Without materials, the oldest piece of gear or tool goes. What is worn now stays.
  */
 const fitBag = (snapshot: Snapshot, character: string): void => {
   const bag = snapshot.bags[character];
@@ -110,16 +126,21 @@ const fitBag = (snapshot: Snapshot, character: string): void => {
     return;
   }
   const { capacity } = containerGrid(PLAYER_PREFAB, 0);
+  const stacks = snapshot.itemStacks;
   const worn = snapshot.worn[character] ?? [];
   const gear = new Set((snapshot.gear[character] ?? []).map((entry) => gearPiece(entry).prefab));
-  while (slotsUsed(bag, snapshot.itemStacks) > capacity) {
+  while (slotsUsed(bag, stacks) > capacity) {
     const items = Object.keys(bag).filter((item) => !worn.includes(item));
-    const oldest =
-      items.find((item) => !gear.has(item) && (snapshot.itemStacks[item] ?? MIN_STACKABLE) >= MIN_STACKABLE) ?? items[0];
-    if (oldest === undefined) {
+    const materials = items.filter((item) => !gear.has(item) && (stacks[item] ?? MIN_STACKABLE) >= MIN_STACKABLE);
+    const fullest = materials.toSorted((first, second) => slotsOf(bag, second, stacks) - slotsOf(bag, first, stacks))[0];
+    if (fullest !== undefined) {
+      takeOneSlot(bag, fullest, stacks[fullest] ?? bag[fullest]!);
+      continue;
+    }
+    if (items[0] === undefined) {
       return;
     }
-    delete bag[oldest];
+    delete bag[items[0]];
   }
 };
 
@@ -157,6 +178,7 @@ const bagOwnerOf = (event: LogEvent): string | null => {
     case 'itemHung':
     case 'planted':
     case 'fueled':
+    case 'shot':
     case 'tombstoneEmptied':
       return event.player;
     default:
@@ -167,10 +189,10 @@ const bagOwnerOf = (event: LogEvent): string | null => {
 /**
  * Updates the guess of what each character carries in [state] from [event]. Items come in when picked up, taken from
  * a chest or a tombstone, or seen worn or held, and go out when dropped, stored, smelted, cooked, fermented, eaten,
- * burnt in a fire, hung on a stand, or used to build, plant or craft. An item on the ground has an ID, so each pickup
- * counts once. Gear worn now always stays in the bag, and a death empties the bag into the tombstone and takes off
- * everything worn until the next gear line. Crafting is only seen once a
- * made item reaches a chest or the ground, so the bag is only a guess, kept within the player's slots.
+ * shot, burnt in a fire, hung on a stand, or used to build, plant or craft. An item on the ground has an ID, so each
+ * pickup counts once. Gear worn now always stays in the bag, and a death empties the bag into the tombstone and takes
+ * off everything worn until the next gear line. Crafting is only seen once a made item reaches a chest or the ground,
+ * so the bag is only a guess, kept within the player's slots.
  */
 export const updateBags = (state: ServerState, event: LogEvent): void => {
   const { snapshot } = state;
@@ -201,6 +223,7 @@ export const updateBags = (state: ServerState, event: LogEvent): void => {
       break;
     case 'foodStarted':
     case 'itemHung':
+    case 'shot':
       addToBag(snapshot, character, event.item, -1);
       break;
     case 'fueled': {
