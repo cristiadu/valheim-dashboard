@@ -85,6 +85,7 @@ export const createServerState = (serverUtcOffsetMinutes: number): ServerState =
     pieceCosts: {},
     craftCosts: {},
     pickedUpItemIds: new Set(),
+    droppers: new Map(),
     foods: {},
     fireFuels: {},
     lastMeals: {},
@@ -154,6 +155,7 @@ export const startNewLog = (state: ServerState): void => {
   state.reader = createLogReader(snapshot.serverUtcOffsetMinutes);
   state.pendingSaveNumber = null;
   state.pickedUpItemIds.clear();
+  state.droppers.clear();
   Object.assign(snapshot, {
     world: null,
     version: null,
@@ -198,7 +200,7 @@ export const readLogLine = (state: ServerState, line: string): void => {
   if (isStoryNews(event, addFirstSeen(snapshot, event))) {
     pushCapped(snapshot.events, { ...event, line } as StoryEvent, MAX_EVENTS);
   }
-  addActivityOf(snapshot, event, line);
+  addActivityOf(state, event, line);
   updateBags(state, event);
   for (const item of itemsSeenIn(event)) {
     if (!snapshot.seenItems.includes(item)) {

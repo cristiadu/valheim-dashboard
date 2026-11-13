@@ -6,7 +6,8 @@ import type { StoryKind } from '#/lib/models/story';
  * from the world, items stored in or taken from chests, crops planted, food eaten, items put into smelters, food
  * put on to cook, mead bases put into fermenters, ships steered, crafting stations opened, emotes, items made or
  * upgraded, tames ridden, forsaken powers used, carts pulled, fires fueled, pieces repaired, items obliterated,
- * arrows and bolts shot, trees cut down or rocks mined out.
+ * arrows and bolts shot, trees cut down or rocks mined out, items dropped on the ground, or items picked up that
+ * another player dropped.
  */
 export type ActivityKind =
   | 'built'
@@ -33,7 +34,9 @@ export type ActivityKind =
   | 'obliterated'
   | 'shot'
   | 'cut'
-  | 'mined';
+  | 'mined'
+  | 'dropped'
+  | 'received';
 
 /** One player's activity of one kind, with pauses under a few minutes, told as one story line. */
 export type ActivityRecord = {
@@ -47,6 +50,8 @@ export type ActivityRecord = {
   endUtc: string;
   /** How many of each thing, by prefab name, for example `{ wood_floor_1x1: 14 }` or `{ Troll: 2 }`. */
   things: Record<string, number>;
+  /** Player who dropped the items, for items picked up that another player dropped. */
+  from?: string;
   /** Log lines of the stretch. */
   source: SourceLines;
 };
@@ -78,6 +83,8 @@ export const ACTIVITY_STORY_KINDS: Record<ActivityKind, StoryKind> = {
   shot: 'items',
   cut: 'items',
   mined: 'items',
+  dropped: 'items',
+  received: 'items',
 };
 
 /**
@@ -109,6 +116,8 @@ export const ACTIVITY_WORDS: Record<Exclude<ActivityKind, 'destroyed'>, { verb: 
   shot: { verb: 'shot', one: 'arrow or bolt', many: 'arrows and bolts', ending: '' },
   cut: { verb: 'cut down', one: 'tree', many: 'trees', ending: '' },
   mined: { verb: 'mined out', one: 'rock', many: 'rocks', ending: '' },
+  dropped: { verb: 'dropped', one: 'item', many: 'items', ending: '' },
+  received: { verb: 'picked up', one: 'item', many: 'items', ending: '' },
 };
 
 /** Activity totals on a player's card, in this order, with the label under each number. Kills have their own number. */
@@ -133,6 +142,7 @@ export const PLAYER_ACTIVITY_STATS: { kind: ActivityKind; label: string }[] = [
   { kind: 'repaired', label: 'Pieces repaired' },
   { kind: 'obliterated', label: 'Items obliterated' },
   { kind: 'shot', label: 'Arrows shot' },
+  { kind: 'dropped', label: 'Items dropped' },
 ];
 
 /** Thing a meal counts as when the server never learned what the player ate, left out of the item list. */
