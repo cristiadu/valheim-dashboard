@@ -40,18 +40,55 @@ const keepWorn = (snapshot: Snapshot, character: string, movedItem: string | nul
 };
 
 /**
- * Takes what making [count] of [item] at [level] costs out of [character]'s bag in [state]. A craft can make more
- * than one, such as 20 arrows, and an upgrade makes one.
+ * Takes what making [count] of [item] at [level] costs out of [character]'s bag in [state], and returns how many the
+ * crafts made. A craft can make more than one, such as 20 arrows, and an upgrade makes one.
  */
-const payForCraft = (state: ServerState, character: string, item: string, level: number, count: number): void => {
+const payForCraft = (state: ServerState, character: string, item: string, level: number, count: number): number => {
   const cost = state.craftCosts[item]?.[level];
   if (cost === undefined) {
-    return;
+    return 0;
   }
   const crafts = Math.ceil(count / cost.yields);
   for (const [ingredient, amount] of Object.entries(cost.items)) {
     addToBag(state.snapshot, character, ingredient, -amount * crafts);
   }
+  return crafts * cost.yields;
+};
+
+/**
+ * Pays for [count] of [item] at [level] that a `Made` or `Upgraded` line says [character] made, as in [payForCraft],
+ * except the ones in [state] already guessed as crafted unseen and paid for when they left the bag.
+ */
+const payForSeenCraft = (state: ServerState, character: string, item: string, level: number, count: number): void => {
+  const unseen = (state.unseenCrafts[character] ??= {});
+  const alreadyPaid = level === 1 ? Math.min(unseen[item] ?? 0, count) : 0;
+  unseen[item] = (unseen[item] ?? 0) - alreadyPaid;
+  if (count > alreadyPaid) {
+    payForCraft(state, character, item, level, count - alreadyPaid);
+  }
+};
+
+/**
+ * Makes sure [character]'s bag in [state] holds [count] of [item] before they use, store, drop or wear it. Crafting
+ * happens on the player's game and is often never seen, so when the bag holds fewer and the item can be crafted, the
+ * missing ones were crafted: their cost comes out and what the crafts made goes in, remembered so a later `Made` line
+ * for them does not pay again.
+ */
+const craftMissing = (state: ServerState, character: string, item: string, count: number): void => {
+  const missing = count - (state.snapshot.bags[character]?.[item] ?? 0);
+  if (missing <= 0 || state.craftCosts[item]?.[1] === undefined) {
+    return;
+  }
+  const made = payForCraft(state, character, item, 1, missing);
+  const unseen = (state.unseenCrafts[character] ??= {});
+  unseen[item] = (unseen[item] ?? 0) + made;
+  addToBag(state.snapshot, character, item, made);
+};
+
+/** Takes [count] of [item] out of [character]'s bag in [state], crafting the ones it is missing first. */
+const takeOut = (state: ServerState, character: string, item: string, count: number): void => {
+  craftMissing(state, character, item, count);
+  addToBag(state.snapshot, character, item, -count);
 };
 
 /**
@@ -106,7 +143,7 @@ const eat = (state: ServerState, character: string, food: string | null, maxHeal
     return;
   }
   meals[eaten] = timeUtc;
-  addToBag(state.snapshot, character, eaten, -1);
+  takeOut(state, character, eaten, 1);
 };
 
 /** Takes what building [piece] costs out of [character]'s bag in [state]. */
@@ -237,7 +274,8 @@ const bagOwnerOf = (event: LogEvent): string | null => {
  * shot, burnt in a fire, hung on a stand, or used to build, plant or craft. An item on the ground has an ID, so each
  * pickup counts once. Gear worn now always stays in the bag, and a death empties the bag into the tombstone and takes
  * off everything worn until the next gear line. Crafting is only seen once a made item reaches a chest or the ground,
- * so the bag is only a guess, kept within the player's slots.
+ * so something leaving the bag or worn that the bag never had is taken as crafted unseen. The bag is only a guess,
+ * kept within the player's slots.
  */
 export const updateBags = (state: ServerState, event: LogEvent): void => {
   const { snapshot } = state;
@@ -252,13 +290,17 @@ export const updateBags = (state: ServerState, event: LogEvent): void => {
       }
       break;
     case 'itemDropped':
-      addToBag(snapshot, character, event.item, -event.count);
+      takeOut(state, character, event.item, event.count);
       break;
     case 'itemMade':
-      payForCraft(state, character, event.item, event.level, event.count);
+      payForSeenCraft(state, character, event.item, event.level, event.count);
       break;
     case 'chestChanged':
-      addToBag(snapshot, character, event.item, event.isStored ? -event.count : event.count);
+      if (event.isStored) {
+        takeOut(state, character, event.item, event.count);
+      } else {
+        addToBag(snapshot, character, event.item, event.count);
+      }
       break;
     case 'smelting':
       addToBag(snapshot, character, event.item, -event.count);
@@ -269,7 +311,7 @@ export const updateBags = (state: ServerState, event: LogEvent): void => {
     case 'foodStarted':
     case 'itemHung':
     case 'shot':
-      addToBag(snapshot, character, event.item, -1);
+      takeOut(state, character, event.item, 1);
       break;
     case 'fueled': {
       const fuel = state.fireFuels[event.fire];
@@ -285,10 +327,12 @@ export const updateBags = (state: ServerState, event: LogEvent): void => {
       payFor(state, character, event.plant);
       break;
     case 'gearSeen':
+      craftMissing(state, character, event.item, 1);
       keepInBag(snapshot, character, event.item);
       break;
     case 'wearing':
       for (const item of event.items) {
+        craftMissing(state, character, item, 1);
         keepInBag(snapshot, character, item);
       }
       break;

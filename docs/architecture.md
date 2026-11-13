@@ -214,6 +214,11 @@ out what the recipe costs, from `craft-costs.txt` (`ArrowWood 1 20 Wood x8`). Th
 `logs.txt` on each start. A craft is only seen once the made item reaches a chest or the ground, so the guess can
 be off. Gear worn now always stays in the bag.
 
+When something leaves the bag, or is first seen worn, and the bag never had it, it was crafted where the server
+couldn't see. If it has a recipe, one craft's cost comes out and what it made goes in, so shooting 2 fire arrows
+from an empty bag takes 8 wood, 8 resin and 2 feathers and leaves 18 arrows. A `Made` line that comes later for
+those same items doesn't pay again.
+
 A meal takes one food out. When the log only says `Ate something`, it is the food the player carries most of,
 skipping foods eaten in the last 20 minutes, since a food still in effect can't be eaten again. The line also
 says how much the player's max health went up, so only foods giving about that much health count. A rise of 0

@@ -188,6 +188,11 @@ export type ServerState = {
    * of each item and when, as a UTC ISO time. Trusted over counted pickups for [SURE_ITEMS_MINUTES].
    */
   sureItems: Record<string, { timeUtc: string; items: Record<string, number> }>;
+  /**
+   * How many of each item each character was guessed to have crafted unseen, by character and item, so a later
+   * `Made` line for them does not take the cost out again.
+   */
+  unseenCrafts: Record<string, Record<string, number>>;
 };
 
 /** What one craft of an item at one level makes and takes, for example 20 wood arrows from `{ Wood: 8 }`. */

@@ -210,6 +210,63 @@ describe('updateBags', () => {
     expect(bag).toEqual({ Wood: 21 });
   });
 
+  it('takes the cost of arrows shot that the bag never had, as they were crafted unseen', () => {
+    // GIVEN 20 wood arrows take 8 wood, and Ragnar picks up 10 wood, then shoots 2 wood arrows nobody saw him make
+    state.craftCosts = { ArrowWood: { 1: { yields: 20, items: { Wood: 8 } } } };
+    readLines(state, [
+      ...RUN_START,
+      logLine('03:00:00', 'Picked up: Wood x10 by Ragnar'),
+      logLine('03:00:01', 'Shot: ArrowWood by Ragnar'),
+      logLine('03:00:02', 'Shot: ArrowWood by Ragnar'),
+    ]);
+
+    // WHEN his bag is read
+    const bag = state.snapshot.bags['Ragnar'];
+
+    // THEN one craft took 8 wood and made 20 arrows, and 18 are left
+    expect(bag).toEqual({ Wood: 2, ArrowWood: 18 });
+  });
+
+  it('does not pay again when the made line comes after the crafted items were stored', () => {
+    // GIVEN 20 wood arrows take 8 wood, and Ragnar picks up 16 wood, stores 20 arrows the bag never had, and then
+    // the plugin sees those 20 arrows as made
+    state.craftCosts = { ArrowWood: { 1: { yields: 20, items: { Wood: 8 } } } };
+    readLines(state, [
+      ...RUN_START,
+      logLine('03:00:00', 'Picked up: Wood x16 by Ragnar'),
+      logLine('03:00:01', 'Stored: ArrowWood x20 in piece_chest_wood by Ragnar'),
+      logLine('03:00:01', 'Made: ArrowWood x20 by Ragnar'),
+    ]);
+
+    // WHEN his bag is read
+    const bag = state.snapshot.bags['Ragnar'];
+
+    // THEN only one craft took 8 wood
+    expect(bag).toEqual({ Wood: 8 });
+  });
+
+  it('takes the cost of gear first seen worn that the bag never had, but not of gear it had', () => {
+    // GIVEN a club takes 6 wood and a torch 1 wood and 1 resin, and Ragnar picks up 10 wood, 2 resin and a torch,
+    // then is seen holding the club and the torch
+    state.craftCosts = {
+      Club: { 1: { yields: 1, items: { Wood: 6 } } },
+      Torch: { 1: { yields: 1, items: { Wood: 1, Resin: 1 } } },
+    };
+    readLines(state, [
+      ...RUN_START,
+      logLine('03:00:00', 'Picked up: Wood x10 by Ragnar'),
+      logLine('03:00:01', 'Picked up: Resin x2 by Ragnar'),
+      logLine('03:00:02', 'Picked up: Torch x1 by Ragnar'),
+      logLine('03:00:03', 'Wearing: Ragnar has Club, Torch'),
+    ]);
+
+    // WHEN his bag is read
+    const bag = state.snapshot.bags['Ragnar'];
+
+    // THEN only the club was crafted, taking 6 wood
+    expect(bag).toEqual({ Wood: 4, Resin: 2, Torch: 1, Club: 1 });
+  });
+
   it('puts worn gear back after a spare is stored, but not gear stored and taken off', () => {
     // GIVEN Ragnar wears a sword and a helmet, stores a spare sword, picks up stone, then stores the helmet and takes it off
     readLines(state, [
