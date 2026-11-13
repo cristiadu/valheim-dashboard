@@ -78,6 +78,20 @@ describe('wikiTitlesOf', () => {
     expect(wikiTitlesOf('Flint arrow')).toEqual(['File:Flinthead Arrow.png']);
   });
 
+  it('also tries only the first word capitalized, as the wiki names some files', () => {
+    // GIVEN an item the game names with capitals and the wiki without
+    // WHEN its wiki titles are asked for
+    // THEN the wiki's `Wooden_mace` spelling is tried last
+    expect(wikiTitlesOf('Wooden Mace')).toEqual(['File:Wooden_Mace.png', 'File:Wooden_mace.png']);
+  });
+
+  it('writes a colon in the name as a dash, as the wiki names mead bases', () => {
+    // GIVEN a mead base the game names with a colon
+    // WHEN its wiki titles are asked for
+    // THEN the wiki's `Mead_Base_-_Tasty` spelling comes first
+    expect(wikiTitlesOf('Mead Base: Tasty')).toEqual(['File:Mead_Base_-_Tasty.png', 'File:Mead_base_-_tasty.png']);
+  });
+
   it('asks once for a one-word name', () => {
     // GIVEN a one-word item
     // WHEN its wiki titles are asked for
@@ -153,6 +167,25 @@ describe('iconFile', () => {
     // THEN both are missing and the wiki was asked once
     expect([first, second]).toEqual([null, null]);
     expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('asks the wiki again on the next view after asking failed', async () => {
+    // GIVEN a wiki that cannot be reached once, then has the item's file
+    const fetchMock = vi
+      .fn()
+      .mockRejectedValueOnce(new TypeError('fetch failed'))
+      .mockResolvedValueOnce(
+        Response.json({ query: { pages: { '5': { title: 'File:Obsidian.png', imageinfo: [{ url: 'https://static.example/Obsidian.png' }] } } } }),
+      )
+      .mockResolvedValueOnce(new Response('png'));
+    vi.stubGlobal('fetch', fetchMock);
+
+    // WHEN the icon is asked for, fails, and is asked for again
+    await expect(iconFile(folder, 'obsidian.png', { Obsidian: 50 })).rejects.toThrow('fetch failed');
+    const image = await iconFile(folder, 'obsidian.png', { Obsidian: 50 });
+
+    // THEN the second view downloads it
+    expect(image?.toString()).toBe('png');
   });
 
   it('returns null for a file no item uses', async () => {

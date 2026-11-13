@@ -46,8 +46,8 @@ export const ICON_FOLDER_NAME = 'item-icons';
 /** Valheim wiki API, which gives the image address of an uploaded file. */
 export const WIKI_API_URL = 'https://valheim.fandom.com/api.php';
 
-/** Most file titles one wiki API request may ask about. */
-export const WIKI_TITLES_PER_REQUEST = 50;
+/** Most items one wiki API request asks about: up to 3 file titles each, within the wiki's limit of 50 titles. */
+export const WIKI_ITEMS_PER_REQUEST = 16;
 
 /** How long browsers may keep an icon before asking again, in seconds. */
 export const ICON_CACHE_SECONDS = 86_400;
