@@ -75,7 +75,7 @@ export const ACTIVITY_STORY_KINDS: Record<ActivityKind, StoryKind> = {
   fueled: 'built',
   repaired: 'built',
   obliterated: 'items',
-  shot: 'fight',
+  shot: 'items',
   cut: 'items',
   mined: 'items',
 };
@@ -119,7 +119,7 @@ export const PLAYER_ACTIVITY_STATS: { kind: ActivityKind; label: string }[] = [
   { kind: 'mined', label: 'Rocks mined' },
   { kind: 'planted', label: 'Crops planted' },
   { kind: 'ate', label: 'Meals eaten' },
-  { kind: 'smelted', label: 'Ores smelted' },
+  { kind: 'smelted', label: 'Put in smelters' },
   { kind: 'cooked', label: 'Food cooked' },
   { kind: 'brewed', label: 'Meads brewed' },
   { kind: 'crafted', label: 'Crafting visits' },
