@@ -245,9 +245,14 @@ flowchart LR
   stacks --> slots
 ```
 
-The guess never needs more than 32 slots. When it would, the stackable material touched longest ago is taken out,
-as it most likely went into crafting. Gear and tools go only when no material is left, and what a player wears
-now never does.
+The guess never needs more than 32 slots. When it would, one slot at a time is taken from the stackable material
+filling the most slots, as a big pile most likely went into crafting the server did not see. Gear and tools go only
+when no material is left, and what a player wears now never does.
+
+```mermaid
+flowchart LR
+  full["Bag guess needs 33 slots: Wood 130, Honey 20, ..."] -->|biggest pile loses its part-filled slot| fit["Wood 100, Honey 20, ...: 32 slots"]
+```
 
 The plugin logs everything a player wears, holds or carries on the back whenever it changes (`Wearing:`). The
 Vikings character sheet puts each of those pieces in its slot, at the newest level seen in the gear lines, and
