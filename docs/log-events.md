@@ -194,7 +194,7 @@ when the plugin does not know who it was.
 | Plant harvested | `Harvested: RaspberryBush by Ragnar` | `^Harvested: (?<plant>\S+) by (?<player>.+)$` |
 | Crop or sapling planted | `Planted: sapling_carrot by Ragnar` | `^Planted: (?<plant>\S+) by (?<player>.+)$` |
 | Food eaten or mead drunk | `Ate: Ragnar CookedMeat` | `^Ate: (?<character>.+) (?<item>\S+)$` |
-| Started eating or drinking, but the food never showed in their hand | `Ate something: Ragnar` | `^Ate something: (?<character>.+)$` |
+| Started eating or drinking, but the food never showed in their hand, with how much their max health went up (0 for a mead) | `Ate something: Ragnar (max health +30)`, or `Ate something: Ragnar` before plugin 2.22.0 | `^Ate something: (?<character>.+?)(?: \(max health \+(?<gain>\d+)\))?$` |
 | Items or fuel put into a smelter, kiln or similar | `Smelting: CopperOre x3 in smelter by Ragnar`, `Smelting: Coal x5 in smelter by Ragnar` | `^Smelting: (?<item>\S+) x(?<count>\d+) in (?<station>\S+) by (?<player>.+)$` |
 | Raw food put on a cooking station, or a mead base into a fermenter | `Cooking: RawMeat on piece_cookingstation by Ragnar`, `Fermenting: MeadBaseTasty in fermenter by Ragnar` | `^(?<kind>Cooking\|Fermenting): (?<item>\S+) (?:on\|in) (?<station>\S+) by (?<player>.+)$` |
 | Took the helm of a raft or ship | `Sailing: Ragnar on Karve` | `^Sailing: (?<character>.+) on (?<ship>\S+)$` |

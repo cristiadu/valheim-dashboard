@@ -215,8 +215,10 @@ out what the recipe costs, from `craft-costs.txt` (`ArrowWood 1 20 Wood x8`). Th
 be off. Gear worn now always stays in the bag.
 
 A meal takes one food out. When the log only says `Ate something`, it is the food the player carries most of,
-skipping foods eaten in the last 20 minutes, since a food still in effect can't be eaten again. Each `Fueled`
-line takes out one of what that fire burns. Both lists come from the plugin: `foods.txt` and `fire-fuels.txt`
+skipping foods eaten in the last 20 minutes, since a food still in effect can't be eaten again. The line also
+says how much the player's max health went up, so only foods giving about that much health count. A rise of 0
+is a mead, which takes nothing out. Each `Fueled` line takes out one of what that fire burns. Both lists come
+from the plugin: `foods.txt` (`CookedMeat 30`, with the health each food gives) and `fire-fuels.txt`
 (`piece_groundtorch_wood Resin`). Each `Shot` line takes out one arrow or bolt, and coal put in a smelter comes
 out through its `Smelting` line.
 
@@ -543,7 +545,7 @@ Every log lives in `C:\Valheim Server`.
 | `item-stacks.txt` | The event log plugin, once per start: the most of each item one slot holds |
 | `piece-costs.txt` | The event log plugin, once per start: what building each piece takes |
 | `craft-costs.txt` | The event log plugin, once per start: what crafting or upgrading each item takes |
-| `foods.txt` | The event log plugin, once per start: every item that is food |
+| `foods.txt` | The event log plugin, once per start: every item that is food, with the health it gives |
 | `fire-fuels.txt` | The event log plugin, once per start: the item each fire burns |
 | `game-names.txt` | The event log plugin, once per start: the English name the game shows for each item, piece, creature and raid. Every name on the page uses it first, so `AtgeirIron` reads `Iron atgeir` and `army_theelder` reads `The ground is shaking` |
 | `player-vitals.txt` | The event log plugin, when a number changes: health, max health, stamina and eitr of each player online |

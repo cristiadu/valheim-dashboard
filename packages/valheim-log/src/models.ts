@@ -64,7 +64,7 @@ export type LogEvent = { timeUtc: string } & (
   | { type: 'tombstoneEmptied'; owner: string | null; player: string | null }
   | { type: 'position'; character: string; x: number; z: number }
   | { type: 'planted'; plant: string; player: string | null }
-  | { type: 'ate'; character: string; item: string | null }
+  | { type: 'ate'; character: string; item: string | null; maxHealthGain: number | null }
   | { type: 'smelting'; item: string; count: number; station: string; player: string | null }
   | { type: 'foodStarted'; kind: 'cooking' | 'fermenting'; item: string; station: string; player: string | null }
   | { type: 'sailing'; character: string; ship: string }
