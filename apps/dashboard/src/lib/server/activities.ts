@@ -5,12 +5,13 @@ import type { Snapshot } from '#/lib/models/snapshot';
 import { characterOfSteamName } from '#/lib/players';
 import { pushCapped } from '#/lib/server/lists';
 import { addLineUnder, addSourceLine } from '#/lib/server/log-sources';
-import { ACTIVITY_GAP_MS, MAX_ACTIVITIES } from '#/lib/server/models';
+import { ACTIVITY_GAP_MS, MAX_ACTIVITIES, type ServerState } from '#/lib/server/models';
 import { sourceKey } from '#/lib/sources';
 
 /**
  * Adds [count] of [thing] and its log [line] to the player's latest stretch of the same [kind] in [snapshot], or
  * starts a new stretch when the player paused longer than [ACTIVITY_GAP_MS]. Also adds them to the player's totals.
+ * [from] is who dropped the items, for items picked up that another player dropped.
  */
 const addActivity = (
   snapshot: Snapshot,
@@ -20,6 +21,7 @@ const addActivity = (
   kind: ActivityKind,
   thing: string,
   count: number,
+  from?: string,
 ): void => {
   if (player !== null) {
     const totals = (snapshot.activityTotals[player] ??= {});
@@ -27,7 +29,7 @@ const addActivity = (
     addLineUnder(snapshot, sourceKey('activity', player, kind), timeUtc, line, ACTIVITY_STORY_KINDS[kind]);
   }
   const { activities } = snapshot;
-  const stretch = activities.findLast((activity) => activity.player === player && activity.kind === kind);
+  const stretch = activities.findLast((activity) => activity.player === player && activity.kind === kind && activity.from === from);
   if (stretch && Date.parse(timeUtc) - Date.parse(stretch.endUtc) <= ACTIVITY_GAP_MS) {
     stretch.endUtc = timeUtc;
     stretch.things[thing] = (stretch.things[thing] ?? 0) + count;
@@ -35,14 +37,17 @@ const addActivity = (
     return;
   }
   const source = { total: 1, lines: [{ timeUtc, line, kind: ACTIVITY_STORY_KINDS[kind] }] };
-  pushCapped(activities, { player, kind, startUtc: timeUtc, endUtc: timeUtc, things: { [thing]: count }, source }, MAX_ACTIVITIES);
+  const stretchFrom = from === undefined ? {} : { from };
+  pushCapped(activities, { player, kind, startUtc: timeUtc, endUtc: timeUtc, things: { [thing]: count }, ...stretchFrom, source }, MAX_ACTIVITIES);
 };
 
 /**
  * Adds the activity [event] stands for, such as a piece built or a creature killed, read from [line], to the
- * activities of [snapshot]. An item counts as gathered only the first time anyone picks it up.
+ * activities of [state]. An item counts as gathered only the first time anyone picks it up. An item picked up again
+ * counts as received when another player dropped it.
  */
-export const addActivityOf = (snapshot: Snapshot, event: LogEvent, line: string): void => {
+export const addActivityOf = (state: ServerState, event: LogEvent, line: string): void => {
+  const { snapshot } = state;
   const { timeUtc } = event;
   switch (event.type) {
     case 'pieceBuilt':
@@ -56,9 +61,22 @@ export const addActivityOf = (snapshot: Snapshot, event: LogEvent, line: string)
         addActivity(snapshot, line, timeUtc, attacker, 'killed', event.creature, 1);
       }
       break;
-    case 'itemPickedUp':
+    case 'itemPickedUp': {
+      const dropper = event.itemId === null ? undefined : state.droppers.get(event.itemId);
       if (event.isFirstPickup) {
         addActivity(snapshot, line, timeUtc, event.player, 'gathered', event.item, event.count);
+      } else if (dropper !== undefined && dropper !== event.player) {
+        addActivity(snapshot, line, timeUtc, event.player, 'received', event.item, event.count, dropper);
+      }
+      if (event.itemId !== null) {
+        state.droppers.delete(event.itemId);
+      }
+      break;
+    }
+    case 'itemDropped':
+      addActivity(snapshot, line, timeUtc, event.player, 'dropped', event.item, event.count);
+      if (event.player !== null) {
+        state.droppers.set(event.itemId, event.player);
       }
       break;
     case 'chestChanged':

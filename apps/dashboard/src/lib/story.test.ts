@@ -180,7 +180,7 @@ describe('storyOf', () => {
   });
 
   it('tells kills and items in one line per stretch', () => {
-    // GIVEN Ragnar killed creatures, moved items, cooked, brewed and steered a karve for 25 minutes
+    // GIVEN Ragnar killed creatures, moved items, cooked, brewed, steered a karve for 25 minutes and dropped coins Bjorn picked up
     const snapshot = snapshotWith({
       activities: [
         { player: 'Ragnar', kind: 'killed', startUtc: '2026-10-29T10:00:00.000Z', endUtc: '2026-10-29T10:05:00.000Z', things: { Greydwarf: 3, Troll: 1 }, source: NO_LINES },
@@ -192,6 +192,8 @@ describe('storyOf', () => {
         { player: 'Ragnar', kind: 'brewed', startUtc: '2026-10-29T10:11:00.000Z', endUtc: '2026-10-29T10:11:00.000Z', things: { MeadBaseTasty: 1 }, source: NO_LINES },
         { player: 'Ragnar', kind: 'sailed', startUtc: '2026-10-29T09:47:00.000Z', endUtc: '2026-10-29T10:12:00.000Z', things: { Karve: 3 }, source: NO_LINES },
         { player: 'Ragnar', kind: 'made', startUtc: '2026-10-29T10:13:00.000Z', endUtc: '2026-10-29T10:13:00.000Z', things: { ArrowFlint: 20 }, source: NO_LINES },
+        { player: 'Ragnar', kind: 'dropped', startUtc: '2026-10-29T10:14:00.000Z', endUtc: '2026-10-29T10:14:00.000Z', things: { Coins: 115 }, source: NO_LINES },
+        { player: 'Bjorn', kind: 'received', startUtc: '2026-10-29T10:15:00.000Z', endUtc: '2026-10-29T10:15:00.000Z', things: { Coins: 115 }, from: 'Ragnar', source: NO_LINES },
       ],
     });
 
@@ -200,6 +202,8 @@ describe('storyOf', () => {
 
     // THEN each stretch reads plainly, and item lines leave the list to their item icons
     expect(story.map((item) => [item.kind, item.text, item.things])).toEqual([
+      ['items', 'Bjorn picked up 115 items that Ragnar dropped', { Coins: 115 }],
+      ['items', 'Ragnar dropped 115 items', { Coins: 115 }],
       ['items', 'Ragnar made 20 items', { ArrowFlint: 20 }],
       ['travel', 'Ragnar steered the karve for 25m', undefined],
       ['items', 'Ragnar started brewing 1 mead', { MeadBaseTasty: 1 }],

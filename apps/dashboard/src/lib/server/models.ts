@@ -177,6 +177,8 @@ export type ServerState = {
   craftCosts: Record<string, Record<number, CraftCost>>;
   /** IDs of the items on the ground whose pickup already went into a bag this run, so each counts once. */
   pickedUpItemIds: Set<string>;
+  /** Who dropped each item now on the ground this run, by item ID, so a pickup by someone else can name them. */
+  droppers: Map<string, string>;
   /** The health each food gives, by food, from the plugin's foods file, for example `{ CookedMeat: 30 }`, or 0 when not known. */
   foods: Record<string, number>;
   /** The item each fire burns, by fire prefab, from the plugin's fire fuels file, for example `{ piece_groundtorch_wood: 'Resin' }`. */

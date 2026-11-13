@@ -109,6 +109,26 @@ describe('server state', () => {
     expect(kinds).toEqual([['Ragnar', 'gathered', { Dandelion: 1 }]]);
   });
 
+  it('keeps dropped items per player, and names the dropper when another player picks them up', () => {
+    // GIVEN Ragnar drops coins and stone, Bjorn picks up the coins and Ragnar takes the stone back
+    readLines(state, [
+      ...RUN_START,
+      logLine('03:00:00', 'Dropped: Coins x115 by Ragnar (item 549297305:10)'),
+      logLine('03:00:05', 'Dropped: Stone x6 by Ragnar (item 549297305:11)'),
+      logLine('03:00:10', 'Picked up again: Coins x115 by Bjorn (item 549297305:10)'),
+      logLine('03:00:15', 'Picked up again: Stone x6 by Ragnar (item 549297305:11)'),
+    ]);
+
+    // WHEN the activities are listed
+    const kinds = state.snapshot.activities.map((activity) => [activity.player, activity.kind, activity.things, activity.from]);
+
+    // THEN both drops count for Ragnar, and only the coins count as picked up from him
+    expect(kinds).toEqual([
+      ['Ragnar', 'dropped', { Coins: 115, Stone: 6 }, undefined],
+      ['Bjorn', 'received', { Coins: 115 }, 'Ragnar'],
+    ]);
+  });
+
   it('keeps planting, eating, smelting, trees and rocks as activities per player', () => {
     // GIVEN Ragnar plants, eats, fills a smelter, cuts a tree and mines a rock
     readLines(state, [

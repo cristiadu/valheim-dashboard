@@ -380,7 +380,7 @@ On the dashboard, plugin lines become:
 
 | Kept as | Lines | Shown as |
 | --- | --- | --- |
-| Activities | Pieces built or destroyed, kills, items gathered, chests, planting, eating, smelting, cooking, brewing, steering ships, crafting station visits, emotes, items made or upgraded, rides, forsaken powers, carts pulled, fires fueled, repairs, items obliterated, trees and rocks | One Saga line per player and kind, until a 10 minute pause, naming every thing, and a running total per player and kind for the Vikings numbers |
+| Activities | Pieces built or destroyed, kills, items gathered, chests, planting, eating, smelting, cooking, brewing, steering ships, crafting station visits, emotes, items made or upgraded, rides, forsaken powers, carts pulled, fires fueled, repairs, items obliterated, trees and rocks, items dropped, items picked up that another player dropped | One Saga line per player and kind, until a 10 minute pause, naming every thing, and a running total per player and kind for the Vikings numbers |
 | Story events | Deaths, bosses, raids, portals, tames, signs, item stands, tombstones, beds claimed, portals named, wards turned on or off, stones read, saddles, tames following, ward access, maps shared | One Saga line each |
 | News only | Areas, gear, global keys | A Saga line for a first visit or a dungeon trip, new gear, or a boss defeat |
 | Stats | Areas, kills, the day, boss keys | Where each player is now and their kills, areas and gear on Vikings, the day and bosses on Server |
@@ -394,6 +394,8 @@ flowchart LR
   tree[Tree falls, drops Wood] --> first["Picked up: Wood x1 by Ragnar"] --> gathered[Gathered]
   first --> chest[Stored and taken from chests] --> notgathered[Not gathered again]
   first --> drop[Dropped on the ground] --> again["Picked up again: Wood x1 by Ragnar"] --> notgathered
+  drop --> dropped[Dropped, for Ragnar]
+  again -->|by another player| received["Picked up items that Ragnar dropped"]
 ```
 
 An item counts as gathered only the first time anyone picks it up. Harvest lines are not counted, since the

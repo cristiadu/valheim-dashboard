@@ -14,8 +14,8 @@ export const activityTotal = (activity: ActivityRecord): number =>
   Object.values(activity.things).reduce((sum, amount) => sum + amount, 0);
 
 /**
- * Story line for one stretch of activity, such as building or kills. Powers and carts have no list, and meals leave
- * out food the server never learned. Steering and riding name the ships or tames and how long the stretch lasted,
+ * Story line for one stretch of activity, such as building or kills. Powers and carts have no list, meals leave
+ * out food the server never learned, and items picked up after another player dropped them name that player. Steering and riding name the ships or tames and how long the stretch lasted,
  * from the first time a player took the wheel or got on to the last, since the log can't tell two of a kind apart.
  */
 const activityItem = (activity: ActivityRecord): StoryText => {
@@ -28,7 +28,8 @@ const activityItem = (activity: ActivityRecord): StoryText => {
   }
   const words = ACTIVITY_WORDS[activity.kind];
   const kind = ACTIVITY_STORY_KINDS[activity.kind];
-  const sentence = `${activity.player ?? 'Someone'} ${words.verb} ${count(total, words.one, words.many)}${words.ending}`;
+  const ending = activity.from === undefined ? words.ending : ` that ${activity.from} dropped`;
+  const sentence = `${activity.player ?? 'Someone'} ${words.verb} ${count(total, words.one, words.many)}${ending}`;
   if (kind === 'items') {
     const things = Object.fromEntries(Object.entries(activity.things).filter(([thing]) => thing !== UNKNOWN_FOOD));
     return { timeUtc, kind, text: sentence, things };
