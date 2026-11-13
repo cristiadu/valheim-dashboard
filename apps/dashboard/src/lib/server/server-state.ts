@@ -88,6 +88,7 @@ export const createServerState = (serverUtcOffsetMinutes: number): ServerState =
     foods: {},
     fireFuels: {},
     lastMeals: {},
+    unseenCrafts: {},
     snapshot: {
       serverUtcOffsetMinutes,
       world: null,
