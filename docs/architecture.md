@@ -247,7 +247,8 @@ flowchart LR
 
 The guess never needs more than 32 slots. When it would, one slot at a time is taken from the stackable material
 filling the most slots, as a big pile most likely went into crafting the server did not see. Gear and tools go only
-when no material is left, and what a player wears now never does.
+when no material is left, and what a player wears now never does. For an hour after a player empties their
+tombstone, what it held is exact, so guessed items go first and the tombstone's items only once none are left.
 
 ```mermaid
 flowchart LR
