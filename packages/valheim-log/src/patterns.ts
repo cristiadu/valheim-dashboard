@@ -201,6 +201,9 @@ export const PULLING_CART_PATTERN = /^Pulling cart: (?<player>.+) with (?<cart>\
 /** Items a player destroyed in an obliterator. Written by the event log plugin. */
 export const OBLITERATED_PATTERN = /^Obliterated: (?<item>\S+) x(?<count>\d+) in (?<station>\S+) by (?<player>.+)$/;
 
+/** A player shot an arrow, a bolt or other ammo. Written by the event log plugin. */
+export const SHOT_PATTERN = /^Shot: (?<item>\S+) by (?<player>.+)$/;
+
 /** A player put fuel on a fire. Written by the event log plugin. */
 export const FUELED_PATTERN = /^Fueled: (?<fire>\S+) by (?<player>.+)$/;
 

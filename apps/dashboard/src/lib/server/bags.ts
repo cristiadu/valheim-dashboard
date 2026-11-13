@@ -178,6 +178,7 @@ const bagOwnerOf = (event: LogEvent): string | null => {
     case 'itemHung':
     case 'planted':
     case 'fueled':
+    case 'shot':
     case 'tombstoneEmptied':
       return event.player;
     default:
@@ -188,10 +189,10 @@ const bagOwnerOf = (event: LogEvent): string | null => {
 /**
  * Updates the guess of what each character carries in [state] from [event]. Items come in when picked up, taken from
  * a chest or a tombstone, or seen worn or held, and go out when dropped, stored, smelted, cooked, fermented, eaten,
- * burnt in a fire, hung on a stand, or used to build, plant or craft. An item on the ground has an ID, so each pickup
- * counts once. Gear worn now always stays in the bag, and a death empties the bag into the tombstone and takes off
- * everything worn until the next gear line. Crafting is only seen once a
- * made item reaches a chest or the ground, so the bag is only a guess, kept within the player's slots.
+ * shot, burnt in a fire, hung on a stand, or used to build, plant or craft. An item on the ground has an ID, so each
+ * pickup counts once. Gear worn now always stays in the bag, and a death empties the bag into the tombstone and takes
+ * off everything worn until the next gear line. Crafting is only seen once a made item reaches a chest or the ground,
+ * so the bag is only a guess, kept within the player's slots.
  */
 export const updateBags = (state: ServerState, event: LogEvent): void => {
   const { snapshot } = state;
@@ -222,6 +223,7 @@ export const updateBags = (state: ServerState, event: LogEvent): void => {
       break;
     case 'foodStarted':
     case 'itemHung':
+    case 'shot':
       addToBag(snapshot, character, event.item, -1);
       break;
     case 'fueled': {

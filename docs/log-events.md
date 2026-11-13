@@ -195,7 +195,7 @@ when the plugin does not know who it was.
 | Crop or sapling planted | `Planted: sapling_carrot by Ragnar` | `^Planted: (?<plant>\S+) by (?<player>.+)$` |
 | Food eaten or mead drunk | `Ate: Ragnar CookedMeat` | `^Ate: (?<character>.+) (?<item>\S+)$` |
 | Started eating or drinking, but the food never showed in their hand | `Ate something: Ragnar` | `^Ate something: (?<character>.+)$` |
-| Items put into a smelter, kiln or similar | `Smelting: CopperOre x3 in smelter by Ragnar` | `^Smelting: (?<item>\S+) x(?<count>\d+) in (?<station>\S+) by (?<player>.+)$` |
+| Items or fuel put into a smelter, kiln or similar | `Smelting: CopperOre x3 in smelter by Ragnar`, `Smelting: Coal x5 in smelter by Ragnar` | `^Smelting: (?<item>\S+) x(?<count>\d+) in (?<station>\S+) by (?<player>.+)$` |
 | Raw food put on a cooking station, or a mead base into a fermenter | `Cooking: RawMeat on piece_cookingstation by Ragnar`, `Fermenting: MeadBaseTasty in fermenter by Ragnar` | `^(?<kind>Cooking\|Fermenting): (?<item>\S+) (?:on\|in) (?<station>\S+) by (?<player>.+)$` |
 | Took the helm of a raft or ship | `Sailing: Ragnar on Karve` | `^Sailing: (?<character>.+) on (?<ship>\S+)$` |
 | Opened a crafting station (several kinds share one name, joined with `/`, when they share an animation) | `Crafting: Ragnar at forge` | `^Crafting: (?<character>.+?) at (?<station>\S+)$` |
@@ -212,6 +212,7 @@ when the plugin does not know who it was.
 | A tame started following a player | `Tame following: Wolf follows Ragnar` | `^Tame following: (?<creature>\S+) follows (?<player>.+)$` |
 | Started pulling a cart | `Pulling cart: Ragnar with Cart` | `^Pulling cart: (?<player>.+) with (?<cart>\S+)$` |
 | Items destroyed in an obliterator after a player pulled its lever | `Obliterated: Resin x20 in incinerator by Ragnar` | `^Obliterated: (?<item>\S+) x(?<count>\d+) in (?<station>\S+) by (?<player>.+)$` |
+| Arrow, bolt or other ammo shot | `Shot: ArrowFire by Ragnar` | `^Shot: (?<item>\S+) by (?<player>.+)$` |
 | Put fuel on a fire | `Fueled: fire_pit by Ragnar` | `^Fueled: (?<fire>\S+) by (?<player>.+)$` |
 | Repaired a built piece | `Repaired: wood_wall by Ragnar` | `^Repaired: (?<piece>\S+) by (?<player>.+)$` |
 | Added what they explored to a map table | `Map shared: Ragnar at piece_cartographertable` | `^Map shared: (?<player>.+) at (?<table>\S+)$` |
@@ -261,7 +262,11 @@ when the plugin does not know who it was.
 - **Ate** reads the food the character holds for a moment after the eat animation, which every game shows.
   Food held this way is never logged as **Gear**.
 - **Smelting**, **Tree cut** and **Rock mined** name the player who hit or filled it through the server in the
-  last 10 seconds, or else the player whose game owns it. A station's queue is read once per scan.
+  last 10 seconds, or else the player whose game owns it. A station's queue is read once per scan. Since plugin
+  2.21.0, fuel put in a station, such as coal in a smelter, is a **Smelting** line too, one per scan.
+- **Shot** is logged since plugin 2.21.0 when a flying arrow or bolt is gone. The shooter's game makes it, so its
+  object ID starts with the shooter's ID. Ammo that shares its flying object with other ammo isn't logged, since
+  the object can't tell which one it was.
 - **Planted** replaces **Piece built** for crops and saplings. A plant that grows is not logged as destroyed.
 - **Position** is logged each time a player has walked 20 meters from the last one, outside dungeons. `x` is
   meters east and `z` meters north of the world's center.

@@ -13,6 +13,7 @@ import {
   OBLITERATED_PATTERN,
   PICKED_UP_PATTERN,
   PLANTED_PATTERN,
+  SHOT_PATTERN,
   SMELTING_PATTERN,
   TOMBSTONE_EMPTIED_PATTERN,
   TOMBSTONE_PATTERN,
@@ -139,6 +140,10 @@ export const ITEM_MATCHERS: readonly Matcher[] = [
       count: Number(groups.count),
       player: playerOf(groups.player),
     }),
+  },
+  {
+    pattern: SHOT_PATTERN,
+    toEvent: (groups, timeUtc) => ({ type: 'shot', timeUtc, item: groups.item!, player: playerOf(groups.player) }),
   },
   {
     pattern: TOMBSTONE_PATTERN,
