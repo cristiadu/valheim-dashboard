@@ -1,0 +1,18 @@
+11/13/2026 00:42:15: Valheim version: 1.0.21 (network version 41)
+11/13/2026 00:42:18: ZNet.LoadWorld: Cotil (Cotil), save number 1183
+11/13/2026 00:42:19: Player history entry with index 0:  Tony Example (Steam_76561198000000001, 3C9D07E1B2A4F856)
+11/13/2026 00:42:23: Game server connected
+11/13/2026 00:42:45: PlayFab listen socket child connected to remote player A1B2C3D4E5F60718
+11/13/2026 00:42:45: PlayFab socket with remote ID playfab/A1B2C3D4E5F60718 received local Platform ID Steam_76561198000000001
+11/13/2026 00:42:45: Got handshake from client playfab/A1B2C3D4E5F60718
+11/13/2026 00:43:13: Got character ZDOID from Ragnar : 549297305:1
+11/13/2026 00:43:14: Wearing: Ragnar has ArmorBronzeChest, ArmorBronzeLegs, CapeTrollHide, HelmetBronze, ShieldBronzeBuckler, SwordBronze
+11/13/2026 00:44:00: Picked up: Honey x20 by Ragnar (item 549297305:10)
+11/13/2026 00:44:10: Picked up: Raspberry x22 by Ragnar (item 549297305:11)
+11/13/2026 00:44:20: Picked up: CopperOre x18 by Ragnar (item 549297305:12)
+11/13/2026 00:44:30: Picked up: Amber x5 by Ragnar (item 549297305:13)
+11/13/2026 00:44:40: Picked up: Coins x40 by Ragnar (item 549297305:14)
+11/13/2026 00:50:00: Picked up: Wood x500 by Ragnar (item 549297305:15)
+11/13/2026 00:55:00: Picked up: Stone x300 by Ragnar (item 549297305:16)
+11/13/2026 00:58:00: Picked up: Resin x250 by Ragnar (item 549297305:17)
+11/13/2026 01:00:00: Picked up: Feathers x100 by Ragnar (item 549297305:18)
