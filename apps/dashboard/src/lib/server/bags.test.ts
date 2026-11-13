@@ -145,6 +145,32 @@ describe('updateBags', () => {
     expect(Object.keys(bag)).toHaveLength(31);
   });
 
+  it('keeps what was just taken back from a tombstone over picked up items when the bag is full, for an hour', () => {
+    // GIVEN wood and stone stack to 50 and trophies to 20, Ragnar dies holding 150 wood and 28 kinds of trophies, and
+    // Bjorn the same, both empty their tombstones, then Ragnar picks up 60 stone right away and Bjorn 2 hours later,
+    // one slot more than they have
+    const trophies = Array.from({ length: 28 }, (_, index) => `Trophy${index}`);
+    state.snapshot.itemStacks = { Wood: 50, Stone: 50, ...Object.fromEntries(trophies.map((trophy) => [trophy, 20])) };
+    const holds = ['Wood x150', ...trophies.map((trophy) => `${trophy} x1`)].join(', ');
+    readLines(state, [
+      ...RUN_START,
+      logLine('03:01:00', `Tombstone: Ragnar at 70 20 holds ${holds}`),
+      logLine('03:01:00', `Tombstone: Bjorn at 80 20 holds ${holds}`),
+      logLine('03:02:00', 'Tombstone emptied: Ragnar by Ragnar'),
+      logLine('03:02:00', 'Tombstone emptied: Bjorn by Bjorn'),
+      logLine('03:03:00', 'Picked up: Stone x60 by Ragnar'),
+      logLine('05:03:00', 'Picked up: Stone x60 by Bjorn'),
+    ]);
+
+    // WHEN their bags are read
+    const { bags } = state.snapshot;
+
+    // THEN Ragnar lost the part-filled stone slot and kept all the wood, and Bjorn's tombstone wood, trusted no
+    // more, lost its part-filled slot as the biggest pile
+    expect([bags['Ragnar']!['Wood'], bags['Ragnar']!['Stone']]).toEqual([150, 50]);
+    expect([bags['Bjorn']!['Wood'], bags['Bjorn']!['Stone']]).toEqual([100, 60]);
+  });
+
   it('moves a dropped item to whoever picks it up, and counts each item ID once', () => {
     // GIVEN Ragnar carries 30 wood and drops 20, Bjorn picks them up, and the same pickup line is read twice
     readLines(state, [

@@ -6,7 +6,7 @@ import { PLAYER_PREFAB } from '#/lib/models/chests';
 import { MIN_STACKABLE } from '#/lib/models/items';
 import type { Snapshot } from '#/lib/models/snapshot';
 import { MS_PER_MINUTE } from '#/lib/models/time';
-import { MEAL_HEALTH_TOLERANCE, MEAL_MINUTES, type ServerState } from '#/lib/server/models';
+import { MEAL_HEALTH_TOLERANCE, MEAL_MINUTES, type ServerState, SURE_ITEMS_MINUTES } from '#/lib/server/models';
 
 /**
  * Adds [count] of [item] to [character]'s bag in [snapshot], or takes it out when [count] is below zero, never below
@@ -157,10 +157,13 @@ const payFor = (state: ServerState, character: string, piece: string): void => {
 const slotsOf = (bag: Record<string, number>, item: string, stacks: Record<string, number>): number =>
   Math.ceil(bag[item]! / (stacks[item] ?? bag[item]!));
 
-/** Takes one slot of [item] out of [bag]: the part-filled slot when there is one, or else a full stack of [stack]. */
-const takeOneSlot = (bag: Record<string, number>, item: string, stack: number): void => {
+/**
+ * Takes one slot of [item] out of [bag]: the part-filled slot when there is one, or else a full stack of [stack], but
+ * never more than [most].
+ */
+const takeOneSlot = (bag: Record<string, number>, item: string, stack: number, most: number): void => {
   const rest = bag[item]! % stack;
-  const taken = rest > 0 ? rest : stack;
+  const taken = Math.min(rest > 0 ? rest : stack, most);
   if (bag[item]! <= taken) {
     delete bag[item];
   } else {
@@ -168,13 +171,34 @@ const takeOneSlot = (bag: Record<string, number>, item: string, stack: number): 
   }
 };
 
+/** Returns how many of [item] in [bag] are not known for sure by [sure], counted from pickups and other guesses. */
+const unsureOf = (bag: Record<string, number>, sure: Record<string, number>, item: string): number =>
+  bag[item]! - Math.min(sure[item] ?? 0, bag[item]!);
+
+/**
+ * Returns the items in [character]'s bag in [state] known for sure at [timeUtc]: what they took back from their
+ * tombstone in the last [SURE_ITEMS_MINUTES], kept within what the bag still holds.
+ */
+const sureItemsOf = (state: ServerState, character: string, timeUtc: string): Record<string, number> => {
+  const sure = state.sureItems[character];
+  if (sure === undefined || Date.parse(timeUtc) - Date.parse(sure.timeUtc) > SURE_ITEMS_MINUTES * MS_PER_MINUTE) {
+    return {};
+  }
+  const bag = state.snapshot.bags[character] ?? {};
+  for (const item of Object.keys(sure.items)) {
+    sure.items[item] = Math.min(sure.items[item]!, bag[item] ?? 0);
+  }
+  return sure.items;
+};
+
 /**
  * Keeps [character]'s bag in [snapshot] within the slots a player has. Crafting is only seen once a made item reaches
  * the world, so materials pile up in the guess. While it needs more slots, one slot at a time is taken from the
  * stackable material filling the most slots, oldest touched first on a tie, so a big pile of guessed wood shrinks
- * before a small real stack goes. Without materials, the oldest piece of gear or tool goes. What is worn now stays.
+ * before a small real stack goes. Items known for sure in [sure], just taken back from a tombstone, go only once
+ * no guessed ones are left. Without materials, the oldest piece of gear or tool goes. What is worn now stays.
  */
-const fitBag = (snapshot: Snapshot, character: string): void => {
+const fitBag = (snapshot: Snapshot, character: string, sure: Record<string, number>): void => {
   const bag = snapshot.bags[character];
   if (bag === undefined) {
     return;
@@ -186,9 +210,13 @@ const fitBag = (snapshot: Snapshot, character: string): void => {
   while (slotsUsed(bag, stacks) > capacity) {
     const items = Object.keys(bag).filter((item) => !worn.includes(item));
     const materials = items.filter((item) => !gear.has(item) && (stacks[item] ?? MIN_STACKABLE) >= MIN_STACKABLE);
-    const fullest = materials.toSorted((first, second) => slotsOf(bag, second, stacks) - slotsOf(bag, first, stacks))[0];
+    const guessed = materials.filter((item) => unsureOf(bag, sure, item) > 0);
+    const fullest = (guessed.length > 0 ? guessed : materials).toSorted(
+      (first, second) => slotsOf(bag, second, stacks) - slotsOf(bag, first, stacks),
+    )[0];
     if (fullest !== undefined) {
-      takeOneSlot(bag, fullest, stacks[fullest] ?? bag[fullest]!);
+      const most = guessed.length > 0 ? unsureOf(bag, sure, fullest) : bag[fullest]!;
+      takeOneSlot(bag, fullest, stacks[fullest] ?? bag[fullest]!, most);
       continue;
     }
     if (items[0] === undefined) {
@@ -317,6 +345,7 @@ export const updateBags = (state: ServerState, event: LogEvent): void => {
       for (const [item, count] of Object.entries(tombstone?.items ?? {})) {
         addToBag(snapshot, character, item, count);
       }
+      state.sureItems[character] = { timeUtc: event.timeUtc, items: { ...tombstone?.items } };
       break;
     }
     default:
@@ -325,5 +354,5 @@ export const updateBags = (state: ServerState, event: LogEvent): void => {
   if (event.type !== 'tombstoneContents' && event.type !== 'wearing') {
     keepWorn(snapshot, character, movedItemOf(event));
   }
-  fitBag(snapshot, character);
+  fitBag(snapshot, character, sureItemsOf(state, character, event.timeUtc));
 };
