@@ -81,11 +81,17 @@ export const ITEM_MATCHERS: readonly Matcher[] = [
   },
   {
     pattern: ATE_SOMETHING_PATTERN,
-    toEvent: (groups, timeUtc) => ({ type: 'ate', timeUtc, character: groups.character!, item: null }),
+    toEvent: (groups, timeUtc) => ({
+      type: 'ate',
+      timeUtc,
+      character: groups.character!,
+      item: null,
+      maxHealthGain: groups.gain === undefined ? null : Number(groups.gain),
+    }),
   },
   {
     pattern: ATE_PATTERN,
-    toEvent: (groups, timeUtc) => ({ type: 'ate', timeUtc, character: groups.character!, item: groups.item! }),
+    toEvent: (groups, timeUtc) => ({ type: 'ate', timeUtc, character: groups.character!, item: groups.item!, maxHealthGain: null }),
   },
   {
     pattern: SMELTING_PATTERN,

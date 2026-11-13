@@ -223,7 +223,7 @@ describe('updateBags', () => {
   it('takes out the food carried most when the log does not say which, but not one still in effect', () => {
     // GIVEN cooked meat and honey are foods, and Ragnar carries 5 meat and 3 honey, eats three times in a row, then
     // once more 25 minutes later
-    state.foods = new Set(['CookedMeat', 'Honey']);
+    state.foods = { CookedMeat: 0, Honey: 0 };
     readLines(state, [
       ...RUN_START,
       logLine('03:00:00', 'Picked up: CookedMeat x5 by Ragnar'),
@@ -241,6 +241,27 @@ describe('updateBags', () => {
     // THEN one meat and one honey went in the first meal, the third bite found no food that was not in effect, and
     // one more meat went later
     expect(bag).toEqual({ CookedMeat: 3, Honey: 2, Wood: 10 });
+  });
+
+  it('takes out the food giving the health a meal added, and nothing for a mead', () => {
+    // GIVEN cooked meat gives 30 health and honey 8, and Ragnar carries 5 meat and 3 honey, eats something that adds
+    // 8 max health, drinks a mead, then eats something adding 50, which no food he carries gives
+    state.foods = { CookedMeat: 30, Honey: 8 };
+    readLines(state, [
+      ...RUN_START,
+      logLine('03:00:00', 'Picked up: CookedMeat x5 by Ragnar'),
+      logLine('03:00:01', 'Picked up: Honey x3 by Ragnar'),
+      logLine('03:10:00', 'Ate something: Ragnar (max health +8)'),
+      logLine('03:11:00', 'Ate something: Ragnar (max health +0)'),
+      logLine('03:12:00', 'Ate something: Ragnar (max health +50)'),
+    ]);
+
+    // WHEN his bag is read
+    const bag = state.snapshot.bags['Ragnar'];
+
+    // THEN honey went first though he carries more meat, the mead took nothing, and the last meal took the meat he
+    // carries most of
+    expect(bag).toEqual({ CookedMeat: 4, Honey: 2 });
   });
 
   it('takes out what a fire burns each time it is fueled', () => {

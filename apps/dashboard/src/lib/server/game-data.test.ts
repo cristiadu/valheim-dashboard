@@ -49,15 +49,15 @@ describe('craftCostsOf', () => {
 });
 
 describe('foodsOf', () => {
-  it('reads every food, with Windows line ends, and skips lines it does not know', () => {
-    // GIVEN a foods file with two foods, a blank line and a broken line
-    const text = 'CookedMeat\r\nHoney\r\n\r\nbroken line\r\n';
+  it('reads the health of every food, with Windows line ends, and skips lines it does not know', () => {
+    // GIVEN a foods file with two foods, one from an older plugin with no health, a blank line and a broken line
+    const text = 'CookedMeat 30\r\nHoney\r\n\r\nbroken line\r\n';
 
     // WHEN it is read
     const foods = foodsOf(text);
 
-    // THEN only the two foods are there
-    expect([...foods]).toEqual(['CookedMeat', 'Honey']);
+    // THEN only the two foods are there, the old one with no health
+    expect(foods).toEqual({ CookedMeat: 30, Honey: 0 });
   });
 });
 

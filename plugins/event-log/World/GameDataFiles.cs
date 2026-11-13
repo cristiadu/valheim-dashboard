@@ -39,8 +39,9 @@ namespace ValheimDashboard.EventLog
         /// per piece with what building it takes, for example <c>wood_floor Wood x2</c>. The craft costs file has
         /// one line per item and level with how many one craft makes and what it takes, for example
         /// <c>ArrowWood 1 20 Wood x8</c>, or <c>SwordBronze 2 1 Bronze x4, LeatherScraps x1</c> for an upgrade.
-        /// The foods file has one food per line, for example <c>CookedMeat</c>. The fire fuels file has one line per
-        /// fire with the item it burns, for example <c>piece_groundtorch_wood Resin</c>. The game names file has one
+        /// The foods file has one food per line with the health it gives, for example <c>CookedMeat 30</c>. The fire
+        /// fuels file has one line per fire with the item it burns, for example <c>piece_groundtorch_wood Resin</c>.
+        /// The game names file has one
         /// line per item, piece, creature and raid with the name the game shows, for example <c>AtgeirIron Iron atgeir</c>
         /// or <c>army_theelder The ground is shaking</c>.
         /// </summary>
@@ -67,7 +68,7 @@ namespace ValheimDashboard.EventLog
                 AppendName(names, prefab.name, shared.m_name);
                 if (shared.m_food > 0f || shared.m_foodStamina > 0f || shared.m_foodEitr > 0f)
                 {
-                    foods.Append($"{prefab.name}\n");
+                    foods.Append($"{prefab.name} {Mathf.RoundToInt(shared.m_food)}\n");
                 }
             }
             StringBuilder costs = new StringBuilder();

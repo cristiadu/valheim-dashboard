@@ -8,7 +8,8 @@ namespace ValheimDashboard.EventLog
     /// Logs short actions of each online player: eating or drinking, opening a crafting station, doing an emote,
     /// using a forsaken power and reading a vegvisir or rune stone. Eating and powers play an animation that the
     /// player's game sends to every player through the server, and eating also shows the food in the right hand
-    /// for a moment. Reading a stone asks the server where the place it marks is.
+    /// for a moment. When the food never shows, the rise in the player's max health tells how much health it gives.
+    /// Reading a stone asks the server where the place it marks is.
     /// </summary>
     [HarmonyPatch]
     internal static class ActionTracker
@@ -25,8 +26,18 @@ namespace ValheimDashboard.EventLog
         /// <summary>Seconds to wait for the food to show in a player's hand after they start eating.</summary>
         private const float EatSeconds = 3f;
 
-        /// <summary>When each character started eating, by character, until the food is logged.</summary>
-        private static readonly Dictionary<ZDOID, float> EatStarts = new Dictionary<ZDOID, float>();
+        /// <summary>
+        /// Seconds before an eat call in which a max health change still counts as the meal's, since the player's
+        /// data can reach the server before the call does.
+        /// </summary>
+        private const float EarlyHealthSeconds = 1.5f;
+
+        /// <summary>When each character started eating and their max health before it, by character, until the food is logged.</summary>
+        private static readonly Dictionary<ZDOID, (float Time, float MaxHealth)> EatStarts = new Dictionary<ZDOID, (float Time, float MaxHealth)>();
+
+        /// <summary>Each online character's max health now, the one before its last change, and when it changed, by character.</summary>
+        private static readonly Dictionary<ZDOID, (float Now, float Before, float ChangedAt)> MaxHealths =
+            new Dictionary<ZDOID, (float Now, float Before, float ChangedAt)>();
 
         /// <summary>When each character's food was last logged, by character.</summary>
         private static readonly Dictionary<ZDOID, float> LastAteTimes = new Dictionary<ZDOID, float>();
@@ -69,7 +80,7 @@ namespace ValheimDashboard.EventLog
             string animation = new ZPackage(data.m_parameters.GetArray()).ReadString();
             if (animation == "eat" && !(LastAteTimes.TryGetValue(data.m_targetZDO, out float ateTime) && Time.time - ateTime <= EatSeconds))
             {
-                EatStarts[data.m_targetZDO] = Time.time;
+                EatStarts[data.m_targetZDO] = (Time.time, MaxHealthBeforeNow(data.m_targetZDO, player));
             }
             else if (animation == "gpower")
             {
@@ -96,6 +107,7 @@ namespace ValheimDashboard.EventLog
                 {
                     continue;
                 }
+                NoteMaxHealth(peer.m_characterID, player.GetFloat(ZDOVars.s_maxHealth));
                 (int Hand, int Crafting, int Emote) now = (player.GetInt(ZDOVars.s_rightItem), player.GetInt(CraftingKey), player.GetInt(ZDOVars.s_emoteID));
                 bool isKnown = LastSeen.TryGetValue(peer.m_characterID, out (int Hand, int Crafting, int Emote) before);
                 LastSeen[peer.m_characterID] = now;
@@ -119,24 +131,56 @@ namespace ValheimDashboard.EventLog
             LogLateEats();
         }
 
+        /// <summary>Notes [maxHealth], the max health character [uid] has now, and when it last changed.</summary>
+        private static void NoteMaxHealth(ZDOID uid, float maxHealth)
+        {
+            if (!MaxHealths.TryGetValue(uid, out (float Now, float Before, float ChangedAt) known))
+            {
+                MaxHealths[uid] = (maxHealth, maxHealth, float.MinValue);
+            }
+            else if (known.Now != maxHealth)
+            {
+                MaxHealths[uid] = (maxHealth, known.Now, Time.time);
+            }
+        }
+
+        /// <summary>
+        /// Returns the max health character [uid] had just before eating: the one before its last change when that
+        /// change came in the last [EarlyHealthSeconds], or else what [player] has now.
+        /// </summary>
+        private static float MaxHealthBeforeNow(ZDOID uid, ZDO player)
+        {
+            bool isChangedJustNow = MaxHealths.TryGetValue(uid, out (float Now, float Before, float ChangedAt) known)
+                && Time.time - known.ChangedAt <= EarlyHealthSeconds;
+            return isChangedJustNow ? known.Before : player.GetFloat(ZDOVars.s_maxHealth);
+        }
+
         /// <summary>
         /// Logs each player who started eating a few seconds ago without the food showing in their hand, so the
-        /// server never learned what they ate.
+        /// server never learned what they ate. The line has how much their max health went up, which is the health
+        /// the food gives, or 0 for a mead.
         /// </summary>
         private static void LogLateEats()
         {
-            foreach (KeyValuePair<ZDOID, float> start in EatStarts)
+            foreach (KeyValuePair<ZDOID, (float Time, float MaxHealth)> start in EatStarts)
             {
-                if (Time.time - start.Value > EatSeconds)
+                if (Time.time - start.Value.Time > EatSeconds)
                 {
                     LateEats.Add(start.Key);
                 }
             }
             foreach (ZDOID character in LateEats)
             {
+                float maxHealthBefore = EatStarts[character].MaxHealth;
                 EatStarts.Remove(character);
                 ZDO player = ZDOMan.instance.GetZDO(character);
-                GameEventLog.Write($"Ate something: {(player == null ? Names.UnknownPlayer : player.GetString(ZDOVars.s_playerName, Names.UnknownPlayer))}");
+                if (player == null)
+                {
+                    GameEventLog.Write($"Ate something: {Names.UnknownPlayer}");
+                    continue;
+                }
+                int gain = Mathf.Max(0, Mathf.RoundToInt(player.GetFloat(ZDOVars.s_maxHealth) - maxHealthBefore));
+                GameEventLog.Write($"Ate something: {player.GetString(ZDOVars.s_playerName, Names.UnknownPlayer)} (max health +{gain})");
             }
             LateEats.Clear();
         }
@@ -146,6 +190,7 @@ namespace ValheimDashboard.EventLog
         {
             LastSeen.Remove(uid);
             EatStarts.Remove(uid);
+            MaxHealths.Remove(uid);
             LastAteTimes.Remove(uid);
         }
 

@@ -177,8 +177,8 @@ export type ServerState = {
   craftCosts: Record<string, Record<number, CraftCost>>;
   /** IDs of the items on the ground whose pickup already went into a bag this run, so each counts once. */
   pickedUpItemIds: Set<string>;
-  /** Every item that is food, from the plugin's foods file, for example `CookedMeat`. */
-  foods: Set<string>;
+  /** The health each food gives, by food, from the plugin's foods file, for example `{ CookedMeat: 30 }`, or 0 when not known. */
+  foods: Record<string, number>;
   /** The item each fire burns, by fire prefab, from the plugin's fire fuels file, for example `{ piece_groundtorch_wood: 'Resin' }`. */
   fireFuels: Record<string, string>;
   /** When each character last ate each food, as UTC ISO times, by character and food. */
@@ -231,8 +231,8 @@ export const CRAFT_COST_LINE_PATTERN = /^(?<item>\S+) (?<level>\d+) (?<yields>\d
 /** Name of the plugin's file next to the log with every food, one per line. */
 export const FOODS_FILE_NAME = 'foods.txt';
 
-/** One line of the foods file, for example `CookedMeat`. */
-export const FOOD_LINE_PATTERN = /^(?<item>\S+)$/;
+/** One line of the foods file, for example `CookedMeat 30` with the health it gives, or `CookedMeat` from older plugins. */
+export const FOOD_LINE_PATTERN = /^(?<item>\S+)(?: (?<health>\d+))?$/;
 
 /** Name of the plugin's file next to the log with the item each fire burns. */
 export const FIRE_FUELS_FILE_NAME = 'fire-fuels.txt';
@@ -251,6 +251,12 @@ export const GAME_NAME_LINE_PATTERN = /^(?<id>\S+) (?<name>.+)$/;
  * eat the same food again while it is in effect.
  */
 export const MEAL_MINUTES = 20;
+
+/**
+ * How far a food's health may be from the max health a meal added and still be the food eaten, since the plugin
+ * rounds and food already eaten wears off a little while the player eats.
+ */
+export const MEAL_HEALTH_TOLERANCE = 2;
 
 /** Name of the plugin's file next to the log with each player's health, stamina and eitr now. */
 export const PLAYER_VITALS_FILE_NAME = 'player-vitals.txt';

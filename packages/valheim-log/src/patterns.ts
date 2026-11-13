@@ -177,8 +177,11 @@ export const MADE_PATTERN = /^Made: (?<item>\S+) x(?<count>\d+) by (?<crafter>.+
 /** An item a player crafted showed up at a new level. Written by the event log plugin. */
 export const UPGRADED_PATTERN = /^Upgraded: (?<item>\S+) to level (?<level>\d+) by (?<crafter>.+)$/;
 
-/** A player started eating or drinking, but the food never showed in their hand. Written by the event log plugin. */
-export const ATE_SOMETHING_PATTERN = /^Ate something: (?<character>.+)$/;
+/**
+ * A player started eating or drinking, but the food never showed in their hand. Since plugin 2.22.0 it says how much
+ * their max health went up, which is the health the food gives, or 0 for a mead. Written by the event log plugin.
+ */
+export const ATE_SOMETHING_PATTERN = /^Ate something: (?<character>.+?)(?: \(max health \+(?<gain>\d+)\))?$/;
 
 /** A player used their forsaken power. Written by the event log plugin. */
 export const POWER_USED_PATTERN = /^Power used: (?<character>.+)$/;

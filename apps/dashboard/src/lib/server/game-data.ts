@@ -33,17 +33,9 @@ export const craftCostsOf = (text: string): Record<string, Record<number, CraftC
   return costs;
 };
 
-/** Reads the plugin's foods file [text], one `CookedMeat` line per food, into every food. */
-export const foodsOf = (text: string): Set<string> => {
-  const foods = new Set<string>();
-  for (const line of text.split(/\r?\n/)) {
-    const groups = FOOD_LINE_PATTERN.exec(line)?.groups;
-    if (groups !== undefined) {
-      foods.add(groups.item!);
-    }
-  }
-  return foods;
-};
+/** Reads the plugin's foods file [text], one `CookedMeat 30` line per food, into the health each gives (0 when not given). */
+export const foodsOf = (text: string): Record<string, number> =>
+  Object.fromEntries(matchingLines(text, FOOD_LINE_PATTERN).map(({ item, health }) => [item!, Number(health ?? 0)]));
 
 /** Reads the plugin's fire fuels file [text], one `piece_groundtorch_wood Resin` line per fire, into what each fire burns. */
 export const fireFuelsOf = (text: string): Record<string, string> => {
@@ -73,7 +65,7 @@ export const readCraftCosts = async (path: string): Promise<Record<string, Recor
   craftCostsOf(await readFile(path, 'utf8'));
 
 /** Reads the foods file at [path]. */
-export const readFoods = async (path: string): Promise<Set<string>> => foodsOf(await readFile(path, 'utf8'));
+export const readFoods = async (path: string): Promise<Record<string, number>> => foodsOf(await readFile(path, 'utf8'));
 
 /** Reads the fire fuels file at [path]. */
 export const readFireFuels = async (path: string): Promise<Record<string, string>> => fireFuelsOf(await readFile(path, 'utf8'));

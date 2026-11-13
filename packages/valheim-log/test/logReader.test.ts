@@ -424,7 +424,7 @@ describe('parseMessage', () => {
     const timeUtc = '2026-01-01T00:00:00.000Z';
     expect(events).toEqual([
       { type: 'planted', timeUtc, plant: 'sapling_carrot', player: 'Ragnar' },
-      { type: 'ate', timeUtc, character: 'Ragnar', item: 'CookedMeat' },
+      { type: 'ate', timeUtc, character: 'Ragnar', item: 'CookedMeat', maxHealthGain: null },
       { type: 'smelting', timeUtc, item: 'CopperOre', count: 3, station: 'smelter', player: 'Bjorn' },
       { type: 'depleted', timeUtc, kind: 'tree', thing: 'Beech1', player: 'Ragnar' },
       { type: 'depleted', timeUtc, kind: 'rock', thing: 'rock4_copper', player: null },
@@ -470,6 +470,7 @@ describe('parseMessage', () => {
     // GIVEN one line of each kind, from a player whose name has a space
     const messages = [
       'Ate something: Inge Dragonchow',
+      'Ate something: Inge Dragonchow (max health +25)',
       'Power used: Inge Dragonchow',
       'Location revealed: Eikthyrnir by Inge Dragonchow',
       'Riding: Inge Dragonchow on Lox',
@@ -491,7 +492,8 @@ describe('parseMessage', () => {
     // THEN each line gives its event and values
     const timeUtc = '2026-01-01T00:00:00.000Z';
     expect(events).toEqual([
-      { type: 'ate', timeUtc, character: 'Inge Dragonchow', item: null },
+      { type: 'ate', timeUtc, character: 'Inge Dragonchow', item: null, maxHealthGain: null },
+      { type: 'ate', timeUtc, character: 'Inge Dragonchow', item: null, maxHealthGain: 25 },
       { type: 'powerUsed', timeUtc, character: 'Inge Dragonchow' },
       { type: 'locationRevealed', timeUtc, location: 'Eikthyrnir', player: 'Inge Dragonchow' },
       { type: 'riding', timeUtc, player: 'Inge Dragonchow', creature: 'Lox' },
