@@ -277,7 +277,16 @@ The file only lists players online. Players who left keep the numbers from when 
 dashboard restarts. Skill levels never reach the server, so Vikings cannot show them.
 
 Icons for every recipe item and named piece of gear download on start. Any other item, such as one only
-`item-stacks.txt` lists, downloads the first time a page shows it. The wiki is asked once per item per run.
+`item-stacks.txt` lists, downloads the first time a page shows it. An item the wiki has no icon for is asked about
+once per run; when the wiki can't be reached, the next view asks again.
+
+The wiki's file names don't always match the game's names, so each item tries a few spellings:
+
+| Game name | Tried on the wiki |
+| --- | --- |
+| Deer hide | `Deer_hide.png`, `Deer_Hide.png` |
+| Wooden Mace | `Wooden_Mace.png`, `Wooden_mace.png` |
+| Mead Base: Tasty | `Mead_Base_-_Tasty.png`, `Mead_base_-_tasty.png` |
 
 ## Where a number comes from
 

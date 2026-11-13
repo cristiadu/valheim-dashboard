@@ -6,23 +6,26 @@ import { itemName } from '#/lib/items';
 import { iconFileName } from '#/lib/recipes';
 import { readConfig } from '#/lib/server/config';
 import { logger } from '#/lib/server/logger';
-import { ICON_FOLDER_NAME, WIKI_API_URL, WIKI_ICON_FILES, WIKI_TITLES_PER_REQUEST, type WikiImageResponse } from '#/lib/server/models';
+import { ICON_FOLDER_NAME, WIKI_API_URL, WIKI_ICON_FILES, WIKI_ITEMS_PER_REQUEST, type WikiImageResponse } from '#/lib/server/models';
 
 /** Items the wiki had no icon for since the dashboard started, so a missing icon asks the wiki only once. */
 const missingOnWiki = new Set<string>();
 
 /**
  * Returns the wiki file titles that may hold the icon of [item], best first: the known file name when there is one,
- * else the name as the game writes it (`File:Deer_hide.png`) and with every word capitalized (`File:Deer_Hide.png`).
+ * else the name as the game writes it (`File:Deer_hide.png`), with every word capitalized (`File:Deer_Hide.png`) and
+ * with only the first word capitalized (`File:Wooden_mace.png`). A colon becomes a dash, as in the wiki's
+ * `File:Mead_Base_-_Tasty.png` for `Mead Base: Tasty`.
  */
 export const wikiTitlesOf = (item: string): string[] => {
   const known = WIKI_ICON_FILES[item];
   if (known !== undefined) {
     return [`File:${known}`];
   }
-  const words = item.split(' ');
+  const words = item.replaceAll(': ', ' - ').split(' ');
   const titled = words.map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join('_');
-  return [...new Set([`File:${words.join('_')}.png`, `File:${titled}.png`])];
+  const sentence = [words[0], ...words.slice(1).map((word) => word.toLowerCase())].join('_');
+  return [...new Set([`File:${words.join('_')}.png`, `File:${titled}.png`, `File:${sentence}.png`])];
 };
 
 /** Asks the wiki for the image address of each of [items]' icons. Items without an icon on the wiki are left out. */
@@ -75,8 +78,8 @@ export const downloadMissingIcons = async (folder: string): Promise<void> => {
   await mkdir(folder, { recursive: true });
   const present = new Set(await readdir(folder));
   const missing = iconItems().filter((item) => !present.has(iconFileName(item)));
-  for (let start = 0; start < missing.length; start += WIKI_TITLES_PER_REQUEST) {
-    const batch = missing.slice(start, start + WIKI_TITLES_PER_REQUEST);
+  for (let start = 0; start < missing.length; start += WIKI_ITEMS_PER_REQUEST) {
+    const batch = missing.slice(start, start + WIKI_ITEMS_PER_REQUEST);
     const urls = await imageUrls(batch);
     for (const item of batch) {
       const url = urls.get(item);
@@ -93,7 +96,8 @@ export const downloadMissingIcons = async (folder: string): Promise<void> => {
 /**
  * Returns the icon saved as [file] in [folder]. When it is not there yet, finds which item it is for among the known
  * items and every item prefab in [stacks], downloads it from the wiki, and returns it. Returns null for an unknown
- * file or an item the wiki has no icon for, and asks the wiki about each item only once.
+ * file or an item the wiki has no icon for, and asks the wiki about each such item only once. When asking fails, the
+ * next view asks again.
  */
 export const iconFile = async (folder: string, file: string, stacks: Record<string, number>): Promise<Buffer | null> => {
   const saved = await readFile(join(folder, file)).catch(() => null);
@@ -105,18 +109,14 @@ export const iconFile = async (folder: string, file: string, stacks: Record<stri
   if (item === undefined || missingOnWiki.has(item)) {
     return null;
   }
-  missingOnWiki.add(item);
   const url = (await imageUrls([item])).get(item);
   if (url === undefined) {
+    missingOnWiki.add(item);
     logger.warn(`The wiki has no icon for ${item}`);
     return null;
   }
   await mkdir(folder, { recursive: true });
-  const image = await saveIcon(folder, item, url);
-  if (image !== null) {
-    missingOnWiki.delete(item);
-  }
-  return image;
+  return saveIcon(folder, item, url);
 };
 
 /** Starts downloading the missing icons in the background, so the dashboard serves pages meanwhile. */
