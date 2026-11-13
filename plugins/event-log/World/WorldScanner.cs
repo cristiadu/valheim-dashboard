@@ -118,6 +118,7 @@ namespace ValheimDashboard.EventLog
             CreatureTracker.Destroyed(zdo);
             ItemTracker.Destroyed(zdo);
             WorkTracker.Destroyed(zdo);
+            ShotTracker.Destroyed(zdo);
             if (zdo.GetLong(ZDOVars.s_creator, 0L) != 0L && !Names.Has<Plant>(zdo))
             {
                 GameEventLog.Write($"Piece destroyed: {Names.PrefabName(zdo)} built by {Names.Character(zdo.GetLong(ZDOVars.s_creator, 0L))}");

@@ -50,6 +50,24 @@ describe('updateBags', () => {
     expect(bag).toEqual({ RawMeat: 1 });
   });
 
+  it('takes out each arrow shot and the coal put in a smelter', () => {
+    // GIVEN Ragnar picks up fire arrows and coal, shoots two arrows and puts 5 coal in a smelter
+    readLines(state, [
+      ...RUN_START,
+      logLine('03:00:00', 'Picked up: ArrowFire x20 by Ragnar'),
+      logLine('03:00:01', 'Picked up: Coal x12 by Ragnar'),
+      logLine('03:00:02', 'Shot: ArrowFire by Ragnar'),
+      logLine('03:00:03', 'Shot: ArrowFire by Ragnar'),
+      logLine('03:00:04', 'Smelting: Coal x5 in smelter by Ragnar'),
+    ]);
+
+    // WHEN his bag is read
+    const bag = state.snapshot.bags['Ragnar'];
+
+    // THEN 18 arrows and 7 coal are left
+    expect(bag).toEqual({ ArrowFire: 18, Coal: 7 });
+  });
+
   it('empties the bag into the tombstone on death and fills it again when the tombstone is emptied', () => {
     // GIVEN Ragnar carries stone, dies with a sword and coins, then empties his tombstone
     readLines(state, [
