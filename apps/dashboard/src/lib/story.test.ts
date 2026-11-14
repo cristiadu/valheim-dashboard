@@ -240,12 +240,12 @@ describe('storyOf', () => {
     expect(story.map((item) => item.text)).toEqual(['Ragnar worked at the workbench 3 times, the forge and a crafting station']);
   });
 
-  it('tells hits landed with the creatures hit, and dodge rolls and staggers without a list', () => {
-    // GIVEN Ragnar landed hits on greylings and a troll, rolled 4 times and was staggered once
+  it('tells hits landed as weapon on creature, and dodge rolls and staggers without a list', () => {
+    // GIVEN Ragnar landed hits on greylings with an axe and on a troll with a club, rolled 4 times and was staggered once
     const at = { startUtc: '2026-10-29T10:00:00.000Z', source: NO_LINES };
     const snapshot = snapshotWith({
       activities: [
-        { player: 'Ragnar', kind: 'landed', endUtc: '2026-10-29T10:03:00.000Z', things: { Greyling: 42, Troll: 3 }, ...at },
+        { player: 'Ragnar', kind: 'landed', endUtc: '2026-10-29T10:03:00.000Z', things: { 'Club on Troll': 3, 'AxeBronze on Greyling': 42 }, ...at },
         { player: 'Ragnar', kind: 'dodged', endUtc: '2026-10-29T10:02:00.000Z', things: { dodged: 4 }, ...at },
         { player: 'Ragnar', kind: 'staggered', endUtc: '2026-10-29T10:01:00.000Z', things: { staggered: 1 }, ...at },
       ],
@@ -256,7 +256,7 @@ describe('storyOf', () => {
 
     // THEN each reads as a sentence, newest first
     expect(story.map((item) => [item.kind, item.text])).toEqual([
-      ['fight', 'Ragnar landed 45 hits on creatures: 42 greyling, 3 troll'],
+      ['fight', 'Ragnar landed 45 hits: 42 axe bronze on greyling, 3 club on troll'],
       ['fight', 'Ragnar rolled out of the way 4 times'],
       ['fight', 'Ragnar was staggered'],
     ]);

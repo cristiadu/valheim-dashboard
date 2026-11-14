@@ -136,7 +136,7 @@ export const ACTIVITY_WORDS: Record<Exclude<ActivityKind, 'destroyed'>, { verb: 
   foodCooked: { verb: 'finished cooking', one: 'thing', many: 'things', ending: '' },
   burnt: { verb: 'burnt', one: 'thing', many: 'things', ending: ' on the fire' },
   tapped: { verb: 'tapped', one: 'mead', many: 'meads', ending: ' from fermenters' },
-  landed: { verb: 'landed', one: 'hit', many: 'hits', ending: ' on creatures' },
+  landed: { verb: 'landed', one: 'hit', many: 'hits', ending: '' },
   dodged: { verb: 'rolled out of the way', one: 'time', many: 'times', ending: '' },
   staggered: { verb: 'was staggered', one: 'time', many: 'times', ending: '' },
   jumped: { verb: 'jumped', one: 'time', many: 'times', ending: '' },
@@ -172,6 +172,9 @@ export const PLAYER_ACTIVITY_STATS: { kind: ActivityKind; label: string }[] = [
   { kind: 'jumped', label: 'Jumps' },
   { kind: 'dropped', label: 'Items dropped' },
 ];
+
+/** What joins the weapon and the creature in the thing of a hit landed, for example `AxeBronze on Greyling`. */
+export const HIT_ON = ' on ';
 
 /** Activity kinds told without a list of things, since each has only one thing. */
 export const PLAIN_ACTIVITY_KINDS: readonly ActivityKind[] = ['powered', 'pulled', 'dodged', 'staggered'];

@@ -259,7 +259,7 @@ describe('server state', () => {
   });
 
   it('keeps hits landed, dodge rolls and staggers as activities, and jumps only as a total', () => {
-    // GIVEN Yan lands 42 hits on greylings, with an axe and a club, and 3 on a troll, rolls 4 times, is staggered once and jumps 12 times
+    // GIVEN Yan lands 30 hits on greylings with an axe, 12 with a club, and 3 on a troll with the club, rolls 4 times, is staggered once and jumps 12 times
     readLines(state, [
       ...RUN_START,
       logLine('03:00:00', 'Moves: Yan landed AxeBronze on Greyling x30'),
@@ -276,7 +276,7 @@ describe('server state', () => {
 
     // THEN each kind but jumps is one stretch, and every kind has its total
     expect(kinds).toEqual([
-      ['Yan', 'landed', { Greyling: 42, Troll: 3 }],
+      ['Yan', 'landed', { 'AxeBronze on Greyling': 30, 'Club on Greyling': 12, 'Club on Troll': 3 }],
       ['Yan', 'dodged', { dodged: 4 }],
       ['Yan', 'staggered', { staggered: 1 }],
     ]);

@@ -1,6 +1,6 @@
 import type { LogEvent } from 'valheim-log';
 
-import { ACTIVITY_STORY_KINDS, type ActivityKind, UNKNOWN_FOOD, UNKNOWN_STATION } from '#/lib/models/activities';
+import { ACTIVITY_STORY_KINDS, type ActivityKind, HIT_ON, UNKNOWN_FOOD, UNKNOWN_STATION } from '#/lib/models/activities';
 import type { Snapshot } from '#/lib/models/snapshot';
 import { characterOfSteamName } from '#/lib/players';
 import { pushCapped } from '#/lib/server/lists';
@@ -135,7 +135,8 @@ export const addActivityOf = (state: ServerState, event: LogEvent, line: string)
       if (event.move === 'jumped') {
         addTotal(snapshot, line, timeUtc, event.character, 'jumped', event.count);
       } else {
-        addActivity(snapshot, line, timeUtc, event.character, event.move, event.target ?? event.move, event.count);
+        const thing = event.move === 'landed' ? `${event.item}${HIT_ON}${event.target}` : event.move;
+        addActivity(snapshot, line, timeUtc, event.character, event.move, thing, event.count);
       }
       break;
     case 'fueled':

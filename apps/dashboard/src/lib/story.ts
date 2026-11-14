@@ -4,6 +4,7 @@ import {
   ACTIVITY_STORY_KINDS,
   ACTIVITY_WORDS,
   type ActivityRecord,
+  HIT_ON,
   PLAIN_ACTIVITY_KINDS,
   UNKNOWN_FOOD,
   UNKNOWN_STATION,
@@ -41,6 +42,12 @@ const activityItem = (activity: ActivityRecord): StoryText => {
   if (kind === 'items') {
     const things = Object.fromEntries(Object.entries(activity.things).filter(([thing]) => thing !== UNKNOWN_FOOD));
     return { timeUtc, kind, text: sentence, things };
+  }
+  if (activity.kind === 'landed') {
+    const hits = Object.entries(activity.things)
+      .sort(([, firstCount], [, secondCount]) => secondCount - firstCount)
+      .map(([thing, hitCount]) => `${hitCount} ${thing.split(HIT_ON).map(thingName).join(HIT_ON)}`);
+    return { timeUtc, kind, text: `${sentence}: ${hits.join(', ')}` };
   }
   if (PLAIN_ACTIVITY_KINDS.includes(activity.kind)) {
     return { timeUtc, kind, text: total === 1 ? `${activity.player ?? 'Someone'} ${words.verb}` : sentence };
