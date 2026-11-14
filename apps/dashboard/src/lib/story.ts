@@ -14,7 +14,7 @@ import type { StoryItem, StoryKind, StoryText } from '#/lib/models/story';
 import { DAY_MS, MS_PER_HOUR, MS_PER_MINUTE, MS_PER_SECOND, SECONDS_PER_MINUTE } from '#/lib/models/time';
 import { BOSS_ALTAR_NAMES, BOSS_NAMES, DUNGEON_AREA, HEALTH_SHARE_WORDS, PLACE_NAMES } from '#/lib/models/world';
 import { mergedSource, sourceKey } from '#/lib/sources';
-import { areaName, capitalized, count, listText, raidName, thingList, thingName, withArticle } from '#/lib/text';
+import { areaName, capitalized, count, listText, namedList, raidName, thingList, thingName, withArticle } from '#/lib/text';
 import { durationLabel } from '#/lib/time';
 
 /** Total things in a stretch of activity. */
@@ -44,10 +44,8 @@ const activityItem = (activity: ActivityRecord): StoryText => {
     return { timeUtc, kind, text: sentence, things };
   }
   if (activity.kind === 'landed') {
-    const hits = Object.entries(activity.things)
-      .sort(([, firstCount], [, secondCount]) => secondCount - firstCount)
-      .map(([thing, hitCount]) => `${hitCount} ${thing.split(HIT_ON).map(thingName).join(HIT_ON)}`);
-    return { timeUtc, kind, text: `${sentence}: ${hits.join(', ')}` };
+    const hits = namedList(activity.things, (thing) => thing.split(HIT_ON).map(thingName).join(HIT_ON));
+    return { timeUtc, kind, text: `${sentence}: ${hits}` };
   }
   if (PLAIN_ACTIVITY_KINDS.includes(activity.kind)) {
     return { timeUtc, kind, text: total === 1 ? `${activity.player ?? 'Someone'} ${words.verb}` : sentence };

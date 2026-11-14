@@ -46,9 +46,21 @@ export const withArticle = (name: string): string => `${/^[aeiou]/i.test(name) ?
 export const listText = (names: string[]): string =>
   names.length <= 1 ? (names[0] ?? '') : `${names.slice(0, -1).join(', ')} and ${names.at(-1)}`;
 
-/** Every thing of [things], most first, for example `14 wood floor 1x1, 8 wood fence, 1 workbench`. */
-export const thingList = (things: Record<string, number>): string =>
-  Object.entries(things)
+/**
+ * Every amount of [amounts], most first, each named by [nameOf], for example `14 wood floor 1x1, 8 wood fence`.
+ * Keys with the same name count together, such as the two kinds of skeleton the game both calls `Skeleton`.
+ */
+export const namedList = (amounts: Record<string, number>, nameOf: (key: string) => string): string => {
+  const byName: Record<string, number> = {};
+  for (const [key, amount] of Object.entries(amounts)) {
+    const name = nameOf(key);
+    byName[name] = (byName[name] ?? 0) + amount;
+  }
+  return Object.entries(byName)
     .sort(([, firstAmount], [, secondAmount]) => secondAmount - firstAmount)
-    .map(([thing, amount]) => `${amount} ${thingName(thing)}`)
+    .map(([name, amount]) => `${amount} ${name}`)
     .join(', ');
+};
+
+/** Every thing of [things], most first, for example `14 wood floor 1x1, 8 wood fence, 1 workbench`. */
+export const thingList = (things: Record<string, number>): string => namedList(things, thingName);
