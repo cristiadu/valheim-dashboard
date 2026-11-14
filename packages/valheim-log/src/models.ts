@@ -44,6 +44,9 @@ export type LogEvent = { timeUtc: string } & (
   | { type: 'globalKey'; key: string; isSet: boolean }
   | { type: 'raidEnded'; raid: string }
   | { type: 'bossSummoned'; boss: string; summoner: string | null }
+  | { type: 'bossHurt'; boss: string; percent: number }
+  | { type: 'bossDefeated'; boss: string; seconds: number; attackers: string[] }
+  | { type: 'closeCall'; character: string; health: number; maxHealth: number; area: string; fighting: string[] }
   | { type: 'dayStarted'; day: number }
   | { type: 'deathDetails'; character: string; area: string; fighting: string[] }
   | { type: 'areaEntered'; character: string; area: string; place?: string }

@@ -4,6 +4,9 @@ export const MS_PER_SECOND = 1000;
 /** Milliseconds in one minute. */
 export const MS_PER_MINUTE = 60 * MS_PER_SECOND;
 
+/** Seconds in one minute. */
+export const SECONDS_PER_MINUTE = 60;
+
 /** Minutes in one hour. */
 export const MINUTES_PER_HOUR = 60;
 

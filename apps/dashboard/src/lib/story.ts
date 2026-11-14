@@ -1,10 +1,10 @@
 import type { PlayerSession } from 'valheim-log';
 
 import { ACTIVITY_STORY_KINDS, ACTIVITY_WORDS, type ActivityRecord, UNKNOWN_FOOD, UNKNOWN_STATION } from '#/lib/models/activities';
-import { type ChatRecord, DEATH_DETAILS_WINDOW_MS, type Snapshot, type SourceLines, type StoryEvent } from '#/lib/models/snapshot';
+import { type ChatRecord, DETAILS_WINDOW_MS, type Snapshot, type SourceLines, type StoryEvent } from '#/lib/models/snapshot';
 import type { StoryItem, StoryKind, StoryText } from '#/lib/models/story';
-import { DAY_MS, MS_PER_MINUTE } from '#/lib/models/time';
-import { BOSS_ALTAR_NAMES, BOSS_NAMES, DUNGEON_AREA, PLACE_NAMES } from '#/lib/models/world';
+import { DAY_MS, MS_PER_HOUR, MS_PER_MINUTE, MS_PER_SECOND, SECONDS_PER_MINUTE } from '#/lib/models/time';
+import { BOSS_ALTAR_NAMES, BOSS_NAMES, DUNGEON_AREA, HEALTH_SHARE_WORDS, PLACE_NAMES } from '#/lib/models/world';
 import { mergedSource, sourceKey } from '#/lib/sources';
 import { areaName, capitalized, count, listText, raidName, thingList, thingName, withArticle } from '#/lib/text';
 import { durationLabel } from '#/lib/time';
@@ -69,11 +69,22 @@ const chatItem = (chat: ChatRecord): StoryText => {
   }
 };
 
-/** What a player was fighting when they died, for example ` fighting a troll and Bjorn`. Players keep their names. */
+/** One thing a player was fighting: players and bosses keep their names, other creatures get an article. */
+const fighterName = (name: string, players: Set<string>): string =>
+  players.has(name) ? name : (BOSS_NAMES[name] ?? withArticle(thingName(name)));
+
+/** What a player was fighting when they died or nearly did, for example ` fighting a troll and Bjorn`. */
 const fightingText = (fighting: string[], players: Set<string>): string =>
-  fighting.length === 0
-    ? ''
-    : ` fighting ${listText(fighting.map((name) => (players.has(name) ? name : withArticle(thingName(name)))))}`;
+  fighting.length === 0 ? '' : ` fighting ${listText(fighting.map((name) => fighterName(name, players)))}`;
+
+/** How long after its summon a boss was defeated, for example `3 minutes`, or `1h 5m` from an hour on. */
+const sinceSummonText = (seconds: number): string => {
+  if (seconds < SECONDS_PER_MINUTE) {
+    return 'less than a minute';
+  }
+  const ms = seconds * MS_PER_SECOND;
+  return ms < MS_PER_HOUR ? count(Math.floor(seconds / SECONDS_PER_MINUTE), 'minute', 'minutes') : durationLabel(ms);
+};
 
 /** Sentence for how a tame changed. */
 const tameText = (event: Extract<StoryEvent, { type: 'tameChanged' }>): string => {
@@ -120,6 +131,24 @@ const eventItem = (event: StoryEvent, players: Set<string>): StoryText => {
       return { timeUtc, kind: 'night', text: `${event.character} went to bed` };
     case 'bossSummoned':
       return { timeUtc, kind: 'boss', text: `${event.summoner ?? 'Someone'} summoned ${BOSS_NAMES[event.boss] ?? event.boss}` };
+    case 'bossHurt':
+      return {
+        timeUtc,
+        kind: 'boss',
+        text: `${BOSS_NAMES[event.boss] ?? event.boss} was brought down to ${HEALTH_SHARE_WORDS[event.percent] ?? `${event.percent}%`} of its health`,
+      };
+    case 'bossDefeated':
+      return {
+        timeUtc,
+        kind: 'boss',
+        text: `${BOSS_NAMES[event.boss] ?? event.boss} was defeated by ${listText(event.attackers)}, ${sinceSummonText(event.seconds)} after being summoned`,
+      };
+    case 'closeCall':
+      return {
+        timeUtc,
+        kind: 'fight',
+        text: `${event.character} nearly died in ${areaName(event.area)}${fightingText(event.fighting, players)}, with ${event.health} of ${event.maxHealth} health left`,
+      };
     case 'globalKey':
       return { timeUtc, kind: 'boss', text: `${BOSS_NAMES[event.key] ?? event.key} was defeated` };
     case 'areaEntered':
@@ -194,16 +223,23 @@ const eventItem = (event: StoryEvent, players: Set<string>): StoryText => {
   }
 };
 
-/** True when [other] is the game's own death line for the death the plugin told about in [event]. */
-const isSameDeath = (event: StoryEvent, other: StoryEvent): boolean =>
-  event.type === 'deathDetails' &&
-  other.type === 'playerDied' &&
-  other.character === event.character &&
-  Math.abs(Date.parse(other.timeUtc) - Date.parse(event.timeUtc)) <= DEATH_DETAILS_WINDOW_MS;
+/**
+ * True when [other] is the plain line for what the plugin told in detail in [event]: the game's own death line
+ * for a death, or the global key for a boss defeat.
+ */
+const isPlainLineOf = (event: StoryEvent, other: StoryEvent): boolean => {
+  if (Math.abs(Date.parse(other.timeUtc) - Date.parse(event.timeUtc)) > DETAILS_WINDOW_MS) {
+    return false;
+  }
+  if (event.type === 'deathDetails') {
+    return other.type === 'playerDied' && other.character === event.character;
+  }
+  return event.type === 'bossDefeated' && other.type === 'globalKey' && BOSS_NAMES[other.key] === BOSS_NAMES[event.boss];
+};
 
-/** Log lines behind [event]: its own line, and for death details also the game's death line. */
+/** Log lines behind [event]: its own line, and for death or boss defeat details also the plain line. */
 const eventSource = (event: StoryEvent, events: StoryEvent[], kind: StoryKind): SourceLines => {
-  const told = [...events.filter((other) => isSameDeath(event, other)), event];
+  const told = [...events.filter((other) => isPlainLineOf(event, other)), event];
   return { total: told.length, lines: told.map(({ timeUtc, line }) => ({ timeUtc, line, kind })) };
 };
 
@@ -228,7 +264,7 @@ export const storyOf = (snapshot: Snapshot): StoryItem[] => {
   ]);
   const players = new Set(snapshot.sessions.map((session) => session.character));
   const eventItems = snapshot.events
-    .filter((event) => !snapshot.events.some((other) => isSameDeath(other, event)))
+    .filter((event) => !snapshot.events.some((other) => isPlainLineOf(other, event)))
     .map((event) => {
       const item = eventItem(event, players);
       return { ...item, source: eventSource(event, snapshot.events, item.kind) };

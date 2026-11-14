@@ -240,6 +240,8 @@ describe('parseMessage', () => {
       'Raid ended: army_eikthyr',
       'Boss summoned: Eikthyr by Ragnar',
       'Boss summoned: gd_king by an unknown player',
+      'Boss hurt: Eikthyr 50',
+      'Boss defeated: Eikthyr after 187 seconds by Ragnar, Inge Dragonchow',
       'Day started: 42',
     ];
 
@@ -258,6 +260,8 @@ describe('parseMessage', () => {
       { type: 'raidEnded', timeUtc, raid: 'army_eikthyr' },
       { type: 'bossSummoned', timeUtc, boss: 'Eikthyr', summoner: 'Ragnar' },
       { type: 'bossSummoned', timeUtc, boss: 'gd_king', summoner: null },
+      { type: 'bossHurt', timeUtc, boss: 'Eikthyr', percent: 50 },
+      { type: 'bossDefeated', timeUtc, boss: 'Eikthyr', seconds: 187, attackers: ['Ragnar', 'Inge Dragonchow'] },
       { type: 'dayStarted', timeUtc, day: 42 },
     ]);
   });
@@ -267,6 +271,8 @@ describe('parseMessage', () => {
     const messages = [
       'Player died: Ragnar in BlackForest while fighting Troll, Greydwarf',
       'Player died: Ragnar in Ocean',
+      'Close call: Inge Dragonchow down to 4 of 110 health in BlackForest while fighting Troll, Greydwarf',
+      'Close call: Ragnar down to 3 of 25 health in Meadows',
       'Area entered: Ragnar Swamp',
       'Teleported: Ragnar to Home base',
       'Teleported: Ragnar to an unnamed portal',
@@ -288,6 +294,8 @@ describe('parseMessage', () => {
     expect(events).toEqual([
       { type: 'deathDetails', timeUtc, character: 'Ragnar', area: 'BlackForest', fighting: ['Troll', 'Greydwarf'] },
       { type: 'deathDetails', timeUtc, character: 'Ragnar', area: 'Ocean', fighting: [] },
+      { type: 'closeCall', timeUtc, character: 'Inge Dragonchow', health: 4, maxHealth: 110, area: 'BlackForest', fighting: ['Troll', 'Greydwarf'] },
+      { type: 'closeCall', timeUtc, character: 'Ragnar', health: 3, maxHealth: 25, area: 'Meadows', fighting: [] },
       { type: 'areaEntered', timeUtc, character: 'Ragnar', area: 'Swamp' },
       { type: 'teleported', timeUtc, character: 'Ragnar', portal: 'Home base' },
       { type: 'teleported', timeUtc, character: 'Ragnar', portal: null },
