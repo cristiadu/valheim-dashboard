@@ -108,6 +108,44 @@ describe('storyOf', () => {
     ]);
   });
 
+  it('tells a boss fight and a close call in plain sentences', () => {
+    // GIVEN Eikthyr hurt to half and defeated after 187 seconds with its global key, two more defeats, and two close calls
+    const snapshot = snapshotWith({
+      sessions: [sessionWith({}), sessionWith({ character: 'Bjorn' })],
+      events: [
+        { type: 'bossHurt', timeUtc: '2026-10-29T10:01:00.000Z', boss: 'Eikthyr', percent: 50, line: 'test line' },
+        { type: 'bossDefeated', timeUtc: '2026-10-29T10:02:00.000Z', boss: 'Eikthyr', seconds: 187, attackers: ['Ragnar', 'Bjorn'], line: 'test line' },
+        { type: 'globalKey', timeUtc: '2026-10-29T10:02:01.000Z', key: 'defeated_eikthyr', isSet: true, line: 'test line' },
+        { type: 'bossDefeated', timeUtc: '2026-10-29T10:03:00.000Z', boss: 'gd_king', seconds: 4000, attackers: ['Ragnar'], line: 'test line' },
+        { type: 'bossDefeated', timeUtc: '2026-10-29T10:04:00.000Z', boss: 'Bonemass', seconds: 40, attackers: ['Bjorn'], line: 'test line' },
+        {
+          type: 'closeCall',
+          timeUtc: '2026-10-29T10:05:00.000Z',
+          character: 'Ragnar',
+          health: 4,
+          maxHealth: 110,
+          area: 'BlackForest',
+          fighting: ['Troll', 'gd_king'],
+          line: 'test line',
+        },
+        { type: 'closeCall', timeUtc: '2026-10-29T10:06:00.000Z', character: 'Bjorn', health: 3, maxHealth: 25, area: 'Meadows', fighting: [], line: 'test line' },
+      ],
+    });
+
+    // WHEN the story is made
+    const story = storyOf(snapshot).filter((item) => item.kind !== 'joined');
+
+    // THEN each reads as a sentence, newest first, with one line for Eikthyr's defeat and bosses by name
+    expect(story.map((item) => [item.kind, item.text])).toEqual([
+      ['fight', 'Bjorn nearly died in the Meadows, with 3 of 25 health left'],
+      ['fight', 'Ragnar nearly died in the Black Forest fighting a troll and The Elder, with 4 of 110 health left'],
+      ['boss', 'Bonemass was defeated by Bjorn, less than a minute after being summoned'],
+      ['boss', 'The Elder was defeated by Ragnar, 1h 6m after being summoned'],
+      ['boss', 'Eikthyr was defeated by Ragnar and Bjorn, 3 minutes after being summoned'],
+      ['boss', 'Eikthyr was brought down to half of its health'],
+    ]);
+  });
+
   it('tells beds, portals and wards in plain sentences', () => {
     // GIVEN Inge Dragonchow claims a bed, names a portal and turns her ward off
     const snapshot = snapshotWith({

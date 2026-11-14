@@ -88,6 +88,16 @@ export const RAID_ENDED_PATTERN = /^Raid ended: (?<raid>\w+)$/;
 /** A player summoned a boss. Written by the event log plugin. */
 export const BOSS_SUMMONED_PATTERN = /^Boss summoned: (?<boss>\S+) by (?<summoner>.+)$/;
 
+/** A summoned boss's health dropped to a share of its full health, in percent. Written by the event log plugin. */
+export const BOSS_HURT_PATTERN = /^Boss hurt: (?<boss>\S+) (?<percent>\d+)$/;
+
+/** A summoned boss died, with the seconds since the summon and everyone who hit it. Written by the event log plugin. */
+export const BOSS_DEFEATED_PATTERN = /^Boss defeated: (?<boss>\S+) after (?<seconds>\d+) seconds by (?<attackers>.+)$/;
+
+/** A player's health dropped very low and they got away alive. Written by the event log plugin. */
+export const CLOSE_CALL_PATTERN =
+  /^Close call: (?<character>.+?) down to (?<health>\d+) of (?<maxHealth>\d+) health in (?<area>\w+)(?: while fighting (?<fighting>.+))?$/;
+
 /** Where and fighting what a player died. Written by the event log plugin, next to the game's own death line. */
 export const DEATH_DETAILS_PATTERN = /^Player died: (?<character>.+?) in (?<area>\w+)(?: while fighting (?<fighting>.+))?$/;
 

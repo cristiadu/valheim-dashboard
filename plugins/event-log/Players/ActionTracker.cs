@@ -108,6 +108,7 @@ namespace ValheimDashboard.EventLog
                     continue;
                 }
                 NoteMaxHealth(peer.m_characterID, player.GetFloat(ZDOVars.s_maxHealth));
+                CloseCallTracker.See(peer.m_characterID, player);
                 (int Hand, int Crafting, int Emote) now = (player.GetInt(ZDOVars.s_rightItem), player.GetInt(CraftingKey), player.GetInt(ZDOVars.s_emoteID));
                 bool isKnown = LastSeen.TryGetValue(peer.m_characterID, out (int Hand, int Crafting, int Emote) before);
                 LastSeen[peer.m_characterID] = now;

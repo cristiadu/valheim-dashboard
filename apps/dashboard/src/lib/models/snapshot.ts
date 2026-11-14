@@ -19,6 +19,9 @@ export const STORY_EVENT_TYPES = [
   'worldLoaded',
   'serverStopped',
   'bossSummoned',
+  'bossHurt',
+  'bossDefeated',
+  'closeCall',
   'globalKey',
   'areaEntered',
   'teleported',
@@ -251,5 +254,5 @@ export type ChatRecord = {
   line: string;
 };
 
-/** Longest time between the game's death line and the plugin's details of the same death. */
-export const DEATH_DETAILS_WINDOW_MS = 60_000;
+/** Longest time between a plain line and the plugin's details of the same death or boss defeat. */
+export const DETAILS_WINDOW_MS = 60_000;

@@ -175,8 +175,11 @@ when the plugin does not know who it was.
 | Global key set or removed | `Global key set: defeated_eikthyr` | `^Global key (?<change>set\|removed): (?<key>.+)$` |
 | Raid ended | `Raid ended: army_eikthyr` | `^Raid ended: (?<raid>\w+)$` |
 | Boss summoned | `Boss summoned: Eikthyr by Ragnar` | `^Boss summoned: (?<boss>\S+) by (?<summoner>.+)$` |
+| Boss hurt | `Boss hurt: Eikthyr 50` | `^Boss hurt: (?<boss>\S+) (?<percent>\d+)$` |
+| Boss defeated | `Boss defeated: Eikthyr after 187 seconds by Ragnar, Bjorn` | `^Boss defeated: (?<boss>\S+) after (?<seconds>\d+) seconds by (?<attackers>.+)$` |
 | New in-game day | `Day started: 42` | `^Day started: (?<day>\d+)$` |
 | Player died | `Player died: Ragnar in BlackForest while fighting Troll` | `^Player died: (?<character>.+?) in (?<area>\w+)(?: while fighting (?<fighting>.+))?$` |
+| Close call | `Close call: Ragnar down to 4 of 110 health in BlackForest while fighting Troll` | `^Close call: (?<character>.+?) down to (?<health>\d+) of (?<maxHealth>\d+) health in (?<area>\w+)(?: while fighting (?<fighting>.+))?$` |
 | Area entered | `Area entered: Ragnar Swamp` | `^Area entered: (?<character>.+) (?<area>\w+)$` |
 | Came out of a portal | `Teleported: Ragnar to Home base` | `^Teleported: (?<character>.+?) to (?<portal>.+)$` |
 | PvP turned on or off | `PvP turned on: Ragnar` | `^PvP turned (?<state>on\|off): (?<character>.+)$` |
@@ -240,6 +243,11 @@ when the plugin does not know who it was.
 - **Global keys** mark world progress. The game sets `defeated_<boss>` each time a boss dies, for
   example `defeated_eikthyr`, `defeated_gdking` (The Elder) or `defeated_bonemass`.
 - **Boss summoned** names the player whose offering summoned the boss.
+- **Boss hurt** is logged once each when a summoned boss drops to 75, 50 and 25 percent of its health.
+- **Boss defeated** has the seconds from the summon to the death, and every player who hit the boss.
+  Both lines cover bosses summoned since the server started.
+- **Close call** is a player whose health fell to 15 percent of their max or less and came back to
+  40 percent without dying. It has their lowest health, and `while fighting` as in **Player died**.
 - **Player died** comes with the game's own `Got character ZDOID from Ragnar : 0:0`. `while fighting`
   lists creatures that attacked within 5 seconds and 30 meters, and players who hit them in PvP.
 - **Area** is a biome (`Meadows`, `BlackForest`, `Swamp`, `Mountain`, `Plains`, `Mistlands`,

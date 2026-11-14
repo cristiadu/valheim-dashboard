@@ -85,6 +85,7 @@ namespace ValheimDashboard.EventLog
             ChestLabelTracker.AfterScan();
             TerrainMap.WriteOnce();
             GameDataFiles.WriteOnce();
+            BossFightTracker.AfterScan();
             CombatTracker.ForgetOldMoves();
             WorkTracker.ForgetOldRequests();
             LogNewDay();
@@ -107,6 +108,7 @@ namespace ValheimDashboard.EventLog
             LeviathanTracker.Forget(uid);
             PieceStateTracker.Forget(uid);
             ActionTracker.Forget(uid);
+            CloseCallTracker.Forget(uid);
             CraftedItemTracker.Forget(uid);
             RideTracker.Forget(uid);
             UpkeepTracker.Forget(uid);
@@ -116,6 +118,7 @@ namespace ValheimDashboard.EventLog
                 return;
             }
             CreatureTracker.Destroyed(zdo);
+            BossFightTracker.Destroyed(zdo);
             ItemTracker.Destroyed(zdo);
             WorkTracker.Destroyed(zdo);
             ShotTracker.Destroyed(zdo);
@@ -142,6 +145,7 @@ namespace ValheimDashboard.EventLog
             if (character != null && character.m_boss)
             {
                 GameEventLog.Write($"Boss summoned: {Names.PrefabName(zdo)} by {Names.Peer(zdo.GetOwner())}");
+                BossFightTracker.Summoned(zdo);
             }
         }
 

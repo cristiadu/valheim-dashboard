@@ -25,6 +25,9 @@ export const BOSS_ALTAR_NAMES: Record<string, string> = {
   GoblinKing: 'Yagluth',
 };
 
+/** Words for the share of its health a boss is down to, by the percent the plugin logs. */
+export const HEALTH_SHARE_WORDS: Record<number, string> = { 75: 'three quarters', 50: 'half', 25: 'a quarter' };
+
 /** Start of the global key a boss defeat sets, for example `defeated_eikthyr`. */
 export const DEFEATED_KEY_PREFIX = 'defeated_';
 
