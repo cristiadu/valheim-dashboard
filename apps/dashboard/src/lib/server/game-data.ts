@@ -33,7 +33,10 @@ export const craftCostsOf = (text: string): Record<string, Record<number, CraftC
   return costs;
 };
 
-/** Reads the plugin's foods file [text], one `CookedMeat 30` line per food, into the health each gives (0 when not given). */
+/**
+ * Reads the plugin's foods file [text], one `CookedMeat 30` line per food or drink, into the health each gives (0 for
+ * a mead, or when not given).
+ */
 export const foodsOf = (text: string): Record<string, number> =>
   Object.fromEntries(matchingLines(text, FOOD_LINE_PATTERN).map(({ item, health }) => [item!, Number(health ?? 0)]));
 

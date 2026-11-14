@@ -146,7 +146,8 @@ const twoFoodsGiving = (foods: string[], healths: Record<string, number>, maxHea
  * a food can not be eaten again for [MEAL_MINUTES]. With it, it is the first of these that fits, the most carried
  * first: one food giving about that much health, the food eaten longest ago that tops up to it as in [isTopUp], two
  * foods eaten one right after the other that give it together, or a food never seen eaten that tops up to it.
- * When nothing carried fits, the food eaten is not in the guess and nothing is taken. A gain of 0 is a mead.
+ * When nothing carried fits, the food eaten is not in the guess and nothing is taken. A gain of 0 is a mead, which
+ * gives no health: the one carried most, since a mead can be drunk again after a minute or two.
  */
 const foodsEaten = (
   state: ServerState,
@@ -164,7 +165,7 @@ const foodsEaten = (
     return ready.slice(0, 1);
   }
   if (maxHealthGain === 0) {
-    return [];
+    return carried.filter((item) => state.foods[item] === 0).slice(0, 1);
   }
   const eatenAgain = carried
     .filter((item) => meals[item] !== undefined && nowMs - Date.parse(meals[item]) >= EAT_AGAIN_MINUTES * MS_PER_MINUTE)
