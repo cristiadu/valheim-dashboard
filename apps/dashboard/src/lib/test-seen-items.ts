@@ -1,7 +1,7 @@
 /**
  * Every item the server's logs have named so far, in chests, bags, gear and item lines: the prefab the plugin logs,
- * the name the game names file gives it, and the icon file the dashboard shows for it. The five marked idols have
- * no picture on the wiki, so they show the plain sack.
+ * the name the game names file gives it, and the icon file the dashboard shows for it. The wiki has no picture of the
+ * five marked idols, so theirs were taken from the game files.
  */
 export const SEEN_ITEMS: readonly (readonly [prefab: string, gameName: string, iconFile: string])[] = [
   ['Acorn', 'Acorns', 'acorn.png'],
@@ -147,12 +147,12 @@ export const SEEN_ITEMS: readonly (readonly [prefab: string, gameName: string, i
   ['TrophyNeck', 'Neck Trophy', 'neck-trophy.png'],
   ['TrophySkeleton', 'Skeleton Trophy', 'skeleton-trophy.png'],
   ['Upgrader0Armor', 'Wooden Protection Idol', 'wooden-protection-idol.png'],
-  ['Upgrader0Weapon', 'Wooden Battle Idol', 'wooden-battle-idol.png'], // no wiki picture
-  ['Upgrader1Armor', 'Bronze Protection Idol', 'bronze-protection-idol.png'], // no wiki picture
+  ['Upgrader0Weapon', 'Wooden Battle Idol', 'wooden-battle-idol.png'], // picture from the game files
+  ['Upgrader1Armor', 'Bronze Protection Idol', 'bronze-protection-idol.png'], // picture from the game files
   ['Upgrader1Weapon', 'Bronze Battle Idol', 'bronze-battle-idol.png'],
   ['Upgrader2Armor', 'Iron Protection Idol', 'iron-protection-idol.png'],
-  ['Upgrader2Weapon', 'Iron Battle Idol', 'iron-battle-idol.png'], // no wiki picture
-  ['Upgrader3Armor', 'Silver Protection Idol', 'silver-protection-idol.png'], // no wiki picture
-  ['Upgrader4Weapon', 'Black Metal Battle Idol', 'black-metal-battle-idol.png'], // no wiki picture
+  ['Upgrader2Weapon', 'Iron Battle Idol', 'iron-battle-idol.png'], // picture from the game files
+  ['Upgrader3Armor', 'Silver Protection Idol', 'silver-protection-idol.png'], // picture from the game files
+  ['Upgrader4Weapon', 'Black Metal Battle Idol', 'black-metal-battle-idol.png'], // picture from the game files
   ['Wood', 'Wood', 'wood.png'],
 ];
