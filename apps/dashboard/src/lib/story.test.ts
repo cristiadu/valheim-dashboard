@@ -187,6 +187,21 @@ describe('storyOf', () => {
     ]);
   });
 
+  it('tells crafting by station, most visits first, and leaves a station not known unnamed', () => {
+    // GIVEN Ragnar opened the workbench 3 times, the forge once and a station the plugin could not tell once
+    const snapshot = snapshotWith({
+      activities: [
+        { player: 'Ragnar', kind: 'crafted', startUtc: '2026-10-29T10:00:00.000Z', endUtc: '2026-10-29T10:05:00.000Z', things: { forge: 1, piece_workbench: 3, crafting_station: 1 }, source: NO_LINES },
+      ],
+    });
+
+    // WHEN the story is made
+    const story = storyOf(snapshot);
+
+    // THEN the line names each station with its visits
+    expect(story.map((item) => item.text)).toEqual(['Ragnar worked at the workbench 3 times, the forge and a crafting station']);
+  });
+
   it('leaves the time out when a player took the wheel only once', () => {
     // GIVEN Ragnar took the wheel of a longship once
     const snapshot = snapshotWith({
