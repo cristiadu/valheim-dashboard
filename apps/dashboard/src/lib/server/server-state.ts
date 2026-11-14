@@ -5,7 +5,7 @@ import type { LogEvent } from 'valheim-log';
 import { gearEntryOf } from '#/lib/gear';
 import { squareKeyOf } from '#/lib/map';
 import { type Snapshot, STORY_EVENT_TYPES, type StoryEvent } from '#/lib/models/snapshot';
-import { BOSS_NAMES, BOSS_ORDER, DEFEATED_KEY_PREFIX, DUNGEON_AREA } from '#/lib/models/world';
+import { BOSS_NAMES, BOSS_ORDER, DEFEATED_KEY_PREFIX, DUNGEON_AREA, PLACE_NAMES } from '#/lib/models/world';
 import { characterOfSteamName } from '#/lib/players';
 import { addActivityOf } from '#/lib/server/activities';
 import { updateBags } from '#/lib/server/bags';
@@ -44,13 +44,15 @@ const itemsSeenIn = (event: LogEvent): string[] => {
   }
 };
 
-/** Adds the area [event] enters or the gear it shows to what its character has seen, and returns true when it was new. */
+/** Adds the area [event] enters, the gear it shows or the place it finds to what its character has seen, and returns true when it was new. */
 const addFirstSeen = (snapshot: Snapshot, event: LogEvent): boolean => {
   switch (event.type) {
     case 'areaEntered':
       return addNew(snapshot.visitedAreas, event.character, event.area);
     case 'gearSeen':
       return addNew(snapshot.gear, event.character, gearEntryOf(event.item, event.quality));
+    case 'placeFound':
+      return addNew(snapshot.foundPlaces, event.character, `${event.place}:${event.x}:${event.z}`);
     default:
       return false;
   }
@@ -58,7 +60,8 @@ const addFirstSeen = (snapshot: Snapshot, event: LogEvent): boolean => {
 
 /**
  * Returns true when [event] belongs in the story, where [isFirstSeen] tells whether its area or gear is new. An area
- * is news on a first visit or a trip into a dungeon, gear when it is new, and a global key when it is a boss defeat.
+ * is news on a first visit or a trip into a dungeon, gear when it is new, a place when it is new and worth telling, and
+ * a global key when it is a boss defeat.
  * Other `defeated_` keys, such as `defeated_serpent`, are not bosses.
  */
 const isStoryNews = (event: LogEvent, isFirstSeen: boolean): boolean => {
@@ -67,6 +70,8 @@ const isStoryNews = (event: LogEvent, isFirstSeen: boolean): boolean => {
       return isFirstSeen || event.area === DUNGEON_AREA;
     case 'gearSeen':
       return isFirstSeen;
+    case 'placeFound':
+      return isFirstSeen && PLACE_NAMES[event.place] !== undefined;
     case 'globalKey':
       return event.isSet && event.key.startsWith(DEFEATED_KEY_PREFIX) && BOSS_NAMES[event.key] !== undefined;
     default:
@@ -111,6 +116,7 @@ export const createServerState = (serverUtcOffsetMinutes: number): ServerState =
       activities: [],
       chat: [],
       visitedAreas: {},
+      foundPlaces: {},
       gear: {},
       worn: {},
       currentAreas: {},
