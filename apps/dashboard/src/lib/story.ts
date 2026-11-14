@@ -11,7 +11,7 @@ import {
 import { type ChatRecord, DEATH_DETAILS_WINDOW_MS, type Snapshot, type SourceLines, type StoryEvent } from '#/lib/models/snapshot';
 import type { StoryItem, StoryKind, StoryText } from '#/lib/models/story';
 import { DAY_MS, MS_PER_MINUTE } from '#/lib/models/time';
-import { BOSS_ALTAR_NAMES, BOSS_NAMES, DUNGEON_AREA } from '#/lib/models/world';
+import { BOSS_ALTAR_NAMES, BOSS_NAMES, DUNGEON_AREA, PLACE_NAMES } from '#/lib/models/world';
 import { mergedSource, sourceKey } from '#/lib/sources';
 import { areaName, capitalized, count, listText, raidName, thingList, thingName, withArticle } from '#/lib/text';
 import { durationLabel } from '#/lib/time';
@@ -135,9 +135,11 @@ const eventItem = (event: StoryEvent, players: Set<string>): StoryText => {
         kind: 'travel',
         text:
           event.area === DUNGEON_AREA
-            ? `${event.character} went into a dungeon`
+            ? `${event.character} went into ${PLACE_NAMES[event.place ?? ''] ?? 'a dungeon'}`
             : `${event.character} reached ${areaName(event.area)} for the first time`,
       };
+    case 'placeFound':
+      return { timeUtc, kind: 'travel', text: `${event.character} found ${PLACE_NAMES[event.place] ?? thingName(event.place)}` };
     case 'teleported':
       return {
         timeUtc,

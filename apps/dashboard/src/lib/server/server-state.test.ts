@@ -449,6 +449,30 @@ describe('server state', () => {
     expect(state.snapshot.gear).toEqual({ Ragnar: ['SwordIron'] });
   });
 
+  it('keeps a place as news the first time a character finds it, when it is worth telling', () => {
+    // GIVEN Ragnar finds a troll cave twice, a stone circle and Haldor, and goes into the cave
+    readLines(state, [
+      ...RUN_START,
+      logLine('03:00:00', 'Place found: TrollCave02 at 120 -340 by Ragnar'),
+      logLine('03:01:00', 'Area entered: Ragnar Dungeon in TrollCave02'),
+      logLine('03:05:00', 'Place found: TrollCave02 at 120 -340 by Ragnar'),
+      logLine('03:06:00', 'Place found: StoneCircle at 200 -300 by Ragnar'),
+      logLine('03:07:00', 'Place found: Vendor_BlackForest at 900 -1200 by Ragnar'),
+    ]);
+
+    // WHEN the story events and the places found are listed
+    const events = state.snapshot.events.map((event) => [event.type, 'place' in event ? event.place : null]);
+
+    // THEN the cave and Haldor are news once, the dungeon trip names the cave, and every place is kept
+    expect(events).toEqual([
+      ['worldLoaded', null],
+      ['placeFound', 'TrollCave02'],
+      ['areaEntered', 'TrollCave02'],
+      ['placeFound', 'Vendor_BlackForest'],
+    ]);
+    expect(state.snapshot.foundPlaces).toEqual({ Ragnar: ['TrollCave02:120:-340', 'StoneCircle:200:-300', 'Vendor_BlackForest:900:-1200'] });
+  });
+
   it('tracks where players are, what they wear, their kills, the day and the bosses defeated', () => {
     // GIVEN Ragnar moves to the Swamp, changes what he wears, kills with Bjorn, a day starts and Eikthyr falls twice
     readLines(state, [
