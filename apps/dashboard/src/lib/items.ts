@@ -7,17 +7,18 @@ import {
   TREASURE_CHEST_PREFIX,
 } from '#/lib/models/chests';
 import { GEAR_NAMES } from '#/lib/models/gear';
-import { ITEM_NAMES } from '#/lib/models/items';
+import { ITEM_NAMES, type ItemSlot } from '#/lib/models/items';
 import type { MapChest } from '#/lib/models/map';
+import { NATURE_THINGS } from '#/lib/models/world';
 import { capitalized, gameName, thingName } from '#/lib/text';
 
 /**
  * Returns the name the game shows for the item the plugin logs as [prefab], which also picks its icon. For
  * example `Deer trophy` for `TrophyDeer`, `Iron atgeir` for `AtgeirIron` from the game names file, or `Copper ore`
- * for `CopperOre`, which only needs spaces.
+ * for `CopperOre`, which only needs spaces. A cut tree or mined rock gets its plain name, such as `Beech` for `Beech1`.
  */
 export const itemName = (prefab: string): string =>
-  GEAR_NAMES[prefab] ?? ITEM_NAMES[prefab] ?? gameName(prefab) ?? capitalized(thingName(prefab));
+  GEAR_NAMES[prefab] ?? ITEM_NAMES[prefab] ?? gameName(prefab) ?? NATURE_THINGS[prefab]?.name ?? capitalized(thingName(prefab));
 
 /** Returns the name the game shows for the chest, cart or ship the plugin logs as [prefab], such as `Wood chest`. */
 export const chestName = (prefab: string): string =>
@@ -46,11 +47,20 @@ export const containerGrid = (prefab: string, used: number): { columns: number; 
   return { columns, capacity: rows * columns, slots: Math.max(rows, Math.ceil(used / columns)) * columns };
 };
 
-/** Returns [items] as one entry per item, most first, with the name the game shows. */
-export const itemSlots = (items: Record<string, number>): { prefab: string; name: string; count: number }[] =>
-  Object.entries(items)
-    .map(([prefab, count]) => ({ prefab, name: itemName(prefab), count }))
-    .sort((first, second) => second.count - first.count || first.name.localeCompare(second.name));
+/**
+ * Returns [items] as one entry per name, most first, with the name the game shows and the item whose icon to show:
+ * the item itself, or for a tree or rock the item that stands for it, such as `Beech seeds` for a beech. Things
+ * with the same name, such as the two birches, count together.
+ */
+export const itemSlots = (items: Record<string, number>): ItemSlot[] => {
+  const slots = new Map<string, ItemSlot>();
+  for (const [prefab, count] of Object.entries(items)) {
+    const name = itemName(prefab);
+    const slot = slots.get(name) ?? { prefab, name, iconItem: NATURE_THINGS[prefab]?.iconItem ?? name, count: 0 };
+    slots.set(name, { ...slot, count: slot.count + count });
+  }
+  return [...slots.values()].sort((first, second) => second.count - first.count || first.name.localeCompare(second.name));
+};
 
 /**
  * Returns [items] as the game's slots, most first: each item split into full stacks of the most one slot holds in
@@ -59,7 +69,7 @@ export const itemSlots = (items: Record<string, number>): { prefab: string; name
 export const stackSlots = (
   items: Record<string, number>,
   stacks: Record<string, number>,
-): { prefab: string; name: string; count: number }[] =>
+): ItemSlot[] =>
   itemSlots(items).flatMap((slot) => {
     const stack = stacks[slot.prefab] ?? slot.count;
     const fullStacks = Math.floor(slot.count / stack);

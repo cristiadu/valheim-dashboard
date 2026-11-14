@@ -11,7 +11,7 @@
 
 <ul class="items">
   {#each slots as slot (slot.prefab)}
-    <li><ItemIcon item={slot.name} {size} /><span class="amount">{slot.count.toLocaleString()}×</span>{slot.name}</li>
+    <li><ItemIcon item={slot.iconItem} {size} /><span class="amount">{slot.count.toLocaleString()}×</span>{slot.name}</li>
   {/each}
 </ul>
 
