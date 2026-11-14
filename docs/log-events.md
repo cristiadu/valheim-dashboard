@@ -200,6 +200,8 @@ when the plugin does not know who it was.
 | Started eating or drinking, but the food never showed in their hand, with how much their max health went up (0 for a mead) | `Ate something: Ragnar (max health +30)`, or `Ate something: Ragnar` before plugin 2.22.0 | `^Ate something: (?<character>.+?)(?: \(max health \+(?<gain>\d+)\))?$` |
 | Items or fuel put into a smelter, kiln or similar | `Smelting: CopperOre x3 in smelter by Ragnar`, `Smelting: Coal x5 in smelter by Ragnar` | `^Smelting: (?<item>\S+) x(?<count>\d+) in (?<station>\S+) by (?<player>.+)$` |
 | Raw food put on a cooking station, or a mead base into a fermenter | `Cooking: RawMeat on piece_cookingstation by Ragnar`, `Fermenting: MeadBaseTasty in fermenter by Ragnar` | `^(?<kind>Cooking\|Fermenting): (?<item>\S+) (?:on\|in) (?<station>\S+) by (?<player>.+)$` |
+| Food on a cooking station got cooked, or burnt to coal (names the raw food) | `Cooked: CookedMeat on piece_cookingstation by Ragnar`, `Burnt: RawMeat on piece_cookingstation by Ragnar` | `^(?<kind>Cooked\|Burnt): (?<item>\S+) on (?<station>\S+) by (?<player>.+)$` |
+| Mead in a fermenter is ready, or was tapped | `Mead ready: MeadTasty x6 in fermenter`, `Mead tapped: MeadTasty x6 from fermenter by Ragnar` | `^Mead (?<state>ready\|tapped): (?<item>\S+) x(?<count>\d+) (?:in\|from) (?<station>\S+)(?: by (?<player>.+))?$` |
 | Took the helm of a raft or ship | `Sailing: Ragnar on Karve` | `^Sailing: (?<character>.+) on (?<ship>\S+)$` |
 | Opened a crafting station (several kinds share one name, joined with `/`, when they share an animation) | `Crafting: Ragnar at forge` | `^Crafting: (?<character>.+?) at (?<station>\S+)$` |
 | Did an emote | `Emote: Ragnar wave` | `^Emote: (?<character>.+) (?<emote>\S+)$` |
@@ -267,6 +269,9 @@ when the plugin does not know who it was.
   The game starts an object's ID with the ID of the game that made it, so the dropper is exact. Items a broken
   chest, cart or ship, or an emptied item stand, let go of are not drops. The pickup line repeats the same `item` ID.
 - **Harvested** names the player who asked to harvest, or the player whose game owns the plant.
+- **Cooked** and **Burnt** name the player who put the food on, which the cooking station keeps per slot.
+- **Mead ready** is logged once the mead stayed ready for 15 seconds with a player near, since a fermenter only works
+  while a player's game runs it. **Mead tapped** names the player who asked to tap, or whose game owns the fermenter.
 - **Ate** reads the food the character holds for a moment after the eat animation, which every game shows.
   Food held this way is never logged as **Gear**.
 - **Smelting**, **Tree cut** and **Rock mined** name the player who hit or filled it through the server in the

@@ -163,6 +163,15 @@ export const SMELTING_PATTERN = /^Smelting: (?<item>\S+) x(?<count>\d+) in (?<st
 /** A player put raw food on a cooking station or a mead base into a fermenter. Written by the event log plugin. */
 export const FOOD_STARTED_PATTERN = /^(?<kind>Cooking|Fermenting): (?<item>\S+) (?:on|in) (?<station>\S+) by (?<player>.+)$/;
 
+/**
+ * Food on a cooking station got cooked, or burnt to coal, naming the raw food for burnt and who put it on. Written by
+ * the event log plugin.
+ */
+export const FOOD_DONE_PATTERN = /^(?<kind>Cooked|Burnt): (?<item>\S+) on (?<station>\S+) by (?<player>.+)$/;
+
+/** Mead in a fermenter is ready, or a player tapped it, with the mead it makes and how many. Written by the event log plugin. */
+export const MEAD_PATTERN = /^Mead (?<state>ready|tapped): (?<item>\S+) x(?<count>\d+) (?:in|from) (?<station>\S+)(?: by (?<player>.+))?$/;
+
 /** A player took the helm of a raft or a ship. Written by the event log plugin. */
 export const SAILING_PATTERN = /^Sailing: (?<character>.+) on (?<ship>\S+)$/;
 

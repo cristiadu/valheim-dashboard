@@ -188,6 +188,8 @@ const eventItem = (event: StoryEvent, players: Set<string>): StoryText => {
       return { timeUtc, kind: 'tame', text: capitalized(`${withArticle(thingName(event.creature))} started following ${event.player}`) };
     case 'mapShared':
       return { timeUtc, kind: 'travel', text: `${event.player ?? 'Someone'} added what they explored to a map table` };
+    case 'meadReady':
+      return { timeUtc, kind: 'items', text: 'Mead is ready to tap in a fermenter', things: { [event.item]: event.count } };
     case 'wardAccess': {
       const whose = event.builder === event.player ? 'their own' : `${event.builder ?? 'someone'}'s`;
       return { timeUtc, kind: 'built', text: `${event.player} ${event.isGiven ? 'got access to' : 'gave up access to'} ${whose} ward` };

@@ -19,6 +19,9 @@ namespace ValheimDashboard.EventLog
         /// <summary>Hash of the call a player sends to put a mead base into a fermenter.</summary>
         private static readonly int AddItemHash = "RPC_AddItem".GetStableHashCode();
 
+        /// <summary>Hash of the call a player sends to tap a fermenter.</summary>
+        private static readonly int TapHash = "RPC_Tap".GetStableHashCode();
+
         /// <summary>Hash of the call a player sends to write a name on a portal.</summary>
         private static readonly int SetTagHash = "RPC_SetTag".GetStableHashCode();
 
@@ -49,12 +52,12 @@ namespace ValheimDashboard.EventLog
         private static readonly Dictionary<ZDOID, float> Fuels = new Dictionary<ZDOID, float>();
 
         /// <summary>
-        /// Remembers who asked when [data] is a hit, an item put into a station or a fermenter, a portal name, a
+        /// Remembers who asked when [data] is a hit, an item put into a station or a fermenter, a fermenter tap, a portal name, a
         /// saddle, fuel, a repair or a map shared.
         /// </summary>
         public static void Read(ZRoutedRpc.RoutedRPCData data)
         {
-            if (data.m_methodHash == DamageHash || data.m_methodHash == AddOreHash || data.m_methodHash == AddItemHash
+            if (data.m_methodHash == DamageHash || data.m_methodHash == AddOreHash || data.m_methodHash == AddItemHash || data.m_methodHash == TapHash
                 || data.m_methodHash == SetTagHash || data.m_methodHash == AddSaddleHash || UpkeepHashes.Contains(data.m_methodHash))
             {
                 AskedBy[data.m_targetZDO] = (data.m_senderPeerID, Time.time);

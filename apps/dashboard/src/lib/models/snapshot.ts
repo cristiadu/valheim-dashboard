@@ -40,6 +40,7 @@ export const STORY_EVENT_TYPES = [
   'tameFollowing',
   'wardAccess',
   'mapShared',
+  'meadReady',
 ] as const;
 
 /** A game event friends see, such as a death or a raid. */
