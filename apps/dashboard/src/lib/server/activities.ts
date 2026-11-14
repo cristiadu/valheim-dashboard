@@ -1,6 +1,6 @@
 import type { LogEvent } from 'valheim-log';
 
-import { ACTIVITY_STORY_KINDS, type ActivityKind, UNKNOWN_FOOD } from '#/lib/models/activities';
+import { ACTIVITY_STORY_KINDS, type ActivityKind, UNKNOWN_FOOD, UNKNOWN_STATION } from '#/lib/models/activities';
 import type { Snapshot } from '#/lib/models/snapshot';
 import { characterOfSteamName } from '#/lib/players';
 import { pushCapped } from '#/lib/server/lists';
@@ -50,7 +50,8 @@ const addActivity = (
 /**
  * Adds the activity [event] stands for, such as a piece built or a creature killed, read from [line], to the
  * activities of [state]. An item counts as gathered only the first time anyone picks it up. An item picked up again
- * counts as received when another player dropped it. Jumps only add to the player's total, with no story line.
+ * counts as received when another player dropped it. Jumps only add to the player's total, with no story line. Older
+ * plugins named every station sharing an animation, joined by `/`, which counts as a station not known.
  */
 export const addActivityOf = (state: ServerState, event: LogEvent, line: string): void => {
   const { snapshot } = state;
@@ -110,7 +111,7 @@ export const addActivityOf = (state: ServerState, event: LogEvent, line: string)
       addActivity(snapshot, line, timeUtc, event.character, 'sailed', event.ship, 1);
       break;
     case 'crafting':
-      addActivity(snapshot, line, timeUtc, event.character, 'crafted', event.station, 1);
+      addActivity(snapshot, line, timeUtc, event.character, 'crafted', event.station.includes('/') ? UNKNOWN_STATION : event.station, 1);
       break;
     case 'emote':
       addActivity(snapshot, line, timeUtc, event.character, 'emoted', event.emote, 1);

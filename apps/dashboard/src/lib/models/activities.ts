@@ -176,5 +176,8 @@ export const PLAYER_ACTIVITY_STATS: { kind: ActivityKind; label: string }[] = [
 /** Activity kinds told without a list of things, since each has only one thing. */
 export const PLAIN_ACTIVITY_KINDS: readonly ActivityKind[] = ['powered', 'pulled', 'dodged', 'staggered'];
 
+/** Station a visit counts for when the plugin could not tell which crafting station the player opened. */
+export const UNKNOWN_STATION = 'crafting_station';
+
 /** Thing a meal counts as when the server never learned what the player ate, left out of the item list. */
 export const UNKNOWN_FOOD = 'something';

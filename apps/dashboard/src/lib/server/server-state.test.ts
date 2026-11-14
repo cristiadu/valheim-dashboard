@@ -203,6 +203,7 @@ describe('server state', () => {
       ...RUN_START,
       logLine('03:00:00', 'Crafting: Yan at forge'),
       logLine('03:00:30', 'Crafting: Yan at piece_workbench'),
+      logLine('03:00:40', 'Crafting: Yan at piece_artisanstation/piece_stonecutter/piece_workbench'),
       logLine('03:01:00', 'Emote: Yan wave'),
       logLine('03:01:10', 'Emote: Yan wave'),
     ]);
@@ -212,7 +213,7 @@ describe('server state', () => {
 
     // THEN each kind is one stretch
     expect(kinds).toEqual([
-      ['Yan', 'crafted', { forge: 1, piece_workbench: 1 }],
+      ['Yan', 'crafted', { forge: 1, piece_workbench: 1, crafting_station: 1 }],
       ['Yan', 'emoted', { wave: 2 }],
     ]);
   });
