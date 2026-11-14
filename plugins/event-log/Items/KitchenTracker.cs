@@ -24,6 +24,9 @@ namespace ValheimDashboard.EventLog
         /// <summary>Item in each slot of each cooking station at the last scan, by object ID.</summary>
         private static readonly Dictionary<ZDOID, string[]> Slots = new Dictionary<ZDOID, string[]>();
 
+        /// <summary>Player who filled each slot of each cooking station, as the last scan saw it, by object ID.</summary>
+        private static readonly Dictionary<ZDOID, string[]> Fillers = new Dictionary<ZDOID, string[]>();
+
         /// <summary>Item hash each fermenter held at the last scan, or 0 when empty, and when it was put in, by object ID.</summary>
         private static readonly Dictionary<ZDOID, (int Item, long StartTicks)> Contents = new Dictionary<ZDOID, (int Item, long StartTicks)>();
 
@@ -47,6 +50,7 @@ namespace ValheimDashboard.EventLog
         public static void Forget(ZDOID uid)
         {
             Slots.Remove(uid);
+            Fillers.Remove(uid);
             Contents.Remove(uid);
             ReadySince.Remove(uid);
         }
@@ -118,39 +122,50 @@ namespace ValheimDashboard.EventLog
         /// <summary>
         /// Logs each slot of cooking station [zdo] that now holds raw food it did not hold at the last scan, and each
         /// slot whose food turned cooked or burnt since then. A burnt slot holds coal, so the line names the raw food
-        /// it was.
+        /// it was. Only done food can be taken off, so raw food that is gone was cooked and taken between two scans.
         /// </summary>
         private static void SeeCookingStation(ZDO zdo)
         {
             CookingStation station = Names.Prefab(zdo).GetComponent<CookingStation>();
             string[] now = new string[station.m_slots.Length];
+            string[] fillers = new string[now.Length];
             Slots.TryGetValue(zdo.m_uid, out string[] before);
+            Fillers.TryGetValue(zdo.m_uid, out string[] fillersBefore);
             for (int slot = 0; slot < now.Length; slot++)
             {
                 now[slot] = zdo.GetString("slot" + slot);
+                fillers[slot] = Names.Peer(zdo.GetLong(ZDOVars.s_playerID + slot, 0L));
                 string item = now[slot];
-                if (before == null || item == before[slot] || item == string.Empty)
+                if (before == null || item == before[slot])
                 {
                     continue;
                 }
                 string was = before[slot];
-                string by = $"on {Names.PrefabName(zdo)} by {Names.Peer(zdo.GetLong(ZDOVars.s_playerID + slot, 0L))}";
+                string on = $"on {Names.PrefabName(zdo)} by";
+                CookingStation.ItemConversion raw = station.m_conversion.Find(conversion => conversion.m_from.gameObject.name == was);
+                bool isCooked = raw != null && raw.m_to.gameObject.name == item;
+                bool isBurnt = station.m_overCookedItem != null && station.m_overCookedItem.gameObject.name == item;
+                if (raw != null && !isCooked && !isBurnt)
+                {
+                    GameEventLog.Write($"Cooked: {raw.m_to.gameObject.name} {on} {fillersBefore[slot]}");
+                }
                 CookingStation.ItemConversion burnt = station.m_conversion.Find(
                     conversion => conversion.m_from.gameObject.name == was || conversion.m_to.gameObject.name == was);
                 if (station.m_conversion.Exists(conversion => conversion.m_from.gameObject.name == item))
                 {
-                    GameEventLog.Write($"Cooking: {item} {by}");
+                    GameEventLog.Write($"Cooking: {item} {on} {fillers[slot]}");
                 }
                 else if (station.m_conversion.Exists(conversion => conversion.m_to.gameObject.name == item))
                 {
-                    GameEventLog.Write($"Cooked: {item} {by}");
+                    GameEventLog.Write($"Cooked: {item} {on} {fillers[slot]}");
                 }
-                else if (station.m_overCookedItem != null && station.m_overCookedItem.gameObject.name == item && burnt != null)
+                else if (isBurnt && burnt != null)
                 {
-                    GameEventLog.Write($"Burnt: {burnt.m_from.gameObject.name} {by}");
+                    GameEventLog.Write($"Burnt: {burnt.m_from.gameObject.name} {on} {fillers[slot]}");
                 }
             }
             Slots[zdo.m_uid] = now;
+            Fillers[zdo.m_uid] = fillers;
         }
     }
 }
