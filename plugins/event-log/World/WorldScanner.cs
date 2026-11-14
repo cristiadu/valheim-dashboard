@@ -69,6 +69,7 @@ namespace ValheimDashboard.EventLog
                 UpkeepTracker.See(zdo);
                 CraftedItemTracker.See(zdo);
                 MoveTracker.See(zdo);
+                ShotTracker.See(zdo);
                 ActionTracker.See(zdo);
                 if (isNew)
                 {

@@ -291,8 +291,11 @@ when the plugin does not know who it was.
   so the hit is on the creature closest to where the number shows. A swing that hits nothing, a tree or a rock is not counted.
   Tools and bows are left out.
 - **Shot** is logged since plugin 2.21.0 when a flying arrow or bolt is gone. The shooter's game makes it, so its
-  object ID starts with the shooter's ID. Ammo that shares its flying object with other ammo isn't logged, since
-  the object can't tell which one it was.
+  object ID starts with the shooter's ID. Since plugin 2.29.0 only ammo a recipe makes counts, since ammo only
+  creatures shoot can share a flying object with an arrow. Ammo that still shares one isn't logged, since the object
+  can't tell which one it was. A player's game also makes the arrows of creatures it runs, so the shooter must hold
+  a bow or crossbow, or have held one in the last 30 seconds. After a start, the plugin logs once which ammo it
+  tracks: `Ammo tracked: ArrowFire, ArrowWood`.
 - **Planted** replaces **Piece built** for crops and saplings. A plant that grows is not logged as destroyed.
 - **Position** is logged each time a player has walked 20 meters from the last one, outside dungeons. `x` is
   meters east and `z` meters north of the world's center.
