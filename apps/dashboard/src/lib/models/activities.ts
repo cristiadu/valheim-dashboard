@@ -7,7 +7,7 @@ import type { StoryKind } from '#/lib/models/story';
  * put on to cook, mead bases put into fermenters, ships steered, crafting stations opened, emotes, items made or
  * upgraded, tames ridden, forsaken powers used, carts pulled, fires fueled, pieces repaired, items obliterated,
  * arrows and bolts shot, trees cut down or rocks mined out, items dropped on the ground, or items picked up that
- * another player dropped.
+ * another player dropped, food that finished cooking or burnt on a cooking station, or meads tapped from a fermenter.
  */
 export type ActivityKind =
   | 'built'
@@ -36,7 +36,10 @@ export type ActivityKind =
   | 'cut'
   | 'mined'
   | 'dropped'
-  | 'received';
+  | 'received'
+  | 'foodCooked'
+  | 'burnt'
+  | 'tapped';
 
 /** One player's activity of one kind, with pauses under a few minutes, told as one story line. */
 export type ActivityRecord = {
@@ -85,6 +88,9 @@ export const ACTIVITY_STORY_KINDS: Record<ActivityKind, StoryKind> = {
   mined: 'items',
   dropped: 'items',
   received: 'items',
+  foodCooked: 'items',
+  burnt: 'items',
+  tapped: 'items',
 };
 
 /**
@@ -118,6 +124,9 @@ export const ACTIVITY_WORDS: Record<Exclude<ActivityKind, 'destroyed'>, { verb: 
   mined: { verb: 'mined out', one: 'rock', many: 'rocks', ending: '' },
   dropped: { verb: 'dropped', one: 'item', many: 'items', ending: '' },
   received: { verb: 'picked up', one: 'item', many: 'items', ending: '' },
+  foodCooked: { verb: 'finished cooking', one: 'thing', many: 'things', ending: '' },
+  burnt: { verb: 'burnt', one: 'thing', many: 'things', ending: ' on the fire' },
+  tapped: { verb: 'tapped', one: 'mead', many: 'meads', ending: ' from fermenters' },
 };
 
 /** Activity totals on a player's card, in this order, with the label under each number. Kills have their own number. */
@@ -130,7 +139,9 @@ export const PLAYER_ACTIVITY_STATS: { kind: ActivityKind; label: string }[] = [
   { kind: 'ate', label: 'Meals eaten' },
   { kind: 'smelted', label: 'Put in smelters' },
   { kind: 'cooked', label: 'Food cooked' },
+  { kind: 'burnt', label: 'Food burnt' },
   { kind: 'brewed', label: 'Meads brewed' },
+  { kind: 'tapped', label: 'Meads tapped' },
   { kind: 'crafted', label: 'Crafting visits' },
   { kind: 'emoted', label: 'Emotes' },
   { kind: 'made', label: 'Items made' },
