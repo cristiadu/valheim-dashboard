@@ -6,10 +6,12 @@ import {
   CHEST_PATTERN,
   DEPLETED_PATTERN,
   DROPPED_PATTERN,
+  FOOD_DONE_PATTERN,
   FOOD_STARTED_PATTERN,
   HARVESTED_PATTERN,
   ITEM_HUNG_PATTERN,
   MADE_PATTERN,
+  MEAD_PATTERN,
   OBLITERATED_PATTERN,
   PICKED_UP_PATTERN,
   PLANTED_PATTERN,
@@ -114,6 +116,24 @@ export const ITEM_MATCHERS: readonly Matcher[] = [
       station: groups.station!,
       player: playerOf(groups.player),
     }),
+  },
+  {
+    pattern: FOOD_DONE_PATTERN,
+    toEvent: (groups, timeUtc) => ({
+      type: 'foodDone',
+      timeUtc,
+      isBurnt: groups.kind === 'Burnt',
+      item: groups.item!,
+      station: groups.station!,
+      player: playerOf(groups.player),
+    }),
+  },
+  {
+    pattern: MEAD_PATTERN,
+    toEvent: (groups, timeUtc) => {
+      const mead = { timeUtc, item: groups.item!, count: Number(groups.count), station: groups.station! };
+      return groups.state === 'ready' ? { type: 'meadReady', ...mead } : { type: 'meadTapped', ...mead, player: playerOf(groups.player) };
+    },
   },
   {
     pattern: MADE_PATTERN,
