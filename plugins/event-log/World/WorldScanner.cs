@@ -85,6 +85,7 @@ namespace ValheimDashboard.EventLog
             ChestLabelTracker.AfterScan();
             TerrainMap.WriteOnce();
             GameDataFiles.WriteOnce();
+            MoveTracker.AfterScan();
             CombatTracker.ForgetOldMoves();
             WorkTracker.ForgetOldRequests();
             LogNewDay();

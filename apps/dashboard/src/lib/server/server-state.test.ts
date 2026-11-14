@@ -257,6 +257,31 @@ describe('server state', () => {
     ]);
   });
 
+  it('keeps swings, dodge rolls and staggers as activities, and jumps only as a total', () => {
+    // GIVEN Yan swings an axe 42 times and a club 3 times, rolls 4 times, is staggered once and jumps 12 times
+    readLines(state, [
+      ...RUN_START,
+      logLine('03:00:00', 'Moves: Yan swung AxeBronze x30'),
+      logLine('03:00:00', 'Moves: Yan dodged x4'),
+      logLine('03:00:00', 'Moves: Yan jumped x12'),
+      logLine('03:01:00', 'Moves: Yan swung AxeBronze x12'),
+      logLine('03:01:00', 'Moves: Yan swung Club x3'),
+      logLine('03:01:00', 'Moves: Yan staggered x1'),
+    ]);
+
+    // WHEN the activities and Yan's totals are listed
+    const kinds = state.snapshot.activities.map((activity) => [activity.player, activity.kind, activity.things]);
+    const totals = state.snapshot.activityTotals.Yan;
+
+    // THEN each kind but jumps is one stretch, and every kind has its total
+    expect(kinds).toEqual([
+      ['Yan', 'swung', { AxeBronze: 42, Club: 3 }],
+      ['Yan', 'dodged', { dodged: 4 }],
+      ['Yan', 'staggered', { staggered: 1 }],
+    ]);
+    expect(totals).toEqual({ swung: 45, dodged: 4, staggered: 1, jumped: 12 });
+  });
+
   it('names builders the plugin gave by Steam name by their character instead', () => {
     // GIVEN Tony Example plays Ragnar, and the plugin names a chest and pieces by his Steam name
     readLines(state, [

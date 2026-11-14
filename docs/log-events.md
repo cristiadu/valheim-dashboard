@@ -214,6 +214,7 @@ when the plugin does not know who it was.
 | A tame started following a player | `Tame following: Wolf follows Ragnar` | `^Tame following: (?<creature>\S+) follows (?<player>.+)$` |
 | Started pulling a cart | `Pulling cart: Ragnar with Cart` | `^Pulling cart: (?<player>.+) with (?<cart>\S+)$` |
 | Items destroyed in an obliterator after a player pulled its lever | `Obliterated: Resin x20 in incinerator by Ragnar` | `^Obliterated: (?<item>\S+) x(?<count>\d+) in (?<station>\S+) by (?<player>.+)$` |
+| Weapon swings, dodge rolls, jumps and staggers of the last minute | `Moves: Ragnar swung AxeBronze x42`, `Moves: Ragnar dodged x3` | `^Moves: (?<character>.+?) (?<move>dodged\|jumped\|staggered\|swung)(?: (?<item>\S+))? x(?<count>\d+)$` |
 | Arrow, bolt or other ammo shot | `Shot: ArrowFire by Ragnar` | `^Shot: (?<item>\S+) by (?<player>.+)$` |
 | Put fuel on a fire | `Fueled: fire_pit by Ragnar` | `^Fueled: (?<fire>\S+) by (?<player>.+)$` |
 | Repaired a built piece | `Repaired: wood_wall by Ragnar` | `^Repaired: (?<piece>\S+) by (?<player>.+)$` |
@@ -269,6 +270,8 @@ when the plugin does not know who it was.
 - **Smelting**, **Tree cut** and **Rock mined** name the player who hit or filled it through the server in the
   last 10 seconds, or else the player whose game owns it. A station's queue is read once per scan. Since plugin
   2.21.0, fuel put in a station, such as coal in a smelter, is a **Smelting** line too, one per scan.
+- **Moves** counts the animations a player's game sends to everyone, and logs the counts once a minute. A swing is
+  an attack animation of the weapon in hand, so chopping a tree counts too. Tools and bows are left out.
 - **Shot** is logged since plugin 2.21.0 when a flying arrow or bolt is gone. The shooter's game makes it, so its
   object ID starts with the shooter's ID. Ammo that shares its flying object with other ammo isn't logged, since
   the object can't tell which one it was.

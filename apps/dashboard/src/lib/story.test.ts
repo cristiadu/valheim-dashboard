@@ -164,6 +164,28 @@ describe('storyOf', () => {
     ]);
   });
 
+  it('tells swings with their weapons, and dodge rolls and staggers without a list', () => {
+    // GIVEN Ragnar swung an axe and a club, rolled 4 times and was staggered once
+    const at = { startUtc: '2026-10-29T10:00:00.000Z', source: NO_LINES };
+    const snapshot = snapshotWith({
+      activities: [
+        { player: 'Ragnar', kind: 'swung', endUtc: '2026-10-29T10:03:00.000Z', things: { AxeBronze: 42, Club: 3 }, ...at },
+        { player: 'Ragnar', kind: 'dodged', endUtc: '2026-10-29T10:02:00.000Z', things: { dodged: 4 }, ...at },
+        { player: 'Ragnar', kind: 'staggered', endUtc: '2026-10-29T10:01:00.000Z', things: { staggered: 1 }, ...at },
+      ],
+    });
+
+    // WHEN the story is made
+    const story = storyOf(snapshot);
+
+    // THEN each reads as a sentence, newest first
+    expect(story.map((item) => [item.kind, item.text])).toEqual([
+      ['fight', 'Ragnar swung a weapon 45 times: 42 axe bronze, 3 club'],
+      ['fight', 'Ragnar rolled out of the way 4 times'],
+      ['fight', 'Ragnar was staggered'],
+    ]);
+  });
+
   it('leaves the time out when a player took the wheel only once', () => {
     // GIVEN Ragnar took the wheel of a longship once
     const snapshot = snapshotWith({

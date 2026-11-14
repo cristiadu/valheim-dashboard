@@ -9,6 +9,14 @@ import { ACTIVITY_GAP_MS, MAX_ACTIVITIES, type ServerState } from '#/lib/server/
 import { sourceKey } from '#/lib/sources';
 
 /**
+/** Adds [count] and the log [line] to the total of [kind] on [player]'s card in [snapshot]. */
+const addTotal = (snapshot: Snapshot, line: string, timeUtc: string, player: string, kind: ActivityKind, count: number): void => {
+  const totals = (snapshot.activityTotals[player] ??= {});
+  totals[kind] = (totals[kind] ?? 0) + count;
+  addLineUnder(snapshot, sourceKey('activity', player, kind), timeUtc, line, ACTIVITY_STORY_KINDS[kind]);
+};
+
+/**
  * Adds [count] of [thing] and its log [line] to the player's latest stretch of the same [kind] in [snapshot], or
  * starts a new stretch when the player paused longer than [ACTIVITY_GAP_MS]. Also adds them to the player's totals.
  * [from] is who dropped the items, for items picked up that another player dropped.
@@ -24,9 +32,7 @@ const addActivity = (
   from?: string,
 ): void => {
   if (player !== null) {
-    const totals = (snapshot.activityTotals[player] ??= {});
-    totals[kind] = (totals[kind] ?? 0) + count;
-    addLineUnder(snapshot, sourceKey('activity', player, kind), timeUtc, line, ACTIVITY_STORY_KINDS[kind]);
+    addTotal(snapshot, line, timeUtc, player, kind, count);
   }
   const { activities } = snapshot;
   const stretch = activities.findLast((activity) => activity.player === player && activity.kind === kind && activity.from === from);
@@ -44,7 +50,7 @@ const addActivity = (
 /**
  * Adds the activity [event] stands for, such as a piece built or a creature killed, read from [line], to the
  * activities of [state]. An item counts as gathered only the first time anyone picks it up. An item picked up again
- * counts as received when another player dropped it.
+ * counts as received when another player dropped it. Jumps only add to the player's total, with no story line.
  */
 export const addActivityOf = (state: ServerState, event: LogEvent, line: string): void => {
   const { snapshot } = state;
@@ -123,6 +129,13 @@ export const addActivityOf = (state: ServerState, event: LogEvent, line: string)
       break;
     case 'shot':
       addActivity(snapshot, line, timeUtc, event.player, 'shot', event.item, 1);
+      break;
+    case 'moves':
+      if (event.move === 'jumped') {
+        addTotal(snapshot, line, timeUtc, event.character, 'jumped', event.count);
+      } else {
+        addActivity(snapshot, line, timeUtc, event.character, event.move, event.item ?? event.move, event.count);
+      }
       break;
     case 'fueled':
       addActivity(snapshot, line, timeUtc, event.player, 'fueled', event.fire, 1);

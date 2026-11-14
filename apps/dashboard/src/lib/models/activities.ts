@@ -7,7 +7,8 @@ import type { StoryKind } from '#/lib/models/story';
  * put on to cook, mead bases put into fermenters, ships steered, crafting stations opened, emotes, items made or
  * upgraded, tames ridden, forsaken powers used, carts pulled, fires fueled, pieces repaired, items obliterated,
  * arrows and bolts shot, trees cut down or rocks mined out, items dropped on the ground, or items picked up that
- * another player dropped, food that finished cooking or burnt on a cooking station, or meads tapped from a fermenter.
+ * another player dropped, food that finished cooking or burnt on a cooking station, meads tapped from a fermenter,
+ * weapon swings, dodge rolls, times staggered, or jumps.
  */
 export type ActivityKind =
   | 'built'
@@ -39,7 +40,11 @@ export type ActivityKind =
   | 'received'
   | 'foodCooked'
   | 'burnt'
-  | 'tapped';
+  | 'tapped'
+  | 'swung'
+  | 'dodged'
+  | 'staggered'
+  | 'jumped';
 
 /** One player's activity of one kind, with pauses under a few minutes, told as one story line. */
 export type ActivityRecord = {
@@ -91,6 +96,10 @@ export const ACTIVITY_STORY_KINDS: Record<ActivityKind, StoryKind> = {
   foodCooked: 'items',
   burnt: 'items',
   tapped: 'items',
+  swung: 'fight',
+  dodged: 'fight',
+  staggered: 'fight',
+  jumped: 'fight',
 };
 
 /**
@@ -127,6 +136,10 @@ export const ACTIVITY_WORDS: Record<Exclude<ActivityKind, 'destroyed'>, { verb: 
   foodCooked: { verb: 'finished cooking', one: 'thing', many: 'things', ending: '' },
   burnt: { verb: 'burnt', one: 'thing', many: 'things', ending: ' on the fire' },
   tapped: { verb: 'tapped', one: 'mead', many: 'meads', ending: ' from fermenters' },
+  swung: { verb: 'swung a weapon', one: 'time', many: 'times', ending: '' },
+  dodged: { verb: 'rolled out of the way', one: 'time', many: 'times', ending: '' },
+  staggered: { verb: 'was staggered', one: 'time', many: 'times', ending: '' },
+  jumped: { verb: 'jumped', one: 'time', many: 'times', ending: '' },
 };
 
 /** Activity totals on a player's card, in this order, with the label under each number. Kills have their own number. */
@@ -153,8 +166,15 @@ export const PLAYER_ACTIVITY_STATS: { kind: ActivityKind; label: string }[] = [
   { kind: 'repaired', label: 'Pieces repaired' },
   { kind: 'obliterated', label: 'Items obliterated' },
   { kind: 'shot', label: 'Arrows shot' },
+  { kind: 'swung', label: 'Weapon swings' },
+  { kind: 'dodged', label: 'Dodge rolls' },
+  { kind: 'staggered', label: 'Times staggered' },
+  { kind: 'jumped', label: 'Jumps' },
   { kind: 'dropped', label: 'Items dropped' },
 ];
+
+/** Activity kinds told without a list of things, since each has only one thing. */
+export const PLAIN_ACTIVITY_KINDS: readonly ActivityKind[] = ['powered', 'pulled', 'dodged', 'staggered'];
 
 /** Thing a meal counts as when the server never learned what the player ate, left out of the item list. */
 export const UNKNOWN_FOOD = 'something';

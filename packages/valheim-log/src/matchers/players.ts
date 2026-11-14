@@ -1,5 +1,5 @@
 import { optionalNumber, playerOf } from '#/fields';
-import type { ChatKind, Matcher } from '#/models';
+import type { ChatKind, Matcher, MoveKind } from '#/models';
 import {
   AREA_ENTERED_PATTERN,
   BED_CLAIMED_PATTERN,
@@ -11,6 +11,7 @@ import {
   GEAR_PATTERN,
   LOCATION_REVEALED_PATTERN,
   MAP_SHARED_PATTERN,
+  MOVES_PATTERN,
   NOTHING_HELD,
   PING_PATTERN,
   POSITION_PATTERN,
@@ -105,6 +106,17 @@ export const PLAYER_MATCHERS: readonly Matcher[] = [
   {
     pattern: MAP_SHARED_PATTERN,
     toEvent: (groups, timeUtc) => ({ type: 'mapShared', timeUtc, player: playerOf(groups.player), table: groups.table! }),
+  },
+  {
+    pattern: MOVES_PATTERN,
+    toEvent: (groups, timeUtc) => ({
+      type: 'moves',
+      timeUtc,
+      character: groups.character!,
+      move: groups.move as MoveKind,
+      item: groups.item ?? null,
+      count: Number(groups.count),
+    }),
   },
   {
     pattern: DEATH_DETAILS_PATTERN,

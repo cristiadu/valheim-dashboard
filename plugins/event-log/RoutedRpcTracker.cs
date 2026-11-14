@@ -24,6 +24,7 @@ namespace ValheimDashboard.EventLog
             CombatTracker.Read(data);
             ItemTracker.Read(data);
             ActionTracker.Read(data);
+            MoveTracker.Read(data);
             WorkTracker.Read(data);
         }
     }
