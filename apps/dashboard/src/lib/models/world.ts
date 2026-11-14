@@ -25,6 +25,9 @@ export const BOSS_ALTAR_NAMES: Record<string, string> = {
   GoblinKing: 'Yagluth',
 };
 
+/** Words for the share of its health a boss is down to, by the percent the plugin logs. */
+export const HEALTH_SHARE_WORDS: Record<number, string> = { 75: 'three quarters', 50: 'half', 25: 'a quarter' };
+
 /**
  * Places worth a Saga line when a player finds them, by the place prefab the plugin logs, as they read after `found`
  * or `went into`. Ruins, stone circles and other small places are left out.

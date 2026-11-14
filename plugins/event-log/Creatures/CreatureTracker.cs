@@ -61,6 +61,20 @@ namespace ValheimDashboard.EventLog
             TameNames[zdo.m_uid] = name;
         }
 
+        /// <summary>Returns the names of the players who hit the creature [zdo].</summary>
+        public static List<string> AttackersOf(ZDO zdo)
+        {
+            List<string> attackers = new List<string>();
+            foreach (string player in Names.CharacterNames.Values)
+            {
+                if (player != string.Empty && zdo.GetBool(ZDOVars.s_attackers + player) && !attackers.Contains(player))
+                {
+                    attackers.Add(player);
+                }
+            }
+            return attackers;
+        }
+
         /// <summary>
         /// Logs a creature the server is destroying when players hit it, or when it was a tame. A young tame that
         /// grows up is replaced, not killed, so it is not logged.
@@ -73,14 +87,7 @@ namespace ValheimDashboard.EventLog
             {
                 return;
             }
-            List<string> attackers = new List<string>();
-            foreach (string player in Names.CharacterNames.Values)
-            {
-                if (player != string.Empty && zdo.GetBool(ZDOVars.s_attackers + player) && !attackers.Contains(player))
-                {
-                    attackers.Add(player);
-                }
-            }
+            List<string> attackers = AttackersOf(zdo);
             string creature = Names.PrefabName(zdo);
             int level = zdo.GetInt(ZDOVars.s_level, 1);
             if (attackers.Count > 0)

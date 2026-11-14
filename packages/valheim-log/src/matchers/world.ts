@@ -2,6 +2,8 @@ import { optionalNumber, playerOf } from '#/fields';
 import type { Matcher } from '#/models';
 import {
   BACKUP_PATTERN,
+  BOSS_DEFEATED_PATTERN,
+  BOSS_HURT_PATTERN,
   BOSS_SUMMONED_PATTERN,
   DAY_STARTED_PATTERN,
   DISK_SPACE_PATTERN,
@@ -106,6 +108,20 @@ export const WORLD_MATCHERS: readonly Matcher[] = [
       timeUtc,
       boss: groups.boss!,
       summoner: playerOf(groups.summoner),
+    }),
+  },
+  {
+    pattern: BOSS_HURT_PATTERN,
+    toEvent: (groups, timeUtc) => ({ type: 'bossHurt', timeUtc, boss: groups.boss!, percent: Number(groups.percent) }),
+  },
+  {
+    pattern: BOSS_DEFEATED_PATTERN,
+    toEvent: (groups, timeUtc) => ({
+      type: 'bossDefeated',
+      timeUtc,
+      boss: groups.boss!,
+      seconds: Number(groups.seconds),
+      attackers: groups.attackers!.split(', '),
     }),
   },
 ];

@@ -6,6 +6,7 @@ import {
   BED_PATTERN,
   CHAT_PATTERN,
   CRAFTING_PATTERN,
+  CLOSE_CALL_PATTERN,
   DEATH_DETAILS_PATTERN,
   EMOTE_PATTERN,
   GEAR_PATTERN,
@@ -134,6 +135,18 @@ export const PLAYER_MATCHERS: readonly Matcher[] = [
       move: groups.move as MoveKind,
       item: groups.item ?? null,
       count: Number(groups.count),
+    }),
+  },
+  {
+    pattern: CLOSE_CALL_PATTERN,
+    toEvent: (groups, timeUtc) => ({
+      type: 'closeCall',
+      timeUtc,
+      character: groups.character!,
+      health: Number(groups.health),
+      maxHealth: Number(groups.maxHealth),
+      area: groups.area!,
+      fighting: groups.fighting === undefined ? [] : groups.fighting.split(', '),
     }),
   },
   {
