@@ -15,7 +15,9 @@ import {
 } from '#/lib/items';
 import { mapOf } from '#/lib/map';
 import { playersOf } from '#/lib/players';
+import { iconFileName } from '#/lib/recipes';
 import { snapshotWith, TEST_NOON_MS } from '#/lib/test-common';
+import { SEEN_ITEMS } from '#/lib/test-seen-items';
 import { setGameNames } from '#/lib/text';
 
 describe('itemName', () => {
@@ -36,6 +38,19 @@ describe('itemName', () => {
 
     // WHEN / THEN it has the game's name, not its prefab in words
     expect(itemName('AtgeirIron')).toBe('Iron atgeir');
+  });
+});
+
+describe('itemName with the icons of seen items', () => {
+  it("keeps the icon file of every item the server's logs have named", () => {
+    // GIVEN the game names of every item seen in the server's logs
+    setGameNames(Object.fromEntries(SEEN_ITEMS.map(([prefab, gameName]) => [prefab, gameName])));
+
+    // WHEN each one's icon file is worked out from its name
+    const files = SEEN_ITEMS.map(([prefab]) => iconFileName(itemName(prefab)));
+
+    // THEN it is the file the server has for it
+    expect(files).toEqual(SEEN_ITEMS.map(([, , iconFile]) => iconFile));
   });
 });
 
@@ -121,9 +136,24 @@ describe('itemSlots', () => {
 
     // THEN coins and wood share the top by name, then the trophy
     expect(slots).toEqual([
-      { prefab: 'Coins', name: 'Coins', count: 20 },
-      { prefab: 'Wood', name: 'Wood', count: 20 },
-      { prefab: 'TrophyDeer', name: 'Deer trophy', count: 2 },
+      { prefab: 'Coins', name: 'Coins', iconItem: 'Coins', count: 20 },
+      { prefab: 'Wood', name: 'Wood', iconItem: 'Wood', count: 20 },
+      { prefab: 'TrophyDeer', name: 'Deer trophy', iconItem: 'Deer trophy', count: 2 },
+    ]);
+  });
+
+  it('names cut trees and mined rocks, counts both birches together, and shows the icon of their sapling or ore', () => {
+    // GIVEN beeches, both kinds of birch and a copper deposit as the plugin logs them
+    const things = { Beech1: 7, Birch1: 2, Birch2: 1, rock4_copper: 1 };
+
+    // WHEN they are listed
+    const slots = itemSlots(things);
+
+    // THEN each has its plain name and the icon of the item that stands for it
+    expect(slots).toEqual([
+      { prefab: 'Beech1', name: 'Beech', iconItem: 'Beech sapling', count: 7 },
+      { prefab: 'Birch1', name: 'Birch', iconItem: 'Birch sapling', count: 3 },
+      { prefab: 'rock4_copper', name: 'Copper deposit', iconItem: 'Copper ore', count: 1 },
     ]);
   });
 });
