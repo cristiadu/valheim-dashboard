@@ -7,7 +7,7 @@ import type { StoryKind } from '#/lib/models/story';
 
 /**
  * Event types friends see in the story of the server. Joins and leaves come from the sessions, and building,
- * kills and items from the activities. Areas, gear and global keys are kept only when they are news.
+ * kills and items from the activities. Areas, gear, places and global keys are kept only when they are news.
  */
 export const STORY_EVENT_TYPES = [
   'playerDied',
@@ -24,6 +24,7 @@ export const STORY_EVENT_TYPES = [
   'teleported',
   'pvpChanged',
   'gearSeen',
+  'placeFound',
   'tameChanged',
   'petNamed',
   'signWritten',
@@ -135,6 +136,8 @@ export type Snapshot = {
   chat: ChatRecord[];
   /** Areas each character has been to, by character name, in the order they first went. */
   visitedAreas: Record<string, string[]>;
+  /** Places each character has found, by character name, as prefab and map position, for example `Crypt2:120:-340`. */
+  foundPlaces: Record<string, string[]>;
   /** Gear each character was seen with, by character name, for example `SwordIron quality 2`. */
   gear: Record<string, string[]>;
   /** Prefabs each character wears, holds or carries on the back now, by character name, once the plugin logged it. */

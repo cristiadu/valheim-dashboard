@@ -451,6 +451,26 @@ describe('parseMessage', () => {
     ]);
   });
 
+  it('reads places found and the place of a dungeon from the event log plugin', () => {
+    // GIVEN a place found, a dungeon with its place and a plain area, from a player whose name has a space
+    const messages = [
+      'Place found: Vendor_BlackForest at 900 -1200 by Inge Dragonchow',
+      'Area entered: Inge Dragonchow Dungeon in Crypt2',
+      'Area entered: Inge Dragonchow Swamp',
+    ];
+
+    // WHEN each message is read
+    const events = messages.map((message) => parseMessage(message, '2026-01-01T00:00:00.000Z'));
+
+    // THEN each line gives its event and values, and only the dungeon has a place
+    const timeUtc = '2026-01-01T00:00:00.000Z';
+    expect(events).toEqual([
+      { type: 'placeFound', timeUtc, character: 'Inge Dragonchow', place: 'Vendor_BlackForest', x: 900, z: -1200 },
+      { type: 'areaEntered', timeUtc, character: 'Inge Dragonchow', area: 'Dungeon', place: 'Crypt2' },
+      { type: 'areaEntered', timeUtc, character: 'Inge Dragonchow', area: 'Swamp' },
+    ]);
+  });
+
   it('reads items made and upgrades from the event log plugin', () => {
     // GIVEN one line of each kind, from a player whose name has a space
     const messages = ['Made: ArrowFlint x20 by Inge Dragonchow', 'Upgraded: SwordBronze to level 2 by Inge Dragonchow'];

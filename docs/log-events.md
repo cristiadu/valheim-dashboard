@@ -177,7 +177,8 @@ when the plugin does not know who it was.
 | Boss summoned | `Boss summoned: Eikthyr by Ragnar` | `^Boss summoned: (?<boss>\S+) by (?<summoner>.+)$` |
 | New in-game day | `Day started: 42` | `^Day started: (?<day>\d+)$` |
 | Player died | `Player died: Ragnar in BlackForest while fighting Troll` | `^Player died: (?<character>.+?) in (?<area>\w+)(?: while fighting (?<fighting>.+))?$` |
-| Area entered | `Area entered: Ragnar Swamp` | `^Area entered: (?<character>.+) (?<area>\w+)$` |
+| Area entered, with the place a dungeon belongs to since plugin 2.25.0 | `Area entered: Ragnar Swamp`, `Area entered: Ragnar Dungeon in Crypt2` | `^Area entered: (?<character>.+?) (?<area>\w+)(?: in (?<place>\S+))?$` |
+| Walked up to a place of the world, such as a trader, a boss altar or a crypt | `Place found: Vendor_BlackForest at 900 -1200 by Ragnar` | `^Place found: (?<place>\S+) at (?<x>-?\d+) (?<z>-?\d+) by (?<character>.+)$` |
 | Came out of a portal | `Teleported: Ragnar to Home base` | `^Teleported: (?<character>.+?) to (?<portal>.+)$` |
 | PvP turned on or off | `PvP turned on: Ragnar` | `^PvP turned (?<state>on\|off): (?<character>.+)$` |
 | Went to bed | `Went to bed: Ragnar` | `^Went to bed: (?<character>.+)$` |
@@ -258,6 +259,9 @@ when the plugin does not know who it was.
 - **Dropped** is logged when an item someone carried lands on the ground, naming the player whose game made it.
   The game starts an object's ID with the ID of the game that made it, so the dropper is exact. Items a broken
   chest, cart or ship, or an emptied item stand, let go of are not drops. The pickup line repeats the same `item` ID.
+- **Place found** is logged once per player and place each time the server runs. The world keeps at most one place
+  per zone (a 64 m square), and a player finds it within its own radius, or 15 m for small ones. A dungeon's inside
+  sits high above its entrance in the same zone, which is how **Area entered** names the dungeon.
 - **Harvested** names the player who asked to harvest, or the player whose game owns the plant.
 - **Ate** reads the food the character holds for a moment after the eat animation, which every game shows.
   Food held this way is never logged as **Gear**.
