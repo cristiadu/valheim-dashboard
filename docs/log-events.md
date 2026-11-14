@@ -279,6 +279,8 @@ when the plugin does not know who it was.
 - **Cooked** and **Burnt** name the player who put the food on, which the cooking station keeps per slot.
 - **Mead ready** is logged once the mead stayed ready for 15 seconds with a player near, since a fermenter only works
   while a player's game runs it. **Mead tapped** names the player who asked to tap, or whose game owns the fermenter.
+  Since plugin 2.30.0, mead tapped and a new base put in between two scans log both lines: the fermenter then holds
+  a base with a new start time where ready mead was.
 - **Ate** reads the food the character holds for a moment after the eat animation, which every game shows.
   Food held this way is never logged as **Gear**.
 - **Smelting**, **Tree cut** and **Rock mined** name the player who hit or filled it through the server in the

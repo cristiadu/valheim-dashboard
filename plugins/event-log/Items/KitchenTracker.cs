@@ -24,8 +24,8 @@ namespace ValheimDashboard.EventLog
         /// <summary>Item in each slot of each cooking station at the last scan, by object ID.</summary>
         private static readonly Dictionary<ZDOID, string[]> Slots = new Dictionary<ZDOID, string[]>();
 
-        /// <summary>Item hash each fermenter held at the last scan, or 0 when empty, by object ID.</summary>
-        private static readonly Dictionary<ZDOID, int> Contents = new Dictionary<ZDOID, int>();
+        /// <summary>Item hash each fermenter held at the last scan, or 0 when empty, and when it was put in, by object ID.</summary>
+        private static readonly Dictionary<ZDOID, (int Item, long StartTicks)> Contents = new Dictionary<ZDOID, (int Item, long StartTicks)>();
 
         /// <summary>
         /// Logs food put on [zdo], cooked or burnt there, or a mead base put into it, ready or tapped, since the last
@@ -53,30 +53,31 @@ namespace ValheimDashboard.EventLog
 
         /// <summary>
         /// Logs a mead base put into fermenter [zdo], the mead tapped from it, or its mead turning ready, since the
-        /// last scan. Mead already ready when the server starts is not logged again.
+        /// last scan. Mead already ready when the server starts is not logged again. A player can tap ready mead and
+        /// put in a new base between two scans, which shows as a new start time on a fermenter whose mead was ready.
         /// </summary>
         private static void SeeFermenter(ZDO zdo)
         {
             int content = zdo.GetInt(ZDOVars.s_content);
-            bool isKnown = Contents.TryGetValue(zdo.m_uid, out int before);
-            Contents[zdo.m_uid] = content;
+            long startTicks = zdo.GetLong(ZDOVars.s_startTime, 0L);
+            bool isKnown = Contents.TryGetValue(zdo.m_uid, out (int Item, long StartTicks) before);
+            Contents[zdo.m_uid] = (content, startTicks);
             Fermenter fermenter = Names.Prefab(zdo).GetComponent<Fermenter>();
-            if (isKnown && before == 0 && content != 0)
+            bool isRefilled = content != 0 && startTicks != before.StartTicks && IsReady(fermenter, before.StartTicks);
+            if (isKnown && before.Item != 0 && (content == 0 || isRefilled))
+            {
+                GameEventLog.Write($"Mead tapped: {MeadOf(fermenter, before.Item)} from {Names.PrefabName(zdo)} by {WorkTracker.Doer(zdo)}");
+            }
+            if (isKnown && content != 0 && (before.Item == 0 || isRefilled))
             {
                 GameEventLog.Write($"Fermenting: {Names.Item(content)} in {Names.PrefabName(zdo)} by {WorkTracker.Doer(zdo)}");
-            }
-            else if (isKnown && before != 0 && content == 0)
-            {
-                GameEventLog.Write($"Mead tapped: {MeadOf(fermenter, before)} from {Names.PrefabName(zdo)} by {WorkTracker.Doer(zdo)}");
             }
             if (content == 0)
             {
                 ReadySince.Remove(zdo.m_uid);
                 return;
             }
-            long startTicks = zdo.GetLong(ZDOVars.s_startTime, 0L);
-            bool isReady = startTicks != 0L && (ZNet.instance.GetTime() - new DateTime(startTicks)).TotalSeconds > fermenter.m_fermentationDuration;
-            if (!isReady)
+            if (!IsReady(fermenter, startTicks))
             {
                 ReadySince.Remove(zdo.m_uid);
             }
@@ -96,6 +97,12 @@ namespace ValheimDashboard.EventLog
                     GameEventLog.Write($"Mead ready: {MeadOf(fermenter, content)} in {Names.PrefabName(zdo)}");
                 }
             }
+        }
+
+        /// <summary>Returns true when a mead base put into [fermenter] at [startTicks] is mead by now. 0 means it holds none.</summary>
+        private static bool IsReady(Fermenter fermenter, long startTicks)
+        {
+            return startTicks != 0L && (ZNet.instance.GetTime() - new DateTime(startTicks)).TotalSeconds > fermenter.m_fermentationDuration;
         }
 
         /// <summary>
