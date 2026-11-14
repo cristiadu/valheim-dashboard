@@ -8,7 +8,7 @@ import type { StoryKind } from '#/lib/models/story';
  * upgraded, tames ridden, forsaken powers used, carts pulled, fires fueled, pieces repaired, items obliterated,
  * arrows and bolts shot, trees cut down or rocks mined out, items dropped on the ground, or items picked up that
  * another player dropped, food that finished cooking or burnt on a cooking station, meads tapped from a fermenter,
- * weapon swings, dodge rolls, times staggered, or jumps.
+ * weapon hits landed on creatures, dodge rolls, times staggered, or jumps.
  */
 export type ActivityKind =
   | 'built'
@@ -41,7 +41,7 @@ export type ActivityKind =
   | 'foodCooked'
   | 'burnt'
   | 'tapped'
-  | 'swung'
+  | 'landed'
   | 'dodged'
   | 'staggered'
   | 'jumped';
@@ -96,7 +96,7 @@ export const ACTIVITY_STORY_KINDS: Record<ActivityKind, StoryKind> = {
   foodCooked: 'items',
   burnt: 'items',
   tapped: 'items',
-  swung: 'fight',
+  landed: 'fight',
   dodged: 'fight',
   staggered: 'fight',
   jumped: 'fight',
@@ -136,7 +136,7 @@ export const ACTIVITY_WORDS: Record<Exclude<ActivityKind, 'destroyed'>, { verb: 
   foodCooked: { verb: 'finished cooking', one: 'thing', many: 'things', ending: '' },
   burnt: { verb: 'burnt', one: 'thing', many: 'things', ending: ' on the fire' },
   tapped: { verb: 'tapped', one: 'mead', many: 'meads', ending: ' from fermenters' },
-  swung: { verb: 'swung a weapon', one: 'time', many: 'times', ending: '' },
+  landed: { verb: 'landed', one: 'hit', many: 'hits', ending: '' },
   dodged: { verb: 'rolled out of the way', one: 'time', many: 'times', ending: '' },
   staggered: { verb: 'was staggered', one: 'time', many: 'times', ending: '' },
   jumped: { verb: 'jumped', one: 'time', many: 'times', ending: '' },
@@ -166,7 +166,7 @@ export const PLAYER_ACTIVITY_STATS: { kind: ActivityKind; label: string }[] = [
   { kind: 'repaired', label: 'Pieces repaired' },
   { kind: 'obliterated', label: 'Items obliterated' },
   { kind: 'shot', label: 'Arrows shot' },
-  { kind: 'swung', label: 'Weapon swings' },
+  { kind: 'landed', label: 'Hits landed' },
   { kind: 'dodged', label: 'Dodge rolls' },
   { kind: 'staggered', label: 'Times staggered' },
   { kind: 'jumped', label: 'Jumps' },

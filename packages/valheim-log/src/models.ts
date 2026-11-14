@@ -21,8 +21,8 @@ export type ChatKind = 'said' | 'shouted' | 'whispered';
 /** How a tame changed: a creature was tamed, a young tame was born, a young tame grew up, or a tame died. */
 export type TameChange = 'tamed' | 'born' | 'grewUp' | 'died';
 
-/** A move a player's game shows to everyone: a dodge roll, a jump, being staggered, or a weapon swing. */
-export type MoveKind = 'dodged' | 'jumped' | 'staggered' | 'swung';
+/** A move a player's game shows to everyone: a dodge roll, a jump, being staggered, or a weapon hit landed on a creature. */
+export type MoveKind = 'dodged' | 'jumped' | 'staggered' | 'landed';
 
 /** One event read from `logs.txt`. `timeUtc` is the log time moved to UTC, as an ISO string. */
 export type LogEvent = { timeUtc: string } & (
