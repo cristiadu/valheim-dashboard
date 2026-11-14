@@ -198,7 +198,7 @@ when the plugin does not know who it was.
 | Items or fuel put into a smelter, kiln or similar | `Smelting: CopperOre x3 in smelter by Ragnar`, `Smelting: Coal x5 in smelter by Ragnar` | `^Smelting: (?<item>\S+) x(?<count>\d+) in (?<station>\S+) by (?<player>.+)$` |
 | Raw food put on a cooking station, or a mead base into a fermenter | `Cooking: RawMeat on piece_cookingstation by Ragnar`, `Fermenting: MeadBaseTasty in fermenter by Ragnar` | `^(?<kind>Cooking\|Fermenting): (?<item>\S+) (?:on\|in) (?<station>\S+) by (?<player>.+)$` |
 | Took the helm of a raft or ship | `Sailing: Ragnar on Karve` | `^Sailing: (?<character>.+) on (?<ship>\S+)$` |
-| Opened a crafting station (several kinds share one name, joined with `/`, when they share an animation) | `Crafting: Ragnar at forge` | `^Crafting: (?<character>.+?) at (?<station>\S+)$` |
+| Opened a crafting station (`crafting_station` when the plugin can't tell which; before plugin 2.24.0, every kind sharing the animation, joined with `/`) | `Crafting: Ragnar at forge` | `^Crafting: (?<character>.+?) at (?<station>\S+)$` |
 | Did an emote | `Emote: Ragnar wave` | `^Emote: (?<character>.+) (?<emote>\S+)$` |
 | Claimed a bed | `Bed claimed: Ragnar` | `^Bed claimed: (?<character>.+)$` |
 | Named a portal | `Portal named: Swamp camp by Ragnar` | `^Portal named: (?<portal>.+) by (?<player>.+)$` |
@@ -259,6 +259,8 @@ when the plugin does not know who it was.
   The game starts an object's ID with the ID of the game that made it, so the dropper is exact. Items a broken
   chest, cart or ship, or an emptied item stand, let go of are not drops. The pickup line repeats the same `item` ID.
 - **Harvested** names the player who asked to harvest, or the player whose game owns the plant.
+- **Crafting** names the station since plugin 2.24.0. A station only opens within its use range (2 m), so it is the
+  one kind with the player's crafting animation in reach. With none or several kinds in reach it is `crafting_station`.
 - **Ate** reads the food the character holds for a moment after the eat animation, which every game shows.
   Food held this way is never logged as **Gear**.
 - **Smelting**, **Tree cut** and **Rock mined** name the player who hit or filled it through the server in the

@@ -145,5 +145,8 @@ export const PLAYER_ACTIVITY_STATS: { kind: ActivityKind; label: string }[] = [
   { kind: 'dropped', label: 'Items dropped' },
 ];
 
+/** Station a visit counts for when the plugin could not tell which crafting station the player opened. */
+export const UNKNOWN_STATION = 'crafting_station';
+
 /** Thing a meal counts as when the server never learned what the player ate, left out of the item list. */
 export const UNKNOWN_FOOD = 'something';
