@@ -1,4 +1,4 @@
-import { AREA_NAMES } from '#/lib/models/world';
+import { AREA_NAMES, NATURE_NAMES } from '#/lib/models/world';
 
 /** English name the game shows for each item, piece, creature and raid, set from the snapshot's game names. */
 const gameNames: Record<string, string> = {};
@@ -16,11 +16,13 @@ export const count = (amount: number, one: string, many: string): string => `${a
 
 /**
  * Readable name of a prefab, for example `greydwarf brute` for `Greydwarf_Elite`: the game's name when the game names
- * file has one, or else the prefab split into words, such as `wood floor 1x1`.
+ * file has one, the name of a tree or rock such as `beech` for `Beech1`, or else the prefab split into words, such
+ * as `wood floor 1x1`.
  */
 export const thingName = (prefab: string): string =>
   (
     gameNames[prefab] ??
+    NATURE_NAMES[prefab] ??
     prefab
       .replace(/^(piece|Pickable)_/, '')
       .replaceAll('_', ' ')
@@ -46,9 +48,18 @@ export const withArticle = (name: string): string => `${/^[aeiou]/i.test(name) ?
 export const listText = (names: string[]): string =>
   names.length <= 1 ? (names[0] ?? '') : `${names.slice(0, -1).join(', ')} and ${names.at(-1)}`;
 
-/** Every thing of [things], most first, for example `14 wood floor 1x1, 8 wood fence, 1 workbench`. */
-export const thingList = (things: Record<string, number>): string =>
-  Object.entries(things)
+/**
+ * Every thing of [things], most first, for example `14 wood floor 1x1, 8 wood fence, 1 workbench`. Things with the
+ * same name, such as the two birches, count together.
+ */
+export const thingList = (things: Record<string, number>): string => {
+  const amounts = new Map<string, number>();
+  for (const [thing, amount] of Object.entries(things)) {
+    const name = thingName(thing);
+    amounts.set(name, (amounts.get(name) ?? 0) + amount);
+  }
+  return [...amounts]
     .sort(([, firstAmount], [, secondAmount]) => secondAmount - firstAmount)
-    .map(([thing, amount]) => `${amount} ${thingName(thing)}`)
+    .map(([name, amount]) => `${amount} ${name}`)
     .join(', ');
+};

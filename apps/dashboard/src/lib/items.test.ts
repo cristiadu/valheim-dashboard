@@ -15,7 +15,9 @@ import {
 } from '#/lib/items';
 import { mapOf } from '#/lib/map';
 import { playersOf } from '#/lib/players';
+import { iconFileName } from '#/lib/recipes';
 import { snapshotWith, TEST_NOON_MS } from '#/lib/test-common';
+import { SEEN_ITEMS } from '#/lib/test-seen-items';
 import { setGameNames } from '#/lib/text';
 
 describe('itemName', () => {
@@ -36,6 +38,19 @@ describe('itemName', () => {
 
     // WHEN / THEN it has the game's name, not its prefab in words
     expect(itemName('AtgeirIron')).toBe('Iron atgeir');
+  });
+});
+
+describe('itemName with the icons of seen items', () => {
+  it("keeps the icon file of every item the server's logs have named", () => {
+    // GIVEN the game names of every item seen in the server's logs
+    setGameNames(Object.fromEntries(SEEN_ITEMS.map(([prefab, gameName]) => [prefab, gameName])));
+
+    // WHEN each one's icon file is worked out from its name
+    const files = SEEN_ITEMS.map(([prefab]) => iconFileName(itemName(prefab)));
+
+    // THEN it is the file the server has for it
+    expect(files).toEqual(SEEN_ITEMS.map(([, , iconFile]) => iconFile));
   });
 });
 

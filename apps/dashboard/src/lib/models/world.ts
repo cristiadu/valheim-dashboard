@@ -86,3 +86,24 @@ export const BOSS_ORDER = ['Eikthyr', 'The Elder', 'Bonemass', 'Moder', 'Yagluth
 
 /** Area name the plugin logs inside a dungeon. Every trip into one is news. */
 export const DUNGEON_AREA = 'Dungeon';
+
+/**
+ * Names of the trees and rocks the plugin logs as cut down or mined out, by prefab. The game names file has none
+ * for them, and the two birches share one name so a story line counts them together.
+ */
+export const NATURE_NAMES: Record<string, string> = {
+  Beech1: 'Beech',
+  Birch1: 'Birch',
+  Birch2: 'Birch',
+  Birch1_aut: 'Birch',
+  Birch2_aut: 'Birch',
+  Oak1: 'Oak',
+  FirTree: 'Fir',
+  Pinetree_01: 'Pine',
+  SwampTree1: 'Ancient tree',
+  rock4_copper: 'Copper deposit',
+  MineRock_Tin: 'Tin deposit',
+  MineRock_Obsidian: 'Obsidian deposit',
+  MineRock_Meteorite: 'Meteorite',
+  rock3_silver: 'Silver vein',
+};

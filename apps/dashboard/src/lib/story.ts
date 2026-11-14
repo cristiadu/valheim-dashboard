@@ -1,6 +1,13 @@
 import type { PlayerSession } from 'valheim-log';
 
-import { ACTIVITY_STORY_KINDS, ACTIVITY_WORDS, type ActivityRecord, UNKNOWN_FOOD, UNKNOWN_STATION } from '#/lib/models/activities';
+import {
+  ACTIVITY_STORY_KINDS,
+  ACTIVITY_WORDS,
+  type ActivityRecord,
+  ICONLESS_ACTIVITY_KINDS,
+  UNKNOWN_FOOD,
+  UNKNOWN_STATION,
+} from '#/lib/models/activities';
 import { type ChatRecord, DETAILS_WINDOW_MS, type Snapshot, type SourceLines, type StoryEvent } from '#/lib/models/snapshot';
 import type { StoryItem, StoryKind, StoryText } from '#/lib/models/story';
 import { DAY_MS, MS_PER_HOUR, MS_PER_MINUTE, MS_PER_SECOND, SECONDS_PER_MINUTE } from '#/lib/models/time';
@@ -16,6 +23,7 @@ export const activityTotal = (activity: ActivityRecord): number =>
 /**
  * Story line for one stretch of activity, such as building or kills. Powers and carts have no list, meals leave
  * out food the server never learned, and items picked up after another player dropped them name that player.
+ * Trees and rocks are listed in words since they have no icon.
  * Crafting names each station and how often the player opened it. Steering and riding name the ships or tames and how long the stretch lasted,
  * from the first time a player took the wheel or got on to the last, since the log can't tell two of a kind apart.
  */
@@ -31,7 +39,7 @@ const activityItem = (activity: ActivityRecord): StoryText => {
   const kind = ACTIVITY_STORY_KINDS[activity.kind];
   const ending = activity.from === undefined ? words.ending : ` that ${activity.from} dropped`;
   const sentence = `${activity.player ?? 'Someone'} ${words.verb} ${count(total, words.one, words.many)}${ending}`;
-  if (kind === 'items') {
+  if (kind === 'items' && !ICONLESS_ACTIVITY_KINDS.includes(activity.kind)) {
     const things = Object.fromEntries(Object.entries(activity.things).filter(([thing]) => thing !== UNKNOWN_FOOD));
     return { timeUtc, kind, text: sentence, things };
   }

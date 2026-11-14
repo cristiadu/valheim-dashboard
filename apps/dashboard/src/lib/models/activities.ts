@@ -93,6 +93,9 @@ export const ACTIVITY_STORY_KINDS: Record<ActivityKind, StoryKind> = {
   tapped: 'items',
 };
 
+/** Activities under the Items filter whose things are trees and rocks, which have no item icon, so they are told in words. */
+export const ICONLESS_ACTIVITY_KINDS: readonly ActivityKind[] = ['cut', 'mined'];
+
 /**
  * Words for what a player did in each activity kind: the verb, the thing in singular and plural, and an
  * ending. Destroyed pieces are told from the builder's side, with their own words.

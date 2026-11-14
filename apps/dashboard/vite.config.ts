@@ -16,7 +16,7 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       include: ['src/**/*.{ts,svelte}'],
-      exclude: ['src/**/*.test.ts', 'src/lib/test-common.ts'],
+      exclude: ['src/**/*.test.ts', 'src/lib/test-*.ts'],
       reporter: ['cobertura', 'text-summary'],
     },
   },
