@@ -153,6 +153,29 @@ describe('server state', () => {
     ]);
   });
 
+  it('keeps food cooked or burnt and meads tapped as activities, and ready mead as a story event', () => {
+    // GIVEN Ragnar's meat gets cooked, another burns, and his mead turns ready and is tapped
+    readLines(state, [
+      ...RUN_START,
+      logLine('03:00:00', 'Cooked: CookedMeat on piece_cookingstation by Ragnar'),
+      logLine('03:00:30', 'Burnt: RawMeat on piece_cookingstation by Ragnar'),
+      logLine('03:01:00', 'Mead ready: MeadTasty x6 in fermenter'),
+      logLine('03:02:00', 'Mead tapped: MeadTasty x6 from fermenter by Ragnar'),
+    ]);
+
+    // WHEN the activities and the story events are listed
+    const kinds = state.snapshot.activities.map((activity) => [activity.player, activity.kind, activity.things]);
+    const events = state.snapshot.events.map((event) => event.type);
+
+    // THEN each has its own kind, and the ready mead is news
+    expect(kinds).toEqual([
+      ['Ragnar', 'foodCooked', { CookedMeat: 1 }],
+      ['Ragnar', 'burnt', { RawMeat: 1 }],
+      ['Ragnar', 'tapped', { MeadTasty: 6 }],
+    ]);
+    expect(events).toEqual(['worldLoaded', 'meadReady']);
+  });
+
   it('keeps cooking, brewing and steering ships as activities per player', () => {
     // GIVEN Inge Dragonchow cooks twice, starts a mead and steers a karve
     readLines(state, [

@@ -95,6 +95,12 @@ export const addActivityOf = (state: ServerState, event: LogEvent, line: string)
     case 'foodStarted':
       addActivity(snapshot, line, timeUtc, event.player, event.kind === 'cooking' ? 'cooked' : 'brewed', event.item, 1);
       break;
+    case 'foodDone':
+      addActivity(snapshot, line, timeUtc, event.player, event.isBurnt ? 'burnt' : 'foodCooked', event.item, 1);
+      break;
+    case 'meadTapped':
+      addActivity(snapshot, line, timeUtc, event.player, 'tapped', event.item, event.count);
+      break;
     case 'sailing':
       addActivity(snapshot, line, timeUtc, event.character, 'sailed', event.ship, 1);
       break;
