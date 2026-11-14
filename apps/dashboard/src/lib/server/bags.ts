@@ -6,7 +6,14 @@ import { PLAYER_PREFAB } from '#/lib/models/chests';
 import { MIN_STACKABLE } from '#/lib/models/items';
 import type { Snapshot } from '#/lib/models/snapshot';
 import { MS_PER_MINUTE } from '#/lib/models/time';
-import { MEAL_HEALTH_TOLERANCE, MEAL_MINUTES, type ServerState, SURE_ITEMS_MINUTES } from '#/lib/server/models';
+import {
+  EAT_AGAIN_MINUTES,
+  EATEN_AGAIN_MIN_SHARE,
+  MEAL_HEALTH_TOLERANCE,
+  MEAL_MINUTES,
+  type ServerState,
+  SURE_ITEMS_MINUTES,
+} from '#/lib/server/models';
 
 /**
  * Adds [count] of [item] to [character]'s bag in [snapshot], or takes it out when [count] is below zero, never below
@@ -111,12 +118,37 @@ const isPickupNew = (state: ServerState, event: Extract<LogEvent, { type: 'itemP
 const isFoodReady = (meals: Record<string, string>, food: string, nowMs: number): boolean =>
   meals[food] === undefined || nowMs - Date.parse(meals[food]) >= MEAL_MINUTES * MS_PER_MINUTE;
 
+/** Returns true when [health] is about the max health a meal added, [maxHealthGain]. */
+const isAboutGain = (health: number, maxHealthGain: number): boolean => Math.abs(health - maxHealthGain) <= MEAL_HEALTH_TOLERANCE;
+
 /**
- * Returns the foods in [character]'s [bag] in [state] they may have eaten at [nowMs], the most carried first: those
- * not eaten in the last [MEAL_MINUTES], since a food still in effect can not be eaten again. When [maxHealthGain] is
- * known, only those giving about that much health; when none does, all of them, unless the gain is 0, which is a mead.
+ * Returns true when eating a food that gives [health] again, while some of it was still in effect, can add
+ * [maxHealthGain]. Eating a food again only adds back the health it had lost: less than the food gives, but at
+ * least [EATEN_AGAIN_MIN_SHARE] of it.
  */
-const foodsToEat = (
+const isTopUp = (health: number, maxHealthGain: number): boolean =>
+  maxHealthGain <= health + MEAL_HEALTH_TOLERANCE && maxHealthGain >= health * EATEN_AGAIN_MIN_SHARE - MEAL_HEALTH_TOLERANCE;
+
+/** Returns the first two of [foods] that give [maxHealthGain] together, by the health each gives in [healths], or none. */
+const twoFoodsGiving = (foods: string[], healths: Record<string, number>, maxHealthGain: number): string[] => {
+  for (const first of foods) {
+    const second = foods.find((item) => item !== first && isAboutGain(healths[first]! + healths[item]!, maxHealthGain));
+    if (second !== undefined) {
+      return [first, second];
+    }
+  }
+  return [];
+};
+
+/**
+ * Returns the foods [character] ate from their [bag] in [state] in one meal at [nowMs], when the log names none.
+ * Without the max health the meal added, [maxHealthGain], it is the food carried most that is not still in effect:
+ * a food can not be eaten again for [MEAL_MINUTES]. With it, it is the first of these that fits, the most carried
+ * first: one food giving about that much health, the food eaten longest ago that tops up to it as in [isTopUp], two
+ * foods eaten one right after the other that give it together, or a food never seen eaten that tops up to it.
+ * When nothing carried fits, the food eaten is not in the guess and nothing is taken. A gain of 0 is a mead.
+ */
+const foodsEaten = (
   state: ServerState,
   character: string,
   bag: Record<string, number>,
@@ -124,26 +156,40 @@ const foodsToEat = (
   maxHealthGain: number | null,
 ): string[] => {
   const meals = state.lastMeals[character] ?? {};
-  const ready = Object.keys(bag)
-    .filter((item) => item in state.foods && isFoodReady(meals, item, nowMs))
+  const carried = Object.keys(bag)
+    .filter((item) => item in state.foods)
     .sort((first, second) => bag[second]! - bag[first]!);
-  const matching = ready.filter((item) => Math.abs(state.foods[item]! - (maxHealthGain ?? 0)) <= MEAL_HEALTH_TOLERANCE);
-  return maxHealthGain === null || (matching.length === 0 && maxHealthGain > 0) ? ready : matching;
+  const ready = carried.filter((item) => isFoodReady(meals, item, nowMs));
+  if (maxHealthGain === null) {
+    return ready.slice(0, 1);
+  }
+  if (maxHealthGain === 0) {
+    return [];
+  }
+  const eatenAgain = carried
+    .filter((item) => meals[item] !== undefined && nowMs - Date.parse(meals[item]) >= EAT_AGAIN_MINUTES * MS_PER_MINUTE)
+    .filter((item) => isTopUp(state.foods[item]!, maxHealthGain))
+    .toSorted((first, second) => Date.parse(meals[first]!) - Date.parse(meals[second]!))[0];
+  const one = ready.find((item) => isAboutGain(state.foods[item]!, maxHealthGain)) ?? eatenAgain;
+  if (one !== undefined) {
+    return [one];
+  }
+  const two = twoFoodsGiving(ready, state.foods, maxHealthGain);
+  return two.length > 0 ? two : ready.filter((item) => isTopUp(state.foods[item]!, maxHealthGain)).slice(0, 1);
 };
 
 /**
- * Takes one food [character] ate at [timeUtc] out of their bag in [state]. When the log names no food, it is the
- * first of [foodsToEat], by how much their max health went up, [maxHealthGain].
+ * Takes what [character] ate at [timeUtc] out of their bag in [state]: [food] when the log names it, or else each
+ * of [foodsEaten], by how much their max health went up, [maxHealthGain].
  */
 const eat = (state: ServerState, character: string, food: string | null, maxHealthGain: number | null, timeUtc: string): void => {
   const bag = state.snapshot.bags[character] ?? {};
   const meals = (state.lastMeals[character] ??= {});
-  const eaten = food ?? foodsToEat(state, character, bag, Date.parse(timeUtc), maxHealthGain)[0];
-  if (eaten === undefined) {
-    return;
+  const eaten = food === null ? foodsEaten(state, character, bag, Date.parse(timeUtc), maxHealthGain) : [food];
+  for (const item of eaten) {
+    meals[item] = timeUtc;
+    takeOut(state, character, item, 1);
   }
-  meals[eaten] = timeUtc;
-  takeOut(state, character, eaten, 1);
 };
 
 /** Takes what building [piece] costs out of [character]'s bag in [state]. */

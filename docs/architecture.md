@@ -219,10 +219,19 @@ couldn't see. If it has a recipe, one craft's cost comes out and what it made go
 from an empty bag takes 8 wood, 8 resin and 2 feathers and leaves 18 arrows. A `Made` line that comes later for
 those same items doesn't pay again.
 
-A meal takes one food out. When the log only says `Ate something`, it is the food the player carries most of,
+A meal takes food out. When the log only says `Ate something`, it is the food the player carries most of,
 skipping foods eaten in the last 20 minutes, since a food still in effect can't be eaten again. The line also
-says how much the player's max health went up, so only foods giving about that much health count. A rise of 0
-is a mead, which takes nothing out. Each `Fueled` line takes out one of what that fire burns. Both lists come
+says how much the player's max health went up, and the guess takes the first of these that fits:
+
+| The meal added | Food taken | Example |
+| --- | --- | --- |
+| About what one carried food gives | That food | +24 is a grilled neck tail (25) |
+| Less than a food eaten before gives, but at least a fifth of it | That food, eaten again to top it up | +12, 14 minutes after a deer stew (45) |
+| What two carried foods give together | Both, eaten one right after the other | +68 is a deer stew (45) and a boar jerky (23) |
+| 0 | Nothing: it is a mead | |
+| Something no carried food fits | Nothing: the food is not in the guess | |
+
+Each `Fueled` line takes out one of what that fire burns. Both lists come
 from the plugin: `foods.txt` (`CookedMeat 30`, with the health each food gives) and `fire-fuels.txt`
 (`piece_groundtorch_wood Resin`). Each `Shot` line takes out one arrow or bolt, and coal put in a smelter comes
 out through its `Smelting` line.

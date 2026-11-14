@@ -271,6 +271,18 @@ export const MEAL_MINUTES = 20;
 export const MEAL_HEALTH_TOLERANCE = 2;
 
 /**
+ * Minutes after eating a food before a player can eat it again to top it up: half the time of the shortest foods.
+ * The game lets a food be eaten again once half its time is gone.
+ */
+export const EAT_AGAIN_MINUTES = 5;
+
+/**
+ * Smallest share of a food's health that eating it again adds back. With half its time left, a food still gives
+ * 0.5 to the power of 0.3 of its health, about four fifths, so it lost about a fifth.
+ */
+export const EATEN_AGAIN_MIN_SHARE = 0.19;
+
+/**
  * Minutes after a player empties their tombstone during which its exact items are kept over guessed ones when the
  * bag guess is too full. Later, crafting the server never saw has likely used some of them up.
  */
