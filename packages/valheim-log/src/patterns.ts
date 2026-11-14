@@ -101,8 +101,14 @@ export const CLOSE_CALL_PATTERN =
 /** Where and fighting what a player died. Written by the event log plugin, next to the game's own death line. */
 export const DEATH_DETAILS_PATTERN = /^Player died: (?<character>.+?) in (?<area>\w+)(?: while fighting (?<fighting>.+))?$/;
 
-/** A player entered a biome, or `Dungeon` inside one. Written by the event log plugin. */
-export const AREA_ENTERED_PATTERN = /^Area entered: (?<character>.+) (?<area>\w+)$/;
+/**
+ * A player entered a biome, or `Dungeon` inside one, followed since plugin 2.25.0 by the place the dungeon belongs to.
+ * Written by the event log plugin.
+ */
+export const AREA_ENTERED_PATTERN = /^Area entered: (?<character>.+?) (?<area>\w+)(?: in (?<place>\S+))?$/;
+
+/** A player walked up to a place of the world, such as a trader or a crypt, at a map position. Written by the event log plugin. */
+export const PLACE_FOUND_PATTERN = /^Place found: (?<place>\S+) at (?<x>-?\d+) (?<z>-?\d+) by (?<character>.+)$/;
 
 /** A player came out of a portal. Written by the event log plugin. */
 export const TELEPORTED_PATTERN = /^Teleported: (?<character>.+?) to (?<portal>.+)$/;

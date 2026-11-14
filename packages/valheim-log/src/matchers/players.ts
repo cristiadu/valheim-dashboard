@@ -12,6 +12,7 @@ import {
   GEAR_PATTERN,
   LOCATION_REVEALED_PATTERN,
   MAP_SHARED_PATTERN,
+  PLACE_FOUND_PATTERN,
   NOTHING_HELD,
   PING_PATTERN,
   POSITION_PATTERN,
@@ -68,7 +69,24 @@ export const PLAYER_MATCHERS: readonly Matcher[] = [
   },
   {
     pattern: AREA_ENTERED_PATTERN,
-    toEvent: (groups, timeUtc) => ({ type: 'areaEntered', timeUtc, character: groups.character!, area: groups.area! }),
+    toEvent: (groups, timeUtc) => ({
+      type: 'areaEntered',
+      timeUtc,
+      character: groups.character!,
+      area: groups.area!,
+      ...(groups.place === undefined ? {} : { place: groups.place }),
+    }),
+  },
+  {
+    pattern: PLACE_FOUND_PATTERN,
+    toEvent: (groups, timeUtc) => ({
+      type: 'placeFound',
+      timeUtc,
+      character: groups.character!,
+      place: groups.place!,
+      x: Number(groups.x),
+      z: Number(groups.z),
+    }),
   },
   {
     pattern: TELEPORTED_PATTERN,

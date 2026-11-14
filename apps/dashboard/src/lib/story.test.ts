@@ -108,6 +108,29 @@ describe('storyOf', () => {
     ]);
   });
 
+  it('tells places found and names the dungeon a player went into', () => {
+    // GIVEN Ragnar found Haldor and a troll cave, went into the cave, and went into a dungeon an older plugin did not name
+    const snapshot = snapshotWith({
+      events: [
+        { type: 'placeFound', timeUtc: '2026-10-29T10:00:00.000Z', character: 'Ragnar', place: 'Vendor_BlackForest', x: 900, z: -1200, line: '' },
+        { type: 'placeFound', timeUtc: '2026-10-29T10:01:00.000Z', character: 'Ragnar', place: 'TrollCave02', x: 120, z: -340, line: '' },
+        { type: 'areaEntered', timeUtc: '2026-10-29T10:02:00.000Z', character: 'Ragnar', area: 'Dungeon', place: 'TrollCave02', line: '' },
+        { type: 'areaEntered', timeUtc: '2026-10-29T10:03:00.000Z', character: 'Ragnar', area: 'Dungeon', line: '' },
+      ],
+    });
+
+    // WHEN the story is made
+    const story = storyOf(snapshot);
+
+    // THEN each reads plainly, newest first
+    expect(story.map((item) => [item.kind, item.text])).toEqual([
+      ['travel', 'Ragnar went into a dungeon'],
+      ['travel', 'Ragnar went into a troll cave'],
+      ['travel', 'Ragnar found a troll cave'],
+      ['travel', 'Ragnar found Haldor the trader'],
+    ]);
+  });
+
   it('tells a boss fight and a close call in plain sentences', () => {
     // GIVEN Eikthyr hurt to half and defeated after 187 seconds with its global key, two more defeats, and two close calls
     const snapshot = snapshotWith({

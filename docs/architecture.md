@@ -383,7 +383,7 @@ On the dashboard, plugin lines become:
 | --- | --- | --- |
 | Activities | Pieces built or destroyed, kills, items gathered, chests, planting, eating, smelting, cooking, brewing, steering ships, crafting station visits, emotes, items made or upgraded, rides, forsaken powers, carts pulled, fires fueled, repairs, items obliterated, trees and rocks, items dropped, items picked up that another player dropped, food cooked or burnt, meads tapped | One Saga line per player and kind, until a 10 minute pause, naming every thing, and a running total per player and kind for the Vikings numbers |
 | Story events | Deaths, bosses, raids, portals, tames, signs, item stands, tombstones, beds claimed, portals named, wards turned on or off, stones read, saddles, tames following, ward access, maps shared, mead ready | One Saga line each |
-| News only | Areas, gear, global keys | A Saga line for a first visit or a dungeon trip, new gear, or a boss defeat |
+| News only | Areas, gear, places found, global keys | A Saga line for a first visit or a dungeon trip, new gear, a trader, altar, crypt or other notable place a player finds for the first time, or a boss defeat |
 | Stats | Areas, kills, the day, boss keys | Where each player is now and their kills, areas and gear on Vikings, the day and bosses on Server |
 | Chat | Chat and pings | The Saga's "Chat and signs" filter, kept apart so it never pushes out events |
 | Map | Positions, chests, tombstones | Explored squares, chests and last deaths on Map, and the land each player explored on Vikings |

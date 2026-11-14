@@ -5,7 +5,7 @@ namespace ValheimDashboard.EventLog
 {
     /// <summary>
     /// Follows each player character the scan finds and logs what changed since the last scan: deaths,
-    /// biomes and dungeons, portal trips, PvP, beds and new gear.
+    /// biomes and dungeons, places found, portal trips, PvP, beds and new gear.
     /// </summary>
     internal static class PlayerTracker
     {
@@ -92,7 +92,8 @@ namespace ValheimDashboard.EventLog
                 {
                     LogChanges(player, name, before, now);
                 }
-                LogArea(name, now.Area);
+                LogArea(name, now);
+                PlaceTracker.See(name, now.Position);
                 LogPosition(name, now);
                 States[player.m_uid] = now;
                 LogNewGear(player, name);
@@ -131,11 +132,13 @@ namespace ValheimDashboard.EventLog
         }
 
         /// <summary>
-        /// Logs [area] for the character [name] when it differs from the last one logged. A new area counts once
-        /// two scans in a row saw it, so walking along a border does not flood the log.
+        /// Logs the area of [now] for the character [name] when it differs from the last one logged. A new area
+        /// counts once two scans in a row saw it, so walking along a border does not flood the log. A dungeon is
+        /// logged with the place it belongs to, such as <c>Dungeon in Crypt2</c>.
         /// </summary>
-        private static void LogArea(string name, string area)
+        private static void LogArea(string name, PlayerState now)
         {
+            string area = now.Area;
             if (LoggedAreas.TryGetValue(name, out string logged) && logged == area)
             {
                 PendingAreas.Remove(name);
@@ -148,7 +151,8 @@ namespace ValheimDashboard.EventLog
             }
             PendingAreas.Remove(name);
             LoggedAreas[name] = area;
-            GameEventLog.Write($"Area entered: {name} {area}");
+            string place = area == PlayerState.DungeonArea ? PlaceTracker.PlaceAt(now.Position) : null;
+            GameEventLog.Write($"Area entered: {name} {area}{(place == null ? string.Empty : $" in {place}")}");
         }
 
         /// <summary>

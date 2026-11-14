@@ -49,7 +49,8 @@ export type LogEvent = { timeUtc: string } & (
   | { type: 'closeCall'; character: string; health: number; maxHealth: number; area: string; fighting: string[] }
   | { type: 'dayStarted'; day: number }
   | { type: 'deathDetails'; character: string; area: string; fighting: string[] }
-  | { type: 'areaEntered'; character: string; area: string }
+  | { type: 'areaEntered'; character: string; area: string; place?: string }
+  | { type: 'placeFound'; character: string; place: string; x: number; z: number }
   | { type: 'teleported'; character: string; portal: string | null }
   | { type: 'pvpChanged'; character: string; isOn: boolean }
   | { type: 'wentToBed'; character: string }
