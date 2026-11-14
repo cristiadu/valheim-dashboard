@@ -1,6 +1,6 @@
 import type { PlayerSession } from 'valheim-log';
 
-import { ACTIVITY_STORY_KINDS, ACTIVITY_WORDS, type ActivityRecord, UNKNOWN_FOOD } from '#/lib/models/activities';
+import { ACTIVITY_STORY_KINDS, ACTIVITY_WORDS, type ActivityRecord, UNKNOWN_FOOD, UNKNOWN_STATION } from '#/lib/models/activities';
 import { type ChatRecord, DEATH_DETAILS_WINDOW_MS, type Snapshot, type SourceLines, type StoryEvent } from '#/lib/models/snapshot';
 import type { StoryItem, StoryKind, StoryText } from '#/lib/models/story';
 import { DAY_MS, MS_PER_MINUTE } from '#/lib/models/time';
@@ -15,7 +15,8 @@ export const activityTotal = (activity: ActivityRecord): number =>
 
 /**
  * Story line for one stretch of activity, such as building or kills. Powers and carts have no list, meals leave
- * out food the server never learned, and items picked up after another player dropped them name that player. Steering and riding name the ships or tames and how long the stretch lasted,
+ * out food the server never learned, and items picked up after another player dropped them name that player.
+ * Crafting names each station and how often the player opened it. Steering and riding name the ships or tames and how long the stretch lasted,
  * from the first time a player took the wheel or got on to the last, since the log can't tell two of a kind apart.
  */
 const activityItem = (activity: ActivityRecord): StoryText => {
@@ -36,6 +37,15 @@ const activityItem = (activity: ActivityRecord): StoryText => {
   }
   if (activity.kind === 'powered' || activity.kind === 'pulled') {
     return { timeUtc, kind, text: total === 1 ? `${activity.player ?? 'Someone'} ${words.verb}` : sentence };
+  }
+  if (activity.kind === 'crafted') {
+    const stations = Object.entries(activity.things)
+      .sort(([, firstVisits], [, secondVisits]) => secondVisits - firstVisits)
+      .map(([station, visits]) => {
+        const name = station === UNKNOWN_STATION ? 'a crafting station' : `the ${thingName(station)}`;
+        return visits === 1 ? name : `${name} ${visits} times`;
+      });
+    return { timeUtc, kind, text: `${activity.player ?? 'Someone'} worked at ${listText(stations)}` };
   }
   if (activity.kind === 'sailed' || activity.kind === 'rode') {
     const ships = Object.keys(activity.things).map(thingName).join(' and the ');
