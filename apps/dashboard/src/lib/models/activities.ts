@@ -136,7 +136,7 @@ export const ACTIVITY_WORDS: Record<Exclude<ActivityKind, 'destroyed'>, { verb: 
   foodCooked: { verb: 'finished cooking', one: 'thing', many: 'things', ending: '' },
   burnt: { verb: 'burnt', one: 'thing', many: 'things', ending: ' on the fire' },
   tapped: { verb: 'tapped', one: 'mead', many: 'meads', ending: ' from fermenters' },
-  landed: { verb: 'landed', one: 'hit', many: 'hits', ending: '' },
+  landed: { verb: 'landed', one: 'hit', many: 'hits', ending: ' on creatures' },
   dodged: { verb: 'rolled out of the way', one: 'time', many: 'times', ending: '' },
   staggered: { verb: 'was staggered', one: 'time', many: 'times', ending: '' },
   jumped: { verb: 'jumped', one: 'time', many: 'times', ending: '' },

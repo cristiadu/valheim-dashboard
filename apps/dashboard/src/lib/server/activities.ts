@@ -135,7 +135,7 @@ export const addActivityOf = (state: ServerState, event: LogEvent, line: string)
       if (event.move === 'jumped') {
         addTotal(snapshot, line, timeUtc, event.character, 'jumped', event.count);
       } else {
-        addActivity(snapshot, line, timeUtc, event.character, event.move, event.item ?? event.move, event.count);
+        addActivity(snapshot, line, timeUtc, event.character, event.move, event.target ?? event.move, event.count);
       }
       break;
     case 'fueled':

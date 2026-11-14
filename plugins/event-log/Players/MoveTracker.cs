@@ -46,7 +46,7 @@ namespace ValheimDashboard.EventLog
         /// <summary>Hands a weapon can be held in.</summary>
         private static readonly int[] HandSlots = { ZDOVars.s_rightItem, ZDOVars.s_leftItem };
 
-        /// <summary>Moves since the last log, by character and move, for example <c>landed AxeBronze</c>.</summary>
+        /// <summary>Moves since the last log, by character and move, for example <c>landed AxeBronze on Greyling</c>.</summary>
         private static readonly Dictionary<(string Character, string Move), int> Counts = new Dictionary<(string Character, string Move), int>();
 
         /// <summary>The latest swing of each player's game that has not hit yet: when, who, and with which weapon.</summary>
@@ -113,7 +113,7 @@ namespace ValheimDashboard.EventLog
 
         /// <summary>
         /// Logs the counts once a minute, one line per character and move, for example
-        /// <c>Moves: Ragnar landed AxeBronze x42</c> or <c>Moves: Ragnar dodged x3</c>, then starts counting again.
+        /// <c>Moves: Ragnar landed AxeBronze on Greyling x42</c> or <c>Moves: Ragnar dodged x3</c>, then starts counting again.
         /// Also keeps the creatures this scan found.
         /// </summary>
         public static void AfterScan()
@@ -138,7 +138,7 @@ namespace ValheimDashboard.EventLog
         /// </summary>
         private static void ReadDamage(ZRoutedRpc.RoutedRPCData data, ZDO target)
         {
-            if (!Names.Has<Character>(target))
+            if (!Names.Has<Character>(target) || Names.Has<Player>(target))
             {
                 return;
             }
@@ -154,14 +154,15 @@ namespace ValheimDashboard.EventLog
             if (Swings.TryGetValue(data.m_senderPeerID, out (float Time, ZDO Player, string Weapon) swing) && Time.time - swing.Time <= HitSeconds && hit.m_attacker == swing.Player.m_uid)
             {
                 Swings.Remove(data.m_senderPeerID);
-                Count(swing.Player, $"landed {swing.Weapon}");
+                Count(swing.Player, $"landed {swing.Weapon} on {Names.PrefabName(target)}");
             }
         }
 
         /// <summary>
         /// Counts a hit when [data] is a damage number from a game whose player just swung, shown within reach of that
         /// player and on a creature. A game shows the number itself, with no damage call, when it runs the creature its
-        /// player hits. Numbers on players and tames, and numbers for another player's hit, are left out.
+        /// player hits. The number has no creature in it, so the hit is on the creature closest to where it shows.
+        /// Numbers on players and tames, and numbers for another player's hit, are left out.
         /// </summary>
         private static void ReadDamageText(ZRoutedRpc.RoutedRPCData data)
         {
@@ -191,24 +192,29 @@ namespace ValheimDashboard.EventLog
             {
                 return;
             }
-            if (Vector3.Distance(swing.Player.GetPosition(), position) <= ReachMeters && IsOnCreature(position))
+            ZDO creature = Vector3.Distance(swing.Player.GetPosition(), position) <= ReachMeters ? CreatureAt(position) : null;
+            if (creature != null)
             {
                 Swings.Remove(data.m_senderPeerID);
-                Count(swing.Player, $"landed {swing.Weapon}");
+                Count(swing.Player, $"landed {swing.Weapon} on {Names.PrefabName(creature)}");
             }
         }
 
-        /// <summary>Returns true when a creature stands at [position].</summary>
-        private static bool IsOnCreature(Vector3 position)
+        /// <summary>Returns the creature closest to [position], or null when none stands there.</summary>
+        private static ZDO CreatureAt(Vector3 position)
         {
+            ZDO closest = null;
+            float closestMeters = CreatureSizeMeters;
             foreach (ZDO creature in creatures)
             {
-                if (Vector3.Distance(creature.GetPosition(), position) <= CreatureSizeMeters)
+                float meters = Vector3.Distance(creature.GetPosition(), position);
+                if (meters <= closestMeters)
                 {
-                    return true;
+                    closest = creature;
+                    closestMeters = meters;
                 }
             }
-            return false;
+            return closest;
         }
 
         /// <summary>Adds one [move] to the count of the character [player].</summary>

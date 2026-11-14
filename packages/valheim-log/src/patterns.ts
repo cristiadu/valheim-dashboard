@@ -230,10 +230,11 @@ export const PULLING_CART_PATTERN = /^Pulling cart: (?<player>.+) with (?<cart>\
 export const OBLITERATED_PATTERN = /^Obliterated: (?<item>\S+) x(?<count>\d+) in (?<station>\S+) by (?<player>.+)$/;
 
 /**
- * How many times a player dodged, jumped, was staggered or landed a weapon hit on a creature in the last minute. Written by the
- * event log plugin.
+ * How many times a player dodged, jumped, was staggered or landed a hit with a weapon on a kind of creature in the last
+ * minute. Written by the event log plugin.
  */
-export const MOVES_PATTERN = /^Moves: (?<character>.+?) (?<move>dodged|jumped|staggered|landed)(?: (?<item>\S+))? x(?<count>\d+)$/;
+export const MOVES_PATTERN =
+  /^Moves: (?<character>.+?) (?:(?<move>dodged|jumped|staggered)|landed (?<item>\S+) on (?<target>\S+)) x(?<count>\d+)$/;
 
 /** A player shot an arrow, a bolt or other ammo. Written by the event log plugin. */
 export const SHOT_PATTERN = /^Shot: (?<item>\S+) by (?<player>.+)$/;
