@@ -258,6 +258,31 @@ describe('server state', () => {
     ]);
   });
 
+  it('keeps hits landed, dodge rolls and staggers as activities, and jumps only as a total', () => {
+    // GIVEN Yan lands 30 hits on greylings with an axe, 12 with a club, and 3 on a troll with the club, rolls 4 times, is staggered once and jumps 12 times
+    readLines(state, [
+      ...RUN_START,
+      logLine('03:00:00', 'Moves: Yan landed AxeBronze on Greyling x30'),
+      logLine('03:00:00', 'Moves: Yan dodged x4'),
+      logLine('03:00:00', 'Moves: Yan jumped x12'),
+      logLine('03:01:00', 'Moves: Yan landed Club on Greyling x12'),
+      logLine('03:01:00', 'Moves: Yan landed Club on Troll x3'),
+      logLine('03:01:00', 'Moves: Yan staggered x1'),
+    ]);
+
+    // WHEN the activities and Yan's totals are listed
+    const kinds = state.snapshot.activities.map((activity) => [activity.player, activity.kind, activity.things]);
+    const totals = state.snapshot.activityTotals.Yan;
+
+    // THEN each kind but jumps is one stretch, and every kind has its total
+    expect(kinds).toEqual([
+      ['Yan', 'landed', { 'AxeBronze on Greyling': 30, 'Club on Greyling': 12, 'Club on Troll': 3 }],
+      ['Yan', 'dodged', { dodged: 4 }],
+      ['Yan', 'staggered', { staggered: 1 }],
+    ]);
+    expect(totals).toEqual({ landed: 45, dodged: 4, staggered: 1, jumped: 12 });
+  });
+
   it('names builders the plugin gave by Steam name by their character instead', () => {
     // GIVEN Tony Example plays Ragnar, and the plugin names a chest and pieces by his Steam name
     readLines(state, [

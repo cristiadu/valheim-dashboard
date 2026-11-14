@@ -218,6 +218,7 @@ when the plugin does not know who it was.
 | A tame started following a player | `Tame following: Wolf follows Ragnar` | `^Tame following: (?<creature>\S+) follows (?<player>.+)$` |
 | Started pulling a cart | `Pulling cart: Ragnar with Cart` | `^Pulling cart: (?<player>.+) with (?<cart>\S+)$` |
 | Items destroyed in an obliterator after a player pulled its lever | `Obliterated: Resin x20 in incinerator by Ragnar` | `^Obliterated: (?<item>\S+) x(?<count>\d+) in (?<station>\S+) by (?<player>.+)$` |
+| Weapon hits landed on creatures, dodge rolls, jumps and staggers of the last minute | `Moves: Ragnar landed AxeBronze on Greyling x42`, `Moves: Ragnar dodged x3` | `^Moves: (?<character>.+?) (?:(?<move>dodged\|jumped\|staggered)\|landed (?<item>\S+) on (?<target>\S+)) x(?<count>\d+)$` |
 | Arrow, bolt or other ammo shot | `Shot: ArrowFire by Ragnar` | `^Shot: (?<item>\S+) by (?<player>.+)$` |
 | Put fuel on a fire | `Fueled: fire_pit by Ragnar` | `^Fueled: (?<fire>\S+) by (?<player>.+)$` |
 | Repaired a built piece | `Repaired: wood_wall by Ragnar` | `^Repaired: (?<piece>\S+) by (?<player>.+)$` |
@@ -283,6 +284,12 @@ when the plugin does not know who it was.
 - **Smelting**, **Tree cut** and **Rock mined** name the player who hit or filled it through the server in the
   last 10 seconds, or else the player whose game owns it. A station's queue is read once per scan. Since plugin
   2.21.0, fuel put in a station, such as coal in a smelter, is a **Smelting** line too, one per scan.
+- **Moves** are logged as counts once a minute. Dodge rolls, jumps and staggers are animations a player's game sends
+  to everyone. `landed` is a swing of the weapon in hand that hit a creature: within a second of the swing, either
+  that game sent a damage call for it, or it showed a damage number on a creature within the player's reach, which
+  a game does when it runs the creature its player hits. A damage call names the creature. A damage number does not,
+  so the hit is on the creature closest to where the number shows. A swing that hits nothing, a tree or a rock is not counted.
+  Tools and bows are left out.
 - **Shot** is logged since plugin 2.21.0 when a flying arrow or bolt is gone. The shooter's game makes it, so its
   object ID starts with the shooter's ID. Ammo that shares its flying object with other ammo isn't logged, since
   the object can't tell which one it was.

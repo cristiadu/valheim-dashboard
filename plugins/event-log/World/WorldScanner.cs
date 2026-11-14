@@ -68,6 +68,7 @@ namespace ValheimDashboard.EventLog
                 RideTracker.See(zdo);
                 UpkeepTracker.See(zdo);
                 CraftedItemTracker.See(zdo);
+                MoveTracker.See(zdo);
                 ActionTracker.See(zdo);
                 if (isNew)
                 {
@@ -86,6 +87,7 @@ namespace ValheimDashboard.EventLog
             ChestLabelTracker.AfterScan();
             TerrainMap.WriteOnce();
             GameDataFiles.WriteOnce();
+            MoveTracker.AfterScan();
             BossFightTracker.AfterScan();
             CombatTracker.ForgetOldMoves();
             WorkTracker.ForgetOldRequests();
