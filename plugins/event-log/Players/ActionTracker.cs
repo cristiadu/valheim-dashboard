@@ -23,6 +23,12 @@ namespace ValheimDashboard.EventLog
         /// <summary>Hash of the call a player's game sends to the server to find the place a stone marks.</summary>
         private static readonly int DiscoverLocationHash = "RPC_DiscoverClosestLocation".GetStableHashCode();
 
+        /// <summary>Station logged when no station, or more than one kind, is in reach of the player.</summary>
+        private const string UnknownStation = "crafting_station";
+
+        /// <summary>Meters past a station's use range a player may seem to stand, since their place reaches the server late.</summary>
+        private const float StationMarginMeters = 0.5f;
+
         /// <summary>Seconds to wait for the food to show in a player's hand after they start eating.</summary>
         private const float EatSeconds = 3f;
 
@@ -49,8 +55,9 @@ namespace ValheimDashboard.EventLog
         private static readonly Dictionary<ZDOID, (int Hand, int Crafting, int Emote)> LastSeen =
             new Dictionary<ZDOID, (int Hand, int Crafting, int Emote)>();
 
-        /// <summary>Crafting station prefab names by the animation a player plays at them, built on first use.</summary>
-        private static Dictionary<int, List<string>> stationsByAnimation;
+        /// <summary>Every crafting station in the world, by object ID: its prefab name, place, use animation and use range in meters.</summary>
+        private static readonly Dictionary<ZDOID, (string Name, Vector3 Position, int Animation, float Range)> Stations =
+            new Dictionary<ZDOID, (string Name, Vector3 Position, int Animation, float Range)>();
 
         /// <summary>Returns true when item prefab [hash] is food or a drink.</summary>
         public static bool IsConsumable(int hash)
@@ -121,7 +128,7 @@ namespace ValheimDashboard.EventLog
                 }
                 if (isKnown && before.Crafting == 0 && now.Crafting != 0)
                 {
-                    GameEventLog.Write($"Crafting: {name} at {StationNames(now.Crafting)}");
+                    GameEventLog.Write($"Crafting: {name} at {StationInReach(player.GetPosition(), now.Crafting)}");
                 }
                 string emote = player.GetString(ZDOVars.s_emote);
                 if (isKnown && before.Emote != now.Emote && emote != string.Empty)
@@ -186,40 +193,49 @@ namespace ValheimDashboard.EventLog
             LateEats.Clear();
         }
 
-        /// <summary>Forgets character [uid] when the server destroys it.</summary>
+        /// <summary>Remembers where crafting station [zdo] stands, each scan.</summary>
+        public static void See(ZDO zdo)
+        {
+            if (!Names.Has<CraftingStation>(zdo))
+            {
+                return;
+            }
+            CraftingStation station = Names.Prefab(zdo).GetComponent<CraftingStation>();
+            Stations[zdo.m_uid] = (Names.PrefabName(zdo), zdo.GetPosition(), station.m_useAnimation, station.m_useDistance);
+        }
+
+        /// <summary>Forgets character or crafting station [uid] when the server destroys it.</summary>
         public static void Forget(ZDOID uid)
         {
             LastSeen.Remove(uid);
             EatStarts.Remove(uid);
             MaxHealths.Remove(uid);
             LastAteTimes.Remove(uid);
+            Stations.Remove(uid);
         }
 
         /// <summary>
-        /// Returns the crafting stations where a player plays crafting animation [animation], for example
-        /// <c>forge</c>, or every such station joined by <c>/</c> when several share it.
+        /// Returns the crafting station a player at [position] playing crafting animation [animation] is using, for
+        /// example <c>forge</c>. A station only opens within its use range, so the station is the one kind with
+        /// that animation in reach. Several stations share an animation, so when none or more than one kind is in
+        /// reach the station is not known.
         /// </summary>
-        private static string StationNames(int animation)
+        private static string StationInReach(Vector3 position, int animation)
         {
-            if (stationsByAnimation == null)
+            string found = null;
+            foreach ((string Name, Vector3 Position, int Animation, float Range) station in Stations.Values)
             {
-                stationsByAnimation = new Dictionary<int, List<string>>();
-                foreach (GameObject prefab in ZNetScene.instance.m_prefabs)
+                if (station.Animation != animation || Vector3.Distance(station.Position, position) > station.Range + StationMarginMeters)
                 {
-                    CraftingStation station = prefab.GetComponent<CraftingStation>();
-                    if (station == null)
-                    {
-                        continue;
-                    }
-                    if (!stationsByAnimation.TryGetValue(station.m_useAnimation, out List<string> names))
-                    {
-                        names = new List<string>();
-                        stationsByAnimation[station.m_useAnimation] = names;
-                    }
-                    names.Add(prefab.name);
+                    continue;
                 }
+                if (found != null && found != station.Name)
+                {
+                    return UnknownStation;
+                }
+                found = station.Name;
             }
-            return stationsByAnimation.TryGetValue(animation, out List<string> found) ? string.Join("/", found) : "a crafting station";
+            return found ?? UnknownStation;
         }
     }
 }

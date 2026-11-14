@@ -203,7 +203,7 @@ when the plugin does not know who it was.
 | Food on a cooking station got cooked, or burnt to coal (names the raw food) | `Cooked: CookedMeat on piece_cookingstation by Ragnar`, `Burnt: RawMeat on piece_cookingstation by Ragnar` | `^(?<kind>Cooked\|Burnt): (?<item>\S+) on (?<station>\S+) by (?<player>.+)$` |
 | Mead in a fermenter is ready, or was tapped | `Mead ready: MeadTasty x6 in fermenter`, `Mead tapped: MeadTasty x6 from fermenter by Ragnar` | `^Mead (?<state>ready\|tapped): (?<item>\S+) x(?<count>\d+) (?:in\|from) (?<station>\S+)(?: by (?<player>.+))?$` |
 | Took the helm of a raft or ship | `Sailing: Ragnar on Karve` | `^Sailing: (?<character>.+) on (?<ship>\S+)$` |
-| Opened a crafting station (several kinds share one name, joined with `/`, when they share an animation) | `Crafting: Ragnar at forge` | `^Crafting: (?<character>.+?) at (?<station>\S+)$` |
+| Opened a crafting station (`crafting_station` when the plugin can't tell which; before plugin 2.24.0, every kind sharing the animation, joined with `/`) | `Crafting: Ragnar at forge` | `^Crafting: (?<character>.+?) at (?<station>\S+)$` |
 | Did an emote | `Emote: Ragnar wave` | `^Emote: (?<character>.+) (?<emote>\S+)$` |
 | Claimed a bed | `Bed claimed: Ragnar` | `^Bed claimed: (?<character>.+)$` |
 | Named a portal | `Portal named: Swamp camp by Ragnar` | `^Portal named: (?<portal>.+) by (?<player>.+)$` |
@@ -269,6 +269,8 @@ when the plugin does not know who it was.
   The game starts an object's ID with the ID of the game that made it, so the dropper is exact. Items a broken
   chest, cart or ship, or an emptied item stand, let go of are not drops. The pickup line repeats the same `item` ID.
 - **Harvested** names the player who asked to harvest, or the player whose game owns the plant.
+- **Crafting** names the station since plugin 2.24.0. A station only opens within its use range (2 m), so it is the
+  one kind with the player's crafting animation in reach. With none or several kinds in reach it is `crafting_station`.
 - **Cooked** and **Burnt** name the player who put the food on, which the cooking station keeps per slot.
 - **Mead ready** is logged once the mead stayed ready for 15 seconds with a player near, since a fermenter only works
   while a player's game runs it. **Mead tapped** names the player who asked to tap, or whose game owns the fermenter.
