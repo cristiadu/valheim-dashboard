@@ -1,6 +1,18 @@
 /** Fewest items one slot holds for an item to count as a stackable material, not a tool or piece of gear. */
 export const MIN_STACKABLE = 2;
 
+/** One item of a list or one slot of a chest: what it is, the name to show, the item whose icon to show, and how many. */
+export type ItemSlot = {
+  /** Prefab the plugin logs, for example `CopperOre`. */
+  prefab: string;
+  /** Name the game shows, for example `Copper ore`. */
+  name: string;
+  /** Item whose icon shows: the item itself, or for a tree or rock the item that stands for it. */
+  iconItem: string;
+  /** How many there are. */
+  count: number;
+};
+
 /**
  * Names the game shows for items that are not gear, by the prefab the plugin logs, for example `Boar meat` for
  * `RawMeat`. The names also pick the icon, and every item listed here gets its icon downloaded on start. Other

@@ -255,25 +255,6 @@ describe('storyOf', () => {
     expect(story.map((item) => item.text)).toEqual(['Ragnar steered the viking ship']);
   });
 
-  it('lists cut trees and mined rocks in words, since they have no icon', () => {
-    // GIVEN Ragnar cut down beeches and both kinds of birch, then mined out a copper deposit
-    const snapshot = snapshotWith({
-      activities: [
-        { player: 'Ragnar', kind: 'cut', startUtc: '2026-10-29T10:00:00.000Z', endUtc: '2026-10-29T10:05:00.000Z', things: { Beech1: 7, Birch1: 2, Birch2: 1 }, source: NO_LINES },
-        { player: 'Ragnar', kind: 'mined', startUtc: '2026-10-29T10:06:00.000Z', endUtc: '2026-10-29T10:06:00.000Z', things: { rock4_copper: 1 }, source: NO_LINES },
-      ],
-    });
-
-    // WHEN the story is made
-    const story = storyOf(snapshot);
-
-    // THEN both are item lines that name the trees and rocks, with nothing left for item icons
-    expect(story.map((item) => [item.kind, item.text, item.things])).toEqual([
-      ['items', 'Ragnar mined out 1 rock: 1 copper deposit', undefined],
-      ['items', 'Ragnar cut down 10 trees: 7 beech, 3 birch', undefined],
-    ]);
-  });
-
   it('tells kills and items in one line per stretch', () => {
     // GIVEN Ragnar killed creatures, moved items, cooked, brewed, steered a karve for 25 minutes and dropped coins Bjorn picked up
     const snapshot = snapshotWith({

@@ -136,9 +136,24 @@ describe('itemSlots', () => {
 
     // THEN coins and wood share the top by name, then the trophy
     expect(slots).toEqual([
-      { prefab: 'Coins', name: 'Coins', count: 20 },
-      { prefab: 'Wood', name: 'Wood', count: 20 },
-      { prefab: 'TrophyDeer', name: 'Deer trophy', count: 2 },
+      { prefab: 'Coins', name: 'Coins', iconItem: 'Coins', count: 20 },
+      { prefab: 'Wood', name: 'Wood', iconItem: 'Wood', count: 20 },
+      { prefab: 'TrophyDeer', name: 'Deer trophy', iconItem: 'Deer trophy', count: 2 },
+    ]);
+  });
+
+  it('names cut trees and mined rocks, counts both birches together, and shows the icon of their sapling or ore', () => {
+    // GIVEN beeches, both kinds of birch and a copper deposit as the plugin logs them
+    const things = { Beech1: 7, Birch1: 2, Birch2: 1, rock4_copper: 1 };
+
+    // WHEN they are listed
+    const slots = itemSlots(things);
+
+    // THEN each has its plain name and the icon of the item that stands for it
+    expect(slots).toEqual([
+      { prefab: 'Beech1', name: 'Beech', iconItem: 'Beech sapling', count: 7 },
+      { prefab: 'Birch1', name: 'Birch', iconItem: 'Birch sapling', count: 3 },
+      { prefab: 'rock4_copper', name: 'Copper deposit', iconItem: 'Copper ore', count: 1 },
     ]);
   });
 });

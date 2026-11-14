@@ -39,7 +39,7 @@
       {@const isEquipped = equipped.includes(slot.prefab)}
       <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
       <li class="slot" class:equipped={isEquipped} tabindex="0" aria-label="{slot.count.toLocaleString()} {slot.name}{isEquipped ? ', worn' : ''}">
-        <ItemIcon item={slot.name} size={CHEST_SLOT_ICON_PX} />
+        <ItemIcon item={slot.iconItem} size={CHEST_SLOT_ICON_PX} />
         <span class="count" aria-hidden="true">{slot.count.toLocaleString()}</span>
         <span class="tip" aria-hidden="true">{slot.name} <strong>{slot.count.toLocaleString()}</strong></span>
       </li>

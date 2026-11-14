@@ -24,12 +24,6 @@ describe('thingName', () => {
     // WHEN / THEN it reads in lowercase words, as the game names it
     expect(thingName('Greydwarf_Elite')).toBe('greydwarf brute');
   });
-
-  it('names trees and rocks, which the game names file leaves out', () => {
-    // GIVEN a beech, a pine and a copper deposit as the plugin logs them
-    // WHEN / THEN each reads as players call it
-    expect(['Beech1', 'Pinetree_01', 'rock4_copper'].map(thingName)).toEqual(['beech', 'pine', 'copper deposit']);
-  });
 });
 
 describe('raidName', () => {
@@ -62,12 +56,6 @@ describe('thingList', () => {
     // GIVEN a stretch of building
     // WHEN / THEN the most built piece comes first
     expect(thingList({ wood_fence: 8, piece_workbench: 1, wood_floor_1x1: 14 })).toBe('14 wood floor 1x1, 8 wood fence, 1 workbench');
-  });
-
-  it('counts things with the same name together', () => {
-    // GIVEN both kinds of birch and a beech
-    // WHEN / THEN the birches are one entry
-    expect(thingList({ Birch1: 6, Beech1: 7, Birch2: 6 })).toBe('12 birch, 7 beech');
   });
 });
 

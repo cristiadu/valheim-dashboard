@@ -88,22 +88,22 @@ export const BOSS_ORDER = ['Eikthyr', 'The Elder', 'Bonemass', 'Moder', 'Yagluth
 export const DUNGEON_AREA = 'Dungeon';
 
 /**
- * Names of the trees and rocks the plugin logs as cut down or mined out, by prefab. The game names file has none
- * for them, and the two birches share one name so a story line counts them together.
+ * Trees and rocks the plugin logs as cut down or mined out, by prefab: the name players call each one, and the item
+ * whose icon stands for it, since they are not items and have no icon of their own: the sapling for a tree, the ore
+ * for a rock. The two birches share one name so a story line counts them together.
  */
-export const NATURE_NAMES: Record<string, string> = {
-  Beech1: 'Beech',
-  Birch1: 'Birch',
-  Birch2: 'Birch',
-  Birch1_aut: 'Birch',
-  Birch2_aut: 'Birch',
-  Oak1: 'Oak',
-  FirTree: 'Fir',
-  Pinetree_01: 'Pine',
-  SwampTree1: 'Ancient tree',
-  rock4_copper: 'Copper deposit',
-  MineRock_Tin: 'Tin deposit',
-  MineRock_Obsidian: 'Obsidian deposit',
-  MineRock_Meteorite: 'Meteorite',
-  rock3_silver: 'Silver vein',
+export const NATURE_THINGS: Record<string, { name: string; iconItem: string }> = {
+  Beech1: { name: 'Beech', iconItem: 'Beech sapling' },
+  Birch1: { name: 'Birch', iconItem: 'Birch sapling' },
+  Birch2: { name: 'Birch', iconItem: 'Birch sapling' },
+  Birch1_aut: { name: 'Birch', iconItem: 'Birch sapling' },
+  Birch2_aut: { name: 'Birch', iconItem: 'Birch sapling' },
+  Oak1: { name: 'Oak', iconItem: 'Oak sapling' },
+  FirTree: { name: 'Fir', iconItem: 'Fir sapling' },
+  Pinetree_01: { name: 'Pine', iconItem: 'Pine sapling' },
+  SwampTree1: { name: 'Ancient tree', iconItem: 'Ancient bark' },
+  rock4_copper: { name: 'Copper deposit', iconItem: 'Copper ore' },
+  MineRock_Tin: { name: 'Tin deposit', iconItem: 'Tin ore' },
+  MineRock_Obsidian: { name: 'Obsidian deposit', iconItem: 'Obsidian' },
+  rock3_silver: { name: 'Silver vein', iconItem: 'Silver ore' },
 };
