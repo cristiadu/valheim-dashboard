@@ -451,6 +451,28 @@ describe('parseMessage', () => {
     ]);
   });
 
+  it('reads food cooked or burnt and mead ready or tapped from the event log plugin', () => {
+    // GIVEN one line of each kind, from a player whose name has a space
+    const messages = [
+      'Cooked: CookedMeat on piece_cookingstation by Inge Dragonchow',
+      'Burnt: RawMeat on piece_cookingstation by Inge Dragonchow',
+      'Mead ready: MeadTasty x6 in fermenter',
+      'Mead tapped: MeadTasty x6 from fermenter by Inge Dragonchow',
+    ];
+
+    // WHEN each message is read
+    const events = messages.map((message) => parseMessage(message, '2026-01-01T00:00:00.000Z'));
+
+    // THEN each line gives its event and values
+    const timeUtc = '2026-01-01T00:00:00.000Z';
+    expect(events).toEqual([
+      { type: 'foodDone', timeUtc, isBurnt: false, item: 'CookedMeat', station: 'piece_cookingstation', player: 'Inge Dragonchow' },
+      { type: 'foodDone', timeUtc, isBurnt: true, item: 'RawMeat', station: 'piece_cookingstation', player: 'Inge Dragonchow' },
+      { type: 'meadReady', timeUtc, item: 'MeadTasty', count: 6, station: 'fermenter' },
+      { type: 'meadTapped', timeUtc, item: 'MeadTasty', count: 6, station: 'fermenter', player: 'Inge Dragonchow' },
+    ]);
+  });
+
   it('reads places found and the place of a dungeon from the event log plugin', () => {
     // GIVEN a place found, a dungeon with its place and a plain area, from a player whose name has a space
     const messages = [

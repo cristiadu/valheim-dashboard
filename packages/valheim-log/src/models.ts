@@ -68,6 +68,9 @@ export type LogEvent = { timeUtc: string } & (
   | { type: 'ate'; character: string; item: string | null; maxHealthGain: number | null }
   | { type: 'smelting'; item: string; count: number; station: string; player: string | null }
   | { type: 'foodStarted'; kind: 'cooking' | 'fermenting'; item: string; station: string; player: string | null }
+  | { type: 'foodDone'; isBurnt: boolean; item: string; station: string; player: string | null }
+  | { type: 'meadReady'; item: string; count: number; station: string }
+  | { type: 'meadTapped'; item: string; count: number; station: string; player: string | null }
   | { type: 'sailing'; character: string; ship: string }
   | { type: 'crafting'; character: string; station: string }
   | { type: 'emote'; character: string; emote: string }
