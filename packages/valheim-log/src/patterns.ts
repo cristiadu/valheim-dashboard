@@ -236,8 +236,14 @@ export const OBLITERATED_PATTERN = /^Obliterated: (?<item>\S+) x(?<count>\d+) in
 export const MOVES_PATTERN =
   /^Moves: (?<character>.+?) (?:(?<move>dodged|jumped|staggered)|landed (?<item>\S+) on (?<target>\S+)) x(?<count>\d+)$/;
 
-/** A player shot an arrow, a bolt or other ammo. Written by the event log plugin. */
-export const SHOT_PATTERN = /^Shot: (?<item>\S+) by (?<player>.+)$/;
+/**
+ * A player shot an arrow, a bolt or other ammo. When several kinds of ammo look the same in flight, the line names
+ * each one it may be, as in `Shot: ArrowWood/ArrowBronze by Ragnar`. Written by the event log plugin.
+ */
+export const SHOT_PATTERN = /^Shot: (?<items>\S+) by (?<player>.+)$/;
+
+/** Between the kinds of ammo a shot may be, in a `Shot` line. */
+export const SHOT_ITEM_SEPARATOR = '/';
 
 /** A player put fuel on a fire. Written by the event log plugin. */
 export const FUELED_PATTERN = /^Fueled: (?<fire>\S+) by (?<player>.+)$/;

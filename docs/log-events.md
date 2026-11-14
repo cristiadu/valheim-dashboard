@@ -219,7 +219,7 @@ when the plugin does not know who it was.
 | Started pulling a cart | `Pulling cart: Ragnar with Cart` | `^Pulling cart: (?<player>.+) with (?<cart>\S+)$` |
 | Items destroyed in an obliterator after a player pulled its lever | `Obliterated: Resin x20 in incinerator by Ragnar` | `^Obliterated: (?<item>\S+) x(?<count>\d+) in (?<station>\S+) by (?<player>.+)$` |
 | Weapon hits landed on creatures, dodge rolls, jumps and staggers of the last minute | `Moves: Ragnar landed AxeBronze on Greyling x42`, `Moves: Ragnar dodged x3` | `^Moves: (?<character>.+?) (?:(?<move>dodged\|jumped\|staggered)\|landed (?<item>\S+) on (?<target>\S+)) x(?<count>\d+)$` |
-| Arrow, bolt or other ammo shot | `Shot: ArrowFire by Ragnar` | `^Shot: (?<item>\S+) by (?<player>.+)$` |
+| Arrow, bolt or other ammo shot | `Shot: ArrowFire by Ragnar`, `Shot: ArrowWood/ArrowBronze by Ragnar` | `^Shot: (?<items>\S+) by (?<player>.+)$` |
 | Put fuel on a fire | `Fueled: fire_pit by Ragnar` | `^Fueled: (?<fire>\S+) by (?<player>.+)$` |
 | Repaired a built piece | `Repaired: wood_wall by Ragnar` | `^Repaired: (?<piece>\S+) by (?<player>.+)$` |
 | Added what they explored to a map table | `Map shared: Ragnar at piece_cartographertable` | `^Map shared: (?<player>.+) at (?<table>\S+)$` |
@@ -291,8 +291,9 @@ when the plugin does not know who it was.
   so the hit is on the creature closest to where the number shows. A swing that hits nothing, a tree or a rock is not counted.
   Tools and bows are left out.
 - **Shot** is logged since plugin 2.21.0 when a flying arrow or bolt is gone. The shooter's game makes it, so its
-  object ID starts with the shooter's ID. Ammo that shares its flying object with other ammo isn't logged, since
-  the object can't tell which one it was.
+  object ID starts with the shooter's ID. Some ammo shares its flying object, as wood arrows do with other arrows,
+  so the object can't tell which one it was. Since plugin 2.28.0 such a shot names each kind it may be, with `/`
+  between them. Before, it wasn't logged.
 - **Planted** replaces **Piece built** for crops and saplings. A plant that grows is not logged as destroyed.
 - **Position** is logged each time a player has walked 20 meters from the last one, outside dungeons. `x` is
   meters east and `z` meters north of the world's center.
