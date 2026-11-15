@@ -72,9 +72,10 @@ const payForSeenCraft = (state: ServerState, character: string, item: string, le
  * Makes sure [character]'s bag in [state] holds [count] of [item] before they use, store, drop or wear it. Crafting
  * happens on the player's game and is often never seen, so when the bag holds fewer and the item can be crafted, the
  * missing ones were crafted: their cost comes out and what the crafts made goes in, remembered so a later `Made` line
- * for them does not pay again.
+ * for them does not pay again. A craft can make more than was missing, such as 20 arrows for one shot. The rest stays
+ * in the bag, unless [isWholePile]: a player who stores what they made puts the whole pile in the chest.
  */
-const craftMissing = (state: ServerState, character: string, item: string, count: number): void => {
+const craftMissing = (state: ServerState, character: string, item: string, count: number, isWholePile: boolean): void => {
   const missing = count - (state.snapshot.bags[character]?.[item] ?? 0);
   if (missing <= 0 || state.craftCosts[item]?.[1] === undefined) {
     return;
@@ -82,12 +83,15 @@ const craftMissing = (state: ServerState, character: string, item: string, count
   const made = payForCraft(state, character, item, 1, missing);
   const unseen = (state.unseenCrafts[character] ??= {});
   unseen[item] = (unseen[item] ?? 0) + made;
-  addToBag(state.snapshot, character, item, made);
+  addToBag(state.snapshot, character, item, isWholePile ? missing : made);
 };
 
-/** Takes [count] of [item] out of [character]'s bag in [state], crafting the ones it is missing first. */
-const takeOut = (state: ServerState, character: string, item: string, count: number): void => {
-  craftMissing(state, character, item, count);
+/**
+ * Takes [count] of [item] out of [character]'s bag in [state], crafting the ones it is missing first, as in
+ * [craftMissing].
+ */
+const takeOut = (state: ServerState, character: string, item: string, count: number, isWholePile = false): void => {
+  craftMissing(state, character, item, count, isWholePile);
   addToBag(state.snapshot, character, item, -count);
 };
 
@@ -307,7 +311,7 @@ export const updateBags = (state: ServerState, event: LogEvent): void => {
       break;
     case 'chestChanged':
       if (event.isStored) {
-        takeOut(state, character, event.item, event.count);
+        takeOut(state, character, event.item, event.count, true);
       } else {
         addToBag(snapshot, character, event.item, event.count);
       }
@@ -339,12 +343,12 @@ export const updateBags = (state: ServerState, event: LogEvent): void => {
       payFor(state, character, event.plant);
       break;
     case 'gearSeen':
-      craftMissing(state, character, event.item, 1);
+      craftMissing(state, character, event.item, 1, false);
       keepInBag(snapshot, character, event.item);
       break;
     case 'wearing':
       for (const item of event.items) {
-        craftMissing(state, character, item, 1);
+        craftMissing(state, character, item, 1, false);
         keepInBag(snapshot, character, item);
       }
       break;
