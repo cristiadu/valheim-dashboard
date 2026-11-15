@@ -277,8 +277,12 @@ when the plugin does not know who it was.
 - **Crafting** names the station since plugin 2.24.0. A station only opens within its use range (2 m), so it is the
   one kind with the player's crafting animation in reach. With none or several kinds in reach it is `crafting_station`.
 - **Cooked** and **Burnt** name the player who put the food on, which the cooking station keeps per slot.
+  Since plugin 2.32.0, raw food gone from a slot between two scans is logged as **Cooked** too: only done food can
+  be taken off, so it was cooked and taken before the next scan saw it.
 - **Mead ready** is logged once the mead stayed ready for 15 seconds with a player near, since a fermenter only works
   while a player's game runs it. **Mead tapped** names the player who asked to tap, or whose game owns the fermenter.
+  Since plugin 2.32.0, mead tapped and a new base put in between two scans log both lines: the fermenter then holds
+  a base with a new start time where ready mead was.
 - **Ate** reads the food the character holds for a moment after the eat animation, which every game shows.
   Food held this way is never logged as **Gear**.
 - **Smelting**, **Tree cut** and **Rock mined** name the player who hit or filled it through the server in the
@@ -293,7 +297,7 @@ when the plugin does not know who it was.
   its place, such as `sfx_sword_swing`. Since 2.28.0 that hit counts for the creature, and the parser skips the old lines.
 - **Shot** is logged since plugin 2.21.0 when a flying arrow or bolt is gone. The shooter's game makes it, so its
   object ID starts with the shooter's ID. Some ammo shares its flying object, as wood arrows do with other arrows,
-  so the object can't tell which one it was. Since plugin 2.31.0 such a shot names each kind it may be, with `/`
+  so the object can't tell which one it was. Since plugin 2.33.0 such a shot names each kind it may be, with `/`
   between them. Before, it wasn't logged.
 - **Planted** replaces **Piece built** for crops and saplings. A plant that grows is not logged as destroyed.
 - **Position** is logged each time a player has walked 20 meters from the last one, outside dungeons. `x` is
