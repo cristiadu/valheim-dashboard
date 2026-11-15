@@ -24,8 +24,11 @@ namespace ValheimDashboard.EventLog
         /// <summary>Item in each slot of each cooking station at the last scan, by object ID.</summary>
         private static readonly Dictionary<ZDOID, string[]> Slots = new Dictionary<ZDOID, string[]>();
 
-        /// <summary>Item hash each fermenter held at the last scan, or 0 when empty, by object ID.</summary>
-        private static readonly Dictionary<ZDOID, int> Contents = new Dictionary<ZDOID, int>();
+        /// <summary>Player who filled each slot of each cooking station, as the last scan saw it, by object ID.</summary>
+        private static readonly Dictionary<ZDOID, string[]> Fillers = new Dictionary<ZDOID, string[]>();
+
+        /// <summary>Item hash each fermenter held at the last scan, or 0 when empty, and when it was put in, by object ID.</summary>
+        private static readonly Dictionary<ZDOID, (int Item, long StartTicks)> Contents = new Dictionary<ZDOID, (int Item, long StartTicks)>();
 
         /// <summary>
         /// Logs food put on [zdo], cooked or burnt there, or a mead base put into it, ready or tapped, since the last
@@ -47,36 +50,38 @@ namespace ValheimDashboard.EventLog
         public static void Forget(ZDOID uid)
         {
             Slots.Remove(uid);
+            Fillers.Remove(uid);
             Contents.Remove(uid);
             ReadySince.Remove(uid);
         }
 
         /// <summary>
         /// Logs a mead base put into fermenter [zdo], the mead tapped from it, or its mead turning ready, since the
-        /// last scan. Mead already ready when the server starts is not logged again.
+        /// last scan. Mead already ready when the server starts is not logged again. A player can tap ready mead and
+        /// put in a new base between two scans, which shows as a new start time on a fermenter whose mead was ready.
         /// </summary>
         private static void SeeFermenter(ZDO zdo)
         {
             int content = zdo.GetInt(ZDOVars.s_content);
-            bool isKnown = Contents.TryGetValue(zdo.m_uid, out int before);
-            Contents[zdo.m_uid] = content;
+            long startTicks = zdo.GetLong(ZDOVars.s_startTime, 0L);
+            bool isKnown = Contents.TryGetValue(zdo.m_uid, out (int Item, long StartTicks) before);
+            Contents[zdo.m_uid] = (content, startTicks);
             Fermenter fermenter = Names.Prefab(zdo).GetComponent<Fermenter>();
-            if (isKnown && before == 0 && content != 0)
+            bool isRefilled = content != 0 && startTicks != before.StartTicks && IsReady(fermenter, before.StartTicks);
+            if (isKnown && before.Item != 0 && (content == 0 || isRefilled))
+            {
+                GameEventLog.Write($"Mead tapped: {MeadOf(fermenter, before.Item)} from {Names.PrefabName(zdo)} by {WorkTracker.Doer(zdo)}");
+            }
+            if (isKnown && content != 0 && (before.Item == 0 || isRefilled))
             {
                 GameEventLog.Write($"Fermenting: {Names.Item(content)} in {Names.PrefabName(zdo)} by {WorkTracker.Doer(zdo)}");
-            }
-            else if (isKnown && before != 0 && content == 0)
-            {
-                GameEventLog.Write($"Mead tapped: {MeadOf(fermenter, before)} from {Names.PrefabName(zdo)} by {WorkTracker.Doer(zdo)}");
             }
             if (content == 0)
             {
                 ReadySince.Remove(zdo.m_uid);
                 return;
             }
-            long startTicks = zdo.GetLong(ZDOVars.s_startTime, 0L);
-            bool isReady = startTicks != 0L && (ZNet.instance.GetTime() - new DateTime(startTicks)).TotalSeconds > fermenter.m_fermentationDuration;
-            if (!isReady)
+            if (!IsReady(fermenter, startTicks))
             {
                 ReadySince.Remove(zdo.m_uid);
             }
@@ -98,6 +103,12 @@ namespace ValheimDashboard.EventLog
             }
         }
 
+        /// <summary>Returns true when a mead base put into [fermenter] at [startTicks] is mead by now. 0 means it holds none.</summary>
+        private static bool IsReady(Fermenter fermenter, long startTicks)
+        {
+            return startTicks != 0L && (ZNet.instance.GetTime() - new DateTime(startTicks)).TotalSeconds > fermenter.m_fermentationDuration;
+        }
+
         /// <summary>
         /// Returns the mead [fermenter] makes from the mead base with item hash [content], and how many, for example
         /// <c>MeadHealthMinor x6</c>.
@@ -111,39 +122,50 @@ namespace ValheimDashboard.EventLog
         /// <summary>
         /// Logs each slot of cooking station [zdo] that now holds raw food it did not hold at the last scan, and each
         /// slot whose food turned cooked or burnt since then. A burnt slot holds coal, so the line names the raw food
-        /// it was.
+        /// it was. Only done food can be taken off, so raw food that is gone was cooked and taken between two scans.
         /// </summary>
         private static void SeeCookingStation(ZDO zdo)
         {
             CookingStation station = Names.Prefab(zdo).GetComponent<CookingStation>();
             string[] now = new string[station.m_slots.Length];
+            string[] fillers = new string[now.Length];
             Slots.TryGetValue(zdo.m_uid, out string[] before);
+            Fillers.TryGetValue(zdo.m_uid, out string[] fillersBefore);
             for (int slot = 0; slot < now.Length; slot++)
             {
                 now[slot] = zdo.GetString("slot" + slot);
+                fillers[slot] = Names.Peer(zdo.GetLong(ZDOVars.s_playerID + slot, 0L));
                 string item = now[slot];
-                if (before == null || item == before[slot] || item == string.Empty)
+                if (before == null || item == before[slot])
                 {
                     continue;
                 }
                 string was = before[slot];
-                string by = $"on {Names.PrefabName(zdo)} by {Names.Peer(zdo.GetLong(ZDOVars.s_playerID + slot, 0L))}";
+                string on = $"on {Names.PrefabName(zdo)} by";
+                CookingStation.ItemConversion raw = station.m_conversion.Find(conversion => conversion.m_from.gameObject.name == was);
+                bool isCooked = raw != null && raw.m_to.gameObject.name == item;
+                bool isBurnt = station.m_overCookedItem != null && station.m_overCookedItem.gameObject.name == item;
+                if (raw != null && !isCooked && !isBurnt)
+                {
+                    GameEventLog.Write($"Cooked: {raw.m_to.gameObject.name} {on} {fillersBefore[slot]}");
+                }
                 CookingStation.ItemConversion burnt = station.m_conversion.Find(
                     conversion => conversion.m_from.gameObject.name == was || conversion.m_to.gameObject.name == was);
                 if (station.m_conversion.Exists(conversion => conversion.m_from.gameObject.name == item))
                 {
-                    GameEventLog.Write($"Cooking: {item} {by}");
+                    GameEventLog.Write($"Cooking: {item} {on} {fillers[slot]}");
                 }
                 else if (station.m_conversion.Exists(conversion => conversion.m_to.gameObject.name == item))
                 {
-                    GameEventLog.Write($"Cooked: {item} {by}");
+                    GameEventLog.Write($"Cooked: {item} {on} {fillers[slot]}");
                 }
-                else if (station.m_overCookedItem != null && station.m_overCookedItem.gameObject.name == item && burnt != null)
+                else if (isBurnt && burnt != null)
                 {
-                    GameEventLog.Write($"Burnt: {burnt.m_from.gameObject.name} {by}");
+                    GameEventLog.Write($"Burnt: {burnt.m_from.gameObject.name} {on} {fillers[slot]}");
                 }
             }
             Slots[zdo.m_uid] = now;
+            Fillers[zdo.m_uid] = fillers;
         }
     }
 }
