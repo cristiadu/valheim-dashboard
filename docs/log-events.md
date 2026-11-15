@@ -277,11 +277,11 @@ when the plugin does not know who it was.
 - **Crafting** names the station since plugin 2.24.0. A station only opens within its use range (2 m), so it is the
   one kind with the player's crafting animation in reach. With none or several kinds in reach it is `crafting_station`.
 - **Cooked** and **Burnt** name the player who put the food on, which the cooking station keeps per slot.
-  Since plugin 2.31.0, raw food gone from a slot between two scans is logged as **Cooked** too: only done food can
+  Since plugin 2.32.0, raw food gone from a slot between two scans is logged as **Cooked** too: only done food can
   be taken off, so it was cooked and taken before the next scan saw it.
 - **Mead ready** is logged once the mead stayed ready for 15 seconds with a player near, since a fermenter only works
   while a player's game runs it. **Mead tapped** names the player who asked to tap, or whose game owns the fermenter.
-  Since plugin 2.31.0, mead tapped and a new base put in between two scans log both lines: the fermenter then holds
+  Since plugin 2.32.0, mead tapped and a new base put in between two scans log both lines: the fermenter then holds
   a base with a new start time where ready mead was.
 - **Ate** reads the food the character holds for a moment after the eat animation, which every game shows.
   Food held this way is never logged as **Gear**.
