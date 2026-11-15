@@ -373,14 +373,17 @@ describe('updateBags', () => {
     expect(bag).toEqual({ CookedMeat: 3, Honey: 2, Wood: 10 });
   });
 
-  it('takes out the food giving the health a meal added, and nothing for a mead', () => {
-    // GIVEN cooked meat gives 30 health and honey 8, and Ragnar carries 5 meat and 3 honey, eats something that adds
-    // 8 max health, drinks a mead, then eats something adding 50, which no food he carries gives
-    state.foods = { CookedMeat: 30, Honey: 8 };
+  it('takes out the food giving the health a meal added, a mead when it added none, and nothing for a food it does not carry', () => {
+    // GIVEN cooked meat gives 30 health, honey 8 and meads none, and Ragnar carries 5 meat, 3 honey, 9 healing meads
+    // and 2 stamina meads, eats something that adds 8 max health, drinks a mead, then eats something adding 50, which
+    // no food he carries gives
+    state.foods = { CookedMeat: 30, Honey: 8, MeadHealthMinor: 0, MeadStaminaMinor: 0 };
     readLines(state, [
       ...RUN_START,
       logLine('03:00:00', 'Picked up: CookedMeat x5 by Ragnar'),
       logLine('03:00:01', 'Picked up: Honey x3 by Ragnar'),
+      logLine('03:00:02', 'Taken: MeadHealthMinor x9 from piece_chest_wood by Ragnar'),
+      logLine('03:00:03', 'Taken: MeadStaminaMinor x2 from piece_chest_wood by Ragnar'),
       logLine('03:10:00', 'Ate something: Ragnar (max health +8)'),
       logLine('03:11:00', 'Ate something: Ragnar (max health +0)'),
       logLine('03:12:00', 'Ate something: Ragnar (max health +50)'),
@@ -389,9 +392,46 @@ describe('updateBags', () => {
     // WHEN his bag is read
     const bag = state.snapshot.bags['Ragnar'];
 
-    // THEN honey went first though he carries more meat, the mead took nothing, and the last meal took the meat he
-    // carries most of
-    expect(bag).toEqual({ CookedMeat: 4, Honey: 2 });
+    // THEN honey went though he carries more meat, the mead he carries most of went, and the unknown food took nothing
+    expect(bag).toEqual({ CookedMeat: 5, Honey: 2, MeadHealthMinor: 8, MeadStaminaMinor: 2 });
+  });
+
+  it('takes out two foods when one meal adds the health of both', () => {
+    // GIVEN deer stew gives 45 health, boar jerky 23 and honey 8, and Ragnar carries all three and eats something
+    // that adds 68 max health
+    state.foods = { DeerStew: 45, BoarJerky: 23, Honey: 8 };
+    readLines(state, [
+      ...RUN_START,
+      logLine('03:00:00', 'Taken: DeerStew x4 from piece_chest_wood by Ragnar'),
+      logLine('03:00:01', 'Taken: BoarJerky x3 from piece_chest_wood by Ragnar'),
+      logLine('03:00:02', 'Taken: Honey x9 from piece_chest_wood by Ragnar'),
+      logLine('03:10:00', 'Ate something: Ragnar (max health +68)'),
+    ]);
+
+    // WHEN his bag is read
+    const bag = state.snapshot.bags['Ragnar'];
+
+    // THEN one stew and one jerky went, and no honey though he carries most of it
+    expect(bag).toEqual({ DeerStew: 3, BoarJerky: 2, Honey: 9 });
+  });
+
+  it('takes out a food eaten again when a meal adds only part of its health', () => {
+    // GIVEN deer stew gives 45 health and honey 8, and Ragnar carries both, eats a stew, and 14 minutes later eats
+    // something that adds 12 max health
+    state.foods = { DeerStew: 45, Honey: 8 };
+    readLines(state, [
+      ...RUN_START,
+      logLine('03:00:00', 'Taken: DeerStew x4 from piece_chest_wood by Ragnar'),
+      logLine('03:00:01', 'Taken: Honey x9 from piece_chest_wood by Ragnar'),
+      logLine('03:10:00', 'Ate something: Ragnar (max health +45)'),
+      logLine('03:24:00', 'Ate something: Ragnar (max health +12)'),
+    ]);
+
+    // WHEN his bag is read
+    const bag = state.snapshot.bags['Ragnar'];
+
+    // THEN both meals were stew: the second topped the first one up, and honey gives too little
+    expect(bag).toEqual({ DeerStew: 2, Honey: 9 });
   });
 
   it('takes out what a fire burns each time it is fueled', () => {

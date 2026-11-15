@@ -293,7 +293,7 @@ when the plugin does not know who it was.
   its place, such as `sfx_sword_swing`. Since 2.28.0 that hit counts for the creature, and the parser skips the old lines.
 - **Shot** is logged since plugin 2.21.0 when a flying arrow or bolt is gone. The shooter's game makes it, so its
   object ID starts with the shooter's ID. Some ammo shares its flying object, as wood arrows do with other arrows,
-  so the object can't tell which one it was. Since plugin 2.29.0 such a shot names each kind it may be, with `/`
+  so the object can't tell which one it was. Since plugin 2.31.0 such a shot names each kind it may be, with `/`
   between them. Before, it wasn't logged.
 - **Planted** replaces **Piece built** for crops and saplings. A plant that grows is not logged as destroyed.
 - **Position** is logged each time a player has walked 20 meters from the last one, outside dungeons. `x` is

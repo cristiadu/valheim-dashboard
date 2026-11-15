@@ -220,14 +220,31 @@ from an empty bag takes 8 wood, 8 resin and 2 feathers and leaves 18 arrows. Sto
 stores what they made puts the whole pile in the chest, so nothing of it stays in the bag. A `Made` line that
 comes later for those same items doesn't pay again.
 
-A meal takes one food out. When the log only says `Ate something`, it is the food the player carries most of,
+A meal takes food out. When the log only says `Ate something`, it is the food the player carries most of,
 skipping foods eaten in the last 20 minutes, since a food still in effect can't be eaten again. The line also
+<<<<<<< HEAD
 says how much the player's max health went up, so only foods giving about that much health count. A rise of 0
 is a mead, which takes nothing out. Each `Fueled` line takes out one of what that fire burns. Both lists come
 from the plugin: `foods.txt` (`CookedMeat 30`, with the health each food gives) and `fire-fuels.txt`
 (`piece_groundtorch_wood Resin`). Each `Shot` line takes out one arrow or bolt. Wood arrows look the
 same in flight as some other arrows, so their line names each kind it may be: the one in the shooter's bag is
 taken. Coal put in a smelter comes out through its `Smelting` line.
+=======
+says how much the player's max health went up, and the guess takes the first of these that fits:
+
+| The meal added | Food taken | Example |
+| --- | --- | --- |
+| About what one carried food gives | That food | +24 is a grilled neck tail (25) |
+| Less than a food eaten before gives, but at least a fifth of it | That food, eaten again to top it up | +12, 14 minutes after a deer stew (45) |
+| What two carried foods give together | Both, eaten one right after the other | +68 is a deer stew (45) and a boar jerky (23) |
+| 0 | The mead carried most, since a mead gives no health | +0 with 9 healing meads and 2 stamina meads is a healing mead |
+| Something no carried food fits | Nothing: the food is not in the guess | |
+
+Each `Fueled` line takes out one of what that fire burns. Both lists come
+from the plugin: `foods.txt` (`CookedMeat 30`, with the health each food gives, and `MeadHealthMinor 0` for a mead) and `fire-fuels.txt`
+(`piece_groundtorch_wood Resin`). Each `Shot` line takes out one arrow or bolt, and coal put in a smelter comes
+out through its `Smelting` line.
+>>>>>>> origin/main
 
 Items on the ground have an ID, the game's object ID. The same ID is on the drop and the pickup, so an item
 counts once however often it is seen:
@@ -555,7 +572,7 @@ Every log lives in `C:\Valheim Server`.
 | `item-stacks.txt` | The event log plugin, once per start: the most of each item one slot holds |
 | `piece-costs.txt` | The event log plugin, once per start: what building each piece takes |
 | `craft-costs.txt` | The event log plugin, once per start: what crafting or upgrading each item takes |
-| `foods.txt` | The event log plugin, once per start: every item that is food, with the health it gives |
+| `foods.txt` | The event log plugin, once per start: every item a player can eat or drink, with the health it gives (0 for a mead) |
 | `fire-fuels.txt` | The event log plugin, once per start: the item each fire burns |
 | `game-names.txt` | The event log plugin, once per start: the English name the game shows for each item, piece, creature and raid. Every name on the page uses it first, so `AtgeirIron` reads `Iron atgeir` and `army_theelder` reads `The ground is shaking` |
 | `player-vitals.txt` | The event log plugin, when a number changes: health, max health, stamina and eitr of each player online |
