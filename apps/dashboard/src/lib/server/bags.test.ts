@@ -326,14 +326,17 @@ describe('updateBags', () => {
     expect(bag).toEqual({ CookedMeat: 3, Honey: 2, Wood: 10 });
   });
 
-  it('takes out the food giving the health a meal added, and nothing for a mead or a food it does not carry', () => {
-    // GIVEN cooked meat gives 30 health and honey 8, and Ragnar carries 5 meat and 3 honey, eats something that adds
-    // 8 max health, drinks a mead, then eats something adding 50, which no food he carries gives
-    state.foods = { CookedMeat: 30, Honey: 8 };
+  it('takes out the food giving the health a meal added, a mead when it added none, and nothing for a food it does not carry', () => {
+    // GIVEN cooked meat gives 30 health, honey 8 and meads none, and Ragnar carries 5 meat, 3 honey, 9 healing meads
+    // and 2 stamina meads, eats something that adds 8 max health, drinks a mead, then eats something adding 50, which
+    // no food he carries gives
+    state.foods = { CookedMeat: 30, Honey: 8, MeadHealthMinor: 0, MeadStaminaMinor: 0 };
     readLines(state, [
       ...RUN_START,
       logLine('03:00:00', 'Picked up: CookedMeat x5 by Ragnar'),
       logLine('03:00:01', 'Picked up: Honey x3 by Ragnar'),
+      logLine('03:00:02', 'Taken: MeadHealthMinor x9 from piece_chest_wood by Ragnar'),
+      logLine('03:00:03', 'Taken: MeadStaminaMinor x2 from piece_chest_wood by Ragnar'),
       logLine('03:10:00', 'Ate something: Ragnar (max health +8)'),
       logLine('03:11:00', 'Ate something: Ragnar (max health +0)'),
       logLine('03:12:00', 'Ate something: Ragnar (max health +50)'),
@@ -342,8 +345,8 @@ describe('updateBags', () => {
     // WHEN his bag is read
     const bag = state.snapshot.bags['Ragnar'];
 
-    // THEN honey went though he carries more meat, and the mead and the unknown food took nothing
-    expect(bag).toEqual({ CookedMeat: 5, Honey: 2 });
+    // THEN honey went though he carries more meat, the mead he carries most of went, and the unknown food took nothing
+    expect(bag).toEqual({ CookedMeat: 5, Honey: 2, MeadHealthMinor: 8, MeadStaminaMinor: 2 });
   });
 
   it('takes out two foods when one meal adds the health of both', () => {

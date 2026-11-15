@@ -179,7 +179,10 @@ export type ServerState = {
   pickedUpItemIds: Set<string>;
   /** Who dropped each item now on the ground this run, by item ID, so a pickup by someone else can name them. */
   droppers: Map<string, string>;
-  /** The health each food gives, by food, from the plugin's foods file, for example `{ CookedMeat: 30 }`, or 0 when not known. */
+  /**
+   * The health each food or drink gives, by item, from the plugin's foods file, for example `{ CookedMeat: 30 }`:
+   * 0 for a mead, and for every food when an older plugin wrote the file without the health.
+   */
   foods: Record<string, number>;
   /** The item each fire burns, by fire prefab, from the plugin's fire fuels file, for example `{ piece_groundtorch_wood: 'Resin' }`. */
   fireFuels: Record<string, string>;
@@ -243,7 +246,10 @@ export const CRAFT_COST_LINE_PATTERN = /^(?<item>\S+) (?<level>\d+) (?<yields>\d
 /** Name of the plugin's file next to the log with every food, one per line. */
 export const FOODS_FILE_NAME = 'foods.txt';
 
-/** One line of the foods file, for example `CookedMeat 30` with the health it gives, or `CookedMeat` from older plugins. */
+/**
+ * One line of the foods file, for example `CookedMeat 30` with the health it gives, `MeadHealthMinor 0` for a mead,
+ * or `CookedMeat` from older plugins.
+ */
 export const FOOD_LINE_PATTERN = /^(?<item>\S+)(?: (?<health>\d+))?$/;
 
 /** Name of the plugin's file next to the log with the item each fire burns. */
