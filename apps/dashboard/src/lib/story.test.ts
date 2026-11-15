@@ -262,6 +262,26 @@ describe('storyOf', () => {
     ]);
   });
 
+  it('counts hits and kills whose names read the same as one entry', () => {
+    // GIVEN Ragnar hit and killed two kinds of greyling that read as the same name
+    const at = { player: 'Ragnar', startUtc: '2026-10-29T10:00:00.000Z', source: NO_LINES };
+    const snapshot = snapshotWith({
+      activities: [
+        { kind: 'landed', endUtc: '2026-10-29T10:02:00.000Z', things: { 'AxeBronze on Greyling': 2, 'AxeBronze on greyling': 3 }, ...at },
+        { kind: 'killed', endUtc: '2026-10-29T10:01:00.000Z', things: { Greyling: 1, Neck: 2, greyling: 2 }, ...at },
+      ],
+    });
+
+    // WHEN the story is made
+    const story = storyOf(snapshot);
+
+    // THEN each name shows once with the counts added up
+    expect(story.map((item) => item.text)).toEqual([
+      'Ragnar landed 5 hits: 5 axe bronze on greyling',
+      'Ragnar killed 5 creatures: 3 greyling, 2 neck',
+    ]);
+  });
+
   it('leaves the time out when a player took the wheel only once', () => {
     // GIVEN Ragnar took the wheel of a longship once
     const snapshot = snapshotWith({

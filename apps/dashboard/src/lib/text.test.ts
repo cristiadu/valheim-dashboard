@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { areaLabel, areaName, count, listText, raidName, setGameNames, thingList, thingName, withArticle } from '#/lib/text';
+import { areaLabel, areaName, count, listText, namedList, raidName, setGameNames, thingList, thingName, withArticle } from '#/lib/text';
 
 describe('count', () => {
   it('uses the single word only for one', () => {
@@ -56,6 +56,19 @@ describe('thingList', () => {
     // GIVEN a stretch of building
     // WHEN / THEN the most built piece comes first
     expect(thingList({ wood_fence: 8, piece_workbench: 1, wood_floor_1x1: 14 })).toBe('14 wood floor 1x1, 8 wood fence, 1 workbench');
+  });
+});
+
+describe('namedList', () => {
+  it('counts keys with the same name together', () => {
+    // GIVEN kills of two kinds of skeleton and a neck
+    const kills = { Skeleton_NoArcher: 2, Neck: 3, Skeleton: 2 };
+
+    // WHEN the list is made with a name the two skeletons share
+    const list = namedList(kills, (creature) => (creature.startsWith('Skeleton') ? 'skeleton' : 'neck'));
+
+    // THEN the skeletons are one entry, and the most killed comes first
+    expect(list).toBe('4 skeleton, 3 neck');
   });
 });
 
