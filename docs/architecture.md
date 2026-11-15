@@ -234,8 +234,9 @@ says how much the player's max health went up, and the guess takes the first of 
 
 Each `Fueled` line takes out one of what that fire burns. Both lists come
 from the plugin: `foods.txt` (`CookedMeat 30`, with the health each food gives, and `MeadHealthMinor 0` for a mead) and `fire-fuels.txt`
-(`piece_groundtorch_wood Resin`). Each `Shot` line takes out one arrow or bolt, and coal put in a smelter comes
-out through its `Smelting` line.
+(`piece_groundtorch_wood Resin`). Each `Shot` line takes out one arrow or bolt. Wood arrows look the
+same in flight as some other arrows, so their line names each kind it may be: the one in the shooter's bag is
+taken. Coal put in a smelter comes out through its `Smelting` line.
 
 Items on the ground have an ID, the game's object ID. The same ID is on the drop and the pickup, so an item
 counts once however often it is seen:

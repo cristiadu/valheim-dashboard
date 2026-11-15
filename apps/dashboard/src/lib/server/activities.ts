@@ -3,6 +3,7 @@ import type { LogEvent } from 'valheim-log';
 import { ACTIVITY_STORY_KINDS, type ActivityKind, HIT_ON, UNKNOWN_FOOD, UNKNOWN_STATION } from '#/lib/models/activities';
 import type { Snapshot } from '#/lib/models/snapshot';
 import { characterOfSteamName } from '#/lib/players';
+import { shotItemOf } from '#/lib/server/bags';
 import { pushCapped } from '#/lib/server/lists';
 import { addLineUnder, addSourceLine } from '#/lib/server/log-sources';
 import { ACTIVITY_GAP_MS, MAX_ACTIVITIES, type ServerState } from '#/lib/server/models';
@@ -129,7 +130,7 @@ export const addActivityOf = (state: ServerState, event: LogEvent, line: string)
       addActivity(snapshot, line, timeUtc, event.player, 'obliterated', event.item, event.count);
       break;
     case 'shot':
-      addActivity(snapshot, line, timeUtc, event.player, 'shot', event.item, 1);
+      addActivity(snapshot, line, timeUtc, event.player, 'shot', shotItemOf(snapshot, event), 1);
       break;
     case 'moves':
       if (event.move === 'jumped') {

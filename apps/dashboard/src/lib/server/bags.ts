@@ -277,6 +277,16 @@ const fitBag = (snapshot: Snapshot, character: string, sure: Record<string, numb
   }
 };
 
+/**
+ * Returns the ammo [event], a shot, used. Some ammo looks the same in flight, so the log names each kind it may be:
+ * it is then the first of them in the shooter's bag in [snapshot], oldest touched first, as a bow uses the first
+ * it finds, or else the first one named.
+ */
+export const shotItemOf = (snapshot: Snapshot, event: Extract<LogEvent, { type: 'shot' }>): string => {
+  const bag = event.player === null ? {} : (snapshot.bags[event.player] ?? {});
+  return Object.keys(bag).find((item) => event.items.includes(item)) ?? event.items[0]!;
+};
+
 /** Returns the item [event] takes out of a bag on purpose, so worn gear moved away is not put back, or null. */
 const movedItemOf = (event: LogEvent): string | null => {
   switch (event.type) {
@@ -361,8 +371,10 @@ export const updateBags = (state: ServerState, event: LogEvent): void => {
       break;
     case 'foodStarted':
     case 'itemHung':
-    case 'shot':
       takeOut(state, character, event.item, 1);
+      break;
+    case 'shot':
+      takeOut(state, character, shotItemOf(snapshot, event), 1);
       break;
     case 'fueled': {
       const fuel = state.fireFuels[event.fire];

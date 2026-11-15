@@ -91,7 +91,7 @@ export type LogEvent = { timeUtc: string } & (
   | { type: 'tameFollowing'; creature: string; player: string }
   | { type: 'cartPulled'; player: string | null; cart: string }
   | { type: 'obliterated'; item: string; count: number; player: string | null }
-  | { type: 'shot'; item: string; player: string | null }
+  | { type: 'shot'; items: string[]; player: string | null }
   | { type: 'moves'; character: string; move: MoveKind; item: string | null; target: string | null; count: number }
   | { type: 'fueled'; fire: string; player: string | null }
   | { type: 'repaired'; piece: string; player: string | null }
