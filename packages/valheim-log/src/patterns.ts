@@ -231,10 +231,11 @@ export const OBLITERATED_PATTERN = /^Obliterated: (?<item>\S+) x(?<count>\d+) in
 
 /**
  * How many times a player dodged, jumped, was staggered or landed a hit with a weapon on a kind of creature in the last
- * minute. Written by the event log plugin.
+ * minute. Written by the event log plugin. Plugin 2.27.0 logged the hit that killed a creature on the sound or effect
+ * that took its place, such as `sfx_sword_swing`. Those lines are left out.
  */
 export const MOVES_PATTERN =
-  /^Moves: (?<character>.+?) (?:(?<move>dodged|jumped|staggered)|landed (?<item>\S+) on (?<target>\S+)) x(?<count>\d+)$/;
+  /^Moves: (?<character>.+?) (?:(?<move>dodged|jumped|staggered)|landed (?<item>\S+) on (?<target>(?!(?:s|v)?fx_)\S+)) x(?<count>\d+)$/;
 
 /**
  * A player shot an arrow, a bolt or other ammo. When several kinds of ammo look the same in flight, the line names

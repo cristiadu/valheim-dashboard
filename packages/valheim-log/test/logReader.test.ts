@@ -601,6 +601,17 @@ describe('parseMessage', () => {
     expect(events.map((event) => event.type)).toEqual(['chatMessage', 'chatMessage']);
   });
 
+  it('leaves out a hit logged on a sound or an effect', () => {
+    // GIVEN hits plugin 2.27.0 logged on what took the place of a creature that died
+    const messages = ['Moves: Ragnar landed SwordBronze on sfx_sword_swing x1', 'Moves: Ragnar landed SwordBronze on vfx_neck_death x1'];
+
+    // WHEN each message is read
+    const events = messages.map((message) => parseMessage(message, '2026-01-01T00:00:00.000Z'));
+
+    // THEN neither counts as a move
+    expect(events.map((event) => event.type)).toEqual(['otherLine', 'otherLine']);
+  });
+
   it('keeps an unknown message as another line', () => {
     // WHEN an upkeep message is read
     const event = parseMessage('Update PlayFab entity token', '2026-01-01T00:00:00.000Z');

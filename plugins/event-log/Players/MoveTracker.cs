@@ -58,11 +58,15 @@ namespace ValheimDashboard.EventLog
         /// </summary>
         private static readonly Dictionary<long, Queue<float>> OthersHits = new Dictionary<long, Queue<float>>();
 
-        /// <summary>Creatures the last scan found.</summary>
-        private static List<ZDO> creatures = new List<ZDO>();
+        /// <summary>
+        /// Creatures the last scan found: each one's object, ID, prefab name and where it stood. The game uses the
+        /// object of a dead creature again for something else, such as a sound, so the ID tells whether it still is
+        /// the creature.
+        /// </summary>
+        private static List<(ZDO Object, ZDOID Uid, string Prefab, Vector3 Position)> creatures = new List<(ZDO Object, ZDOID Uid, string Prefab, Vector3 Position)>();
 
         /// <summary>Creatures found by the scan in progress.</summary>
-        private static List<ZDO> scannedCreatures = new List<ZDO>();
+        private static List<(ZDO Object, ZDOID Uid, string Prefab, Vector3 Position)> scannedCreatures = new List<(ZDO Object, ZDOID Uid, string Prefab, Vector3 Position)>();
 
         /// <summary>Game time of the next log, in seconds.</summary>
         private static float nextLogTime;
@@ -72,7 +76,7 @@ namespace ValheimDashboard.EventLog
         {
             if (Names.Has<Character>(zdo) && !Names.Has<Player>(zdo))
             {
-                scannedCreatures.Add(zdo);
+                scannedCreatures.Add((zdo, zdo.m_uid, Names.PrefabName(zdo), zdo.GetPosition()));
             }
         }
 
@@ -192,25 +196,29 @@ namespace ValheimDashboard.EventLog
             {
                 return;
             }
-            ZDO creature = Vector3.Distance(swing.Player.GetPosition(), position) <= ReachMeters ? CreatureAt(position) : null;
+            string creature = Vector3.Distance(swing.Player.GetPosition(), position) <= ReachMeters ? CreatureAt(position) : null;
             if (creature != null)
             {
                 Swings.Remove(data.m_senderPeerID);
-                Count(swing.Player, $"landed {swing.Weapon} on {Names.PrefabName(creature)}");
+                Count(swing.Player, $"landed {swing.Weapon} on {creature}");
             }
         }
 
-        /// <summary>Returns the creature closest to [position], or null when none stands there.</summary>
-        private static ZDO CreatureAt(Vector3 position)
+        /// <summary>
+        /// Returns the prefab name of the creature closest to [position], or null when none stands there. A creature
+        /// the hit killed is gone by now, so it counts where the last scan saw it.
+        /// </summary>
+        private static string CreatureAt(Vector3 position)
         {
-            ZDO closest = null;
+            string closest = null;
             float closestMeters = CreatureSizeMeters;
-            foreach (ZDO creature in creatures)
+            foreach ((ZDO Object, ZDOID Uid, string Prefab, Vector3 Position) creature in creatures)
             {
-                float meters = Vector3.Distance(creature.GetPosition(), position);
+                Vector3 stoodAt = creature.Object.m_uid == creature.Uid ? creature.Object.GetPosition() : creature.Position;
+                float meters = Vector3.Distance(stoodAt, position);
                 if (meters <= closestMeters)
                 {
-                    closest = creature;
+                    closest = creature.Prefab;
                     closestMeters = meters;
                 }
             }
