@@ -216,8 +216,9 @@ be off. Gear worn now always stays in the bag.
 
 When something leaves the bag, or is first seen worn, and the bag never had it, it was crafted where the server
 couldn't see. If it has a recipe, one craft's cost comes out and what it made goes in, so shooting 2 fire arrows
-from an empty bag takes 8 wood, 8 resin and 2 feathers and leaves 18 arrows. A `Made` line that comes later for
-those same items doesn't pay again.
+from an empty bag takes 8 wood, 8 resin and 2 feathers and leaves 18 arrows. Storing is different: a player who
+stores what they made puts the whole pile in the chest, so nothing of it stays in the bag. A `Made` line that
+comes later for those same items doesn't pay again.
 
 A meal takes food out. When the log only says `Ate something`, it is the food the player carries most of,
 skipping foods eaten in the last 20 minutes, since a food still in effect can't be eaten again. The line also

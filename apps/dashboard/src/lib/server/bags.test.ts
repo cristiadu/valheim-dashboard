@@ -227,6 +227,23 @@ describe('updateBags', () => {
     expect(bag).toEqual({ Wood: 2, ArrowWood: 18 });
   });
 
+  it('keeps no leftover of a craft nobody saw when what it made is stored', () => {
+    // GIVEN 20 bronze nails take 1 bronze, and Ragnar takes 10 bronze from a chest, then stores 141 nails nobody saw
+    // him make
+    state.craftCosts = { BronzeNails: { 1: { yields: 20, items: { Bronze: 1 } } } };
+    readLines(state, [
+      ...RUN_START,
+      logLine('03:00:00', 'Taken: Bronze x10 from piece_chest_wood by Ragnar'),
+      logLine('03:00:01', 'Stored: BronzeNails x141 in piece_chest_wood by Ragnar'),
+    ]);
+
+    // WHEN his bag is read
+    const bag = state.snapshot.bags['Ragnar'];
+
+    // THEN 8 crafts took 8 bronze, and none of the 19 nails they made on top of the 141 stay in the bag
+    expect(bag).toEqual({ Bronze: 2 });
+  });
+
   it('does not pay again when the made line comes after the crafted items were stored', () => {
     // GIVEN 20 wood arrows take 8 wood, and Ragnar picks up 16 wood, stores 20 arrows the bag never had, and then
     // the plugin sees those 20 arrows as made
