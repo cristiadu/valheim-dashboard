@@ -30,7 +30,7 @@
     "@types/node": "26.6.6",
     "@vitest/coverage-v8": "5.1.0",
     "eslint": "10.13.0",
-    "eslint-plugin-svelte": "3.24.0",
+    "eslint-plugin-svelte": "3.24.1",
     "globals": "17.14.0",
     "svelte": "5.57.3",
     "svelte-check": "4.7.7",
