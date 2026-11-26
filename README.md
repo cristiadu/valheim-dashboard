@@ -12,21 +12,13 @@ world last saved. It also has a recipe planner for working out what you still ne
 
 You need [Node.js](https://nodejs.org) 26 or newer on the server PC.
 
-**Whenever anything is down, double-click `scripts\start-valheim.cmd`.** It starts whatever is not running
-and leaves the rest alone, so it is always safe to run:
-
-| Part | Window | What it does |
-| --- | --- | --- |
-| Game server | `Valheim server` | `start_headless_server.bat` |
-| Dashboard | `Valheim dashboard` | Builds the dashboard the first time, runs it on http://localhost:3000, and starts it again 5 seconds after it stops |
-| Link | `Valheim dashboard link (zrok)` | Shares the dashboard with friends, and starts again 30 seconds after zrok stops |
-| Updater | `Valheim dashboard updater` | Checks `main` every 5 minutes. It pulls, rebuilds and restarts the dashboard, and installs a changed event log plugin when nobody is online. It only takes a commit once CI passed on it |
-
-It also makes Windows run it at every logon, and installs the pnpm version in `package.json` and zrok when
-they are missing. Closing a window stops that part until the next run. `start-valheim.cmd -Remove` stops
-starting at logon. Logs go next to the server's `C:\Valheim Server\logs.txt`.
-
-Only this PC can open http://localhost:3000. Friends use the shared link.
+**Double-click `scripts\start-valheim.cmd`.** It starts the dashboard and the friends' link when they are
+not already running, then checks `main` every 5 minutes. A commit that changes the dashboard or its packages
+rebuilds and restarts the dashboard.
+When the event log plugin changed and nobody is online, it builds the plugin, asks the game server to save
+and exit, copies the DLL in, and starts the server again. It only takes a commit once CI passed on it. The
+first check builds the dashboard once and records the plugin already installed. Logs go next to
+`C:\Valheim Server\logs.txt`.
 
 ## Share it with friends
 

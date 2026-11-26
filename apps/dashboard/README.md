@@ -26,9 +26,12 @@ Then open `http://localhost:3000`.
 
 ### Keep it running
 
-`scripts/start-valheim.ps1` starts the dashboard in its own window with the game server, the link and the
-updater. It builds the dashboard if there is no build yet, and starts it again 5 seconds after it stops. Its
-output goes to `dashboard.log`, in the same folder as the server's `logs.txt`.
+`scripts/start-valheim.ps1` starts the dashboard in its own window, shares it with zrok, and checks `main`
+every 5 minutes. A commit that changes the dashboard or its packages rebuilds and restarts it. When the event log plugin changed and
+nobody is online, it installs that plugin on the game server. It builds the dashboard if there is no build
+yet, and starts it again 5 seconds after it stops. Its output goes to `dashboard.log`, in the same folder as
+the server's `logs.txt`. The start script sets `HOST` to `127.0.0.1` and `DASHBOARD_PASSWORD` from the
+Valheim server's `-password` in `start_headless_server.bat`.
 
 ```powershell
 .\scripts\start-valheim.ps1
