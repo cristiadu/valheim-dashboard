@@ -25,7 +25,7 @@ flowchart LR
 | `packages/valheim-log` | Turns log lines into game events and player sessions. No files, no network. |
 | `apps/dashboard` | SvelteKit app on Node. Follows `logs.txt` and serves the page. |
 | `plugins/event-log` | BepInEx plugin on the server only. Logs what the game does not. Friends install nothing. |
-| `scripts` | Start the dashboard, keep it running and update it from `main` on Windows, and share it through zrok. |
+| `scripts` | On Windows, run the dashboard, share it through zrok, and keep the dashboard and the event log plugin in sync with `main`. |
 | `docs/log-events.md` | Every log line the dashboard reads, with its regex. |
 
 ## Reading a log line
@@ -466,41 +466,18 @@ BepInEx's own log file is turned off, so its messages land in
 
 ## Start script
 
-`start-valheim.ps1` is the one script that starts everything, by hand (`start-valheim.cmd`) or from the
-`Valheim` logon task it adds. Each part gets its own window, and a part that already runs is left alone.
-
-```mermaid
-flowchart TD
-  start[start-valheim.cmd or the Valheim logon task] --> server{Game server running?}
-  server -->|no| s[start_headless_server.bat in its window]
-  server -->|yes| dash
-  s --> dash{Dashboard window open?}
-  dash -->|no| d[Stop a dashboard without a window, open the Dashboard window]
-  dash -->|yes| link
-  d --> link{zrok running?}
-  link -->|no| l[Open the Link window]
-  link -->|yes| upd
-  l --> upd{Updater window open?}
-  upd -->|no| u[Open the Updater window]
-```
+`start-valheim.ps1`, started by hand with `start-valheim.cmd`, opens the dashboard and the zrok link when
+they are not already running, then keeps both the dashboard and the event log plugin in sync with `main`.
+A second updater exits. It does not start the game server except to load a new plugin.
 
 | Window | Loop |
 | --- | --- |
 | Dashboard | Build if there is none, run node, wait 5 s after it stops, run it again |
 | Link | Delete a leftover share on the link's name, run zrok, wait 30 s after it stops, run it again |
-| Updater | Run one update as its own PowerShell, wait 5 minutes, again |
-
-Run by hand, it installs pnpm and zrok when they are missing, adds the logon task, and then starts that task
-instead of the windows. The windows then belong to Task Scheduler, not to whatever ran the script: windows
-started from an app's shell close when that app quits or updates. From the task it installs nothing.
+| Updater | Check `main`, wait 5 minutes, again |
 
 A share zrok had when the PC shut down keeps the link's name, and zrok refuses a new share on that name. With
 no other zrok running, that share is stale, so the Link window deletes it first.
-
-## Updates from main
-
-The Updater window runs one update every 5 minutes. Each is its own PowerShell, so a failed update never
-stops the loop, and each reads the script as `main` has it now.
 
 ```mermaid
 flowchart TD
@@ -512,9 +489,9 @@ flowchart TD
   fetch --> ci{CI passed on the newest main commit?}
   ci -->|yes| pull[Fast-forward to it]
   ci -->|no| stay[Stay on the current commit]
-  pull --> dash{Dashboard built from this commit?}
+  pull --> dash{Dashboard inputs changed since the running build?}
   stay --> dash
-  dash -->|no| build[pnpm install and build, stop node] --> loop[Start script starts node again]
+  dash -->|no| build[pnpm install and build, stop node] --> loop[Dashboard window starts node again]
   dash -->|yes| plugin
   loop --> plugin{Plugin files changed since the installed plugin?}
   plugin -->|no| done[Done]
@@ -526,17 +503,18 @@ flowchart TD
 
 | Step | How |
 | --- | --- |
-| Who is online | Sessions without an end in `/api/status`. |
-| Stopping the game server | Ctrl+C sent to its console, as in its window. The game saves the world and exits. |
+| Who is online | Sessions without an end in `/api/status` on the dashboard. |
+| Stopping the game server | Ctrl+C sent to its console, as in its window. The game saves the world and exits. That send runs in its own PowerShell, because attaching to the server's console detaches from this one. |
 | Starting the game server | `start_headless_server.bat` in its own console window, in the foreground. A server that was already stopped stays stopped. |
+| Dashboard inputs | `apps/dashboard/`, `packages/valheim-log/`, `package.json`, `pnpm-lock.yaml` and `pnpm-workspace.yaml` in the commit's diff. Any other commit leaves the dashboard running as it is. |
 | Remembering what is installed | `updater-state.json` keeps the commit of the running dashboard and of the installed plugin. A step that fails or waits runs again on the next pass. |
 
-The first run takes the installed plugin as current and builds the dashboard once.
+The first run builds the dashboard once and takes the installed plugin as current.
 
 ### What it trusts
 
-Whatever reaches `main` runs on the server PC as its Windows user, with nobody watching: the build scripts,
-the plugin build and the plugin inside the game server. These keep that to reviewed code.
+Whatever reaches `main` runs on the server PC as its Windows user: the dashboard build, the plugin build and
+the plugin inside the game server. These keep that to reviewed code.
 
 | Guard | What it stops |
 | --- | --- |
@@ -575,27 +553,21 @@ The dashboard also reads the world save, `worlds_local\Cotil\_main.<save number>
 
 ```mermaid
 flowchart LR
-  pr[Pull request or push to main] --> install[pnpm install] --> check[pnpm check] --> lint[pnpm lint] --> coverage[pnpm coverage] --> build[pnpm build] --> scripts[Measure-Coverage.ps1]
-  scripts --> summary[Run summary]
-  scripts --> comment[Comment on the pull request]
+  pr[Pull request or push to main] --> install[pnpm install] --> check[pnpm check] --> lint[pnpm lint] --> coverage[pnpm coverage] --> build[pnpm build]
 ```
 
 `pnpm coverage` runs each project's tests twice, once per kind, and writes what they ran to
-`coverage/<kind>/cobertura-coverage.xml` in that project. `scripts\Measure-Coverage.ps1` does the same for the
-PowerShell scripts with Pester 6.2.0, then turns all those files into one table.
+`coverage/<kind>/cobertura-coverage.xml` in that project.
 
 | Test kind | What it checks | Files |
 | --- | --- | --- |
-| Unit | One source file at a time | `*.test.ts`, `*.Tests.ps1` |
-| Integration | Several parts together on real files, for example the dashboard following a log folder in a temp folder, or the updater on a throwaway git checkout | `*.integration.test.ts`, `*.Integration.Tests.ps1` |
+| Unit | One source file at a time | `*.test.ts` |
+| Integration | Several parts together on real files, for example the dashboard following a log folder in a temp folder | `*.integration.test.ts` |
 
-The comment is updated on each push, so a pull request has one. Dependabot's pull requests get only the summary,
-since their token cannot comment. The event log plugin is not measured: it builds only against the game's own files.
+The event log plugin is not measured: it builds only against the game's own files.
 
 `pnpm lint` runs ESLint in each project. Besides the recommended TypeScript and Svelte rules, it rejects
 relative imports (use `#/`), `function` declarations, `.then()`, `console` and `if` without braces.
-
-On the PC, `Invoke-Pester scripts` runs both kinds of script tests.
 
 Dependabot opens weekly upgrade PRs for npm packages and GitHub Actions, for versions out for 7 days. The plugin is built on the
 server PC, not in CI.
