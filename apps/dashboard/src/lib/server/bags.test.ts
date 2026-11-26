@@ -68,6 +68,36 @@ describe('updateBags', () => {
     expect(bag).toEqual({ ArrowFire: 18, Coal: 7 });
   });
 
+  it('takes a shot that may be several kinds of arrow from the kind in the bag', () => {
+    // GIVEN Ragnar takes 49 wood arrows from a chest and shoots twice, and wood, bronze and iron arrows may look the
+    // same in flight
+    readLines(state, [
+      ...RUN_START,
+      logLine('03:00:00', 'Taken: ArrowWood x49 from piece_chest_wood by Ragnar'),
+      logLine('03:00:01', 'Shot: ArrowBronze/ArrowWood/ArrowIron by Ragnar'),
+      logLine('03:00:02', 'Shot: ArrowBronze/ArrowWood/ArrowIron by Ragnar'),
+    ]);
+
+    // WHEN his bag and his arrows shot are read
+    const bag = state.snapshot.bags['Ragnar'];
+    const shot = state.snapshot.activities.find((activity) => activity.kind === 'shot')?.things;
+
+    // THEN both shots were wood arrows
+    expect(bag).toEqual({ ArrowWood: 47 });
+    expect(shot).toEqual({ ArrowWood: 2 });
+  });
+
+  it('takes a shot that may be several kinds of arrow from the first kind named when the bag has none', () => {
+    // GIVEN Ragnar shoots an arrow that may be bronze or iron with an empty bag, and no recipe is known
+    readLines(state, [...RUN_START, logLine('03:00:00', 'Shot: ArrowBronze/ArrowIron by Ragnar')]);
+
+    // WHEN his arrows shot are read
+    const shot = state.snapshot.activities.find((activity) => activity.kind === 'shot')?.things;
+
+    // THEN the shot counts as the first kind named
+    expect(shot).toEqual({ ArrowBronze: 1 });
+  });
+
   it('empties the bag into the tombstone on death and fills it again when the tombstone is emptied', () => {
     // GIVEN Ragnar carries stone, dies with a sword and coins, then empties his tombstone
     readLines(state, [
