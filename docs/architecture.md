@@ -9,7 +9,7 @@ flowchart LR
     game[Valheim server] -->|writes| log[logs.txt]
     plugin[Event log plugin] -->|adds game event lines| log
     log --> dash[Dashboard]
-    dash -->|copies each run| hist[log-history folder]
+    plugin -->|copies each run, even while the dashboard is off| hist[log-history folder]
     hist -->|read on start| dash
     game -->|saves| save[World save]
     save -->|bosses defeated| dash
@@ -59,16 +59,13 @@ sequenceDiagram
   participant T as Log reader
   participant L as logs.txt
   participant S as Server state
-  participant H as log-history
   loop every 2 s
     T->>L: Read new bytes only
     L-->>T: New lines
     T->>S: Each line
-    T->>H: Same lines, to this run's copy
   end
   Note over T,L: File got shorter: the server restarted
   T->>S: End the run, close open sessions
-  T->>H: Start a new copy
 ```
 
 | A run ends as | When |
@@ -88,8 +85,10 @@ flowchart TD
   state --> follow
 ```
 
-The server overwrites `logs.txt` on each start, so `log-history` keeps every run. Copies are named by the
-run's first line, for example `20261030-154346.txt`.
+The server overwrites `logs.txt` on each start, so `log-history` keeps every run. The event log plugin writes
+the copies every 5 seconds and when the server stops, so a run is kept even when the dashboard was not running.
+Copies are named by the run's first line, for example `20261030-154346.txt`. The dashboard only reads them: every
+run it has not read yet comes in when it starts.
 
 ## Live updates to the page
 
@@ -533,7 +532,7 @@ Every log lives in `C:\Valheim Server`.
 | File | Written by |
 | --- | --- |
 | `logs.txt` | The Valheim server, the event log plugin and BepInEx |
-| `log-history\*.txt` | The dashboard, one file per server run |
+| `log-history\*.txt` | The event log plugin, one file per server run |
 | `dashboard.log` | The Dashboard window, with the dashboard's output |
 | `updater.log` | The Updater window: what it updated, skipped or is waiting for |
 | `updater-state.json` | The Updater window: commits of the running dashboard and the installed plugin |

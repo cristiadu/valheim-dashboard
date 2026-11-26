@@ -4,7 +4,7 @@ import type { SnapshotChange } from '#/lib/models/app';
 import type { Snapshot } from '#/lib/models/snapshot';
 import { readConfig } from '#/lib/server/config';
 import { readCraftCosts, readFireFuels, readFoods, readGameNames, readItemStacks, readPieceCosts } from '#/lib/server/game-data';
-import { firstRunKey, LogHistory, readHistory } from '#/lib/server/log-history';
+import { firstRunKey, readHistory } from '#/lib/server/log-history';
 import { LogTail } from '#/lib/server/log-tail';
 import { logger } from '#/lib/server/logger';
 import {
@@ -135,13 +135,12 @@ const readPlayerVitals = async (follower: Follower): Promise<void> => {
   }
 };
 
-/** Reads the new lines once and copies them to the history, then tells the listeners what changed if any arrived. */
+/** Reads the new lines once, then tells the listeners what changed if any arrived. */
 const poll = async (follower: Follower): Promise<void> => {
   try {
     await follower.tail.poll();
-    await follower.history.flush();
   } catch (error) {
-    logger.error(`Could not read or copy ${follower.logFile}: ${String(error)}`);
+    logger.error(`Could not read ${follower.logFile}: ${String(error)}`);
   }
   await readSavedBosses(follower);
   await readWorldTerrain(follower);
@@ -187,12 +186,10 @@ const start = async (): Promise<Follower> => {
   if (state.snapshot.startedUtc !== null) {
     startNewLog(state);
   }
-  const history = new LogHistory(historyFolder);
   const follower: Follower = {
     logFile: config.logFile,
     folder,
     state,
-    history,
     hasNewLines: false,
     sentSnapshot: structuredClone(state.snapshot),
     worldSaveRead: null,
@@ -203,13 +200,9 @@ const start = async (): Promise<Follower> => {
     tail: new LogTail(config.logFile, {
       onLine: (line) => {
         readLogLine(state, line);
-        history.record(line);
         follower.hasNewLines = true;
       },
-      onNewFile: () => {
-        startNewLog(state);
-        history.startNewRun();
-      },
+      onNewFile: () => startNewLog(state),
     }),
   };
   await poll(follower);

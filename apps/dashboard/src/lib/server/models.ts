@@ -1,7 +1,6 @@
 import type { LogReader, SessionState } from 'valheim-log';
 
 import type { Snapshot } from '#/lib/models/snapshot';
-import type { LogHistory } from '#/lib/server/log-history';
 import type { LogTail } from '#/lib/server/log-tail';
 
 /** Where the server writes its log when no `LOG_FILE` is set. */
@@ -9,7 +8,8 @@ export const DEFAULT_LOG_FILE = 'C:\\Valheim Server\\logs.txt';
 
 /**
  * Folder next to the server's log that keeps a copy of every run's log, named by the run's first line, for
- * example `20261030-154344.txt`. The server writes a new `logs.txt` on every start, so this is the history.
+ * example `20261030-154344.txt`. The server writes a new `logs.txt` on every start, so this is the history. The
+ * event log plugin writes the copies, so runs are kept while the dashboard is not running.
  */
 export const HISTORY_FOLDER_NAME = 'log-history';
 
@@ -308,8 +308,6 @@ export type Follower = {
   folder: string;
   /** Reads the new lines. */
   tail: LogTail;
-  /** Keeps a copy of the run in the history folder. */
-  history: LogHistory;
   /** What the lines built so far. */
   state: ServerState;
   /** True when lines arrived since the listeners were last told. */
