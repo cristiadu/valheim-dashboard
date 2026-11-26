@@ -59,7 +59,7 @@ flowchart TD
 ```
 
 - Log times are the server PC's clock. They are stored in UTC and shown in each viewer's time zone.
-- History stays in memory while the dashboard runs. It survives server restarts, not dashboard restarts.
+- The event log plugin copies each run's log into log-history next to logs.txt, whether or not the dashboard is running. When the dashboard starts it reads every run there, then follows logs.txt. A run is lost only if the server ran without the plugin.
 
 ## Recipes tab
 

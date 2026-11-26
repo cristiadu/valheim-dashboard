@@ -1,4 +1,4 @@
-import { appendFile, mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
+import { readdir, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
 import { runKeyOf } from 'valheim-log';
@@ -13,57 +13,6 @@ const missingOr = <T>(path: string, error: NodeJS.ErrnoException, fallback: T): 
   }
   return fallback;
 };
-
-/**
- * Keeps a copy of the current run's log in the history folder, so the run survives the server writing a new
- * `logs.txt`. Lines wait in memory until the run's first timestamped line names the file.
- */
-export class LogHistory {
-  /** Copy of the current run, once its first timestamped line arrived. */
-  private runFile: string | null = null;
-  /** True until the first write to [runFile], which replaces any older copy of the same run. */
-  private isRunFileNew = true;
-  /** Lines not written yet. */
-  private pendingLines: string[] = [];
-
-  /**
-   * Creates a history in [folder].
-   * @param folder History folder, created on the first write.
-   */
-  constructor(private readonly folder: string) {}
-
-  /** Remembers [line] of the current run for the next [flush]. */
-  record(line: string): void {
-    const runKey = this.runFile === null ? runKeyOf(line) : null;
-    if (runKey !== null) {
-      this.runFile = join(this.folder, `${runKey}${RUN_FILE_EXTENSION}`);
-    }
-    this.pendingLines.push(line);
-  }
-
-  /** Starts a new run: the server replaced `logs.txt`. */
-  startNewRun(): void {
-    this.runFile = null;
-    this.isRunFileNew = true;
-    this.pendingLines = [];
-  }
-
-  /** Writes the remembered lines to the run's copy. Waits while the run has no name yet. */
-  async flush(): Promise<void> {
-    if (this.runFile === null || this.pendingLines.length === 0) {
-      return;
-    }
-    const text = `${this.pendingLines.join('\n')}\n`;
-    this.pendingLines = [];
-    await mkdir(this.folder, { recursive: true });
-    if (this.isRunFileNew) {
-      this.isRunFileNew = false;
-      await writeFile(this.runFile, text);
-    } else {
-      await appendFile(this.runFile, text);
-    }
-  }
-}
 
 /** Returns the first run key in the log at [logFile], or null when it is missing or has no timestamp yet. */
 export const firstRunKey = async (logFile: string): Promise<string | null> => {
