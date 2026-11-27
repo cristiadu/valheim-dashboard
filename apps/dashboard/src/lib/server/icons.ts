@@ -5,6 +5,7 @@ import { iconItems } from '#/lib/gear';
 import { itemName } from '#/lib/items';
 import { iconFileName } from '#/lib/recipes';
 import { readConfig } from '#/lib/server/config';
+import { gameIconUrl } from '#/lib/server/game-icons';
 import { logger } from '#/lib/server/logger';
 import { ICON_FOLDER_NAME, WIKI_API_URL, WIKI_ICON_FILES, WIKI_ITEMS_PER_REQUEST, type WikiImageResponse } from '#/lib/server/models';
 
@@ -14,7 +15,8 @@ const missingOnWiki = new Set<string>();
 /**
  * Returns the wiki file titles that may hold the icon of [item], best first: the known file name when there is one,
  * else the name as the game writes it (`File:Deer_hide.png`), with every word capitalized (`File:Deer_Hide.png`) and
- * with only the first word capitalized (`File:Wooden_mace.png`). A colon becomes a dash, as in the wiki's
+ * with only the first word capitalized (`File:Wooden_mace.png`). A length keeps its `m` lowercase (`File:Wood_Beam_1_m.png`)
+ * and is also tried against the number (`File:Decorated_Timber_Beam_2m.png`). A colon becomes a dash, as in the wiki's
  * `File:Mead_Base_-_Tasty.png` for `Mead Base: Tasty`.
  */
 export const wikiTitlesOf = (item: string): string[] => {
@@ -25,7 +27,12 @@ export const wikiTitlesOf = (item: string): string[] => {
   const words = item.replaceAll(': ', ' - ').split(' ');
   const titled = words.map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join('_');
   const sentence = [words[0], ...words.slice(1).map((word) => word.toLowerCase())].join('_');
-  return [...new Set([`File:${words.join('_')}.png`, `File:${titled}.png`, `File:${sentence}.png`])];
+  // A length such as `2 m` is `2 m` on some wiki files and `2m` on others, and the m stays lowercase.
+  const unit = words
+    .map((word) => (word.length === 1 ? word.toLowerCase() : word.charAt(0).toUpperCase() + word.slice(1)))
+    .join('_');
+  const tight = unit.replace(/_(\d+)_m\b/g, '_$1m');
+  return [...new Set([`File:${words.join('_')}.png`, `File:${titled}.png`, `File:${sentence}.png`, `File:${unit}.png`, `File:${tight}.png`])];
 };
 
 /** Asks the wiki for the image address of each of [items]' icons. Items without an icon on the wiki are left out. */
@@ -51,6 +58,11 @@ const imageUrls = async (items: string[]): Promise<Map<string, string>> => {
       .find((found) => found !== undefined);
     if (url !== undefined) {
       urls.set(item, url);
+      continue;
+    }
+    const game = gameIconUrl(item);
+    if (game !== undefined) {
+      urls.set(item, game);
     }
   }
   return urls;
@@ -73,7 +85,7 @@ const saveIcon = async (folder: string, item: string, url: string): Promise<Buff
 /** Returns the folder the item icons are kept in, next to the server's log. */
 export const iconFolder = (): string => join(dirname(readConfig(process.env).logFile), ICON_FOLDER_NAME);
 
-/** Downloads from the wiki the icon of every recipe item and known piece of gear that [folder] does not have yet. */
+/** Downloads the icon of every recipe item and known piece of gear that [folder] does not have yet. */
 export const downloadMissingIcons = async (folder: string): Promise<void> => {
   await mkdir(folder, { recursive: true });
   const present = new Set(await readdir(folder));
@@ -85,7 +97,7 @@ export const downloadMissingIcons = async (folder: string): Promise<void> => {
       const url = urls.get(item);
       if (url === undefined) {
         missingOnWiki.add(item);
-        logger.warn(`The wiki has no icon for ${item}`);
+        logger.warn(`No icon for ${item}`);
         continue;
       }
       await saveIcon(folder, item, url);
@@ -95,9 +107,8 @@ export const downloadMissingIcons = async (folder: string): Promise<void> => {
 
 /**
  * Returns the icon saved as [file] in [folder]. When it is not there yet, finds which item it is for among the known
- * items and every item prefab in [stacks], downloads it from the wiki, and returns it. Returns null for an unknown
- * file or an item the wiki has no icon for, and asks the wiki about each such item only once. When asking fails, the
- * next view asks again.
+ * items and every item prefab in [stacks], downloads it, and returns it. Returns null for an unknown file or an item
+ * with no icon, and asks about each such item only once. When asking fails, the next view asks again.
  */
 export const iconFile = async (folder: string, file: string, stacks: Record<string, number>): Promise<Buffer | null> => {
   const saved = await readFile(join(folder, file)).catch(() => null);
@@ -112,12 +123,16 @@ export const iconFile = async (folder: string, file: string, stacks: Record<stri
   const url = (await imageUrls([item])).get(item);
   if (url === undefined) {
     missingOnWiki.add(item);
-    logger.warn(`The wiki has no icon for ${item}`);
+    logger.warn(`No icon for ${item}`);
     return null;
   }
   await mkdir(folder, { recursive: true });
   return saveIcon(folder, item, url);
 };
+
+/** Returns the media type of an icon file. Game sprites are WebP; the wiki files are PNG. */
+export const iconMediaType = (bytes: Buffer): string =>
+  bytes.length >= 12 && bytes.toString('ascii', 0, 4) === 'RIFF' && bytes.toString('ascii', 8, 12) === 'WEBP' ? 'image/webp' : 'image/png';
 
 /** Starts downloading the missing icons in the background, so the dashboard serves pages meanwhile. */
 export const startIconDownload = (): void => {
