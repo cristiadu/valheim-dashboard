@@ -1,8 +1,9 @@
+import { BUILDING_RECIPES } from '#/lib/building';
 import { itemName } from '#/lib/items';
 import { foundChests } from '#/lib/map';
-import type { Player } from '#/lib/models/players';
 import type { MapChest } from '#/lib/models/map';
-import type { Craftable, ItemPlace } from '#/lib/models/recipes';
+import type { Player } from '#/lib/models/players';
+import type { Craftable, ItemPlace, Recipe } from '#/lib/models/recipes';
 import type { Snapshot } from '#/lib/models/snapshot';
 import { RECIPES, recipeItems } from '#/lib/recipes';
 
@@ -70,9 +71,25 @@ export const itemPlacesOf = (chests: MapChest[], bags: Record<string, Record<str
   return places;
 };
 
-/** Returns every recipe [stock] has enough for at least once, with how many times, in recipe list order. */
-export const craftables = (stock: Record<string, number>): Craftable[] =>
-  RECIPES.map((recipe) => ({
-    recipe,
-    times: Math.min(...recipe.ingredients.map(({ item, amount }) => Math.floor((stock[item] ?? 0) / amount))),
-  })).filter((craftable) => craftable.times > 0);
+/**
+ * Returns every recipe in [recipes] that [stock] has enough for at least once, with how many times, in list order.
+ * Gathered materials are left out: holding wood does not mean you crafted it.
+ */
+export const craftablesOf = (recipes: readonly Recipe[], stock: Record<string, number>): Craftable[] =>
+  recipes
+    .filter((recipe) => recipe.kind !== 'gather' && recipe.ingredients.length > 0)
+    .map((recipe) => ({
+      recipe,
+      times: Math.min(...recipe.ingredients.map(({ item, amount }) => Math.floor((stock[item] ?? 0) / amount))),
+    }))
+    .filter((craftable) => craftable.times > 0);
+
+/** Returns every tool and food recipe [stock] has enough for at least once, with how many times, in recipe list order. */
+export const craftables = (stock: Record<string, number>): Craftable[] => craftablesOf(RECIPES, stock);
+
+/** Returns every building piece [stock] has enough for at least once, with how many times. Materials are left out. */
+export const buildables = (stock: Record<string, number>): Craftable[] =>
+  craftablesOf(
+    BUILDING_RECIPES.filter((recipe) => recipe.kind === 'build'),
+    stock,
+  );

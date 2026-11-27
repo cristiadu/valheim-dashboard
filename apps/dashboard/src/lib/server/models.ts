@@ -79,6 +79,11 @@ export const WIKI_ICON_FILES: Record<string, string> = {
   'Troll trophy': 'Troll Trophy.png',
   'Greydwarf shaman trophy': 'Greydwarf Shaman Trophy.png',
   'Greydwarf brute trophy': 'Greydwarf Brute Trophy.png',
+  'Wood stairs': 'Wood Stair.png',
+  'Forge tool rack': 'Forge Toolrack.png',
+  'Beech sapling': 'Sapling beech.png',
+  'Fir sapling': 'Sapling fir.png',
+  'Pine sapling': 'Sapling pine.png',
 };
 
 /** How often the log file is checked for new lines. */

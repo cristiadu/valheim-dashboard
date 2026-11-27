@@ -29,7 +29,9 @@ export const planItems = (plan: Plan): PlanItem[] => {
   if (recipe === undefined) {
     return [];
   }
-  return recipe.ingredients.map(({ item, amount }) => {
+  // A gathered material is tracked as itself: how many you want, how many you have set aside, how many are still missing.
+  const lines = recipe.kind === 'gather' ? [{ item: recipe.name, amount: recipe.yields }] : recipe.ingredients;
+  return lines.map(({ item, amount }) => {
     const need = amount * plan.crafts;
     const have = Math.min(need, plan.have[item] ?? 0);
     return { item, need, have, missing: need - have };

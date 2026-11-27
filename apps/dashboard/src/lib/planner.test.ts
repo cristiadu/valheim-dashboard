@@ -88,6 +88,17 @@ describe('planItems', () => {
     ]);
   });
 
+  it('tracks a gathered material the same way as an ingredient', () => {
+    // GIVEN a plan for 50 wood with 20 set aside
+    const plan = planWith({ recipeId: 'wood', crafts: 50, have: { Wood: 20 } });
+
+    // WHEN its items are listed
+    const items = planItems(plan);
+
+    // THEN wood is the line, with what is set aside and what is still missing
+    expect(items).toEqual([{ item: 'Wood', need: 50, have: 20, missing: 30 }]);
+  });
+
   it('lists nothing for an unknown recipe', () => {
     // GIVEN a plan for a recipe that is not in the list
     // WHEN its items are listed
