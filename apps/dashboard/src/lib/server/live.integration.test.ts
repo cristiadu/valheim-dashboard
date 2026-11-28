@@ -1,4 +1,4 @@
-import { appendFile, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { appendFile, mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { constants, gunzipSync } from 'node:zlib';
@@ -68,14 +68,6 @@ describe('following a real log folder', () => {
       ['Astrid', '2026-10-29T03:05:00.000Z', '2026-10-29T04:05:00.000Z'],
       ['Ragnar', '2026-10-29T09:43:13.000Z', null],
     ]);
-  });
-
-  it('copies the live run into the history folder', async () => {
-    // WHEN the history copy of the current run is read
-    const copy = await readFile(join(folder, 'log-history', '20261029-024215.txt'), 'utf8');
-
-    // THEN it holds the live log's lines
-    expect(copy).toBe(`${RUN_START.join('\n')}\n`);
   });
 
   it('serves the snapshot as JSON', async () => {

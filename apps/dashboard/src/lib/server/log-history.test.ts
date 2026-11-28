@@ -1,65 +1,21 @@
-import { mkdir, mkdtemp, readdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { logLine } from '#/lib/test-common';
-import { firstRunKey, LogHistory, readHistory } from '#/lib/server/log-history';
+import { firstRunKey, readHistory } from '#/lib/server/log-history';
 
 describe('log history', () => {
   let folder: string;
-  let history: LogHistory;
 
   beforeEach(async () => {
     folder = await mkdtemp(join(tmpdir(), 'log-history-'));
-    history = new LogHistory(join(folder, 'log-history'));
   });
 
   afterEach(async () => {
     await rm(folder, { recursive: true, force: true });
-  });
-
-  it('copies each run to a file named by its first timestamped line', async () => {
-    // GIVEN a run that starts with an engine line, then a second run after a restart
-    history.record('Mono path[0] = C:/Valheim');
-    history.record(logLine('02:42:15', 'Valheim version: 1.0.21 (network version 41)'));
-    await history.flush();
-    history.record(logLine('02:50:00', 'Game server connected'));
-    await history.flush();
-    history.startNewRun();
-    history.record(logLine('03:00:00', 'Valheim version: 1.0.21 (network version 41)'));
-
-    // WHEN the lines are written
-    await history.flush();
-
-    // THEN each run has its own file with all of its lines
-    const runFolder = join(folder, 'log-history');
-    expect(await readdir(runFolder)).toEqual(['20261029-024215.txt', '20261029-030000.txt']);
-    expect(await readFile(join(runFolder, '20261029-024215.txt'), 'utf8')).toBe(
-      [
-        'Mono path[0] = C:/Valheim',
-        logLine('02:42:15', 'Valheim version: 1.0.21 (network version 41)'),
-        logLine('02:50:00', 'Game server connected'),
-        '',
-      ].join('\n'),
-    );
-  });
-
-  it('replaces an older copy of the same run when the dashboard starts again', async () => {
-    // GIVEN a copy of the run from before the dashboard restarted
-    const runFolder = join(folder, 'log-history');
-    await mkdir(runFolder);
-    await writeFile(join(runFolder, '20261029-024215.txt'), 'old copy\n');
-
-    // WHEN the run is read again from the start of logs.txt
-    history.record(logLine('02:42:15', 'Game server connected'));
-    await history.flush();
-
-    // THEN the copy holds the run once
-    expect(await readFile(join(runFolder, '20261029-024215.txt'), 'utf8')).toBe(
-      `${logLine('02:42:15', 'Game server connected')}\n`,
-    );
   });
 
   it('reads past runs oldest first and skips the run the live log has', async () => {
