@@ -171,7 +171,7 @@ the page gives nothing away.
 | Vikings | Each player now: when they were online, health and stamina, their numbers, areas visited, gear laid out like a character sheet, and what is probably in their bag | Snapshot |
 | Saga | Every game event and chat, with filters, 25 at a time | Snapshot |
 | Map | Land each player walked, chests with what they hold, who is where, last deaths | Snapshot |
-| Recipes | Crafting plans and what is still missing, where to find it, and what the chests can make. Only recipes whose ingredients someone has found | The viewer's browser, and chests and found items from the snapshot |
+| Recipes | Crafting plans and what is still missing, where to find it, and what the chests can make. Tools, crafting stations, building pieces, materials, and gear and food are separate lists. Only a recipe whose materials someone has found is offered | The viewer's browser, and chests and found items from the snapshot |
 | Server | Up or down, the world and in-game day, bosses met, uptime in the last 24 hours, saves and backups 5 at a time, warnings 10 at a time: crashes, lost Steam or crossplay connections, joins turned away (with who and why) and low disk | Snapshot |
 
 Long lists show one page at a time, through one shared pager:
@@ -185,7 +185,9 @@ Long lists show one page at a time, through one shared pager:
 
 Page one shows new things as they arrive. A list that shrinks keeps its last page in view. Changing the Saga filter or the stored items search goes back to page one.
 
-Recipe plans are saved in each viewer's browser (`localStorage`). The server stores nothing for them. Chest items are matched to recipe items through `itemName`, so `RoundLog` counts as `Core wood`. Only chests someone has found count.
+Recipe plans are saved in each viewer's browser (`localStorage`). The server stores nothing for them. Chest items are matched to recipe items through `itemName`, so `RoundLog` counts as `Core wood`. Only chests someone has found count. Every list uses that same match: wood in a chest counts toward a wood wall, a plan for wood, a workbench, and a hammer.
+
+The plan lists are separate. Tools are the handheld ones, such as an axe. Crafting tools are the stations, such as the workbench and the forge. Building is the floors, walls and other pieces. Materials are wood, stone, bronze and the other gathered or smelted items; weapons, armor, food and ships stay in their own list. A gathered material such as wood lists where it comes from, for example a beech gives 22 wood. Bronze lists the copper and tin it takes. A plan tracks how many you want against how many you have set aside, and still shows what the chests and bags hold. Holding a material does not count as crafting it.
 
 Each missing plan item lists where to find it: every found chest and every guessed bag that holds some, most first.
 A chest links to the Map with that chest open (`/map?chest=1:42`).
@@ -278,6 +280,7 @@ hand". Until a character's first `Wearing:` line, the newest piece seen of each 
 ```mermaid
 flowchart LR
   wiki[Valheim wiki] -->|on start: named items; later: any item a page asks for| icons["item-icons folder next to logs.txt"]
+  game[Game sprites] -->|when the wiki has no file| icons
   icons -->|/icons/flint-spear.png| pages[Every tab with item icons]
 ```
 
@@ -301,8 +304,10 @@ The file only lists players online. Players who left keep the numbers from when 
 dashboard restarts. Skill levels never reach the server, so Vikings cannot show them.
 
 Icons for every recipe item and named piece of gear download on start. Any other item, such as one only
-`item-stacks.txt` lists, downloads the first time a page shows it. An item the wiki has no icon for is asked about
-once per run; when the wiki can't be reached, the next view asks again.
+`item-stacks.txt` lists, downloads the first time a page shows it. An item with no icon is asked about
+once per run; when the source can't be reached, the next view asks again. Pieces and items the wiki has
+not uploaded, such as a 67° wall or a scalewood wall, use the game's own sprite. Those files are the icons
+read out of Valheim 1.0.21.
 
 The wiki's file names don't always match the game's names, so each item tries a few spellings:
 

@@ -14,18 +14,19 @@
     BAG_SOURCE,
     CHESTS_SOURCE,
     type ItemPlace,
+    type ItemSource,
     MAX_CRAFTS,
     PLACES_SHOWN,
     type Plan,
     RECIPE_ICON_PX,
   } from '#/lib/models/recipes';
-  import { knownRecipes } from '#/lib/picker';
+  import { PLAN_CATALOGS, knownOf, type PlanCatalog } from '#/lib/picker';
   import { planPill } from '#/lib/pills';
   import { clampCrafts, newPlan, planItems, stillNeeded, withHave } from '#/lib/planner';
   import { loadPlans, planner, savePlans } from '#/lib/plans.svelte';
   import { playersOf } from '#/lib/players';
   import { madeAt, recipeById } from '#/lib/recipes';
-  import { bagStock, builderNames, chestStock, craftables, itemPlacesOf } from '#/lib/stock';
+  import { bagStock, builderNames, chestStock, craftablesOf, itemPlacesOf } from '#/lib/stock';
 
   onMount(loadPlans);
 
@@ -56,12 +57,24 @@
   /** Where each item sits: chests found on the map and the bags the server guesses, most first. */
   const places = $derived(itemPlacesOf(mapOf(snapshot, players)?.chests ?? [], snapshot.bags));
 
-  /** Recipes the picked chests or bag have enough for. */
-  const canMake = $derived(craftables(stock));
+  /** Which list the new plan is chosen from. */
+  let catalog = $state<PlanCatalog>('tool');
 
-  /** Recipes whose every ingredient someone has handled or seen in a found chest, so nobody sees what is ahead. */
-  const known = $derived(
-    knownRecipes([...snapshot.seenItems, ...foundChests(snapshot).flatMap(([, chest]) => Object.keys(chest.items))]),
+  /** The open list: tools, crafting stations, building pieces, materials, or gear and food. */
+  const current = $derived(PLAN_CATALOGS.find((entry) => entry.id === catalog) ?? PLAN_CATALOGS[0]);
+
+  /** Items someone has handled or seen in a found chest, so nobody sees a recipe before they have found what it takes. */
+  const seen = $derived([...snapshot.seenItems, ...foundChests(snapshot).flatMap(([, chest]) => Object.keys(chest.items))]);
+
+  /** Recipes in the open list that those finds have unlocked. */
+  const known = $derived(knownOf(current.recipes, seen));
+
+  /**
+   * What the picked chests or bag have enough for, split the same way as the lists.
+   * Holding wood is not listed as making wood. Smelting bronze is.
+   */
+  const canMakeGroups = $derived(
+    PLAN_CATALOGS.map((entry) => ({ title: entry.make, items: craftablesOf(entry.recipes, stock) })).filter((group) => group.items.length > 0),
   );
 
   /** Recipe chosen in the new plan form, if any yet. */
@@ -96,6 +109,18 @@
   };
 </script>
 
+{#snippet gatheredFrom(material: string, sources: ItemSource[])}
+  <p class="muted">Where it comes from:</p>
+  <ul class="sources">
+    {#each sources as source (source.name)}
+      <li>
+        <ItemIcon item={source.iconItem} />
+        <span>{source.name} gives <span class="amount">{source.amount}</span> {material}</span>
+      </li>
+    {/each}
+  </ul>
+{/snippet}
+
 {#snippet placeLink(place: ItemPlace)}
   {#if place.kind === 'bag'}
     <span class="amount">{place.count.toLocaleString()}</span>in {place.character}'s bag
@@ -109,15 +134,16 @@
 <div class="recipes">
   <section class="panel" aria-labelledby="new-title">
     <h2 id="new-title" class="panel-title">START A PLAN</h2>
+    <div class="catalogs" role="group" aria-label="Kind of plan">
+      {#each PLAN_CATALOGS as entry (entry.id)}
+        <button type="button" aria-pressed={catalog === entry.id} onclick={() => (catalog = entry.id)}>{entry.label}</button>
+      {/each}
+    </div>
     {#if picked === null}
-      <p class="muted">No recipes yet. They show up once someone has found everything a recipe takes.</p>
+      <p class="muted">{current.empty}</p>
     {:else}
       <form onsubmit={addPlan}>
-        <RecipePicker
-          bind:value={() => picked.id, (id) => (chosenId = id)}
-          label="What do you want to make?"
-          recipes={known}
-        />
+        <RecipePicker bind:value={() => picked.id, (id) => (chosenId = id)} label={current.question} recipes={known} />
         <label>
           <span class="muted">{picked.yields > 1 ? 'How many batches?' : 'How many?'}</span>
           <input type="number" min="1" max={MAX_CRAFTS} bind:value={pickedCrafts} />
@@ -127,14 +153,18 @@
       <div class="preview">
         <ItemIcon item={picked.name} size={RECIPE_ICON_PX} />
         <div>
-          <p class="muted">
-            {madeAt(picked.station)} {picked.yields > 1 ? `Each batch makes ${picked.yields} and takes:` : 'Takes:'}
-          </p>
-          <ul class="items">
-            {#each picked.ingredients as line (line.item)}
-              <li><ItemIcon item={line.item} /><span class="amount">{line.amount}</span>{line.item}</li>
-            {/each}
-          </ul>
+          {#if picked.kind === 'gather'}
+            {@render gatheredFrom(picked.name, picked.sources ?? [])}
+          {:else}
+            <p class="muted">
+              {madeAt(picked.station)} {picked.yields > 1 ? `Each batch makes ${picked.yields} and takes:` : 'Takes:'}
+            </p>
+            <ul class="items">
+              {#each picked.ingredients as line (line.item)}
+                <li><ItemIcon item={line.item} /><span class="amount">{line.amount}</span>{line.item}</li>
+              {/each}
+            </ul>
+          {/if}
         </div>
       </div>
     {/if}
@@ -166,18 +196,21 @@
         building and dropping things aren't in the log, so it can be off.
       </p>
     {/if}
-    {#if canMake.length === 0}
+    {#if canMakeGroups.length === 0}
       <p class="muted">Not enough here for any recipe yet.</p>
     {:else}
       <p class="muted">How many of each you could make from these items.</p>
-      <ul class="items">
-        {#each canMake as craftable (craftable.recipe.id)}
-          <li>
-            <ItemIcon item={craftable.recipe.name} />
-            <span class="amount">{craftable.times * craftable.recipe.yields}</span>{craftable.recipe.name}
-          </li>
-        {/each}
-      </ul>
+      {#each canMakeGroups as group (group.title)}
+        <h3 class="group-title">{group.title}</h3>
+        <ul class="items">
+          {#each group.items as craftable (craftable.recipe.id)}
+            <li>
+              <ItemIcon item={craftable.recipe.name} />
+              <span class="amount">{craftable.times * craftable.recipe.yields}</span>{craftable.recipe.name}
+            </li>
+          {/each}
+        </ul>
+      {/each}
     {/if}
   </section>
 
@@ -218,7 +251,11 @@
           </label>
           <button type="button" onclick={() => removePlan(plan)}>Remove</button>
         </div>
-        <p class="muted">{madeAt(recipe.station)}{recipe.yields > 1 ? ` You'll get ${recipe.yields * plan.crafts}.` : ''}</p>
+        {#if recipe.kind === 'gather'}
+          {@render gatheredFrom(recipe.name, recipe.sources ?? [])}
+        {:else}
+          <p class="muted">{madeAt(recipe.station)}{recipe.yields > 1 ? ` You'll get ${recipe.yields * plan.crafts}.` : ''}</p>
+        {/if}
         <table>
           <thead>
             <tr><th>Got it</th><th>Item</th><th>You have</th><th>Still need</th></tr>
@@ -349,6 +386,29 @@
     color: var(--ember);
   }
 
+  /* Tools, crafting tools, building, materials, and gear sit above the picker */
+  .catalogs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* The list that is open uses the accent, like the add button */
+  .catalogs button[aria-pressed='true'] {
+    border-color: var(--ember);
+    color: var(--ember);
+  }
+
+  /* Heading over the tools list and the building list */
+  .group-title {
+    margin: 14px 0 0;
+    font-family: var(--font-heading);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+
   /* Picked recipe's icon beside what it takes */
   .preview {
     display: flex;
@@ -365,6 +425,27 @@
   /* Text beside the icon takes the rest of the row */
   .preview > div {
     flex: 1;
+  }
+
+  /* Source lines are full sentences, one per row */
+  .sources {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 10px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .sources li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* The count sits in the sentence, so it does not reserve a column */
+  .sources .amount {
+    min-width: 0;
   }
 
   /* Icon lists of items flow in columns */

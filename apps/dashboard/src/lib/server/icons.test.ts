@@ -6,7 +6,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { iconItems } from '#/lib/gear';
 import { iconFileName } from '#/lib/recipes';
-import { downloadMissingIcons, iconFile, wikiTitlesOf } from '#/lib/server/icons';
+import { gameIconUrl } from '#/lib/server/game-icons';
+import { downloadMissingIcons, iconFile, iconMediaType, wikiTitlesOf } from '#/lib/server/icons';
 
 describe('downloadMissingIcons', () => {
   let folder: string;
@@ -71,11 +72,55 @@ describe('wikiTitlesOf', () => {
     expect(wikiTitlesOf('Minced meat sauce')).toEqual(['File:Minced_meat_sauce.png', 'File:Minced_Meat_Sauce.png']);
   });
 
+  it('uses the game sprite for a piece the wiki has no file for', () => {
+    // GIVEN a scalewood wall, which the wiki has not uploaded
+    // WHEN its game sprite is asked for
+    // THEN it is the game's own icon
+    expect(gameIconUrl('Scalewood wall')).toBe('https://valheimdb.com/game/icons/pieces/scale_wall_2x2.webp');
+    expect(gameIconUrl('Hammer')).toBeUndefined();
+  });
+
+  it('tells a game sprite from a wiki png', () => {
+    // GIVEN a WebP sprite and a PNG
+    const webp = Buffer.concat([Buffer.from('RIFF'), Buffer.alloc(4), Buffer.from('WEBP')]);
+    const png = Buffer.from([0x89, 0x50, 0x4e, 0x47]);
+
+    // THEN each is named by its own type
+    expect(iconMediaType(webp)).toBe('image/webp');
+    expect(iconMediaType(png)).toBe('image/png');
+  });
+
   it('uses the known wiki file name when there is one', () => {
     // GIVEN an item whose wiki file is named differently
     // WHEN its wiki titles are asked for
     // THEN only the known file is tried
     expect(wikiTitlesOf('Flint arrow')).toEqual(['File:Flinthead Arrow.png']);
+  });
+
+  it('keeps the m of a length lowercase, and also tries it written against the number', () => {
+    // GIVEN a beam whose length is written `1 m`
+    // WHEN its wiki titles are asked for
+    // THEN the wiki's `Wood_Beam_1_m` spelling is tried, and `1m` as well
+    expect(wikiTitlesOf('Wood beam 1 m')).toEqual([
+      'File:Wood_beam_1_m.png',
+      'File:Wood_Beam_1_M.png',
+      'File:Wood_Beam_1_m.png',
+      'File:Wood_Beam_1m.png',
+    ]);
+  });
+
+  it('uses the wiki file for the forge tool rack', () => {
+    // GIVEN the forge tool rack, whose wiki file is one word
+    // WHEN its wiki titles are asked for
+    // THEN only that file is tried
+    expect(wikiTitlesOf('Forge tool rack')).toEqual(['File:Forge Toolrack.png']);
+  });
+
+  it('uses the wiki file for a tree sapling', () => {
+    // GIVEN a beech sapling, whose wiki file leads with Sapling
+    // WHEN its wiki titles are asked for
+    // THEN only that file is tried
+    expect(wikiTitlesOf('Beech sapling')).toEqual(['File:Sapling beech.png']);
   });
 
   it('also tries only the first word capitalized, as the wiki names some files', () => {

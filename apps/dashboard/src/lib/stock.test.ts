@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { mapOf } from '#/lib/map';
 import { playersOf } from '#/lib/players';
-import { bagStock, builderNames, chestStock, craftables, itemPlacesOf, recipeItemName } from '#/lib/stock';
+import { bagStock, buildables, builderNames, chestStock, craftables, itemPlacesOf, recipeItemName } from '#/lib/stock';
 import { sessionWith, snapshotWith, TEST_NOON_MS } from '#/lib/test-common';
 
 describe('recipeItemName', () => {
@@ -110,5 +110,18 @@ describe('craftables', () => {
       ['Stone axe', 1],
       ['Wood arrow', 1],
     ]);
+  });
+});
+
+describe('buildables', () => {
+  it('counts building pieces from the same stock and skips materials you gather', () => {
+    // GIVEN 4 wood and 6 stone, enough for walls and floors
+    const listed = buildables({ Wood: 4, Stone: 6 }).map(({ recipe, times }) => [recipe.name, times]);
+
+    // THEN the pieces count their scarcest material, and wood itself is not something you craft
+    expect(listed).toContainEqual(['Wood wall', 2]);
+    expect(listed).toContainEqual(['Wood floor 1x1', 4]);
+    expect(listed).toContainEqual(['Stone wall 1x1', 2]);
+    expect(listed.map(([name]) => name)).not.toContain('Wood');
   });
 });
