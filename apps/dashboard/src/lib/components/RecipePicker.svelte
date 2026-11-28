@@ -2,15 +2,15 @@
   import { tick } from 'svelte';
 
   import ItemIcon from '#/lib/components/ItemIcon';
-  import { type Recipe, RECIPE_BIOMES } from '#/lib/models/recipes';
-  import { movedIndex } from '#/lib/picker';
+  import type { Recipe } from '#/lib/models/recipes';
+  import { groupsIn, movedIndex, recipeGroup } from '#/lib/picker';
   import { recipeById } from '#/lib/recipes';
 
   /** Id of the picked recipe, the question shown above the picker, and the recipes it offers in picker order. */
   let { value = $bindable(), label, recipes }: { value: string; label: string; recipes: readonly Recipe[] } = $props();
 
-  /** Biomes that have a recipe to offer. */
-  const biomes = $derived(RECIPE_BIOMES.filter((biome) => recipes.some((recipe) => recipe.biome === biome)));
+  /** Groups that have a recipe to offer: materials, then biomes. */
+  const groups = $derived(groupsIn(recipes));
 
   /** Prefix that keeps this picker's element ids unique on the page. */
   const uid = $props.id();
@@ -111,11 +111,11 @@
       bind:this={list}
       onkeydown={onListKey}
     >
-      {#each biomes as biome (biome)}
-        <div role="group" aria-labelledby="{uid}-{biome}">
-          <div id="{uid}-{biome}" class="biome" role="presentation">{biome}</div>
+      {#each groups as group (group)}
+        <div role="group" aria-labelledby="{uid}-{group}">
+          <div id="{uid}-{group}" class="biome" role="presentation">{group}</div>
           {#each recipes as recipe, index (recipe.id)}
-            {#if recipe.biome === biome}
+            {#if recipeGroup(recipe) === group}
               <div
                 id="{uid}-{index}"
                 class="option"
