@@ -9,7 +9,7 @@ flowchart LR
     game[Valheim server] -->|writes| log[logs.txt]
     plugin[Event log plugin] -->|adds game event lines| log
     log --> dash[Dashboard]
-    dash -->|copies each run| hist[log-history folder]
+    plugin -->|copies each run, even while the dashboard is off| hist[log-history folder]
     hist -->|read on start| dash
     game -->|saves| save[World save]
     save -->|bosses defeated| dash
@@ -25,7 +25,7 @@ flowchart LR
 | `packages/valheim-log` | Turns log lines into game events and player sessions. No files, no network. |
 | `apps/dashboard` | SvelteKit app on Node. Follows `logs.txt` and serves the page. |
 | `plugins/event-log` | BepInEx plugin on the server only. Logs what the game does not. Friends install nothing. |
-| `scripts` | Start the dashboard, keep it running and update it from `main` on Windows, and share it through zrok. |
+| `scripts` | On Windows, run the dashboard, share it through zrok, and keep the dashboard and the event log plugin in sync with `main`. |
 | `docs/log-events.md` | Every log line the dashboard reads, with its regex. |
 
 ## Reading a log line
@@ -59,16 +59,13 @@ sequenceDiagram
   participant T as Log reader
   participant L as logs.txt
   participant S as Server state
-  participant H as log-history
   loop every 2 s
     T->>L: Read new bytes only
     L-->>T: New lines
     T->>S: Each line
-    T->>H: Same lines, to this run's copy
   end
   Note over T,L: File got shorter: the server restarted
   T->>S: End the run, close open sessions
-  T->>H: Start a new copy
 ```
 
 | A run ends as | When |
@@ -88,8 +85,10 @@ flowchart TD
   state --> follow
 ```
 
-The server overwrites `logs.txt` on each start, so `log-history` keeps every run. Copies are named by the
-run's first line, for example `20261030-154346.txt`.
+The server overwrites `logs.txt` on each start, so `log-history` keeps every run. The event log plugin writes
+the copies every 5 seconds and when the server stops, so a run is kept even when the dashboard was not running.
+Copies are named by the run's first line, for example `20261030-154346.txt`. The dashboard only reads them: every
+run it has not read yet comes in when it starts.
 
 ## Live updates to the page
 
@@ -172,7 +171,7 @@ the page gives nothing away.
 | Vikings | Each player now: when they were online, health and stamina, their numbers, areas visited, gear laid out like a character sheet, and what is probably in their bag | Snapshot |
 | Saga | Every game event and chat, with filters, 25 at a time | Snapshot |
 | Map | Land each player walked, chests with what they hold, who is where, last deaths | Snapshot |
-| Recipes | Crafting plans and what is still missing, where to find it, and what the chests can make. Only recipes whose ingredients someone has found | The viewer's browser, and chests and found items from the snapshot |
+| Recipes | Crafting plans and what is still missing, where to find it, and what the chests can make. Tools, crafting stations, building pieces, materials, and gear and food are separate lists. Only a recipe whose materials someone has found is offered | The viewer's browser, and chests and found items from the snapshot |
 | Server | Up or down, the world and in-game day, bosses met, uptime in the last 24 hours, saves and backups 5 at a time, warnings 10 at a time: crashes, lost Steam or crossplay connections, joins turned away (with who and why) and low disk | Snapshot |
 
 Long lists show one page at a time, through one shared pager:
@@ -186,7 +185,9 @@ Long lists show one page at a time, through one shared pager:
 
 Page one shows new things as they arrive. A list that shrinks keeps its last page in view. Changing the Saga filter or the stored items search goes back to page one.
 
-Recipe plans are saved in each viewer's browser (`localStorage`). The server stores nothing for them. Chest items are matched to recipe items through `itemName`, so `RoundLog` counts as `Core wood`. Only chests someone has found count.
+Recipe plans are saved in each viewer's browser (`localStorage`). The server stores nothing for them. Chest items are matched to recipe items through `itemName`, so `RoundLog` counts as `Core wood`. Only chests someone has found count. Every list uses that same match: wood in a chest counts toward a wood wall, a plan for wood, a workbench, and a hammer.
+
+The plan lists are separate. Tools are the handheld ones, such as an axe. Crafting tools are the stations, such as the workbench and the forge. Building is the floors, walls and other pieces. Materials are wood, stone, bronze and the other gathered or smelted items; weapons, armor, food and ships stay in their own list. A gathered material such as wood lists where it comes from, for example a beech gives 22 wood. Bronze lists the copper and tin it takes. A plan tracks how many you want against how many you have set aside, and still shows what the chests and bags hold. Holding a material does not count as crafting it.
 
 Each missing plan item lists where to find it: every found chest and every guessed bag that holds some, most first.
 A chest links to the Map with that chest open (`/map?chest=1:42`).
@@ -279,6 +280,7 @@ hand". Until a character's first `Wearing:` line, the newest piece seen of each 
 ```mermaid
 flowchart LR
   wiki[Valheim wiki] -->|on start: named items; later: any item a page asks for| icons["item-icons folder next to logs.txt"]
+  game[Game sprites] -->|when the wiki has no file| icons
   icons -->|/icons/flint-spear.png| pages[Every tab with item icons]
 ```
 
@@ -302,8 +304,10 @@ The file only lists players online. Players who left keep the numbers from when 
 dashboard restarts. Skill levels never reach the server, so Vikings cannot show them.
 
 Icons for every recipe item and named piece of gear download on start. Any other item, such as one only
-`item-stacks.txt` lists, downloads the first time a page shows it. An item the wiki has no icon for is asked about
-once per run; when the wiki can't be reached, the next view asks again.
+`item-stacks.txt` lists, downloads the first time a page shows it. An item with no icon is asked about
+once per run; when the source can't be reached, the next view asks again. Pieces and items the wiki has
+not uploaded, such as a 67° wall or a scalewood wall, use the game's own sprite. Those files are the icons
+read out of Valheim 1.0.21.
 
 The wiki's file names don't always match the game's names, so each item tries a few spellings:
 
@@ -466,41 +470,18 @@ BepInEx's own log file is turned off, so its messages land in
 
 ## Start script
 
-`start-valheim.ps1` is the one script that starts everything, by hand (`start-valheim.cmd`) or from the
-`Valheim` logon task it adds. Each part gets its own window, and a part that already runs is left alone.
-
-```mermaid
-flowchart TD
-  start[start-valheim.cmd or the Valheim logon task] --> server{Game server running?}
-  server -->|no| s[start_headless_server.bat in its window]
-  server -->|yes| dash
-  s --> dash{Dashboard window open?}
-  dash -->|no| d[Stop a dashboard without a window, open the Dashboard window]
-  dash -->|yes| link
-  d --> link{zrok running?}
-  link -->|no| l[Open the Link window]
-  link -->|yes| upd
-  l --> upd{Updater window open?}
-  upd -->|no| u[Open the Updater window]
-```
+`start-valheim.ps1`, started by hand with `start-valheim.cmd`, opens the dashboard and the zrok link when
+they are not already running, then keeps both the dashboard and the event log plugin in sync with `main`.
+A second updater exits. It does not start the game server except to load a new plugin.
 
 | Window | Loop |
 | --- | --- |
 | Dashboard | Build if there is none, run node, wait 5 s after it stops, run it again |
 | Link | Delete a leftover share on the link's name, run zrok, wait 30 s after it stops, run it again |
-| Updater | Run one update as its own PowerShell, wait 5 minutes, again |
-
-Run by hand, it installs pnpm and zrok when they are missing, adds the logon task, and then starts that task
-instead of the windows. The windows then belong to Task Scheduler, not to whatever ran the script: windows
-started from an app's shell close when that app quits or updates. From the task it installs nothing.
+| Updater | Check `main`, wait 5 minutes, again |
 
 A share zrok had when the PC shut down keeps the link's name, and zrok refuses a new share on that name. With
 no other zrok running, that share is stale, so the Link window deletes it first.
-
-## Updates from main
-
-The Updater window runs one update every 5 minutes. Each is its own PowerShell, so a failed update never
-stops the loop, and each reads the script as `main` has it now.
 
 ```mermaid
 flowchart TD
@@ -512,9 +493,9 @@ flowchart TD
   fetch --> ci{CI passed on the newest main commit?}
   ci -->|yes| pull[Fast-forward to it]
   ci -->|no| stay[Stay on the current commit]
-  pull --> dash{Dashboard built from this commit?}
+  pull --> dash{Dashboard inputs changed since the running build?}
   stay --> dash
-  dash -->|no| build[pnpm install and build, stop node] --> loop[Start script starts node again]
+  dash -->|no| build[pnpm install and build, stop node] --> loop[Dashboard window starts node again]
   dash -->|yes| plugin
   loop --> plugin{Plugin files changed since the installed plugin?}
   plugin -->|no| done[Done]
@@ -526,17 +507,18 @@ flowchart TD
 
 | Step | How |
 | --- | --- |
-| Who is online | Sessions without an end in `/api/status`. |
-| Stopping the game server | Ctrl+C sent to its console, as in its window. The game saves the world and exits. |
+| Who is online | Sessions without an end in `/api/status` on the dashboard. |
+| Stopping the game server | Ctrl+C sent to its console, as in its window. The game saves the world and exits. That send runs in its own PowerShell, because attaching to the server's console detaches from this one. |
 | Starting the game server | `start_headless_server.bat` in its own console window, in the foreground. A server that was already stopped stays stopped. |
+| Dashboard inputs | `apps/dashboard/`, `packages/valheim-log/`, `package.json`, `pnpm-lock.yaml` and `pnpm-workspace.yaml` in the commit's diff. Any other commit leaves the dashboard running as it is. |
 | Remembering what is installed | `updater-state.json` keeps the commit of the running dashboard and of the installed plugin. A step that fails or waits runs again on the next pass. |
 
-The first run takes the installed plugin as current and builds the dashboard once.
+The first run builds the dashboard once and takes the installed plugin as current.
 
 ### What it trusts
 
-Whatever reaches `main` runs on the server PC as its Windows user, with nobody watching: the build scripts,
-the plugin build and the plugin inside the game server. These keep that to reviewed code.
+Whatever reaches `main` runs on the server PC as its Windows user: the dashboard build, the plugin build and
+the plugin inside the game server. These keep that to reviewed code.
 
 | Guard | What it stops |
 | --- | --- |
@@ -555,7 +537,7 @@ Every log lives in `C:\Valheim Server`.
 | File | Written by |
 | --- | --- |
 | `logs.txt` | The Valheim server, the event log plugin and BepInEx |
-| `log-history\*.txt` | The dashboard, one file per server run |
+| `log-history\*.txt` | The event log plugin, one file per server run |
 | `dashboard.log` | The Dashboard window, with the dashboard's output |
 | `updater.log` | The Updater window: what it updated, skipped or is waiting for |
 | `updater-state.json` | The Updater window: commits of the running dashboard and the installed plugin |
@@ -575,27 +557,21 @@ The dashboard also reads the world save, `worlds_local\Cotil\_main.<save number>
 
 ```mermaid
 flowchart LR
-  pr[Pull request or push to main] --> install[pnpm install] --> check[pnpm check] --> lint[pnpm lint] --> coverage[pnpm coverage] --> build[pnpm build] --> scripts[Measure-Coverage.ps1]
-  scripts --> summary[Run summary]
-  scripts --> comment[Comment on the pull request]
+  pr[Pull request or push to main] --> install[pnpm install] --> check[pnpm check] --> lint[pnpm lint] --> coverage[pnpm coverage] --> build[pnpm build]
 ```
 
 `pnpm coverage` runs each project's tests twice, once per kind, and writes what they ran to
-`coverage/<kind>/cobertura-coverage.xml` in that project. `scripts\Measure-Coverage.ps1` does the same for the
-PowerShell scripts with Pester 6.2.0, then turns all those files into one table.
+`coverage/<kind>/cobertura-coverage.xml` in that project.
 
 | Test kind | What it checks | Files |
 | --- | --- | --- |
-| Unit | One source file at a time | `*.test.ts`, `*.Tests.ps1` |
-| Integration | Several parts together on real files, for example the dashboard following a log folder in a temp folder, or the updater on a throwaway git checkout | `*.integration.test.ts`, `*.Integration.Tests.ps1` |
+| Unit | One source file at a time | `*.test.ts` |
+| Integration | Several parts together on real files, for example the dashboard following a log folder in a temp folder | `*.integration.test.ts` |
 
-The comment is updated on each push, so a pull request has one. Dependabot's pull requests get only the summary,
-since their token cannot comment. The event log plugin is not measured: it builds only against the game's own files.
+The event log plugin is not measured: it builds only against the game's own files.
 
 `pnpm lint` runs ESLint in each project. Besides the recommended TypeScript and Svelte rules, it rejects
 relative imports (use `#/`), `function` declarations, `.then()`, `console` and `if` without braces.
-
-On the PC, `Invoke-Pester scripts` runs both kinds of script tests.
 
 Dependabot opens weekly upgrade PRs for npm packages and GitHub Actions, for versions out for 7 days. The plugin is built on the
 server PC, not in CI.

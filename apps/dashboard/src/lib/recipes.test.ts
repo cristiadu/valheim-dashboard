@@ -35,6 +35,7 @@ describe('recipeById', () => {
       biome: 'Meadows',
       station: 'Workbench',
       yields: 20,
+      kind: 'craft',
       ingredients: [
         { item: 'Wood', amount: 8 },
         { item: 'Resin', amount: 8 },

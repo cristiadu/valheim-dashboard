@@ -1,6 +1,6 @@
 import { error, type RequestEvent } from '@sveltejs/kit';
 
-import { iconFile, iconFolder } from '#/lib/server/icons';
+import { iconFile, iconFolder, iconMediaType } from '#/lib/server/icons';
 import { currentSnapshot } from '#/lib/server/live';
 import { logger } from '#/lib/server/logger';
 import { ICON_CACHE_SECONDS, ICON_FILE_PATTERN } from '#/lib/server/models';
@@ -21,6 +21,6 @@ export const GET = async ({ params }: RequestEvent<{ file: string }>): Promise<R
     error(404, 'No icon for this item');
   }
   return new Response(new Uint8Array(image), {
-    headers: { 'Content-Type': 'image/png', 'Cache-Control': `public, max-age=${ICON_CACHE_SECONDS}` },
+    headers: { 'Content-Type': iconMediaType(image), 'Cache-Control': `public, max-age=${ICON_CACHE_SECONDS}` },
   });
 };

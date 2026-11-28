@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { PICKER_RECIPES, knownRecipes, movedIndex } from '#/lib/picker';
+import { BUILDING_PICKER, MATERIAL_PICKER, PICKER_RECIPES, STATION_PICKER, TOOL_PICKER, knownOf, knownRecipes, movedIndex } from '#/lib/picker';
 
 describe('PICKER_RECIPES', () => {
   it('lists every recipe once, Meadows first and Plains last', () => {
@@ -8,8 +8,8 @@ describe('PICKER_RECIPES', () => {
     // WHEN the picker orders it
     const ids = PICKER_RECIPES.map((recipe) => recipe.id);
 
-    // THEN all 74 recipes are there once, from the Hammer to a Plains recipe
-    expect(new Set(ids).size).toBe(74);
+    // THEN all 73 recipes are there once, from the Hammer to a Plains recipe. The forge is a crafting station.
+    expect(new Set(ids).size).toBe(73);
     expect(ids[0]).toBe('hammer');
     expect(PICKER_RECIPES.at(-1)!.biome).toBe('Plains');
   });
@@ -34,6 +34,36 @@ describe('knownRecipes', () => {
     // WHEN the known recipes are listed
     // THEN there are none
     expect(knownRecipes([])).toEqual([]);
+  });
+
+  it('offers a wood wall once wood is found, and hides anything that needs stone', () => {
+    // GIVEN players have found wood and nothing else
+    // WHEN the building list is filtered
+    const ids = knownOf(BUILDING_PICKER, ['Wood']).map((recipe) => recipe.id);
+
+    // THEN a wood wall is offered, and wood itself and a stone wall are not in this list
+    expect(ids).toContain('wood-wall');
+    expect(ids).not.toContain('wood');
+    expect(ids).not.toContain('stone-wall-1x1');
+  });
+
+  it('keeps axes, stations, pieces and materials in their own lists', () => {
+    // GIVEN the four lists
+    const tools = TOOL_PICKER.map((recipe) => recipe.id);
+    const stations = STATION_PICKER.map((recipe) => recipe.id);
+    const pieces = BUILDING_PICKER.map((recipe) => recipe.id);
+    const materials = MATERIAL_PICKER.map((recipe) => recipe.id);
+
+    // THEN an axe is a tool, the forge is a station, a wall is a piece, and wood and bronze are materials
+    expect(tools).toContain('stone-axe');
+    expect(tools).not.toContain('forge');
+    expect(stations).toContain('workbench');
+    expect(stations).toContain('forge');
+    expect(pieces).toContain('wood-wall');
+    expect(pieces).not.toContain('wood');
+    expect(materials).toContain('wood');
+    expect(materials).toContain('bronze');
+    expect(materials).not.toContain('wood-wall');
   });
 });
 
