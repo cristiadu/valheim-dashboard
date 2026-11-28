@@ -1,5 +1,7 @@
+import { BUILDING_RECIPES } from '#/lib/building';
 import { ICON_PATH } from '#/lib/models/items';
 import type { CraftingStation, Recipe, RecipeBiome } from '#/lib/models/recipes';
+import { STATION_RECIPES } from '#/lib/stations';
 
 /** Returns a recipe from its parts. [ingredients] maps each item name to the amount one craft uses. */
 const recipe = (
@@ -15,6 +17,7 @@ const recipe = (
   biome,
   station,
   yields,
+  kind: 'craft',
   ingredients: Object.entries(ingredients).map(([item, amount]) => ({ item, amount })),
 });
 
@@ -41,7 +44,6 @@ export const RECIPES: readonly Recipe[] = [
   recipe('raft', 'Raft', 'Meadows', 'Workbench', 1, { Wood: 20, 'Leather scraps': 6, Resin: 6 }),
   recipe('queens-jam', "Queen's jam", 'Meadows', 'Cauldron', 4, { Raspberries: 8, Blueberries: 6 }),
   recipe('boar-jerky', 'Boar jerky', 'Meadows', 'Cauldron', 2, { 'Boar meat': 1, Honey: 1 }),
-  recipe('forge', 'Forge', 'Black Forest', 'Workbench', 1, { Stone: 4, Coal: 4, Wood: 10, Copper: 6 }),
   recipe('portal', 'Portal', 'Black Forest', 'Workbench', 1, { 'Fine wood': 20, 'Greydwarf eye': 10, 'Surtling core': 2 }),
   recipe('bronze', 'Bronze', 'Black Forest', 'Forge', 1, { Copper: 2, Tin: 1 }),
   recipe('bronze-nails', 'Bronze nails', 'Black Forest', 'Forge', 20, { Bronze: 1 }),
@@ -96,8 +98,11 @@ export const RECIPES: readonly Recipe[] = [
   recipe('fish-wraps', 'Fish wraps', 'Plains', 'Cauldron', 1, { 'Cooked fish': 2, 'Barley flour': 4 }),
 ];
 
+/** Tools, gear, food, materials, building pieces and crafting stations. */
+export const TRACKED_RECIPES: readonly Recipe[] = [...RECIPES, ...BUILDING_RECIPES, ...STATION_RECIPES];
+
 /** Returns the recipe with [id], or undefined when the list has no such recipe. */
-export const recipeById = (id: string): Recipe | undefined => RECIPES.find((candidate) => candidate.id === id);
+export const recipeById = (id: string): Recipe | undefined => TRACKED_RECIPES.find((candidate) => candidate.id === id);
 
 /** Returns the file name of the icon for [item], for example `queens-jam.png` for Queen's jam. */
 export const iconFileName = (item: string): string =>
@@ -106,10 +111,24 @@ export const iconFileName = (item: string): string =>
 /** Returns the address of the icon for [item], for example `/icons/queens-jam.png`. */
 export const iconUrl = (item: string): string => ICON_PATH + iconFileName(item);
 
-/** Returns every item a recipe makes or uses, once each. */
+/** Returns every item a recipe makes or uses, and every source icon, once each. */
 export const recipeItems = (): string[] => [
-  ...new Set(RECIPES.flatMap((candidate) => [candidate.name, ...candidate.ingredients.map(({ item }) => item)])),
+  ...new Set(
+    TRACKED_RECIPES.flatMap((candidate) => [
+      candidate.name,
+      ...candidate.ingredients.map(({ item }) => item),
+      ...(candidate.sources ?? []).map(({ iconItem }) => iconItem),
+    ]),
+  ),
 ];
 
 /** Returns where [station] recipes are made, as a short sentence such as `Made at the Forge.` */
-export const madeAt = (station: CraftingStation): string => (station === 'Hand' ? 'Made by hand.' : `Made at the ${station}.`);
+export const madeAt = (station: CraftingStation): string => {
+  if (station === 'Hand') {
+    return 'Made by hand.';
+  }
+  if (station === 'None') {
+    return 'Placed with the hammer.';
+  }
+  return `Made at the ${station}.`;
+};
